@@ -1,0 +1,106 @@
+/* === Table === */
+.table {
+  --bs-table-bg: transparent;
+}
+
+.table.table-bordered {
+  --bs-table-bg: transparent;
+  --bs-table-border-color: var(--color-primary);
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  /* iOS 更流暢 */
+  scrollbar-color: var(--scrollbar) transparent;
+}
+
+.table thead.table_head>tr>th {
+  /* 讓所有內容單行顯示，不會換行 */
+  white-space: nowrap;
+  color: var(--color-primary);
+}
+
+.table tbody>tr>td {
+  color: var(--color-primary);
+
+  &>div>button {
+    color: var(--color-primary);
+  }
+}
+
+
+/* === DataTables === */
+/* 表格本體	 */
+div.dataTables_wrapper table.dataTable{
+	border:1px solid var(--color-primary);
+	  border-collapse: collapse;
+	
+}
+div.dataTables_wrapper table.dataTable thead th,
+div.dataTables_wrapper table.dataTable tbody td {
+  border: 1px solid #d6c1ab; /* 或改為 var(--color-primary) 的淡色版 */
+  padding: 10px 12px;
+  text-align: left;
+}
+
+/* 搜尋框	 */
+div.dataTables_wrapper div.dataTables_filter input{
+}
+
+/* 每頁筆數下拉選單	 */
+div.dataTables_wrapper .dataTables_length select{
+  padding: 0;
+  margin: 0.25rem;
+  border: 1px solid var(--color-primary);
+}
+
+/* 資訊列	 */
+div.dataTables_wrapper div.dataTables_info{
+	margin-top:16px;
+}
+
+/* 分頁按鈕基礎樣式 */
+div.dataTables_wrapper div.dataTables_paginate .paginate_button {
+  margin:16px 0;
+  
+  padding: 4px 12px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 0.95rem;
+}
+
+/* 當前頁（啟用） */
+div.dataTables_wrapper div.dataTables_paginate .paginate_button.current {
+  background: transparent;
+  color: var(--color-accent) !important;
+  border: none;
+  font-weight: bold;
+  
+  &:hover{
+  background: transparent;
+  color: var(--color-accent) !important;
+  border: none;
+  font-weight: bold;
+  opacity:var(--hover-opacity);
+  
+  }
+}
+
+/* 滑過（hover）狀態 */
+div.dataTables_wrapper div.dataTables_paginate .paginate_button:hover {
+  background: transparent;
+  color: var(--color-primary) !important;
+  border: none;
+  opacity:var(--hover-opacity);
+}
+
+
+
+
+
+
+
+

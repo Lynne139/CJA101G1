@@ -1,0 +1,25 @@
+/* === variables === */
+@import url(./admin/helpers/variables.css);
+
+/* === base === */
+@import url(./admin/base/base.css);
+
+/* === utilities === */
+
+/* === component === */
+@import url(./admin/component/button.css);
+@import url(./admin/component/form.css);
+@import url(./admin/component/hamburger_menu.css);
+@import url(./admin/component/pagination.css);
+@import url(./admin/component/panel.css);
+@import url(./admin/component/table.css);
+@import url(./admin/component/form_modal.css);
+
+/* === layouts === */
+@import url(./admin/layout/grid.css);
+@import url(./admin/layout/sidebar.css);
+
+
+/* === pages === */
+@import url(./admin/pages/index.css);
+@import url(./admin/pages/resto_info.css);

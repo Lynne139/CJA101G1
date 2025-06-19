@@ -1,0 +1,182 @@
+<div th:fragment="editModalContent">
+
+
+  <div class="modal fade no-transform" id="restoEditModal" tabindex="-1"
+    aria-hidden="true">
+    <div
+      class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content rounded-4 p-4"
+        style="background-color: var(--color-background);">
+
+        <div class="modal-header">
+          <h5 class="modal-title">編輯餐廳</h5>
+          <button type="button" class="btn-close"
+            data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+        
+        <div th:if="${errorMsg}" class="alert alert-danger">
+          <i class="fa-solid fa-triangle-exclamation me-2"></i>
+          <span th:text="${errorMsg}"></span>
+        </div>
+        
+
+          <form id="restoEditForm" data-parsley-validate
+            th:object="${resto}" th:action="@{/admin/resto_info/insert}"
+            method="post" enctype="multipart/form-data"
+            onsubmit="this.querySelector('button[type=submit]').disabled=true">
+
+            <input type="hidden" th:field="*{version}" />
+            
+
+            <div class="mb-3">
+              <label class="form-label">餐廳編號</label>
+              <!-- 顯示編號 -->
+              <input type="text" class="form-control"
+                th:value="*{restoId}" readonly>
+              <!-- 實際送出編號 -->
+              <input type="hidden" th:field="*{restoId}">
+            </div>
+
+            <div class="mb-3">
+              <label for="restoName" class="form-label">餐廳名稱 <span class="text-danger">*</span> <small class="text-muted">最多可40字</small></label>
+              <input type="text" th:field="*{restoName}" id="restoName" class="form-control" required maxlength="100">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('restoName')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('restoName')}" th:text="${err}"></span>
+              </div>
+            </div>
+
+
+            <div class="mb-3">
+              <label for="restoNameEn" class="form-label">英文名稱 <small class="text-muted">最多可40字</small></label>
+              <input type="text" th:field="*{restoNameEn}" id="restoNameEn" class="form-control" required maxlength="100">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('restoNameEn')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('restoNameEn')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">狀態 <span class="text-danger">*</span></label>
+              <div>
+                <div class="form-check form-check-inline">
+                  <input type="radio" th:field="*{isEnabled}" id="isEnabledTrue" class="form-check-input" value="true">
+                  <label for="isEnabledTrue" class="form-check-label">上架</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input type="radio" th:field="*{isEnabled}" id="isEnabledFalse" class="form-check-input" value="false">
+                  <label for="isEnabledFalse" class="form-check-label">下架</label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="restoSeatsTotal" class="form-label">容納座數 <span class="text-danger">*</span> <small class="text-muted">上限1000</small></label>
+              <input type="number" th:field="*{restoSeatsTotal}" id="restoSeatsTotal" class="form-control" required min="1">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('restoSeatsTotal')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('restoSeatsTotal')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="restoType" class="form-label">餐廳類型 <small class="text-muted">最多可30字</small></label>
+              <input type="text" th:field="*{restoType}" id="restoType" class="form-control" maxlength="50">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('restoType')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('restoType')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="restoLoc" class="form-label">樓層位置 <small class="text-muted">最多可30字</small></label>
+              <input type="text" th:field="*{restoLoc}" id="restoLoc" class="form-control" required maxlength="50">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('restoLoc')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('restoLoc')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="restoPhone" class="form-label">電話 <small class="text-muted">最多可16字</small></label>
+              <input type="tel" th:field="*{restoPhone}" id="restoPhone" class="form-control" maxlength="20">
+              <div class="text-danger" th:if="${#fields.hasErrors('restoPhone')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('restoPhone')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="restoInfo" class="form-label">餐廳簡介 <small class="text-muted">最多可150字</small></label>
+              <textarea th:field="*{restoInfo}" id="restoInfo" class="form-control auto-expand"></textarea>
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('restoInfo')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('restoInfo')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="restoContent" class="form-label">餐廳文案</label>
+              <textarea th:field="*{restoContent}" id="restoContent" class="form-control"></textarea>
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('restoContent')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('restoContent')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="uploadImg" class="form-label">圖片上傳 <small class="text-muted">只接受 PNG/JPEG/GIF 格式，檔案上限16MB</small></label>
+              <input type="file" name="uploadImg" id="uploadImg" class="form-control" accept="image/png,image/jpeg,image/gif">
+              <img id="imgPreview"
+                 th:src="${resto.restoImg != null} ?
+                         @{/admin/resto_info/img/{id}(id=${resto.restoId})} :
+                         @{/images/admin/no_img.svg}"
+                 class="img-fluid mt-2 rounded mx-auto d-block"
+                 style="max-height: 200px;" />
+     
+                  <div class="d-flex justify-content-center">
+                    <button type="button" id="btnClearImage" class="btn btn-outline-danger btn-sm mt-2 d-none">
+                      <i class="fa-solid fa-trash-can me-1 mt-2"></i> 清除圖片
+                    </button>
+                  </div>
+      
+                  <input type="hidden" id="clearImgFlag" name="clearImgFlag" value="false" />
+      
+                          
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${imageError}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:text="${imageError}"></span>
+              </div>
+            </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn_secondary "
+            data-bs-dismiss="modal">取消</button>
+          <button type="submit" id="btnSubmitEditSave"
+            class="btn btn_accent ">儲存</button>
+          </form>
+
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
