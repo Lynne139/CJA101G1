@@ -1,0 +1,30 @@
+.modal{
+background-color: rgba(rgb(0, 0, 0) 0.5);
+}
+
+.modal .modal-content{
+  background-color: var(--color-background);
+}
+
+
+
+.modal .modal-header{
+  border-bottom: 1px solid var(--color-primary);
+  padding: 18px 20px;
+}
+
+.modal .modal-title{
+	font-size:1.75rem;
+}
+
+
+.modal-dialog-scrollable{
+	  scrollbar-color: var(--scrollbar) transparent;
+}
+
+.modal input[readonly] {
+  opacity: var(--disabled-opacity);
+  background-color:var(--color-bg-panel);
+  pointer-events: none; /* 禁止滑鼠互動 */
+}
+

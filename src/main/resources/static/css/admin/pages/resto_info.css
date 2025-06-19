@@ -1,0 +1,15 @@
+/* === Modal - View === */
+.modal_sub_title{
+	font-size:1.25rem;
+	padding: 12px 0;
+	color:var(--color-secondary);
+	font-weight:var(--fw-bold);
+}
+
+.resto_img {
+  max-height: 300px;
+  width: auto;
+  object-fit: cover;
+  display: block;
+  margin: 20px auto;
+}

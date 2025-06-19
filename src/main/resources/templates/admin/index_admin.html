@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-TW" xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	  	<title>嶼蔻 - 後台管理系統</title>
+	  	
+	  	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	  	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+	  	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+	  	<link rel="stylesheet" th:href="@{/css/all_admin.css}">
+	  	
+	</head>
+
+	<body>
+		<!-- Hamburger Menu -->
+		<div class="header">
+			<button type="button" class="btn_hamburger px-4"><i class="fa-solid fa-bars"></i></button>
+		</div>		
+		
+
+		<div class="container">		
+			<!-- Sidebar -->
+			<aside class="sidebar">
+				<button type="button" class="btn_sidebar_close"><i class="fa-solid fa-xmark"></i></button>
+				<div class="sidebar_head d-flex flex-column align-items-center gap-2 my-4">
+					<a th:href="@{/admin}" class="sidebar_home">
+			    		<img th:src="@{/images/admin/logo/yuko_logo_prim.svg}" alt="logo">
+			  		</a>
+				    <div class="d-flex flex-column align-items-center">
+				    	<h5 class="sidebar_title mt-2">Maison d'Yuko</h5>
+				    	<h6 class="sidebar_subtitle">後台管理系統</h6>
+				    </div>
+			    </div>
+			
+			    <div class="admin_block d-flex justify-content-between align-items-center p-4">
+			        <span class="">管理員：Admin</span>
+			        <a href="#" class="btn btn_logout">登出</a>
+			    </div>
+			
+			    <nav class="sidebar_nav mt-4">
+					<!-- 會員管理 -->
+			    	<div class="sidebar_section"
+						th:classappend="${currentURI.startsWith('/admin/member')} ? '-active'">
+			       		<a class="sidebar_link">
+			        		<i class="fa-solid fa-user"></i> 會員管理
+			      		</a>
+                
+			      		<div class="submenu_block ps-4" 
+							th:classappend="${currentURI.startsWith('/admin/member')} ? 'show'">
+			        		<a th:href="@{/admin/member1}" th:classappend="${currentURI == '/admin/member1'} ? '-active'" class="sidebar_sub_link">會員子頁1</a>
+			      		</div>
+			    	</div>
+			
+					<!-- 員工管理 -->
+			    	<div class="sidebar_section"
+			    		th:classappend="${currentURI.startsWith('/admin/staff')} ? '-active'">
+			     		<a class="sidebar_link">
+			        		<i class="fa-solid fa-user-tie"></i> 員工管理
+			      		</a>
+                
+			     		<div class="submenu_block ps-4" 
+							th:classappend="${currentURI.startsWith('/admin/staff')} ? 'show'">
+			        		<a th:href="@{/admin/staff1}" th:classappend="${currentURI == '/admin/staff1'} ? '-active'" class="sidebar_sub_link">員工子頁1</a>
+			      		</div>
+			    	</div>
+			
+					<!-- 住宿管理 -->
+			    	<div class="sidebar_section"
+			    		th:classappend="${currentURI.startsWith('/admin/room')} ? '-active'">
+			      		<a class="sidebar_link">
+			        		<i class="fa-solid fa-bed"></i> 住宿管理
+			      		</a>
+                
+				      	<div class="submenu_block ps-4"
+							th:classappend="${currentURI.startsWith('/admin/room')} ? 'show'">
+				        	<a th:href="@{/admin/room1}" th:classappend="${currentURI == '/admin/room1'} ? '-active'" class="sidebar_sub_link">房型子頁1</a>
+				      	</div>
+			    	</div>
+			
+					<!-- 餐廳管理 -->
+			    	<div class="sidebar_section"
+			    		th:classappend="${currentURI.startsWith('/admin/resto')} ? '-active'">
+			      		<a class="sidebar_link">
+			        		<i class="fa-solid fa-utensils"></i> 餐廳管理
+			      		</a>
+                
+			      		<div class="submenu_block ps-4"
+							th:classappend="${currentURI.startsWith('/admin/resto')} ? 'show'">
+					        <a th:href="@{/admin/resto_info}" th:classappend="${currentURI == '/admin/resto_info'} ? '-active'" class="sidebar_sub_link">餐廳資訊</a>
+					        <a th:href="@{/admin/resto_timeslot}" th:classappend="${currentURI == '/admin/resto_timeslot'} ? '-active'" class="sidebar_sub_link">時段管理</a>
+					        <a th:href="@{/admin/resto_order}" th:classappend="${currentURI == '/admin/resto_order'} ? '-active'" class="sidebar_sub_link">訂單管理</a>
+			      		</div>
+			    	</div>
+			
+					<!-- 商店管理 -->
+				    <div class="sidebar_section"
+				    	th:classappend="${currentURI.startsWith('/admin/shop')} ? '-active'">
+						<a class="sidebar_link">
+					    	<i class="fa-solid fa-bag-shopping"></i> 商店管理
+					    </a>
+              
+			      		<div class="submenu_block ps-4"
+			      			th:classappend="${currentURI.startsWith('/admin/shop')} ? 'show'">
+			        		<a th:href="@{/admin/shop1}" th:classappend="${currentURI == '/admin/shop1'} ? '-active'" class="sidebar_sub_link">商品子頁1</a>
+			      		</div>
+			    	</div>
+			
+					<!-- 優惠管理 -->
+				    <div class="sidebar_section"
+				    	th:classappend="${currentURI.startsWith('/admin/coupon')} ? '-active'">
+			      		<a class="sidebar_link">
+			        		<i class="fa-solid fa-ticket"></i> 優惠管理
+			      		</a>
+                
+			      		<div class="submenu_block ps-4"
+			      			th:classappend="${currentURI.startsWith('/admin/coupon')} ? 'show'">
+			        		<a th:href="@{/admin/coupon1}" th:classappend="${currentURI == '/admin/coupon1'} ? '-active'" class="sidebar_sub_link">優惠子頁1</a>
+			      		</div>
+			    	</div>
+			
+					<!-- 客服管理 -->
+				    <div class="sidebar_section"
+				    	th:classappend="${currentURI.startsWith('/admin/cs')} ? '-active'">
+			      		<a class="sidebar_link">
+			        		<i class="fa-solid fa-bell-concierge"></i> 客服管理
+			      		</a>
+                
+			      		<div class="submenu_block ps-4"
+			      			th:classappend="${currentURI.startsWith('/admin/cs')} ? 'show'">
+			        		<a th:href="@{/admin/cs1}" th:classappend="${currentURI == '/admin/cs1'} ? '-active'" class="sidebar_sub_link">訊息子頁1</a>
+			      		</div>
+			    	</div>
+			
+					<!-- 消息管理 -->
+				    <div class="sidebar_section"
+				    	th:classappend="${currentURI.startsWith('/admin/news')} ? '-active'">
+		     	  		<a class="sidebar_link">
+		            		<i class="fa-solid fa-bullhorn"></i> 消息管理
+		          		</a>
+                  
+		          		<div class="submenu_block ps-4"
+		          			th:classappend="${currentURI.startsWith('/admin/news')} ? 'show'">
+		            		<a th:href="@{/admin/news1}" th:classappend="${currentURI == '/admin/news1'} ? '-active'" class="sidebar_sub_link">消息子頁1</a>
+		          		</div>
+		        	</div>
+		  		</nav>		
+			</aside>
+			
+			
+			<!-- Main Content -->
+			<main class="main_content" th:insert="~{${mainFragment}}"></main>	
+			
+			
+			
+			
+			
+	  </div>
+	
+	
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+		<script th:src="@{/js/admin/sidebar.js}"></script>
+		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+		<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script th:src="@{/js/admin/zh-HANT.js}"></script>
+        <script th:src="@{/js/admin/btn_loading_overlay.js}"></script>
+    
+        <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+        
+		
+		
+		
+		<!-- 依引入的fragment區塊，判別該載入的JS檔(自行增設) -->
+		
+		<!-- 餐廳 -->
+		<script th:if="${mainFragment == 'admin/fragments/resto/restoInfo'}"
+        src="https://cdn.tiny.cloud/1/5ydxgx8itt1g2ztd9z0kgct3fry3wndyy5h3mgq55cfw1xxx/tinymce/6/tinymce.min.js"
+        referrerpolicy="origin"></script> 
+		<script th:if="${mainFragment == 'admin/fragments/resto/restoInfo'}"
+        th:src="@{/js/admin/resto/resto_info.js}"></script>
+
+		<script th:if="${mainFragment == 'admin/fragments/resto/restoTimeslot'}"
+        th:src="@{/js/admin/resto/resto_timeslot.js}"></script>
+
+		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrder'}"
+        th:src="@{/js/admin/resto/resto_order.js}"></script>
+		
+		
+
+	</body>
+
+</html>

@@ -1,0 +1,10 @@
+.index_logo{
+  height: 100vh;
+  width: 100%;
+}
+
+.index_logo img{
+display: inline-block;
+transform: scale(3);
+opacity: 0.1;
+}

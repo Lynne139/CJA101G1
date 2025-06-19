@@ -1,0 +1,8 @@
+/* === panel === */
+.panel {
+  background: var(--color-bg-panel);
+  border-radius: 0.5rem;
+  box-shadow: var(--panel-shadow);
+  padding: 2rem 1.5rem;
+  margin-bottom: 1.5rem;
+}

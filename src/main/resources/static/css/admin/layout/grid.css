@@ -1,0 +1,18 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+main {
+  width: calc(100% - var(--aside-width));
+  margin-left: var(--aside-width);
+  min-height: 100vh;
+}
+
+@media(max-width:767.98px) {
+  main.main_content {
+    margin: 0 auto;
+    width: 100%;
+  }
+}

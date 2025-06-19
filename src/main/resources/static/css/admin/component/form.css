@@ -1,0 +1,68 @@
+/* === form === */
+input.form-control.form-control:focus,
+select.form-select.form-select:focus,
+textarea.form-control.form-control:focus {
+  background-color: transparent;
+  color: var(--color-primary);
+  box-shadow: var(--form-focus-shadow);
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.form_control {
+  &::placeholder {
+    color: var(--color-secondary);
+  }
+}
+
+.form-control {
+  border: 1px solid var(--color-primary);
+  background-color: transparent;
+}
+
+.form-select {
+  border: 1px solid var(--color-primary);
+  color: var(--color-secondary);
+  background-color: transparent;
+}
+
+/* === radio === */
+.custom_radio {
+  /* display: none; */
+}
+
+.custom_radio+label {
+  position: relative;
+  padding-left: 25px;
+  cursor: pointer;
+  line-height: 20px;
+}
+
+.custom_radio+label::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  background-color: transparent;
+}
+
+.custom_radio:checked+label::before {
+  border-color: #FF7449;
+  /* ✅ 自訂選取顏色 */
+  background-color: #FF7449;
+}
+
+.custom_radio:checked+label::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+}

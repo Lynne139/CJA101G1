@@ -1,0 +1,34 @@
+:root {
+
+  /* === color === */
+  --color-background: #F4EDE1;
+  --color-primary: #7E4E24;
+  --color-secondary: #B88D67;
+  --color-tertiary: #9D3C3C;
+  --color-accent: #FF7449;
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --color-success: #55AE6E;
+  --color-error: #E96060;
+
+  --color-bg-panel: #ffffff52;
+  --panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --scrollbar:#d5b4964e;
+
+  /* === effect === */
+  --hover-opacity: 80%;
+  --form-focus-shadow: 0 0 4px 0 var(--color-accent);
+  --disabled-opacity: 40%;
+  
+
+  /* === layout === */
+  --aside-width: 260px;
+
+  
+    /* font weight */
+    --fw-regular: 400;
+    --fw-medium: 500;
+    --fw-bold: 700;
+    --fw-black: 900;
+
+}

@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS maison;
+CREATE DATABASE IF NOT EXISTS maison;
+USE maison;
+
 -- 會員等級種類
 CREATE TABLE member_level_type (
 	member_level VARCHAR(30) NOT NULL PRIMARY KEY,
@@ -128,24 +132,21 @@ VALUES
 ('系統管理員', '擁有全站存取權限'),
 ('客服專員', '可回覆顧客留言與查詢訂單');
 
--- 員工 Employee_id
+-- 員工 
 Create table employee (
 Employee_id int auto_increment primary key not null,
-Role_id int not null ,
+Role_id int not null,
 Name Varchar(50) not null,
 Status boolean default true not null,
 Created_date date not null,
 Password Varchar(50) not null,
-job Varchar(50),
-department varchar(50),
-employee_photo longblob,
 foreign key (Role_id) references Role_list (Role_id)
 );
 
-INSERT INTO EMPLOYEE (Role_id, name , CREATED_DATE, PASSWORD , job, department)
+INSERT INTO EMPLOYEE (ROLE_ID, NAME, CREATED_DATE, PASSWORD)
 VALUES 
-( 1, '吳永志', '2025-01-01', '1234' , "總經理" , "總經理室" ),
-( 2, '吳冠宏', '2025-02-15', '1234' , "客服專員" , "客服部" );
+(1, '吳永志', '2025-01-01', '1234'),
+(2, '吳冠宏', '2025-02-15', '1234');
 
 
 -- 客服留言 
@@ -410,7 +411,7 @@ VALUES
 CREATE TABLE ROOM_ORDER (
     ROOM_ORDER_ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     MEMBER_ID INT NOT NULL,
-    ORDER_DATE DATETIME NOT NULL,
+    ORDER_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 自動抓訂單進入時間
     ROOM_ORDER_STATUS TINYINT(1) NOT NULL,  -- 0:取消, 1:成立, 2:完成
     ROOM_AMOUNT INT NOT NULL,
     CHECK_IN_DATE DATETIME NOT NULL,
@@ -426,10 +427,10 @@ CREATE TABLE ROOM_ORDER (
 ALTER TABLE room_order AUTO_INCREMENT = 1000;
 
 
-INSERT INTO ROOM_ORDER (MEMBER_ID, ORDER_DATE, ROOM_ORDER_STATUS, ROOM_AMOUNT, CHECK_IN_DATE, CHECK_OUT_DATE, COUPON_CODE, DISCOUNT_AMOUNT, ACTUAL_AMOUNT, PROJECT_ADD_ON)
+INSERT INTO ROOM_ORDER (MEMBER_ID, ROOM_ORDER_STATUS, ROOM_AMOUNT, CHECK_IN_DATE, CHECK_OUT_DATE, COUPON_CODE, DISCOUNT_AMOUNT, ACTUAL_AMOUNT, PROJECT_ADD_ON)
 VALUES 
-(1, '2025-05-18 08:30:00', 1, 5000, '2025-06-01 15:00:00', '2025-06-03 11:00:00', 'A2505AAA', 200, 4800, 0),
-(2, '2025-05-17 12:00:00', 2, 7500, '2025-06-05 14:00:00', '2025-06-07 12:00:00', 'B2505AAA', 500, 7000, 1);
+(1, 1, 50000, '2025-06-01 15:00:00', '2025-06-03 11:00:00', 'A2505AAA', 100, 49900, 0),
+(2, 2, 60000, '2025-06-05 14:00:00', '2025-06-07 12:00:00', 'B2505AAA', 150, 59850, 1);
 
 
 -- 房型 
@@ -460,10 +461,10 @@ CREATE TABLE room (
 	CONSTRAINT room_id_pk PRIMARY KEY (room_id)
 );
 
-INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (201, 1, null, 1, 0);
-INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (202, 2, null, 1, 0);
-INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (203, 3, null, 1, 0);
-INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (204, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (1101, 1, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (2101, 2, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3101, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4101, 4, null, 1, 0);
 
 
 -- 住宿訂單明細 
@@ -484,8 +485,8 @@ CREATE TABLE ROOM_ORDER_LIST (
 
 INSERT INTO ROOM_ORDER_LIST (ROOM_TYPE_ID, ROOM_ID, ROOM_ORDER_ID, NUMBER_OF_PEOPLE, SPECIAL_REQ, ROOM_PRICE, ROOM_AMOUNT)
 VALUES
-(1, 201, 1000, 2, 'No smoking', 2500, 1),
-(3, 203, 1001, 3, 'Extra bed', 3000, 2);
+(1, 1101, 1000, 2, 'No smoking', 50000, 1),
+(3, 3101, 1001, 6, 'Extra bed', 30000, 2);
 
 -- 以下設定: 自增主鍵的起點值，也就是初始值，取值範圍是1 .. 655355 --
 set auto_increment_offset=1;
@@ -512,14 +513,15 @@ CREATE TABLE room_type_schedule (
 ) AUTO_INCREMENT = 1;
 
 
-INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 3, 10, 6, '2025-05-13');
-INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 4, 10, 2, '2025-05-14');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 1, 10, 1, '2025-05-18');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 2, 10, 2, '2025-05-17');
 
 
 -- 餐廳 
 CREATE TABLE resto (
-	resto_id TINYINT NOT NULL, -- 0:餐廳A、1:餐廳B
+	resto_id INT AUTO_INCREMENT NOT NULL, -- PK用流水號
     resto_name VARCHAR(40) NOT NULL,
+    resto_name_en VARCHAR(40),
     resto_seats_total INT NOT NULL,
     resto_info VARCHAR(150),
     resto_type VARCHAR(30),
@@ -528,82 +530,98 @@ CREATE TABLE resto (
     resto_loc VARCHAR(30),
     resto_img MEDIUMBLOB,
     is_enabled BOOLEAN NOT NULL DEFAULT TRUE, -- 上下架控制
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,  -- 軟刪除使用
+
     
 	CONSTRAINT resto_pk PRIMARY KEY (resto_id)
 );
+ALTER TABLE resto ADD UNIQUE(resto_name);
+ALTER TABLE resto ADD COLUMN version INT NOT NULL DEFAULT 0;
 
-INSERT INTO resto (resto_id,resto_name,resto_seats_total,resto_info,
-	resto_type,resto_content,resto_phone,resto_loc,resto_img,is_enabled) 
+
+-- PK編號從1開始
+ALTER TABLE resto AUTO_INCREMENT = 1;
+
+INSERT INTO resto (resto_name, resto_name_EN, resto_seats_total, resto_info,
+	resto_type, resto_content, resto_phone, resto_loc, resto_img) 
 VALUES 
-	(0, '沐光餐廳 Luma Buffet', 250, '餐廳簡介A', '海島風味、中西式自助餐', '餐廳文案A', '091234567 #123', '1F 中央庭園左側', NULL, TRUE),
-	(1, '嶼間餐館 Islespace Bistro', 200, '餐廳簡介B', '精緻套餐', '餐廳文案B', '091234567 #456', '1F 大廳左側', NULL, TRUE);
+	('沐光餐廳', 'Luma Buffet', 250, '餐廳簡介A', '海島風味、中西式自助餐', '餐廳文案A', '091234567 #123', '1F 中央庭園左側', NULL),
+	('嶼間餐館', 'Islespace Bistro', 200, '餐廳簡介B', '精緻套餐', '餐廳文案B', '091234567 #456', '1F 大廳左側', NULL);
 
 
 -- 區段
-CREATE TABLE period (
-  period_id TINYINT NOT NULL, -- 0:早餐、1:午餐、2:午茶、3:晚餐
+CREATE TABLE resto_period (
+  period_id INT AUTO_INCREMENT NOT NULL, -- PK用流水號
   period_name VARCHAR(20) NOT NULL,
+  is_deleted BOOLEAN NOT NULL DEFAULT FALSE,  -- 軟刪除使用
   
-  CONSTRAINT period_pk PRIMARY KEY (period_id)
+  CONSTRAINT resto_period_pk PRIMARY KEY (period_id)
 );
+-- PK編號從1開始
+ALTER TABLE resto AUTO_INCREMENT = 1;
 
-INSERT INTO period (period_id, period_name)
+INSERT INTO resto_period (period_name)
 VALUES 
-  (0, '早餐'),
-  (1, '午餐'),
-  (2, '午茶'),
-  (3, '晚餐');
+  ('早餐'),
+  ('午餐'),
+  ('午茶'),
+  ('晚餐'),
+  ('宵夜');
   
   
   -- 時段
- CREATE TABLE timeslot (
-  timeslot_id TINYINT NOT NULL,
-  period_id TINYINT NOT NULL,
+ CREATE TABLE resto_timeslot (
+  timeslot_id INT AUTO_INCREMENT NOT NULL, -- PK用流水號
+  period_id INT NOT NULL,
   display_name VARCHAR(20) NOT NULL,
   start_time TIME NOT NULL,
   end_time TIME NOT NULL,
+  is_deleted BOOLEAN NOT NULL DEFAULT FALSE,  -- 軟刪除使用
   
-  CONSTRAINT timeslot_pk PRIMARY KEY (timeslot_id),
-  CONSTRAINT timeslot_period_fk FOREIGN KEY (period_id) REFERENCES period(period_id) -- 方便前端依區段渲染
+  CONSTRAINT resto_timeslot_pk PRIMARY KEY (timeslot_id),
+  CONSTRAINT resto_timeslot_period_fk FOREIGN KEY (period_id) REFERENCES resto_period(period_id) -- 方便前端依區段渲染
 );
+-- PK編號從1開始
+ALTER TABLE resto AUTO_INCREMENT = 1;
 
-INSERT INTO timeslot (timeslot_id, period_id, display_name, start_time, end_time)
+INSERT INTO resto_timeslot (period_id, display_name, start_time, end_time)
 VALUES 
-  (0, 0, '07:00', '07:00:00', '08:30:00'), -- 早餐0
-  (1, 0, '08:30', '08:30:00', '10:00:00'),
-  (2, 1, '11:30', '11:30:00', '13:00:00'), -- 午餐1
-  (3, 1, '13:00', '13:00:00', '14:30:00'),
-  (4, 2, '15:00', '15:00:00', '16:30:00'), -- 午茶2
-  (5, 3, '17:30', '17:30:00', '19:00:00'), -- 晚餐3
-  (6, 3, '19:00', '19:00:00', '20:30:00');
+  (1, '07:00', '07:00:00', '08:30:00'), -- 早餐1
+  (1, '08:30', '08:30:00', '10:00:00'),
+  (2, '11:30', '11:30:00', '13:00:00'), -- 午餐2
+  (3, '13:00', '13:00:00', '14:30:00'),
+  (3, '15:00', '15:00:00', '16:30:00'), -- 午茶3
+  (4, '17:30', '17:30:00', '19:00:00'), -- 晚餐4
+  (4, '19:00', '19:00:00', '20:30:00');
   
   
  -- 餐廳＋區段＋時段（中介）
 CREATE TABLE resto_period_timeslot (
-  resto_id TINYINT NOT NULL,
-  period_id TINYINT NOT NULL,
-  timeslot_id TINYINT NOT NULL,
+  resto_id INT NOT NULL,
+  period_id INT NOT NULL,
+  timeslot_id INT NOT NULL,
   is_enabled BOOLEAN NOT NULL DEFAULT TRUE, -- 上下架控制
   
   CONSTRAINT resto_period_timeslot_pk PRIMARY KEY (resto_id, period_id, timeslot_id),
   CONSTRAINT resto_period_timeslot_resto_fk FOREIGN KEY (resto_id) REFERENCES resto(resto_id),
-  CONSTRAINT resto_period_timeslot_period_fk FOREIGN KEY (period_id) REFERENCES period(period_id),
-  CONSTRAINT resto_period_timeslot_timeslot_fk FOREIGN KEY (timeslot_id) REFERENCES timeslot(timeslot_id)
+  CONSTRAINT resto_period_timeslot_period_fk FOREIGN KEY (period_id) REFERENCES resto_period(period_id),
+  CONSTRAINT resto_period_timeslot_timeslot_fk FOREIGN KEY (timeslot_id) REFERENCES resto_timeslot(timeslot_id)
 );
 
 INSERT INTO resto_period_timeslot (resto_id, period_id, timeslot_id, is_enabled)
 VALUES 
-  -- 0餐廳A  0早(2)、1中(2)、2午茶(1)、3晚(2)
-	(0, 0, 0, TRUE), (0, 0, 1, TRUE),
-	(0, 1, 2, TRUE), (0, 1, 3, TRUE),
-	(0, 2, 4, TRUE),
-	(0, 3, 5, TRUE), (0, 3, 6, TRUE),
+  -- 1餐廳A  1早(2)、2中(2)、3午茶(1)、4晚(2)
+	(1, 1, 1, TRUE), (1, 1, 2, TRUE),
+	(1, 2, 3, TRUE), (1, 2, 4, TRUE),
+	(1, 3, 5, TRUE),
+	(1, 4, 6, TRUE), (1, 4, 7, TRUE),
 
-  -- 1餐廳B  1中(2)、3晚(2)
-	(1, 0, 0, FALSE), (1, 0, 1, FALSE),
-	(1, 1, 2, TRUE), (1, 1, 3, TRUE),
-	(1, 2, 4, FALSE),
-	(1, 3, 5, TRUE), (1, 3, 6, TRUE);
+  -- 2餐廳B  2中(2)、4晚(2)
+	(2, 1, 1, FALSE), (2, 1, 2, FALSE),
+	(2, 2, 3, TRUE), (2, 2, 4, TRUE),
+	(2, 3, 5, FALSE),
+	(2, 4, 6, TRUE), (2, 4, 7, TRUE);
+
 
 -- 訂位訂單
 CREATE TABLE resto_order (
@@ -611,58 +629,83 @@ CREATE TABLE resto_order (
     
     member_id INT NOT NULL,
 	room_order_id INT,
-    resto_id TINYINT NOT NULL,
+    resto_id INT NOT NULL,
     
     regi_date DATE NOT NULL,
-    regi_period_id TINYINT NOT NULL,
-    regi_timeslot_id TINYINT NOT NULL,
+    regi_period_id INT NOT NULL,
+    regi_timeslot_id INT NOT NULL,
     regi_seats INT NOT NULL,
     high_chairs INT DEFAULT 0,
     regi_req VARCHAR(200),
     
-    order_guest_lastname VARCHAR(30) NOT NULL,
-    order_guest_firstname VARCHAR(30) NOT NULL,
+    -- 歷史訂單快照
+    -- resto
+    snapshot_resto_name VARCHAR(40),
+	snapshot_resto_name_en VARCHAR(40),
+    -- period
+	snapshot_period_name VARCHAR(20),
+    -- timeslot
+	snapshot_timeslot_display_name VARCHAR(20),
+
+    
+     -- 訂單客戶資料
+    order_guest_name VARCHAR(30) NOT NULL,
     order_guest_phone VARCHAR(10) NOT NULL,
     order_guest_email VARCHAR(60) NOT NULL,
-    order_time DATETIME,
-    order_status TINYINT NOT NULL DEFAULT 1, -- 0:已取消, 1:預約成立, 2:訂單完成
+	order_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 自動抓訂單進入時間
+    
+	-- 狀態與時效欄位
+	order_status TINYINT NOT NULL DEFAULT 1,  -- 0:取消, 1:成立, 2:保留, 3:完成, 4:逾時
+	reserve_expire_time DATETIME DEFAULT NULL, -- 自動逾時時間（regi_date + timeslot.start_time + 等待分鐘）
+
     
 	CONSTRAINT resto_order_pk PRIMARY KEY (resto_order_id),
     CONSTRAINT resto_order_member_fk FOREIGN KEY (member_id) REFERENCES member (member_id),
     CONSTRAINT resto_order_room_order_fk FOREIGN KEY (room_order_id) REFERENCES room_order (room_order_id),
 	CONSTRAINT resto_order_resto_fk FOREIGN KEY (resto_id) REFERENCES resto (resto_id),
-    CONSTRAINT resto_order_period_fk FOREIGN KEY (regi_period_id) REFERENCES period(period_id),
-    CONSTRAINT resto_order_timeslot_fk FOREIGN KEY (regi_timeslot_id) REFERENCES timeslot(timeslot_id)
+    CONSTRAINT resto_order_period_fk FOREIGN KEY (regi_period_id) REFERENCES resto_period(period_id),
+    CONSTRAINT resto_order_timeslot_fk FOREIGN KEY (regi_timeslot_id) REFERENCES resto_timeslot(timeslot_id)
 );
+-- 訂單編號從200開始
+ALTER TABLE resto_order AUTO_INCREMENT = 200;
 
-INSERT INTO resto_order (resto_order_id,member_id,room_order_id,resto_id,regi_date,regi_period_id,
-regi_timeslot_id,regi_seats,high_chairs,regi_req,order_guest_lastname,order_guest_firstname,
-order_guest_phone,order_guest_email,order_time,order_status) 
+INSERT INTO resto_order ( member_id, room_order_id, resto_id, 
+regi_date, regi_period_id, regi_timeslot_id, regi_seats, high_chairs, regi_req,
+  snapshot_resto_name, snapshot_resto_name_en, snapshot_period_name, snapshot_timeslot_display_name,
+  order_guest_name, order_guest_phone, order_guest_email, 
+  order_status
+)
 VALUES 
-	(NULL,1,1000,0,'2025-05-20',3,5,5,1,NULL,'李','伊皓','0912345678','one@gmail.com','2025-05-13 18:00:00',2),
-	(NULL,1,1001,0,'2025-05-21',0,0,5,1,NULL,'李','伊皓','0912345678','one@gmail.com','2025-05-13 18:00:00',2),
-	(NULL,6,NULL,1,'2025-05-21',1,2,3,0,NULL,'王','珊蔚','0912345678','three@gmail.com','2025-05-10 10:30:05',2);
-
+	(2,1001,1,'2025-06-05',4,6,6,1,NULL, '沐光餐廳', 'Luma Buffet', '晚餐', '17:30', '張書涵','0912345678','shuhan.chang@example.com',1),
+	(2,1001,1,'2025-06-06',1,2,6,1,NULL, '沐光餐廳', 'Luma Buffet', '早餐', '08:30', '張書涵','0912345678','shuhan.chang@example.com',1),
+	(2,1001,1,'2025-06-06',2,3,6,1,NULL, '沐光餐廳', 'Luma Buffet', '午餐', '11:30', '張書涵','0912345678','shuhan.chang@example.com',1),
+	(2,1001,1,'2025-06-06',4,7,6,1,NULL, '沐光餐廳', 'Luma Buffet', '晚餐', '19:00', '張書涵','0912345678','shuhan.chang@example.com',1),
+	(2,1001,1,'2025-06-07',1,1,6,1,NULL, '沐光餐廳', 'Luma Buffet', '早餐', '07:00', '張書涵','0912345678','shuhan.chang@example.com',1),
+	(3,NULL,2,'2025-06-10',2,3,3,0,NULL, '嶼間餐館', 'Islespace Bistro', '晚餐', '11:30', '周柏睿','0933444555','boerh.chou@example.com',1);
+    
 
 -- 餐廳預訂表
 CREATE TABLE resto_reservation (
 	resto_reserve_id INT AUTO_INCREMENT NOT NULL ,
-    resto_id TINYINT NOT NULL,
+    resto_id INT NOT NULL,
     reserve_date DATE NOT NULL,
-    reserve_period_id TINYINT NOT NULL,
-    reserve_timeslot_id TINYINT NOT NULL,
+    reserve_period_id INT NOT NULL,
+    reserve_timeslot_id INT NOT NULL,
     resto_seats_total INT NOT NULL, -- 後端抓餐廳設定寫入
     reserve_seats_total INT DEFAULT 0,
     
 	CONSTRAINT resto_reservation_pk PRIMARY KEY (resto_reserve_id),
     CONSTRAINT resto_reservation_resto_fk FOREIGN KEY (resto_id) REFERENCES resto (resto_id),
-	CONSTRAINT resto_reservation_period_fk FOREIGN KEY (reserve_period_id) REFERENCES period(period_id),
-	CONSTRAINT resto_reservation_timeslot_fk FOREIGN KEY (reserve_timeslot_id) REFERENCES timeslot(timeslot_id)
+	CONSTRAINT resto_reservation_period_fk FOREIGN KEY (reserve_period_id) REFERENCES resto_period(period_id),
+	CONSTRAINT resto_reservation_timeslot_fk FOREIGN KEY (reserve_timeslot_id) REFERENCES resto_timeslot(timeslot_id)
 );
 
-INSERT INTO resto_reservation (resto_reserve_id,resto_id,reserve_date,
+INSERT INTO resto_reservation (resto_id,reserve_date,
 reserve_period_id,reserve_timeslot_id,resto_seats_total,reserve_seats_total) 
 VALUES 
-	(NULL,0,'2025-05-20',3,5,250,5),
-	(NULL,0,'2025-05-21',0,0,250,5),
-	(NULL,1,'2025-05-21',1,2,200,3);
+	(1,'2025-06-05',4,6,250,6),
+	(1,'2025-06-06',1,2,250,6),
+	(1,'2025-06-06',2,3,250,6),
+	(1,'2025-06-06',4,7,250,6),
+	(1,'2025-06-07',1,1,250,6),
+	(2,'2025-06-10',2,3,200,3);
