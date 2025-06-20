@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 設定 favicon -->
+    <link rel="icon" href="./image/logo1_big.png" type="image/png">
+    <title> 首頁 | 嶼蔻 Maison d’Yuko</title>
+    <!-- 載入slick套件 -->
+    <link rel="stylesheet" href="./vendor/slick/slick.css">
+    <link rel="stylesheet" href="./vendor/slick/slick-theme.css">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <div class="logo" onclick="goHome()">
+        <img src="./image/logo_1_closer.png" alt="Logo" class="logo-image">
+        <span class="logo-text">嶼蔻 Maison d’Yuko</span>
+    </div>
+    <nav class="navbar">
+      <div class="menu-item">
+        飯店介紹
+        <div class="dropdown">
+          <a href="#">關於我們</a>
+          <a href="roomtype_info.html">房型介紹</a>
+          <a href="#">設施介紹</a>
+          <a href="#">服務項目</a>
+        </div>
+      </div>
+      <div class="menu-item">
+        最新消息
+        <div class="dropdown">
+          <a href="#">最新消息</a>
+          <a href="#">媒體報導</a>
+        </div>
+      </div>
+      <div class="menu-item">線上訂房</div>
+      <div class="menu-item">嶼蔻選物</div>
+      <div class="menu-item">嶼蔻饗食</div>
+      <div class="menu-item">交通方式</div>
+      <div class="menu-item">聯絡我們</div>
+    </nav>
+  </header>
+
+    <div class="slider">
+        <div><img src="./image/roomtype_1.png"></div>
+        <div><img src="./image/roomtype_2.png"></div>
+        <div><img src="./image/roomtype_3.png"></div>
+        <div><img src="./image/roomtype_4.png"></div>   
+    </div>
+
+  <section class="content-toggle">
+    <button onclick="toggleContent('news')">消息</button>
+    <button onclick="toggleContent('media')">媒體</button>
+  </section>
+
+  <section id="contentDisplay">
+    <h2>消息標題</h2>
+    <p>消息內容...</p>
+  </section>
+
+  <script src="./vendor/jquery/jquery-3.7.1.min.js"></script>
+  <script src="./vendor/slick/slick.min.js"></script>
+  <script src="./js/script.js"></script>
+</body>
+</html>
