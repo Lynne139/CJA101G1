@@ -46,6 +46,7 @@ public class AdminIndexController {
     } 
     
     // === 員工管理 ===
+    // === 新增/查詢 ===
     @GetMapping("/staff1")
     public String staff1(HttpServletRequest request,Model model) {
 
@@ -55,6 +56,16 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
     } 
+    // === 權限管理 ===
+    @GetMapping("/staff2")
+    public String staff2(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/staff/staff2";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    }
     
     // === 房間管理 ===
     @GetMapping("/room1")
