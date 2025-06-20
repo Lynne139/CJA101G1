@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 設定 favicon -->
+  <link rel="icon" href="./image/logo1_big.png" type="image/png">
+  <title> 房型介紹 | 嶼蔻 Maison d’Yuko</title>
+  <!-- 載入slick套件 -->
+  <link rel="stylesheet" href="./vendor/slick/slick.css">
+  <link rel="stylesheet" href="./vendor/slick/slick-theme.css">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+  <div class="logo" onclick="goHome()">
+    <img src="./image/logo_1_closer.png" alt="Logo" class="logo-image">
+    <span class="logo-text">嶼蔻 Maison d’Yuko</span>
+  </div>
+
+  <nav class="navbar">
+    <div class="menu-item">飯店介紹
+      <div class="dropdown">
+        <a href="#">關於我們</a>
+        <a href="#">房型介紹</a>
+        <a href="#">設施介紹</a>
+        <a href="#">服務項目</a>
+      </div>
+    </div>
+    <div class="menu-item">最新消息
+      <div class="dropdown">
+        <a href="#">最新消息</a>
+        <a href="#">媒體報導</a>
+      </div>
+    </div>
+    <div class="menu-item">線上訂房</div>
+    <div class="menu-item">嶼蔻選物</div>
+    <div class="menu-item">嶼蔻饗食</div>
+    <div class="menu-item">交通方式</div>
+    <div class="menu-item">聯絡我們</div>
+  </nav>
+
+  <main class="room-container">
+    <h1 class="room-title">房型介紹 Room Type</h1>
+
+    <div class="room-box">
+      <div class="room-image">
+        <img src="./image/roomtype_1.png" alt="房型圖片">
+      </div>
+      <div class="room-info">
+        <h2>雙人房</h2>
+        <p>這間雙人房提供舒適的住宿環境，適合情侶或朋友共享。房間內設有雙人床、獨立浴室和基本設施，讓您在旅途中享受放鬆的時光。</p>
+        <p><strong>坪數：</strong>12 坪</p>
+        <p><strong>床型：</strong>雙人床一張</p>
+        <p><strong>容納人數：</strong>2 人</p>
+        <a href="room-detail-1.html" class="read-more-btn">Read More</a>
+      </div>
+    </div>
+
+    <div class="room-box">
+      <div class="room-image">
+        <img src="./image/roomtype_2.png" alt="房型圖片">
+      </div>
+      <div class="room-info">
+        <h2>家庭房</h2>
+        <p>這間家庭房適合家庭入住，空間寬敞，配有雙人床和兩張單人床，適合4人入住。</p>
+        <ul>
+          <li><strong>坪數：</strong>20 坪</li>
+          <li><strong>床型：</strong>雙人床一張 + 單人床兩張</li>
+          <li><strong>容納人數：</strong>4 人</li>
+        </ul>
+        <a href="room-detail-2.html" class="read-more-btn">Read More</a>
+      </div>
+    </div>
+
+    <div class="room-box">
+      <div class="room-image">
+        <img src="./image/roomtype_3.png" alt="房型圖片">
+      </div>
+      <div class="room-info">
+        <h2>豪華套房</h2>
+        <p>這間豪華套房提供最頂級的設施與舒適空間，讓您享受高端的住宿體驗。</p>
+        <ul>
+          <li><strong>坪數：</strong>35 坪</li>
+          <li><strong>床型：</strong>特大雙人床</li>
+          <li><strong>容納人數：</strong>2 人</li>
+        </ul>
+        <a href="room-detail-3.html" class="read-more-btn">Read More</a>
+      </div>
+    </div>
+
+    <div class="room-box">
+      <div class="roomtype-slider">
+        <div><img src="./image/roomtype_4.png" alt="房型圖片"></div>
+        <div><img src="./image/roomtype_4-1.png" alt="房型圖片"></div>
+        <div><img src="./image/roomtype_4-2.png" alt="房型圖片"></div>
+      </div>
+      <div class="room-info">
+        <h2>單人房</h2>
+        <p>這間單人房適合商務旅客或獨自旅行者，簡單舒適。</p>
+        <ul>
+          <li><strong>坪數：</strong>8 坪</li>
+          <li><strong>床型：</strong>單人床一張</li>
+          <li><strong>容納人數：</strong>1 人</li>
+        </ul>
+        <a href="room-detail-4.html" class="read-more-btn">Read More</a>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="./vendor/jquery/jquery-3.7.1.min.js"></script>
+  <script src="./vendor/slick/slick.min.js"></script>
+  <script src="./js/roomtype.js"></script>
+</body>
+
+</html>
