@@ -1,84 +1,92 @@
+<!-- index.html -->
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maison d'Yuko</title>
-  <link href="/room_type/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/room_type/css/style.css">
+  <title>Maison d’Yuko</title>
+  <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
+    integrity="sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
 
   <!-- Header -->
-  <header class="d-flex justify-content-between align-items-center p-3">
-    <div class="fw-bold text-brown">Maison d'Yuko</div>
-    <div class="d-flex">
-      <div class="d-none d-lg-block">
-        <img src="./images/icon/hp_member.png" alt="member" class="logo-header" />
-        <a href="#">會員登入</a>
-      </div>
-      <a href="#" id="menuToggle" class="ml-lg-3">☰ MENU</a>
+  <!-- 匯入 header.html -->
+  <div th:replace="~{fragments/header :: header}"></div>
+
   </header>
   <!-- main -->
   <section class="hero-image my-lg-3" style="background-color: #fdf6ef;">
     <!-- 主圖 -->
-    <img src="./images/homepage_02.png" alt="Maison Hero Image" class="hero-background">
+    <img th:src="@{/images/homepage_01.png}" alt="Maison Hero Image" class="hero-background">
 
     <!-- 前景文字 -->
     <div id="banner-text">
-      <h1 class="text-white mid-right">Bienvenue à la Maison d'Yuko</h1>
+      <h1 class="text-white mid-right">Bienvenue à la Maison d’Yuko</h1>
       <p class="text-white mid-right-p">在這座海島，我們邀請您慢下來</p>
     </div>
 
     <!-- 疊加 LOGO -->
-    <img src="./images/logo/logo_hp.png" alt="浮出的logo" class="logo-overlay">
+    <img th:src="@{/images/logo/logo_hp.png}" alt="浮出的logo" class="logo-overlay">
   </section>
 
   <!-- 子選單 Navbar -->
-  <nav class="sub-navbar d-flex justify-content-center">
+  <nav class="sub-navbar d-flex justify-content-center align-items-center">
     <ul class="nav">
+      <li class="nav-item"><a class="nav-link" href="#">關於嶼蔻</a></li>
+      <li class="nav-item"><a class="nav-link" href="#">最新消息</a></li>
       <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">關於嶼蔻</a>
+        <a class="nav-link dropdown-toggle" href="#" tabindex="0">探索嶼蔻</a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#">品牌故事</a></li>
-          <li><a class="dropdown-item" href="#">環境簡介</a></li>
+          <li><a class="dropdown-item" href="#">珍饈美饌</a></li>
+          <li><a class="dropdown-item" href="#">多元設施</a></li>
         </ul>
       </li>
-      <li class="nav-item"><a class="nav-link" href="#news">最新消息</a></li>
-      <li class="nav-item"><a class="nav-link" href="#dining">探索餐廳</a></li>
       <li class="nav-item"><a class="nav-link" href="#rooms">精緻客房</a></li>
       <li class="nav-item"><a class="nav-link" href="#faq">交通資訊</a></li>
       <li class="nav-item"><a class="nav-link" href="#footer">聯絡我們</a></li>
+      <li class="nav-item"><a class="nav-link" href="#faq">常見問題</a></li>
     </ul>
+
   </nav>
 
   <!-- Sticky 右側按鈕 -->
   <div class="sticky-icons d-none d-lg-block">
-    <a href="#"><span>🛏<br>線上訂房</span></a>
-    <a href="#"><span>👜<br>帳號選物</span></a>
-    <a href="#"><span>🍽<br>餐廳訂位</span></a>
+    <a href="#"><img th:src="@{/images/icon/bed.svg}" alt="bed" class="icon"/><br>線上訂房</span></a>
+    <a href="#"><img th:src="@{/images/icon/bag.svg}" alt="bag" class="icon"/><br>帳號選物</span></a>
+    <a href="#"><img th:src="@{/images/icon/dish.svg}" alt="dish" class="icon"/><br>餐廳訂位</span></a>
   </div>
 
   <!-- Overlay Full Menu -->
   <div class="overlay-menu" id="overlayMenu">
     <div class="overlay-menu-header d-flex justify-content-between align-items-start">
+      <div class="overlay-mobile-menu d-flex justify-content-between align-items-center p-3">
+        <div class="mb-menu-header">Maison d’Yuko</div>
+      </div>
       <div class="overlay-logo-contact mb-5">
-        <!-- <img src="./images/logo/logo_hp.png" alt="logo" class="overlay-logo mb-3" /> -->
-        <div class="overlay-title">嶼蔻渡假村 Maison d'Yuko</div>
-        <!-- <div class="overlay-contact">
+        <img th:src="@{/images/logo/logo_hp.png}" alt="logo" class="overlay-logo mb-3" />
+        <div class="overlay-title">嶼蔻渡假村 Maison d’Yuko</div>
+        <div class="overlay-contact">
           <div>+886-7-123-4567</div>
           <div>service@maisondyuko.com</div>
-        </div> -->
+        </div>
       </div>
       <div class="close-btn" id="menuClose">&times;</div>
     </div>
     <div class="overlay-center">
+      <div class="overlay-menu-member px-5 mb-5 d-flex justify-content-center">
+        <img th:src="@{/images/icon/member.svg}" alt="member" class="text-center" style="padding:0 5px" />
+        <a href="#" class="text-center">會員登入</a>
+      </div>
       <div class="px-5 mb-5 d-flex justify-content-between">
-        <a href="#" class="text-center">🛏<br>線上訂房</a>
-        <a href="#" class="text-center">👜<br>帳號選物</a>
-        <a href="#" class="text-center">🍽<br>餐廳訂位</a>
+        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_bed.svg}" alt="bed" class="menu-icon"/><br>線上訂房</span></a>
+        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_bag.svg}" alt="bag" class="menu-icon"/><br>帳號選物</span></a>
+        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_dish.svg}" alt="dish" class="menu-icon"/><br>餐廳訂位</span></a>
       </div>
       <div class="overlay-menu-row d-flex justify-content-center">
         <div class="overlay-menu-col">
@@ -99,10 +107,10 @@
         </div>
         <div class="overlay-menu-col">
           <h5>精緻客房</h5>
-          <a href="#">馥香居</a>
+          <a href="#">蔻香居</a>
+          <a href="#">海音居</a>
           <a href="#">晨曦之庭</a>
           <a href="#">月影行館</a>
-          <a href="#">海音居</a>
         </div>
         <div class="overlay-menu-col">
           <h5>其他</h5>
@@ -152,7 +160,7 @@
         </div>
         <!-- 右側圖片 -->
         <div class="col-md-5 news-image-col d-flex justify-content-center">
-          <img src="./images/asle_01.png" alt="最新消息圖片" class="news-image" />
+          <img th:src="@{/images/asle_01.png}" alt="最新消息圖片" class="news-image" />
         </div>
       </div>
     </div>
@@ -170,14 +178,38 @@
             無論獨旅放鬆、雙人浪漫，還是親子同樂，嶼蔻都精心為您準備好了完美空間！
           </div>
           <div class="rooms-images-row">
-            <img src="./images/room/room1.png" alt="房型1" class="room-img room-img-lg" />
-            <img src="./images/room/room2.png" alt="房型2" class="room-img room-img-md" />
+            <div class="room-img-wrapper">
+              <div class="room-img-lg">
+                <img th:src="@{/images/room/room1.png}" alt="晨曦之庭" class="room-img" />
+                <div class="room-img-overlay"></div>
+                <div class="room-img-text"></div>
+              </div>
+            </div>
+            <div class="room-img-wrapper">
+              <div class="room-img-md">
+                <img th:src="@{/images/room/room2.png}" alt="蔻香居" class="room-img" />
+                <div class="room-img-overlay"></div>
+                <div class="room-img-text"></div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="d-lg-flex">
           <div class="rooms-images-row">
-            <img src="./images/room/room3.png" alt="房型3" class="room-img room-img-mdd" />
-            <img src="./images/room/room4.png" alt="房型4" class="room-img room-img-lgd" />
+            <div class="room-img-wrapper">
+              <div class="room-img-mdd">
+                <img th:src="@{/images/room/room3.png}" alt="海音居" class="room-img" />
+                <div class="room-img-overlay"></div>
+                <div class="room-img-text"></div>
+              </div>
+            </div>
+            <div class="room-img-wrapper">
+              <div class="room-img-lgd">
+                <img th:src="@{/images/room/room4.png}" alt="月影行館" class="room-img" />
+                <div class="room-img-overlay"></div>
+                <div class="room-img-text"></div>
+              </div>
+            </div>
           </div>
           <div class="rooms-quote py-3">
             <div class="rooms-quote-en">A room for every journey,<br>a view for every soul.</div>
@@ -193,51 +225,35 @@
   </section>
 
   <section class="section dining-section" id="dining">
-    <div class="container dining-container text-center">
-      <h3 class="dining-en-title">Dining</h3>
-      <h2 class="dining-title">特色餐廳</h2>
-      <div class="dining-desc">用味蕾探索當地，體驗專屬於這座島的餐桌故事</div>
-      <div id="diningCarousel" class="carousel slide dining-carousel" data-bs-ride="carousel" data-bs-interval="4000">
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <div class="dining-carousel-images">
-              <img src="./images/dining/dining_01.png" class="dining-img left" alt="餐廳1">
-              <img src="./images/dining/dining_02.png" class="dining-img center" alt="餐廳2">
-              <img src="./images/dining/dining_03.png" class="dining-img right" alt="餐廳3">
-            </div>
-          </div>
-          <div class="carousel-item">
-            <div class="dining-carousel-images">
-              <img src="./images/dining/dining_02.png" class="dining-img left" alt="餐廳2">
-              <img src="./images/dining/dining_01.png" class="dining-img center" alt="餐廳3">
-              <img src="./images/dining/dining_03.png" class="dining-img right" alt="餐廳1">
-            </div>
-          </div>
-          <div class="carousel-item">
-            <div class="dining-carousel-images">
-              <img src="./images/dining/dining_03.png" class="dining-img left" alt="餐廳3">
-              <img src="./images/dining/dining_01.png" class="dining-img center" alt="餐廳1">
-              <img src="./images/dining/dining_02.png" class="dining-img right" alt="餐廳2">
-            </div>
+    <div class="dining-container" style="text-align:center;">
+      <div id="diningCarousel" class="owl-carousel owl-theme">
+        <div class="item">
+          <h3 class="dining-en-title">Facilities</h3>
+          <h2 class="dining-title">豐富設施</h2>
+          <p>放慢腳步，享受每一刻的自在與療癒</p>
+          <div class="dining-carousel-images">
+            <img th:src="@{/images/pool_01.png}" class="dining-img" alt="泳池設施">
           </div>
         </div>
-        <button class="carousel-control-prev dining-carousel-arrow" type="button" data-bs-target="#diningCarousel"
-          data-bs-slide="prev">
-          <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next dining-carousel-arrow" type="button" data-bs-target="#diningCarousel"
-          data-bs-slide="next">
-          <span class="carousel-control-next-icon"></span>
-        </button>
-        <!-- <div class="carousel-indicators">
-          <button type="button" data-bs-target="#diningCarousel" data-bs-slide-to="0" class="active"></button>
-          <button type="button" data-bs-target="#diningCarousel" data-bs-slide-to="1"></button>
-          <button type="button" data-bs-target="#diningCarousel" data-bs-slide-to="2"></button>
-        </div> -->
-      </div>
+        <div class="item">
+          <h3 class="dining-en-title">Dining</h3>
+          <h2 class="dining-title">特色餐廳</h2>
+          <p>用味蕾探索當地，體驗專屬於這座島的餐桌故事</p>
+          <div class="dining-carousel-images">
+            <img th:src="@{/images/dining/dining_04.png}" class="dining-img" alt="餐廳2">
+          </div>
+        </div>
+        <div class="item">
+          <h3 class="dining-en-title">Gift Shop</h3>
+          <h2 class="dining-title">經典選物</h2>
+          <p>收藏的不只是物件，更是旅途中的每一份心動</p>
+          <div class="dining-carousel-images">
+            <img th:src="@{/images/dining/dining_03.png}" class="dining-img" alt="餐廳3">
+          </div>
+        </div>
+      <!-- </div> -->
     </div>
   </section>
-
   <section id="faq" class="section faq-section">
     <div class="container faq-container">
       <div class="faq-header">
@@ -294,50 +310,17 @@
     </div>
   </section>
 
-  <footer class="footer-section" id="footer">
-    <div class="container footer-container">
-      <div class="row align-items-center">
-        <!-- 左側 Logo 與資訊 -->
-        <div class="col-md-5 footer-info">
-          <div class="footer-logo-title d-flex flex-column flex-lg-row align-items-center mb-2">
-            <img src="./images/logo/footer_logo.png" alt="logo" class="mr-lg-3 footer-logo me-3" />
-            <div>
-              <p class="footer-title mb-3 mt-4 mt-lg-0">嶼蔻渡假村 Maison d'Yuko</p>
-              <small class="footer-address">南海群島．映灣嶼 9 號．珊瑚灣 2025</small>
-              <small class="footer-tel">+886-7-123-4567</small>
-              <small class="footer-mail">service@maisondyuko.com</small>
-            </div>
-          </div>
-        </div>
-        <!-- 右側社群與聯絡 -->
-        <div class="col-md-4 offset-md-3 footer-contact text-center">
-          <div class="footer-social mb-3">
-            <a href="#"><img src="./images/icon/footer_line.png" alt="LINE" class="footer-icon" /></a>
-            <a href="#"><img src="./images/icon/footer_ig.png" alt="Instagram" class="footer-icon" /></a>
-            <a href="#"><img src="./images/icon/footer_fb.png" alt="Facebook" class="footer-icon" /></a>
-          </div>
-          <a href="#" class="footer-contact-btn">聯絡我們</a>
-        </div>
-      </div>
-      <div class="footer-bottom d-flex flex-wrap justify-content-between align-items-center mt-4">
-        <div class="footer-links">
-          <a href="#">隱私政策</a>
-          <span>|</span>
-          <a href="#">使用條款</a>
-          <span>|</span>
-          <a href="#">Cookies 政策</a>
-        </div>
-        <div class="footer-copyright">
-          © 2025 Maison d'Yuko. All rights reserved.
-        </div>
-      </div>
-    </div>
-  </footer>
+  <!-- 匯入 footer.html -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
 
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     $('#menuToggle').on('click', function () {
+      $('#overlayMenu').addClass('active'); // 將 .show 改為 .active
+    });
+    $('#menu-Toggle').on('click', function () {
       $('#overlayMenu').addClass('active'); // 將 .show 改為 .active
     });
     $('#menuClose').on('click', function () {
@@ -350,6 +333,28 @@
         const item = this.closest('.faq-item');
         item.classList.toggle('active');
       });
+    });
+
+    document.querySelectorAll('.room-img-wrapper').forEach(function (wrapper) {
+      var img = wrapper.querySelector('.room-img');
+      var text = wrapper.querySelector('.room-img-text');
+      if (img && text) text.textContent = img.alt;
+    });
+    $('.owl-carousel').owlCarousel({ 
+      stagePadding: 100,
+      loop: true, 
+      margin: 0, 
+      nav: true, 
+      items: 1,
+      center:true,
+      autoplay: true,
+      autoplayTimeout: 5000,
+      autoplayHoverPause: true,
+      responsive: {
+        0: { items: 1 },
+        600: { items: 1 },
+        1000: { items: 1 }
+      }
     });
   </script>
 </body>
