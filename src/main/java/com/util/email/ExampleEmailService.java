@@ -19,7 +19,7 @@ public class ExampleEmailService { //Example改成自己的通知簡稱e.g.RoomB
     public void sendExampleEmail(String toEmail) throws MessagingException, IOException {
 
         toEmail = "cja101g1@gmail.com"; // 收件者電郵，這行僅供測試，實際應是傳入的參數
-        String subject = "【嶼蔻渡假村】OOO通知信"; // e.g.【嶼蔻渡假村】訂房成功通知信
+        String subject = "【嶼蔻渡假村】測試通知信"; // e.g.【嶼蔻渡假村】訂房成功通知信
         
         MimeMessage message = mailSender.createMimeMessage();
         
