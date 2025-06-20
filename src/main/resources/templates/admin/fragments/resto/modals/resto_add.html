@@ -35,7 +35,7 @@
 
             <div class="mb-3">
               <label for="restoNameEn" class="form-label">英文名稱 <small class="text-muted">最多可40字</small></label>
-              <input type="text" th:field="*{restoNameEn}" id="restoNameEn" class="form-control" required maxlength="100">
+              <input type="text" th:field="*{restoNameEn}" id="restoNameEn" class="form-control" maxlength="100">
               
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('restoNameEn')}">
@@ -60,7 +60,7 @@
             
             <div class="mb-3">
               <label for="restoSeatsTotal" class="form-label">容納座數 <span class="text-danger">*</span> <small class="text-muted">上限1000</small></label>
-              <input type="number" th:field="*{restoSeatsTotal}" id="restoSeatsTotal" class="form-control" required min="1">
+              <input type="text" inputmode="numeric" pattern="\d*" th:field="*{restoSeatsTotal}" id="restoSeatsTotal" class="form-control" required min="1">
               
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('restoSeatsTotal')}">
@@ -82,7 +82,7 @@
             
             <div class="mb-3">
               <label for="restoLoc" class="form-label">樓層位置 <small class="text-muted">最多可30字</small></label>
-              <input type="text" th:field="*{restoLoc}" id="restoLoc" class="form-control" required maxlength="50">
+              <input type="text" th:field="*{restoLoc}" id="restoLoc" class="form-control" maxlength="50">
               
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('restoLoc')}">
@@ -132,7 +132,7 @@
                  class="img-fluid mt-2 rounded mx-auto d-block"
                  style="max-height: 200px;" />        
                  
-                 <div class="d-flex justify-content-center">
+                 <div id="btnClearImageContainer" class="d-flex justify-content-center">
                     <button type="button" id="btnClearImage" class="btn btn-outline-danger btn-sm mt-2 d-none">
                       <i class="fa-solid fa-trash-can me-1 mt-2"></i> 清除圖片
                     </button>

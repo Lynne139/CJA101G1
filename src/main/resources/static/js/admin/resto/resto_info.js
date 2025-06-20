@@ -186,35 +186,40 @@ document.addEventListener("DOMContentLoaded", function () {
 //    }
 
 
+// 圖片清除按鈕收合
+function clearBtnToggle(pic, clearBtn) {
+  if (!pic || pic.includes("no_img.svg")) {
+    clearBtn.classList.add("d-none");
+  } else {
+    clearBtn.classList.remove("d-none");
+  }
+}
+
 function bindImagePreview() {
   const input = document.getElementById("uploadImg");
   const preview = document.getElementById("imgPreview");
   const clearFlag = document.getElementById("clearImgFlag");
   let clearBtn = document.getElementById("btnClearImage");
+  let clearBtnContainer = document.getElementById("btnClearImageContainer");
   
   if (!input || !preview || !clearFlag || !clearBtn) return;
   
   // 抓原始圖片作為fallback
   const originalSrc = preview.src;
-
-  // 製作"清除圖片"按鈕
-  if (!clearBtn) {
-    clearBtn = document.createElement("button");
-    clearBtn.type = "button";
-    clearBtn.id = "btnClearImage";
-    clearBtn.className = "btn btn-sm btn-outline-danger d-block mx-auto mt-2";
-    clearBtn.textContent = "清除圖片";
-	clearBtn.innerHTML = '<i class="fa-solid fa-trash-can me-1"></i> 清除圖片';
-	preview.insertAdjacentElement("afterend", clearBtn);
-  }
   
-  // 一開始決定清除按鈕是否顯示
-  if (originalSrc.includes("no_img.svg")) {
-    clearBtn.style.display = "none";
-  } else {
-    clearBtn.style.display = "inline-block";
-  }
-
+//  // 製作"清除圖片"按鈕
+//  if (!clearBtn) {
+//    clearBtn = document.createElement("button");
+//    clearBtn.type = "button";
+//    clearBtn.id = "btnClearImage";
+//    clearBtn.className = "btn btn-sm btn-outline-danger d-block mx-auto mt-2";
+//    clearBtn.textContent = "清除圖片";
+//	clearBtn.innerHTML = '<i class="fa-solid fa-trash-can me-1"></i> 清除圖片';
+//	clearBtnContainer.insertAdjacentElement("beforebegin", clearBtn);
+//  }
+  
+   	// 初始決定清除按鈕是否顯示
+	clearBtnToggle(originalSrc, clearBtn);
   
   if (input && preview) {
     input.addEventListener("change", function () {
@@ -223,8 +228,8 @@ function bindImagePreview() {
 
 	  if (!file) {
 	    preview.src = originalSrc;
-	    clearBtn.style.display = originalSrc.includes("no_img.svg") ? "none" : "inline-block";
-	    clearFlag.value = "false";
+        clearBtnToggle(preview.src, clearBtn); 
+        clearFlag.value = "false";
 	    return;
 	  }
 
@@ -233,7 +238,7 @@ function bindImagePreview() {
         alert("只接受 PNG / JPEG / GIF 圖片");
         this.value = "";
         preview.src = originalSrc;
-		clearBtn.style.display = originalSrc.includes("no_img.svg") ? "none" : "inline-block";
+		clearBtnToggle(preview.src, clearBtn);
         clearFlag.value = "false";
         return;
       }
@@ -242,7 +247,7 @@ function bindImagePreview() {
         alert("圖片不得超過 16MB！");
         this.value = "";
         preview.src = originalSrc;
-		clearBtn.style.display = originalSrc.includes("no_img.svg") ? "none" : "inline-block";
+		clearBtnToggle(preview.src, clearBtn);
         clearFlag.value = "false";
         return;
       }
@@ -250,7 +255,7 @@ function bindImagePreview() {
       const reader = new FileReader();
       reader.onload = e => {
         preview.src = e.target.result;
-        clearBtn.style.display = "inline-block";
+	    clearBtnToggle(preview.src, clearBtn);
         clearFlag.value = "false";
       };
       reader.readAsDataURL(file);
@@ -258,17 +263,12 @@ function bindImagePreview() {
   }
 
   clearBtn.addEventListener("click", () => {
-    const confirmed = confirm("將會清除圖片，並於送出後從資料庫刪除，是否確定繼續？");
-    if (!confirmed) return;
-
     input.value = "";
 	preview.src = "";
-    clearBtn.style.display = "none";
     clearFlag.value = "true";
+	clearBtn.classList.add("d-none");
   });
 }
-
-  
 
 	
   // ===== Modal - Add =====
@@ -376,8 +376,8 @@ function bindImagePreview() {
 		})
         .then(html => {
 			
-			if (!html) return; // 成功就不會拿到res(表單填入的內容)，也就不處理下面
-
+			if (!html) return; // 成功就不會拿到res(modal fragment+表單填入的內容)，也就不處理下面
+			  
 			  //錯誤時僅更新 modal body（避免整個 modal 重建）
 			  const parser = new DOMParser();
 			  const doc = parser.parseFromString(html, "text/html");

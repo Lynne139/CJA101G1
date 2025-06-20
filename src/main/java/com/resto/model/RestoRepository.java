@@ -12,7 +12,8 @@ public interface RestoRepository extends JpaRepository<RestoVO, Integer> {
 	// 查詢未刪除且上架的（前台用）
     List<RestoVO> findByIsDeletedFalseAndIsEnabledTrue();
     
-    Optional<RestoVO> findByRestoNameAndIsDeletedFalse(String restoName);
+    // 判斷阻擋餐廳重名
+    List<RestoVO> findAllByRestoNameAndIsDeletedFalse(String restoName);
 
     
 }
