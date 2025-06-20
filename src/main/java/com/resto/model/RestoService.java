@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.resto.utils.RestoCriteriaHelper;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceContext;
@@ -44,11 +45,10 @@ public class RestoService {
     }
 
     public void softDelete(Integer id) {
-        RestoVO vo = restoRepository.findById(id).orElse(null);
-        if (vo != null) {
+        restoRepository.findById(id).ifPresent(vo -> {
             vo.setIsDeleted(true);
             restoRepository.save(vo);
-        }
+        });
     }
 
     // 複合查詢（Criteria 結構）
@@ -57,15 +57,14 @@ public class RestoService {
     }
     
     
-    // 用於新增時（單一參數）
-    public boolean isDuplicateName(String name) {
-        return restoRepository.findByRestoNameAndIsDeletedFalse(name).isPresent();
-    }
+    public boolean existsDuplicateName(RestoVO resto) {
+        List<RestoVO> matches = restoRepository.findAllByRestoNameAndIsDeletedFalse(resto.getRestoName());
 
-    // 用於編輯時（排除自己）
-    public boolean isDuplicateName(String name, Integer excludeId) {
-        Optional<RestoVO> existing = restoRepository.findByRestoNameAndIsDeletedFalse(name);
-        return existing.isPresent() && !existing.get().getRestoId().equals(excludeId);
+        if (resto.getRestoId() == null) {
+            return !matches.isEmpty();
+        } else {
+            return matches.stream().anyMatch(r -> !r.getRestoId().equals(resto.getRestoId()));
+        }
     }
 
     
@@ -75,7 +74,7 @@ public class RestoService {
 
         if (vo.getRestoId() == null) {
             // 新增
-            target = vo;
+            target = vo;            
         } else {
             // 編輯：抓出原始資料（含 version）
             target = restoRepository.findById(vo.getRestoId())

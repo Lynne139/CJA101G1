@@ -13,11 +13,11 @@
 @import url(./admin/component/pagination.css);
 @import url(./admin/component/panel.css);
 @import url(./admin/component/table.css);
-@import url(./admin/component/form_modal.css);
 
 /* === layouts === */
 @import url(./admin/layout/grid.css);
 @import url(./admin/layout/sidebar.css);
+@import url(./admin/layout/form_modal.css);
 
 
 /* === pages === */

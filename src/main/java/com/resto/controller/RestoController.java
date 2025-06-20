@@ -10,7 +10,6 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -60,7 +59,6 @@ public class RestoController {
 	    return "admin/fragments/resto/modals/resto_view :: viewModalContent";
 	}
 	
-	//取資料庫圖片
 	@GetMapping("/resto_info/img/{id}")
 	public ResponseEntity<byte[]> getImage(@PathVariable Integer id) {
 	    RestoVO resto = restoService.getById(id);
@@ -70,15 +68,21 @@ public class RestoController {
 
 	    if (imageBytes == null || imageBytes.length == 0) {
 	    	// 回傳no_img.svg bytes
-	    	try (InputStream is = new ClassPathResource("static/images/admin/no_img.svg").getInputStream()) {
-	            byte[] defaultImg = is.readAllBytes();
-	            return ResponseEntity
+	        try (InputStream is = getClass().getResourceAsStream("/static/images/no_img.svg")) {
+	            if (is != null) {
+	                byte[] defaultImg = is.readAllBytes();
+	                return ResponseEntity
 	                    .ok()
 	                    .header(HttpHeaders.CONTENT_TYPE, "image/svg+xml")
 	                    .body(defaultImg);
-	    	} catch (IOException e) {
-	            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	            }
+	        } catch (IOException e) {
+	            // optional: log
 	        }
+
+	        return ResponseEntity
+	            .status(HttpStatus.NO_CONTENT)
+	            .build();
 	    }
 
 	    // 自動判斷圖片格式
@@ -132,14 +136,15 @@ public class RestoController {
 	        Model model
 	) {
 		
+		
 //	    System.out.println("表單資料：" + resto);
 		
 		
 		// 預設值補齊
-	    resto.setIsDeleted(false);
-	    if (resto.getIsEnabled() == null) resto.setIsEnabled(false);
+//	    resto.setIsDeleted(false);
+//	    if (resto.getIsEnabled() == null) resto.setIsEnabled(false);
 		
-	 // 圖片錯誤 flag（初始 false）
+	    // 錯誤 flag（初始 false）
 	    boolean hasImageError = false;
 
 	    // 檢查圖片格式與大小
@@ -162,6 +167,12 @@ public class RestoController {
 	            }
 	        }
 	    }
+	    
+	    // 驗證名稱重複
+	    if (restoService.existsDuplicateName(resto)) {
+	        result.rejectValue("restoName", null, "餐廳名稱已存在，請重新輸入！");
+	        hasImageError = true;
+	    }
 
 	    // 若欄位驗證有錯，或圖片錯誤，回填 modal
 	    if (result.hasErrors() || hasImageError) {
@@ -170,17 +181,8 @@ public class RestoController {
 	    }
 	    
 
-//	    System.out.println("準備儲存資料");
-
-	    // 儲存
-	    try {
-		    restoService.saveWithImage(resto, imageFile , clearImgFlag);
-	    } catch (DataIntegrityViolationException e) {
-	        model.addAttribute("errorMsg", "餐廳名稱已存在，請重新輸入！");
-	        return "admin/fragments/resto/modals/resto_add :: addModalContent";
-	    } 
-	    
-//	    System.out.println("儲存完成");
+	    // 寫入資料庫
+		restoService.saveWithImage(resto, imageFile , clearImgFlag);
 
 	    redirectAttributes.addFlashAttribute("message", "新增成功！");
 	    return "redirect:/admin/resto_info";
@@ -217,7 +219,7 @@ public class RestoController {
 	        Model model
 	) {
 		
-				
+	    // 錯誤 flag（初始 false）
 	    boolean hasImageError = false;
 
 	    // 處理圖片格式與大小
@@ -241,20 +243,22 @@ public class RestoController {
 	        }
 	    }
 
-	    // 驗證錯誤回填modal
+	    // 驗證名稱重複
+	    if (restoService.existsDuplicateName(resto)) {
+	        result.rejectValue("restoName", null, "餐廳名稱已存在，請重新輸入！");
+	    }
+
+	    // 若欄位驗證有錯，或圖片錯誤，回填 modal
 	    if (result.hasErrors() || hasImageError) {
 	        model.addAttribute("resto", resto);
 	        return "admin/fragments/resto/modals/resto_edit :: editModalContent";
 	    }
 	    
-	    
+	    //送出時以version判斷是否期間有人做更動避免覆蓋更新
 	    try {
 		    restoService.saveWithImage(resto, imageFile, clearImgFlag);
-	    } catch (DataIntegrityViolationException e) {
-	        model.addAttribute("errorMsg", "餐廳名稱已存在，請重新輸入！");
-	        return "admin/fragments/resto/modals/resto_edit :: editModalContent";
 	    } catch (ObjectOptimisticLockingFailureException | OptimisticLockException e) {
-	        model.addAttribute("errorMsg", "此餐廳資料已被他人修改，請重新整理頁面");
+	        model.addAttribute("errorMsg", e.getMessage());
 	        model.addAttribute("resto", resto); // 回填原輸入
 	        return "admin/fragments/resto/modals/resto_edit :: editModalContent";
 	    }

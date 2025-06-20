@@ -535,7 +535,6 @@ CREATE TABLE resto (
     
 	CONSTRAINT resto_pk PRIMARY KEY (resto_id)
 );
-ALTER TABLE resto ADD UNIQUE(resto_name);
 ALTER TABLE resto ADD COLUMN version INT NOT NULL DEFAULT 0;
 
 

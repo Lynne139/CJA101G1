@@ -33,7 +33,7 @@ public class RestoVO implements java.io.Serializable{
 
 	@NotBlank(message = "餐廳名稱不得為空")
 	@Size(max = 40, message = "餐廳名稱請勿超過40字")
-	@Column(name = "resto_name", unique = true)
+	@Column(name = "resto_name")
 	private String restoName;
 	
     @Size(max = 40, message = "英文名稱請勿超過40字")
