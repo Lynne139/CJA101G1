@@ -10,7 +10,6 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -60,7 +59,6 @@ public class RestoController {
 	    return "admin/fragments/resto/modals/resto_view :: viewModalContent";
 	}
 	
-	//取資料庫圖片
 	@GetMapping("/resto_info/img/{id}")
 	public ResponseEntity<byte[]> getImage(@PathVariable Integer id) {
 	    RestoVO resto = restoService.getById(id);
@@ -70,15 +68,21 @@ public class RestoController {
 
 	    if (imageBytes == null || imageBytes.length == 0) {
 	    	// 回傳no_img.svg bytes
-	    	try (InputStream is = new ClassPathResource("static/images/admin/no_img.svg").getInputStream()) {
-	            byte[] defaultImg = is.readAllBytes();
-	            return ResponseEntity
+	        try (InputStream is = getClass().getResourceAsStream("/static/images/no_img.svg")) {
+	            if (is != null) {
+	                byte[] defaultImg = is.readAllBytes();
+	                return ResponseEntity
 	                    .ok()
 	                    .header(HttpHeaders.CONTENT_TYPE, "image/svg+xml")
 	                    .body(defaultImg);
-	    	} catch (IOException e) {
-	            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	            }
+	        } catch (IOException e) {
+	            // optional: log
 	        }
+
+	        return ResponseEntity
+	            .status(HttpStatus.NO_CONTENT)
+	            .build();
 	    }
 
 	    // 自動判斷圖片格式
@@ -131,6 +135,7 @@ public class RestoController {
 	        RedirectAttributes redirectAttributes,
 	        Model model
 	) {
+		
 		
 //	    System.out.println("表單資料：" + resto);
 		

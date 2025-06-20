@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.resto.utils.RestoCriteriaHelper;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceContext;
@@ -44,11 +44,10 @@ public class RestoService {
     }
 
     public void softDelete(Integer id) {
-        RestoVO vo = restoRepository.findById(id).orElse(null);
-        if (vo != null) {
+        restoRepository.findById(id).ifPresent(vo -> {
             vo.setIsDeleted(true);
             restoRepository.save(vo);
-        }
+        });
     }
 
     // 複合查詢（Criteria 結構）

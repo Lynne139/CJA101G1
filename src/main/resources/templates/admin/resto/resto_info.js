@@ -190,50 +190,40 @@ function bindImagePreview() {
   const input = document.getElementById("uploadImg");
   const preview = document.getElementById("imgPreview");
   const clearFlag = document.getElementById("clearImgFlag");
-  let clearBtn = document.getElementById("btnClearImage");
-  
-  if (!input || !preview || !clearFlag || !clearBtn) return;
-  
+
   // 抓原始圖片作為fallback
   const originalSrc = preview.src;
 
   // 製作"清除圖片"按鈕
+  let clearBtn = document.getElementById("btnClearImg");
   if (!clearBtn) {
     clearBtn = document.createElement("button");
     clearBtn.type = "button";
-    clearBtn.id = "btnClearImage";
+    clearBtn.id = "btnClearImg";
     clearBtn.className = "btn btn-sm btn-outline-danger d-block mx-auto mt-2";
     clearBtn.textContent = "清除圖片";
-	clearBtn.innerHTML = '<i class="fa-solid fa-trash-can me-1"></i> 清除圖片';
-	preview.insertAdjacentElement("afterend", clearBtn);
-  }
-  
-  // 一開始決定清除按鈕是否顯示
-  if (originalSrc.includes("no_img.svg")) {
     clearBtn.style.display = "none";
-  } else {
-    clearBtn.style.display = "inline-block";
+    preview.insertAdjacentElement("afterend", clearBtn);
   }
 
-  
   if (input && preview) {
     input.addEventListener("change", function () {
-		
       const file = this.files[0];
 
-	  if (!file) {
-	    preview.src = originalSrc;
-	    clearBtn.style.display = originalSrc.includes("no_img.svg") ? "none" : "inline-block";
-	    clearFlag.value = "false";
-	    return;
-	  }
+      if (!file) {
+        // 若取消選取導致input無檔案，顯示資料庫原圖
+        preview.src = originalSrc;
+        clearBtn.style.display = "inline-block";
+        clearFlag.value = "false";
+        return;
+      }
 
       const validTypes = ["image/png", "image/jpeg", "image/gif"];
       if (!validTypes.includes(file.type)) {
         alert("只接受 PNG / JPEG / GIF 圖片");
         this.value = "";
         preview.src = originalSrc;
-		clearBtn.style.display = originalSrc.includes("no_img.svg") ? "none" : "inline-block";
+        clearBtn.style.display = "none";
         clearFlag.value = "false";
         return;
       }
@@ -242,7 +232,7 @@ function bindImagePreview() {
         alert("圖片不得超過 16MB！");
         this.value = "";
         preview.src = originalSrc;
-		clearBtn.style.display = originalSrc.includes("no_img.svg") ? "none" : "inline-block";
+        clearBtn.style.display = "none";
         clearFlag.value = "false";
         return;
       }
@@ -548,6 +538,18 @@ function bindImagePreview() {
       });
     }
  
+
+
+	const socket = new SockJS("/ws");
+	    const stompClient = Stomp.over(socket);
+
+	    stompClient.connect({}, function (frame) {
+	      stompClient.subscribe("/topic/restoUpdated", function (message) {
+	        const restoId = message.body;
+	        alert("餐廳編號 " + restoId + " 已被其他人更新，請重新整理頁面！");
+	        // 你也可以進一步 highlight、遮蔽該筆資料
+	      });
+	    });
   
 
 
