@@ -1,0 +1,122 @@
+<div th:fragment="addRoomTypeModelContent">
+
+
+  <div class="modal fade no-transform" id="restoAddModal" tabindex="-1"
+    aria-hidden="true">
+    <div
+      class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content rounded-4 p-4"
+        style="background-color: var(--color-background);">
+
+        <div class="modal-header">
+          <h5 class="modal-title">新增房型</h5>
+          <button type="button" class="btn-close"
+            data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <form id="restoAddForm" data-parsley-validate
+            th:object="${roomTypeVO}" th:action="@{/admin//roomType_info/insert}"
+            method="post" enctype="multipart/form-data"
+            onsubmit="this.querySelector('button[type=submit]').disabled=true">
+
+            <div class="mb-3">
+              <label for="roomTypeName" class="form-label">房型名稱 <span class="text-danger">*</span> <small class="text-muted">最多可50字</small></label>
+              <input type="text" th:field="*{roomTypeName}" id="roomTypeName" class="form-control" required maxlength="100">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomTypeName')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomTypeName')}" th:text="${err}"></span>
+              </div>
+            </div>
+
+
+            <div class="mb-3">
+              <label for="roomTypeAmount" class="form-label">房型數量 <span class="text-danger">*</span> <small class="text-muted">上限1000</small></label>
+              <input type="text" th:field="*{roomTypeAmount}" id="roomTypeAmount" class="form-control" required min="1">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomTypeAmount')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomTypeAmount')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="roomTypeContent" class="form-label">房型說明 <small class="text-muted">最多可1000字</small></label>
+              <textarea th:field="*{roomTypeContent}" id="roomTypeContent" class="form-control auto-expand"></textarea>
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomTypeContent')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomTypeContent')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">上下架狀態 <span class="text-danger">*</span></label>
+              <div>
+                <div class="form-check form-check-inline">
+                  <input type="radio" th:field="*{roomSaleStatus}" id="roomSaleStatusTrue" class="form-check-input" value="1">
+                  <label for="roomSaleStatus" class="form-check-label">上架</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input type="radio" th:field="*{roomSaleStatus}" id="roomSaleStatusFalse" class="form-check-input" value="0">
+                  <label for="roomSaleStatus" class="form-check-label">下架</label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="roomTypePrice" class="form-label">房型價格 <span class="text-danger">*</span> <small class="text-muted">上限1,000,000</small></label>
+              <input type="number" th:field="*{roomTypePrice}" id="roomTypePrice" class="form-control" required min="1000">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomTypePrice')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomTypePrice')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="roomTypePic" class="form-label">房型圖片 <small class="text-muted">檔案上限16MB</small></label>
+              <input type="file" name="roomTypePic" id="roomTypePic" class="form-control" accept="image/*">
+              <img id="imgPreview"
+                 th:src="${roomTypeVO.roomTypePic != null} ?
+                         @{/admin/roomType_info/img/{id}(id=${roomTypeVO.roomTypeId})} :
+                         @{/images/admin/no_img.svg}"
+                 class="img-fluid mt-2 rounded mx-auto d-block"
+                 style="max-height: 200px;" />        
+                 
+                 <div class="d-flex justify-content-center">
+                    <button type="button" id="btnClearImage" class="btn btn-outline-danger btn-sm mt-2 d-none">
+                      <i class="fa-solid fa-trash-can me-1 mt-2"></i> 清除圖片
+                    </button>
+                  </div>
+      
+                  <input type="hidden" id="clearImgFlag" name="clearImgFlag" value="false" /> 
+                    
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${imageError}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:text="${imageError}"></span>
+              </div>
+            </div>
+
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn_secondary "
+            data-bs-dismiss="modal">取消</button>
+          <button type=submit id="btnSubmitAdd"
+            class="btn btn_accent ">新增</button>
+          </form>
+
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
