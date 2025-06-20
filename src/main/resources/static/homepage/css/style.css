@@ -3,6 +3,7 @@ body {
   background-color: #F4EDE1 !important;
 }
 
+
 header {
   background-color: #F4EDE1;
   border-bottom: 3px solid #7E4E24 !important;
@@ -23,6 +24,23 @@ section {
   background-color: #F4EDE1 !important;
 }
 
+.menu-img {
+  display: none;
+}
+
+.mb-menu-header{
+  display: none;
+}
+
+.icon {
+  max-width: 29px;
+  max-height: 25px;
+  transform: translate(0, 60%);
+}
+
+.overlay-mobile-menu{
+  display: none;
+}
 
 /* Hero 區容器 */
 .hero-image {
@@ -41,25 +59,28 @@ section {
   width: 100%;
   display: block;
   border-radius: 0 0 0 150px;
+  filter: brightness(0.9);
 }
 
 /* 疊加標題文字 */
 .mid-right {
   position: absolute;
-  top: 68%;
-  left: 40%;
+  top: 73%;
+  left: 35%;
   transform: translateY(100%);
-  font: 2em sans-serif;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  font: 1.5em sans-serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 5px;
 }
 
 .mid-right-p {
   position: absolute;
-  top: 75%;
-  left: 53%;
+  top: 78%;
+  left: 45%;
   transform: translateY(100%);
-  font: 2em sans-serif;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  font: 1.5em sans-serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 5px;
 }
 
 .logo-overlay {
@@ -70,7 +91,7 @@ section {
   transform: translateY(30%);
   /* 讓 logo-overlay 只低於MENU圖層 */
   z-index: 3000;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
   max-width: none !important;
   height: auto;
 }
@@ -110,26 +131,26 @@ section {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height:90px;
+  height: 90px;
   width: 90px;
   font-size: 14px;
   text-align: center;
-  background-color: #6c4c2f;
+  background-color: #7E4E24;
   color: white;
   padding: 14px;
   text-decoration: none;
 }
 
-.sticky-icons a:hover{
+.sticky-icons a:hover {
   opacity: .8;
 }
 
-.sticky-icons a:nth-child(2){
-  background-color: red;
+.sticky-icons a:nth-child(2) {
+  background-color: #9D3C3C;
 }
 
-.sticky-icons a:nth-child(3){
-  background-color: rgb(128, 15, 15);
+.sticky-icons a:nth-child(3) {
+  background-color: #B88D67;
 }
 
 /* 滿版選單 overlay */
@@ -139,7 +160,7 @@ section {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(184, 141, 103, 0.9);
+  background-color: rgba(184, 141, 103, 0.98);
   color: #fff;
   z-index: 2000;
   display: none;
@@ -158,12 +179,12 @@ section {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding-top: 60px;
+  /* padding-top: 60px; */
 }
 
 .overlay-logo-contact {
   margin-bottom: 0;
-  margin-left: 20%;
+  margin-right: 57%;
   margin-top: 10%;
   text-align: left;
 }
@@ -194,9 +215,13 @@ section {
   min-height: 120px;
 }
 
+.overlay-menu-member{
+  display: none;
+}
+
 .overlay-title {
   font-size: 1.3rem;
-  font-weight: bold;
+  /* font-weight: bold; */
   margin-bottom: 8px;
   letter-spacing: 1px;
 }
@@ -212,6 +237,14 @@ section {
   flex-wrap: wrap;
 }
 
+.menu-icon{
+  max-width: 32px;
+  max-height: 32px;
+  margin: auto;
+  display: block;
+  transform: translate(0, 50%);
+}
+
 .overlay-menu-col {
   min-width: 160px;
   margin: 0 10px;
@@ -222,12 +255,12 @@ section {
 
 .overlay-menu-col h5 {
   font-size: 1.1rem;
-  font-weight: bold;
+  /* font-weight: bold; */
   margin-bottom: 1rem;
-  text-align: left;
+  text-align: center;
   letter-spacing: 2px;
-  /* border-bottom: 2px solid #fff; */
-  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #fff;
+  padding-bottom: 0.7rem;
   width: 100%;
 }
 
@@ -236,7 +269,7 @@ section {
   font-size: 1rem;
   color: #fff;
   margin: 0.3rem 0;
-  text-align: left;
+  text-align: center;
   font-weight: 400;
   padding-left: 0.2rem;
   width: 100%;
@@ -248,6 +281,7 @@ section {
   color: #ffe6c7;
   text-decoration: underline;
 }
+
 
 
 .overlay-logo {
@@ -380,155 +414,6 @@ section {
   border-left: 12px solid #7E4E24;
 }
 
-/* 網頁寬度小於736px時則mid-right、img依比例縮小 */
-@media (max-width: 736px) {
-  .mid-right {
-    font: 1em sans-serif;
-    left: 50%;
-  }
-
-  .mid-right-p {
-    font: 1em sans-serif;
-    left: 53%;
-  }
-
-  .logo-overlay {
-    width: 150px;
-    left: -20px;
-    bottom: 10px;
-  }
-
-
-
-  /* 以下是menu */
-
-  .overlay-menu-header {
-    flex-direction: row;
-    align-items: flex-start;
-    margin: 20px auto 0 auto;
-    min-height: 80px;
-  }
-
-  .overlay-logo-contact {
-    margin-left: 10px;
-    margin-top: 10px;
-    gap: 12px;
-    text-align: right;
-  }
-
-  .close-btn {
-    font-size: 2rem;
-    padding: 0 12px;
-  }
-
-  .overlay-menu-row {
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-  }
-
-  .overlay-menu-col {
-    min-width: 180px;
-    width: 80vw;
-    align-items: center;
-  }
-
-  .overlay-menu-col h5,
-  .overlay-menu-col a {
-    text-align: center;
-    width: 100%;
-    padding-left: 0;
-
-  }
-
-  .overlay-logo {
-    width: 50px;
-    min-width: 50px;
-    height: auto;
-    position: absolute;
-    left: 4%;
-  }
-
-  .overlay-contact,
-  .overlay-title {
-    margin-left: 20%;
-    text-align: left;
-    font-size: 0.9em !important;
-    /* 不換行 */
-    white-space: nowrap;
-    /* 保持與logo的距離 */
-    padding-left: 10px;
-    padding-top: 10px;
-
-
-  }
-
-  .mid-right {
-    font: 0.8em sans-serif;
-    left: 50%;
-  }
-
-  .mid-right-p {
-    font: 0.8em sans-serif;
-    left: 53%;
-  }
-
-  .logo-overlay {
-    width: 150px;
-    left: -20px;
-    bottom: 10px;
-  }
-
-  .sub-navbar .nav {
-    display: none;
-  }
-
-  header {
-    position: sticky;
-
-  }
-
-
-  header .me-3 a {
-    margin-right: 0;
-    margin-left: 8px;
-  }
-
-  header .me-3 a:first-of-type {
-    margin-left: 0;
-  }
-
-  /* 以下news */
-  .news-image {
-    display: none;
-  }
-}
-
-/* Tablet */
-@media (min-width: 768px) {
-  .logo-overlay {
-    width: 300px;
-    left: 0px;
-  }
-
-  .sub-navbar .nav {
-    margin-left: 200px;
-  }
-
-  header .me-3 {
-    margin-right: 100px !important;
-  }
-
-  header .me-3 a {
-    margin-right: 0;
-    margin-left: 8px;
-  }
-
-  header .me-3 a:first-of-type {
-    margin-left: 0;
-  }
-}
-
 /* Desktop */
 @media (min-width: 1024px) {
   .logo-overlay {
@@ -538,7 +423,7 @@ section {
   }
 
   .sub-navbar .nav {
-    margin-left: 400px;
+    margin-left: 340px;
   }
 
   header .me-3 {
@@ -552,6 +437,10 @@ section {
 
   header .me-3 a:first-of-type {
     margin-left: 0;
+  }
+
+  .text-center {
+    display: none;
   }
 }
 
@@ -685,7 +574,7 @@ section {
   line-height: 1;
   margin-bottom: -30px;
   position: absolute;
-  top: -10px;
+  top: 15px;
   z-index: 1;
 }
 
@@ -694,8 +583,8 @@ section {
   font-weight: bold;
   color: #111;
   margin-bottom: 24px;
-  margin-left: 110px;
-  margin-top: -20px;
+  margin-left: 220px;
+  margin-top: -30px;
   position: relative;
   z-index: 2;
 }
@@ -721,47 +610,101 @@ section {
 .rooms-images-row {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 25px;
   /* 可依需求調整間距 */
   margin-bottom: 0;
 }
 
 .room-img {
-  object-fit: cover;
-  background: #fff;
-  border-radius: 80px;
-  display: block;
+  border-radius: inherit;
+  width: inherit;
+  height: inherit;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+}
+
+.room-img-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+
+.room-img-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(126, 78, 36, 0.5);
+  /* #7E4E24, 50% */
+  opacity: 0;
+  transition: opacity 0.3s;
+  border-radius: inherit;
+  z-index: 2;
+}
+
+.room-img-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: bold;
+  opacity: 0;
+  z-index: 3;
+  pointer-events: none;
+  text-align: center;
+  padding: 0 1em;
+  white-space: pre-line;
+  transition: opacity 0.3s;
+}
+
+.room-img-wrapper:hover .room-img-overlay,
+.room-img-wrapper:hover .room-img-text,
+.room-img-wrapper:focus-within .room-img-overlay,
+.room-img-wrapper:focus-within .room-img-text {
+  opacity: 1;
+}
+
+.room-img-wrapper:hover .room-img,
+.room-img-wrapper:focus-within .room-img {
+  filter: blur(1px);
+  transition: filter 0.3s;
 }
 
 .room-img-lg {
-
-  width: 380px;
-  height: 220px;
-  border-radius: 160px 60px 60px 160px;
+  width: 482px;
+  height: 252px;
+  border-radius: 180px 36px 0px 180px;
   background-color: #F4EDE1;
+
 }
 
-
 .room-img-md {
-  width: 260px;
-  height: 220px;
-  border-radius: 20px 120px 120px 20px;
+  width: 383px;
+  height: 252px;
+  border-radius: 0px 180px 180px 36px;
 }
 
 .room-img-lgd {
-  padding-top: 10px;
-  width: 380px;
-  height: 220px;
-  border-radius: 60px 160px 160px 60px;
+  padding-top: 9px;
+  width: 482px;
+  height: 252px;
+  border-radius: 0px 180px 180px 36px;
   background-color: #F4EDE1;
 }
 
 .room-img-mdd {
-  padding-top: 10px;
-  width: 260px;
-  height: 220px;
-  border-radius: 120px 20px 20px 120px;
-  background-color: #F4EDE1
+  padding-top: 9px;
+  width: 383px;
+  height: 252px;
+  border-radius: 180px 36px 0px 180px;
+  background-color: #F4EDE1;
 }
 
 .rooms-quote {
@@ -852,6 +795,10 @@ section {
   position: relative;
 }
 
+.item>p {
+  color: #7E4E24;
+}
+
 .dining-desc {
   color: #7E4E24;
   font-size: 1.1rem;
@@ -860,67 +807,13 @@ section {
   line-height: 1.7;
 }
 
-.dining-carousel {
-  position: relative;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.dining-carousel-images {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0;
-}
 
 .dining-img {
-  width: 33vw;
-  max-width: 500px;
-  height: 350px;
+  height: 448px;
+  width: 872px;
+  /* 圖片比例維持，超出邊界則裁切 */
   object-fit: cover;
-  margin: 0 -40px;
-  transition: opacity 0.4s, filter 0.4s;
-}
 
-.dining-img.left,
-.dining-img.right {
-  opacity: 0.4;
-  filter: grayscale(30%);
-  z-index: 1;
-}
-
-.dining-img.center {
-  opacity: 1;
-  filter: none;
-  z-index: 2;
-  box-shadow: 0 4px 24px rgba(126, 78, 36, 0.08);
-}
-
-.dining-carousel-arrow {
-  width: 48px;
-  height: 48px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  opacity: 0.7;
-}
-
-.carousel-control-prev {
-  left: 8vw;
-}
-
-.carousel-control-next {
-  right: 8vw;
-}
-
-.carousel-indicators [data-bs-target] {
-  background-color: #7E4E24;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin: 0 6px;
 }
 
 .faq-section {
@@ -947,7 +840,7 @@ section {
   line-height: 1;
   margin-bottom: -30px;
   margin-left: 10px;
-  position: absolute;
+  /* position: absolute; */
   left: 0;
   top: -30px;
   z-index: 1;
@@ -1036,13 +929,71 @@ section {
   display: block;
 }
 
+/* 輪播  */
+.owl-item.active .dining-img {
+  opacity: 1;
+  filter: none;
+  z-index: 2;
+  box-shadow: 0 4px 24px rgba(126, 78, 36, 0.08);
+}
+
+.owl-carousel .owl-item:not(.center) .dining-img {
+  position: relative;
+  opacity: 0.6;
+  filter: brightness(110%) grayscale(10%);
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+/* 白色遮罩遮住兩側圖片 */
+.owl-carousel .owl-item.dining-img:not(.center)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, #ffffffcc, #ffffffcc);
+  z-index: 1;
+  border-radius: 10px;
+}
+
+.owl-nav {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+}
+
+.owl-carousel .owl-nav button.owl-prev {
+  position: absolute;
+  left: 40px;
+  top: 0;
+}
+
+.owl-carousel .owl-nav button.owl-next {
+  position: absolute;
+  right: 40px;
+  top: 0;
+}
+
+.owl-carousel .owl-nav span {
+  font-size: 80px;
+  color: #ffffff;
+}
+
+.owl-carousel .owl-nav button:focus {
+  outline: 0;
+}
+
+
+
 @media (max-width: 900px) {
   .dining-img {
     width: 90vw;
     max-width: 98vw;
     height: 180px;
     margin: 0 -10px;
-    border-radius: 0 0 60px 60px / 0 0 60px 60px;
   }
 
   .carousel-control-prev {
@@ -1056,7 +1007,7 @@ section {
   .faq-en-title {
     font-size: 2.5rem;
     margin-left: 0;
-    top: -10px;
+    top: -25px;
   }
 
   .faq-title {
@@ -1067,6 +1018,12 @@ section {
   .faq-list {
     margin-top: 30px;
   }
+
+  .rooms-en-title {
+    top: -20px;
+    font-size: 2.5rem !important;
+  }
+
 }
 
 #footer h3 {
@@ -1083,12 +1040,14 @@ section {
 }
 
 
+
 /* 手機版 */
 
 @media screen and (max-width: 991px) {
   * {
     position: relative;
   }
+
   html {
     width: 100vw;
     overflow-x: hidden;
@@ -1123,23 +1082,54 @@ section {
     max-width: 90vw;
   }
 
-  .rooms-section img:last-child {
-    margin-right: auto;
-    border-radius: 0 160px 160px 0;
-  }
-
-  .rooms-section img:first-child {
-    margin-left: auto;
-    border-radius: 160px 0 0 160px;
-  }
-
   .rooms-desc {
     padding: 0 20px;
     margin-top: 0;
   }
 
   .rooms-images-row {
+    /* flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between; */
     flex-direction: column;
+  }
+
+  .rooms-images-row>*:first-child {
+    align-self: flex-end;
+  }
+
+  .rooms-images-row>*:last-child {
+    align-self: flex-start;
+  }
+
+  .room-img-lg {
+    width: 482px;
+    height: 252px;
+    border-radius: 180px 0px 0px 180px;
+    background-color: #F4EDE1;
+
+  }
+
+  .room-img-md {
+    width: 383px;
+    height: 252px;
+    border-radius: 0px 180px 180px 0px;
+  }
+
+  .room-img-lgd {
+    padding-top: 9px;
+    width: 482px;
+    height: 252px;
+    border-radius: 0px 180px 180px 0px;
+    background-color: #F4EDE1;
+  }
+
+  .room-img-mdd {
+    padding-top: 9px;
+    width: 383px;
+    height: 252px;
+    border-radius: 180px 0px 0px 180px;
+    background-color: #F4EDE1;
   }
 
   .hero-image .hero-background {
@@ -1196,7 +1186,7 @@ section {
 
   .faq-header * {
     margin: 0;
-    position: unset;
+    /* position: unset; */
   }
 
   .rooms-info {
@@ -1223,7 +1213,7 @@ section {
 
   h3 {
     width: 100%;
-    font-size: 22px !important;
+    font-size: 2.5 rem !important;
     text-align: center;
     margin: 0 !important;
     position: absolute;
@@ -1276,7 +1266,187 @@ section {
     color: #7E4E24;
   }
 
-  .logo-overlay{
+  .logo-overlay {
     display: none;
   }
+
+  .mid-right {
+    font: 1em sans-serif;
+    left: 50%;
+  }
+
+  .mid-right-p {
+    font: 1em sans-serif;
+    left: 53%;
+  }
+
+  .logo-overlay {
+    width: 150px;
+    left: -20px;
+    bottom: 10px;
+  }
+
+
+
+  /* 以下是menu */
+  .overlay-mobile-menu{
+    margin: 0;
+  }
+
+  .overlay-menu-member{
+    border:2px solid #7E4E24;
+    margin: 90px 100px 90px 100px !important;
+    padding: 15px;
+  }
+
+  .overlay-menu-header {
+    flex-direction: row;
+    align-items: flex-start;
+    margin: 0;
+    min-height: 58.67px;
+    border-bottom: 3px solid #7E4E24;
+
+  }
+
+  .mb-menu-header{
+    color: #7E4E24;
+    letter-spacing: 0.1em;
+    display: unset;
+  }
+
+  .overlay-logo-contact {
+    display: none;
+  }
+
+  .close-btn {
+    font-size: 2rem;
+    padding: 13px;
+    padding-left: 30px;
+    padding-right: 30px;
+    border-left: 3px solid #7E4E24;
+    font-weight: unset;
+    display: inline-flex
+  ;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .overlay-menu-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .overlay-menu-col {
+    min-width: 180px;
+    width: 80vw;
+    align-items: center;
+  }
+
+  .overlay-menu-col h5,
+  .overlay-menu-col a {
+    text-align: center;
+    width: 100%;
+    padding-left: 0;
+    border: none;
+
+  }
+
+  .overlay-logo {
+    /* width: 50px;
+    min-width: 50px;
+    height: auto;
+    position: absolute;
+    left: 4%; */
+    display: none;
+  }
+
+  .overlay-contact,
+  .overlay-title {
+    margin-left: 20%;
+    text-align: left;
+    font-size: 0.9em !important;
+    /* 不換行 */
+    white-space: nowrap;
+    /* 保持與logo的距離 */
+    padding-left: 10px;
+    padding-top: 10px;
+
+
+  }
+
+  .mid-right {
+    font: 0.8em sans-serif;
+    left: 50%;
+  }
+
+  .mid-right-p {
+    font: 0.8em sans-serif;
+    left: 53%;
+  }
+
+  .logo-overlay {
+    width: 150px;
+    left: -20px;
+    bottom: 10px;
+  }
+
+  .sub-navbar .nav {
+    display: none;
+  }
+
+  header {
+    position: sticky;
+
+  }
+
+
+  header .me-3 a {
+    margin-right: 0;
+    margin-left: 8px;
+  }
+
+  header .me-3 a:first-of-type {
+    margin-left: 0;
+  }
+
+  /* 以下news */
+  .news-image {
+    display: none;
+  }
+
+  /* dining */
+  .dining-en-title {
+    font-size: 1.5rem !important;
+    position: unset !important;
+    color: #fff;
+    opacity: 0.5;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    margin-bottom: -30px;
+  }
+
+  .menu-img-div {
+    border-left: #7E4E24 3px solid;
+    /* border-bottom: #7E4E24 2px solid; */
+    display: inline-block;
+    padding: 16px;
+    background: #F4EDE1;
+    position: absolute;
+    right: 20px;
+    background-color: #F4EDE1;
+  }
+
+  .menu-img {
+    width: 24px;
+    height: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+  }
+
+
+
 }

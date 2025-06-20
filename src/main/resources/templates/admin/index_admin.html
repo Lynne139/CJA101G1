@@ -62,7 +62,8 @@
                 
 			     		<div class="submenu_block ps-4" 
 							th:classappend="${currentURI.startsWith('/admin/staff')} ? 'show'">
-			        		<a th:href="@{/admin/staff1}" th:classappend="${currentURI == '/admin/staff1'} ? '-active'" class="sidebar_sub_link">員工子頁1</a>
+			        		<a th:href="@{/admin/staff1}" th:classappend="${currentURI == '/admin/staff1'} ? '-active'" class="sidebar_sub_link">新增</a>
+			        		<a th:href="@{/admin/staff2}" th:classappend="${currentURI == '/admin/staff2'} ? '-active'" class="sidebar_sub_link">查詢</a>
 			      		</div>
 			    	</div>
 			
@@ -103,7 +104,12 @@
               
 			      		<div class="submenu_block ps-4"
 			      			th:classappend="${currentURI.startsWith('/admin/shop')} ? 'show'">
-			        		<a th:href="@{/admin/shop1}" th:classappend="${currentURI == '/admin/shop1'} ? '-active'" class="sidebar_sub_link">商品子頁1</a>
+			        		<a th:href="@{/admin/prod/select_page}"       th:classappend="${currentURI == '/admin/prod/select_page'} ? '-active'"       class="sidebar_sub_link">商品管理</a>
+			        		<a th:href="@{/admin/prodCate}"   th:classappend="${currentURI == '/admin/prodCate'} ? '-active'"   class="sidebar_sub_link">購物車項目</a>
+			        		<a th:href="@{/admin/prodCart}"   th:classappend="${currentURI == '/admin/prodCart'} ? '-active'"   class="sidebar_sub_link">商品類別管理</a>
+			        		<a th:href="@{/admin/prodPhoto}"  th:classappend="${currentURI == '/admin/prodPhoto'} ? '-active'"  class="sidebar_sub_link">商品圖片管理</a>
+			        		<a th:href="@{/admin/shopOrd}"    th:classappend="${currentURI == '/admin/shopOrd'} ? '-active'"    class="sidebar_sub_link">商城訂單</a>
+			        		<a th:href="@{/admin/shopOrdDet}" th:classappend="${currentURI == '/admin/shopOrdDet'} ? '-active'" class="sidebar_sub_link">商品訂單明細</a>
 			      		</div>
 			    	</div>
 			
