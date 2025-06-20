@@ -62,7 +62,8 @@
                 
 			     		<div class="submenu_block ps-4" 
 							th:classappend="${currentURI.startsWith('/admin/staff')} ? 'show'">
-			        		<a th:href="@{/admin/staff1}" th:classappend="${currentURI == '/admin/staff1'} ? '-active'" class="sidebar_sub_link">員工子頁1</a>
+			        		<a th:href="@{/admin/staff1}" th:classappend="${currentURI == '/admin/staff1'} ? '-active'" class="sidebar_sub_link">新增</a>
+			        		<a th:href="@{/admin/staff2}" th:classappend="${currentURI == '/admin/staff2'} ? '-active'" class="sidebar_sub_link">查詢</a>
 			      		</div>
 			    	</div>
 			
