@@ -35,3 +35,6 @@ build/
 .mvn/
 bin/
 .DS_Store
+
+# Ignore secret config
+application-secret.properties
