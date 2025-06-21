@@ -166,6 +166,15 @@
 			<version>1.6.2</version>
 		</dependency>
 
+		<!-- Spring Boot Mail Starter -->
+		<!-- 用於發送電子郵件的 Spring Boot 起始器 -->
+		<dependency>
+        	<groupId>org.springframework.boot</groupId>
+        	<artifactId>spring-boot-starter-mail</artifactId>
+    	</dependency>
+
+
+
 
 		
 		<!-- ========================================================================================== -->
