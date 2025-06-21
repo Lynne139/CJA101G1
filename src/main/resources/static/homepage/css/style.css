@@ -1092,6 +1092,8 @@ section {
     align-items: stretch;
     justify-content: space-between; */
     flex-direction: column;
+    padding:59px 0 0 0;
+    gap: 75px;
   }
 
   .rooms-images-row>*:first-child {
@@ -1213,7 +1215,7 @@ section {
 
   h3 {
     width: 100%;
-    font-size: 2.5 rem !important;
+    font-size: 2.5rem !important;
     text-align: center;
     margin: 0 !important;
     position: absolute;
@@ -1447,6 +1449,32 @@ section {
 
   }
 
+  .room-img-overlay {
+    display: none;
+  }
+
+  .room-img-wrapper:hover .room-img,
+  .room-img-wrapper:focus-within .room-img {
+    filter: blur(0px);
+    transition: filter 0s;
+  }
+
+  #room-img-left1,#room-img-left2{
+    color: black;
+    top: -10%;
+    left: 82%;
+    opacity: 1;
+    padding: 0;
+  }
+
+  #room-img-right1,#room-img-right2{
+    display:flex;
+    color:black;
+    top:-10%;
+    right: -33%;
+    opacity:1;
+    padding:0;
+  }
 
 
 }
