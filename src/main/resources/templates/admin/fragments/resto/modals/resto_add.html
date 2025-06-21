@@ -126,9 +126,7 @@
               <label for="uploadImg" class="form-label">圖片上傳 <small class="text-muted">只接受 PNG/JPEG/GIF 格式，檔案上限16MB</small></label>
               <input type="file" name="uploadImg" id="uploadImg" class="form-control" accept="image/png,image/jpeg,image/gif">
               <img id="imgPreview"
-                 th:src="${resto.restoImg != null} ?
-                         @{/admin/resto_info/img/{id}(id=${resto.restoId})} :
-                         @{/images/admin/no_img.svg}"
+                 th:src="@{/images/admin/no_img.svg}"
                  class="img-fluid mt-2 rounded mx-auto d-block"
                  style="max-height: 200px;" />        
                  

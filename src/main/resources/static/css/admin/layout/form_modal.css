@@ -2,6 +2,11 @@
 background-color: rgba(rgb(0, 0, 0) 0.5);
 }
 
+.modal .btn{
+background-color: rgba(rgb(0, 0, 0) 0.5);
+padding: 0.5rem 3rem;
+}
+
 .modal .modal-content{
   background-color: var(--color-background);
 }
@@ -10,6 +15,11 @@ background-color: rgba(rgb(0, 0, 0) 0.5);
 
 .modal .modal-header{
   border-bottom: 1px solid var(--color-primary);
+  padding: 18px 20px;
+}
+
+.modal .modal-footer{
+  border-top: 1px solid var(--color-primary);
   padding: 18px 20px;
 }
 
