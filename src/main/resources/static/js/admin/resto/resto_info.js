@@ -142,49 +142,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     	   
 
-//    function bindImagePreview() {
-//      const input = document.getElementById("uploadImg");
-//      const preview = document.getElementById("imgPreview");
-//  	
-//      if (input && preview) {
-//        input.addEventListener("change", function () {
-//
-//  		
-//          const file = this.files[0];
-//  		
-//  		//沒選檔案（按取消），就直接清除preview
-//          if (!file){
-//  		        preview.src = "";
-//  		        return;
-//  		      }
-//
-//          const validTypes = ["image/png", "image/jpeg", "image/gif"];
-//          if (!validTypes.includes(file.type)) {
-//            alert("只允許上傳 PNG / JPEG / GIF 圖片");
-//            this.value = "";
-//            preview.src = "";
-//            return;
-//          }
-//  		
-//  		const maxSize = 16 * 1024 * 1024; // 16MB
-//
-//  		if (file.size > maxSize) {
-//  		  alert("圖片不得超過 16MB！");
-//  		  this.value = "";
-//  		  preview.src = "";
-//  		  return;
-//  		}
-//
-//          const reader = new FileReader();
-//          reader.onload = e => {
-//            preview.src = e.target.result;
-//
-//          };
-//          reader.readAsDataURL(file);
-//        });
-//      }
-//    }
-
 
 // 圖片清除按鈕收合
 function clearBtnToggle(pic, clearBtn) {
@@ -200,28 +157,33 @@ function bindImagePreview() {
   const preview = document.getElementById("imgPreview");
   const clearFlag = document.getElementById("clearImgFlag");
   let clearBtn = document.getElementById("btnClearImage");
-  let clearBtnContainer = document.getElementById("btnClearImageContainer");
   
   if (!input || !preview || !clearFlag || !clearBtn) return;
+
+		// 抓資料庫原始圖片作為fallback
+		const originalSrc = preview.src;
+		
+
+	  // 初始以及表單被還原時，input是或被清空，都得判定預覽圖與按鈕狀態
+	  if (input.files.length == 0) {
+
+	    if (originalSrc.includes("no_img.svg")) {
+			// 新增或資料庫沒圖，顯示預設圖
+			preview.src = "/images/admin/no_img.svg";
+			clearFlag.value = "false";
+			clearBtnToggle(preview.src, clearBtn);		  
+	      
+	    } else {
+		  // 有資料庫圖，預設顯示它
+	      preview.src = originalSrc;
+		  console.log(preview.src);
+	      clearFlag.value = "false";
+		  clearBtnToggle(preview.src, clearBtn);
+	    }
+	  }
   
-  // 抓原始圖片作為fallback
-  const originalSrc = preview.src;
-  
-//  // 製作"清除圖片"按鈕
-//  if (!clearBtn) {
-//    clearBtn = document.createElement("button");
-//    clearBtn.type = "button";
-//    clearBtn.id = "btnClearImage";
-//    clearBtn.className = "btn btn-sm btn-outline-danger d-block mx-auto mt-2";
-//    clearBtn.textContent = "清除圖片";
-//	clearBtn.innerHTML = '<i class="fa-solid fa-trash-can me-1"></i> 清除圖片';
-//	clearBtnContainer.insertAdjacentElement("beforebegin", clearBtn);
-//  }
-  
-   	// 初始決定清除按鈕是否顯示
-	clearBtnToggle(originalSrc, clearBtn);
-  
-  if (input && preview) {
+  if (input && preview) {		
+	
     input.addEventListener("change", function () {
 		
       const file = this.files[0];
@@ -264,7 +226,7 @@ function bindImagePreview() {
 
   clearBtn.addEventListener("click", () => {
     input.value = "";
-	preview.src = "";
+	preview.src = "/images/admin/no_img.svg";
     clearFlag.value = "true";
 	clearBtn.classList.add("d-none");
   });

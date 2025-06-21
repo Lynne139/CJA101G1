@@ -23,7 +23,7 @@
         
 
           <form id="restoEditForm" data-parsley-validate
-            th:object="${resto}" th:action="@{/admin/resto_info/insert}"
+            th:object="${resto}" th:action="@{/admin/resto_info/update}"
             method="post" enctype="multipart/form-data"
             onsubmit="this.querySelector('button[type=submit]').disabled=true">
 

@@ -68,7 +68,7 @@ public class RestoController {
 
 	    if (imageBytes == null || imageBytes.length == 0) {
 	    	// 回傳no_img.svg bytes
-	        try (InputStream is = getClass().getResourceAsStream("/static/images/no_img.svg")) {
+	        try (InputStream is = getClass().getResourceAsStream("/static/images/admin/no_img.svg")) {
 	            if (is != null) {
 	                byte[] defaultImg = is.readAllBytes();
 	                return ResponseEntity
@@ -176,6 +176,8 @@ public class RestoController {
 
 	    // 若欄位驗證有錯，或圖片錯誤，回填 modal
 	    if (result.hasErrors() || hasImageError) {
+	    	// 避免input有新選其他圖，但表單驗證被擋時，回填的model記成input失敗的內容導致preview錯亂
+	    	resto.setRestoImg(null);
 	        model.addAttribute("resto", resto);
 	        return "admin/fragments/resto/modals/resto_add :: addModalContent";
 	    }
@@ -250,6 +252,10 @@ public class RestoController {
 
 	    // 若欄位驗證有錯，或圖片錯誤，回填 modal
 	    if (result.hasErrors() || hasImageError) {
+	    	// 把資料庫圖片補回去(避免input有新選其他圖，但表單驗證被擋時，回填的model記成input失敗的內容導致preview錯亂)
+	        byte[] originalImg = restoService.getById(resto.getRestoId()).getRestoImg();
+	        resto.setRestoImg(originalImg);
+
 	        model.addAttribute("resto", resto);
 	        return "admin/fragments/resto/modals/resto_edit :: editModalContent";
 	    }
