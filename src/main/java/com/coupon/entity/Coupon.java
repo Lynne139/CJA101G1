@@ -110,5 +110,5 @@
 //        return createdAt;
 //    }
 //
-//    // 不需要 setter for createdAt，讓它自動產生
+//    // 不需要 setter for createdAt，讓DB自動產生
 //}
