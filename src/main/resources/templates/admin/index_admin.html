@@ -78,7 +78,8 @@
 				      	<div class="submenu_block ps-4"
 							th:classappend="${currentURI.startsWith('/admin/room')} ? 'show'">
 				        	<a th:href="@{/admin/room1}" th:classappend="${currentURI == '/admin/room1'} ? '-active'" class="sidebar_sub_link">房型子頁1</a>
-				      	</div>
+							<a th:href="@{/admin/roomo_info}" th:classappend="${currentURI == '/admin/roomo_info'} ? '-active'" class="sidebar_sub_link">訂單查詢</a>
+						</div>
 			    	</div>
 			
 					<!-- 餐廳管理 -->
