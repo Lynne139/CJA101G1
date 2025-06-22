@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.room.model.RoomService;
 import com.room.model.RoomVO;
 import com.roomtype.model.RoomTypeService;
@@ -36,96 +38,79 @@ public class RoomController {
 	@Autowired
 	RoomTypeService roomTypeSvc;
 	
-	@GetMapping("/listAllRoom/addRoom")
-	public String addRoom(HttpServletRequest request,HttpServletResponse response,Model model) {
-		String mainFragment = "admin/fragments/room/addRoom";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-		RoomVO roomVO = new RoomVO();
-		model.addAttribute("roomVO", roomVO);
-		List<RoomTypeVO> roomTypeVOList = roomTypeSvc.getAll();
-    	model.addAttribute("roomTypeVOList",roomTypeVOList);
-//		return "admin/fragments/room/addRoom :: addRoomContent";
-		return "admin/index_admin";
-	}
+	// 顯示新增 modal
+    @GetMapping("/add")
+    public String showAddModal(Model model) {
+        RoomVO roomVO = new RoomVO();
+        // 預設房客名稱驗證格式
+        roomVO.setRoomGuestName("");
+        model.addAttribute("roomVO", roomVO);
+        model.addAttribute("roomTypeVOList", roomTypeSvc.getAll());
+        return "admin/fragments/room/modals/room_add :: addModalContent";
+    }
 	
 	
-	@PostMapping("/listAllRoom/insertRoom")
-	public String insert(@Valid RoomVO roomVO, BindingResult result, ModelMap model) {
+ // 新增處理
+    @PostMapping("/insert")
+    public String insertRoom(@Valid @ModelAttribute("roomVO") RoomVO roomVO,
+                              BindingResult result,
+                              RedirectAttributes redirectAttributes,
+                              Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("roomTypeVOList", roomTypeSvc.getAll());
+            return "admin/fragments/room/modals/room_add :: addModalContent";
+        }
+        roomSvc.addRoom(roomVO);
+        redirectAttributes.addFlashAttribute("message", "新增成功！");
+        return "redirect:/admin/room_info";
+    }	
+	
+	
+ // 顯示修改 modal
+    @GetMapping("/edit")
+    public String showEditModal(@RequestParam("roomId") Integer roomId, Model model) {
+        RoomVO roomVO = roomSvc.getOneRoom(roomId);
+        model.addAttribute("roomVO", roomVO);
+        model.addAttribute("roomTypeVOList", roomTypeSvc.getAll());
+        return "admin/fragments/room/modals/room_edit :: editModalContent";
+    }
 
-		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
-		if (result.hasErrors()) {
-		    return "back-end/room/addRoom";
-		}
-		/*************************** 2.開始新增資料 *****************************************/
-		roomSvc.addRoom(roomVO);
-		/*************************** 3.新增完成,準備轉交(Send the Success view) **************/
-		List<RoomVO> list = roomSvc.getAll();
-		model.addAttribute("roomListData", list); // for listAllRoom.html 第85行用
-		model.addAttribute("success", "- (新增成功)");
-		return "redirect:/room/listAllRoom"; // 新增成功後重導至IndexController_inSpringBoot.java的第58行@GetMapping("/room/listAllRoom")
-	}	
-	
-	
-	@PostMapping("getOneRoom_For_Update")
-	public String getOne_For_Update(@RequestParam("roomId") String roomId, ModelMap model) {
-		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
-		/*************************** 2.開始查詢資料 *****************************************/
-		RoomVO roomVO = roomSvc.getOneRoom(Integer.valueOf(roomId));
+    // 修改處理
+    @PostMapping("/update")
+    public String updateRoom(@Valid @ModelAttribute("roomVO") RoomVO roomVO,
+                              BindingResult result,
+                              RedirectAttributes redirectAttributes,
+                              Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("roomTypeVOList", roomTypeSvc.getAll());
+            return "admin/fragments/room/modals/room_edit :: editModalContent";
+        }
+        roomSvc.updateRoom(roomVO);
+        redirectAttributes.addFlashAttribute("message", "修改成功！");
+        return "redirect:/admin/room_info";
+    }
 
-		/*************************** 3.查詢完成,準備轉交(Send the Success view) **************/
-		model.addAttribute("roomVO", roomVO);
-		return "back-end/room/update_room_input"; // 查詢完成後轉交update_room_input.html
-	}
 	
-	@PostMapping("roomUpdate")
-	public String update(@Valid RoomVO roomVO, BindingResult result, ModelMap model) {
+ // 查看單筆資料 modal
+    @GetMapping("/view")
+    public String viewRoom(@RequestParam("roomId") Integer roomId, Model model) {
+        RoomVO roomVO = roomSvc.getOneRoom(roomId);
+        model.addAttribute("roomVO", roomVO);
+        return "admin/fragments/room/modals/room_view :: viewModalContent";
+    }
 
-		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
-		if (result.hasErrors()) {
-		    return "back-end/room/update_room_input";
-		}
-		/*************************** 2.開始修改資料 *****************************************/
-		roomSvc.updateRoom(roomVO);
+    // 刪除
+//    @GetMapping("/delete")
+//    public String deleteRoom(@RequestParam("roomId") Integer roomId, RedirectAttributes redirectAttributes) {
+//        roomSvc.deleteRoom(roomId);
+//        redirectAttributes.addFlashAttribute("message", "刪除成功！");
+//        return "redirect:/admin/room_info";
+//    }
 
-		/*************************** 3.修改完成,準備轉交(Send the Success view) **************/
-		model.addAttribute("success", "- (修改成功)");
-		roomVO = roomSvc.getOneRoom(Integer.valueOf(roomVO.getRoomId()));
-		model.addAttribute("roomVO", roomVO);
-		return "back-end/room/listOneRoom"; // 修改成功後轉交listOneRoom.html
-	}
-	
-	@ModelAttribute("roomTypeListData")
-	protected List<RoomTypeVO> referenceListData() {
-		List<RoomTypeVO> list = roomTypeSvc.getAll();
-		return list;
-	}
-	
-	@PostMapping("getOneRoom_For_Display")
-	public String getOne_For_Display(
-		/***************************1.接收請求參數 - 輸入格式的錯誤處理*************************/
-		@RequestParam("roomId") String roomId,
-		ModelMap model) {
-		
-		/***************************2.開始查詢資料*********************************************/
-		RoomVO roomVO = roomSvc.getOneRoom(Integer.valueOf(roomId));
-		
-		List<RoomVO> list = roomSvc.getAll();
-		model.addAttribute("roomTypeListData", list);     // for select_page.html 第97 109行用
-		model.addAttribute("roomTypeVO", new RoomTypeVO());  // for select_page.html 第133行用
-		List<RoomTypeVO> list2 = roomTypeSvc.getAll();
-    	model.addAttribute("roomTypeListData",list2);    // for select_page.html 第135行用
-		
-		if (roomVO == null) {
-			model.addAttribute("errorMessage", "查無資料");
-			return "back-end/room/select_page";
-		}
-		
-		/***************************3.查詢完成,準備轉交(Send the Success view)*****************/
-		model.addAttribute("roomVO", roomVO); // for1 --> listOneEmp.html 的第37~44行用
-                                            // for2 --> select_page.html的第156用
-//		return "back-end/room/listOneRoom";   // 查詢完成後轉交listOneEmp.html
-		return "back-end/room/select_page";  // 查詢完成後轉交select_page.html由其第158行insert listOneEmp.html內的th:fragment="listOneEmp-div
-	}
+    // 房型列表供下拉選單用
+    @ModelAttribute("roomTypeVOList")
+    public List<RoomTypeVO> getRoomTypes() {
+        return roomTypeSvc.getAll();
+    }
 	
 }
