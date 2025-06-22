@@ -30,9 +30,9 @@ public class RoomTypeVO implements java.io.Serializable {
 	private static final long serialVersionUID = 11L;
 
 	//樂觀鎖設定
-	@Version
-	@Column(name = "version", nullable = false)
-	private Integer version = 0;
+//	@Version
+//	@Column(name = "version", nullable = false)
+//	private Integer version = 0;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -144,13 +144,13 @@ public class RoomTypeVO implements java.io.Serializable {
 		this.roomVOs = roomVOs;
 	}
 
-	public Integer getVersion() {
-		return version;
-	}
-
-	public void setVersion(Integer version) {
-		this.version = version;
-	}
+//	public Integer getVersion() {
+//		return version;
+//	}
+//
+//	public void setVersion(Integer version) {
+//		this.version = version;
+//	}
 
 	public RoomTypeVO() {
 	}

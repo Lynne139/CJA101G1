@@ -53,7 +53,7 @@ public class RoomVO {
 	public RoomTypeVO getRoomTypeVO() {
 		return roomTypeVO;
 	}
-	public void setRoomTypeHibernateVO(RoomTypeVO roomTypeVO) {
+	public void setRoomTypeVO(RoomTypeVO roomTypeVO) {
 		this.roomTypeVO = roomTypeVO;
 	}
 	public String getRoomGuestName() {
