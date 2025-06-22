@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>所有商品資料 - listAllProd.html</title>
+    <title>所有商品分類資料 - listAllProdCate.html</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -20,12 +20,12 @@
             <!-- 主內容 -->
             <main class="col-12 p-4">
                 <div class="w-100 mx-auto">
-                    <!-- 商品列表 fragment，簡約設計，與整體風格呼應 -->
-                    <div th:fragment="listAllProd-div">
+                    <!-- 商品分類列表 fragment，簡約設計，與整體風格呼應 -->
+                    <div th:fragment="listAllProdCate-div">
                         <div class="panel">
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h3 class="panel-title">商品列表</h3>
-                                <span class="text-muted">共 <span th:text="${prodListData.size()}"></span> 項商品</span>
+                                <h3 class="panel-title">商品分類列表</h3>
+                                <span class="text-muted">共 <span th:text="${prodCateListData.size()}"></span> 項商品分類</span>
                             </div>
                             <div class="table-responsive">
                                 <!-- 載入動畫 -->
@@ -33,40 +33,31 @@
                                     <div class="spinner-border" role="status" style="color: var(--color-primary);">
                                         <span class="visually-hidden">載入中...</span>
                                     </div>
-                                    <p class="mt-2 text-muted">正在載入商品資料...</p>
+                                    <p class="mt-2 text-muted">正在載入商品分類資料...</p>
                                 </div>
                                 
                                 <!-- 表格容器，初始隱藏 -->
                                 <div id="tableContainer" style="display: none;">
-                                    <table id="prodTable" class="table table-lined">
+                                    <table id="prodCateTable" class="table table-lined">
                                         <thead>
                                             <tr>
                                                 <th style="width: 50px; text-align: center;">編號</th>
-                                                <th style="width: 120px; text-align: center;">名稱</th>
-                                                <th style="width: 80px; text-align: center;">價格</th>
-                                                <th style="width: 120px; text-align: center;">類別</th>
-                                                <th style="width: 70px; text-align: center;">狀態</th>
+                                                <th style="width: 150px; text-align: center;">分類名稱</th>
+                                                <th style="width: 200px; text-align: center;">分類說明</th>
                                                 <th style="width: 70px; text-align: center;">修改</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr  th:each="prodVO : ${prodListData}">
-                                                <td style="text-align: center;" th:text="${prodVO.productId}"></td>
-                                                <td style="text-align: center;" th:text="${prodVO.productName}"></td>
-                                                <td style="text-align: center;" th:text="${prodVO.productPrice}"></td>
-                                                <td style="text-align: center;" th:text="${prodVO.prodCateVO.prodCateId} + ' - ' + ${prodVO.prodCateVO.prodCateName}"></td>
-                                                <td style="text-align: center;" class="text-center">
-                                                    <span th:classappend="${prodVO.productStatus == true} ? 'badge bg-success' : 'badge bg-danger'" 
-                                                          class="badge">
-                                                        <span th:text="${prodVO.productStatus == true} ? '上架' : '下架'"></span>
-                                                    </span>
-                                                </td>
+                                            <tr th:each="prodCateVO : ${prodCateListData}">
+                                                <td style="text-align: center;" th:text="${prodCateVO.prodCateId}"></td>
+                                                <td style="text-align: center;" th:text="${prodCateVO.prodCateName}"></td>
+                                                <td style="text-align: center;" th:text="${prodCateVO.prodCateDesc}"></td>
                                                 <td class="text-center">
                                                     <button type="button" class="btn btn-sm btn-outline-primary" 
                                                             data-bs-toggle="modal" 
-                                                            data-bs-target="#editProdModal"
-                                                            th:data-product-id="${prodVO.productId}"
-                                                            onclick="loadEditProdModal(this)">
+                                                            data-bs-target="#editProdCateModal"
+                                                            th:data-prodCate-id="${prodCateVO.prodCateId}"
+                                                            onclick="loadEditProdCateModal(this)">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                 </td>
@@ -92,7 +83,7 @@
     <!-- DataTables 設定 -->
     <script>
         $(document).ready(function() {
-            $('#prodTable').DataTable({
+            $('#prodCateTable').DataTable({
                 "lengthMenu": [3, 5, 10, 20, 50, 100],
                 "searching": true,  // 搜尋功能
                 "paging": true,     // 分頁功能

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新增商品 - addProd.html</title>
+    <title>新增商品分類 - addProdCate.html</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -19,44 +19,30 @@
             <main class="col-12 p-4">
                 <div class="w-100 mx-auto">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h1 class="panel-title">新增商品</h1>
+                        <h1 class="panel-title">新增商品分類</h1>
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                             <i class="fas fa-times me-2"></i>
                             關閉
                         </button>
                     </div>
 
-                    <!-- 新增商品表單 -->
+                    <!-- 新增商品分類表單 -->
                     <div class="panel">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h2 class="panel-title">商品資料</h2>
+                            <h2 class="panel-title">商品分類資料</h2>
                             <span class="text-muted">所有欄位皆為必填</span>
                         </div>
-                        <form th:action="@{/prod/insert}" method="post" th:object="${prodVO}" enctype="multipart/form-data">
+                        <form th:action="@{/prodCate/insert}" method="post" th:object="${prodCateVO}" enctype="multipart/form-data">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">商品類別</label>
-                                    <select th:field="*{prodCateVO.prodCateId}" class="form-select">
-                                        <option th:each="cate : ${prodCateListData}" th:value="${cate.prodCateId}" th:text="${cate.prodCateName}"></option>
-                                    </select>
+                                    <label class="form-label">商品分類名稱</label>
+                                    <input type="text" th:field="*{prodCateName}" onclick="hideContent('prodCateName.errors');" class="form-control" placeholder="請輸入商品分類名稱" />
+                                    <span th:if="${#fields.hasErrors('prodCateName')}" th:errors="*{prodCateName}" class="text-danger small" id="prodCateName.errors"></span>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">商品狀態</label>
-                                    <select th:field="*{productStatus}" class="form-select">
-                                        <option th:value="true">上架</option>
-                                        <option th:value="false">下架</option>
-                                    </select>
-                                    <span th:if="${#fields.hasErrors('productStatus')}" th:errors="*{productStatus}" class="text-danger small" id="productStatus.errors"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">商品名稱</label>
-                                    <input type="text" th:field="*{productName}" onclick="hideContent('productName.errors');" class="form-control" placeholder="請輸入商品名稱" />
-                                    <span th:if="${#fields.hasErrors('productName')}" th:errors="*{productName}" class="text-danger small" id="productName.errors"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">商品價錢</label>
-                                    <input type="text" th:field="*{productPrice}" onclick="hideContent('productPrice.errors');" class="form-control" placeholder="請輸入商品價錢" />
-                                    <span th:if="${#fields.hasErrors('productPrice')}" th:errors="*{productPrice}" class="text-danger small" id="productPrice.errors"></span>
+                                    <label class="form-label">商品分類說明</label>
+                                    <input type="text" th:field="*{prodCateDesc}" onclick="hideContent('prodCateDesc.errors');" class="form-control" placeholder="請輸入商品分類說明" />
+                                    <span th:if="${#fields.hasErrors('prodCateDesc')}" th:errors="*{prodCateDesc}" class="text-danger small" id="prodCateDesc.errors"></span>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end pt-4 border-top mt-4">

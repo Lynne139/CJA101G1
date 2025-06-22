@@ -15,17 +15,17 @@ import jakarta.servlet.http.HttpServletResponse;
 @Controller
 public class ProdPhotoDBGifReaderController {
 	
-	 @Autowired
-	    private ProdPhotoService prodPhotoService;
-
-	    @GetMapping("/prodPhoto/DBGifReader")
-	    public void getPhoto(@RequestParam("prodPhotoId") Integer prodPhotoId, HttpServletResponse response) throws IOException {
-	        ProdPhotoVO vo = prodPhotoService.getOneProdPhoto(prodPhotoId);
-	        byte[] photo = vo != null ? vo.getProdPhoto() : null;
-	        if (photo != null) {
-	            response.setContentType("image/jpeg"); // 根據實際圖片格式調整
-	            response.getOutputStream().write(photo);
-	        }
-	    }
+//	 @Autowired
+//	    private ProdPhotoService prodPhotoService;
+//
+//	    @GetMapping("/prodPhoto/DBGifReader")
+//	    public void getPhoto(@RequestParam("prodPhotoId") Integer prodPhotoId, HttpServletResponse response) throws IOException {
+//	        ProdPhotoVO vo = prodPhotoService.getOneProdPhoto(prodPhotoId);
+//	        byte[] photo = vo != null ? vo.getProdPhoto() : null;
+//	        if (photo != null) {
+//	            response.setContentType("image/jpeg"); // 根據實際圖片格式調整
+//	            response.getOutputStream().write(photo);
+//	        }
+//	    }
 
 }

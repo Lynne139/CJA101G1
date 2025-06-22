@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.prod.model.ProdService;
 import com.prodCate.model.ProdCateService;
 import com.prodCate.model.ProdCateVO;
+import com.prodPhoto.model.ProdPhotoService;
+import com.prodPhoto.model.ProdPhotoVO;
+
 import com.resto.model.RestoService;
 import com.resto.model.RestoVO;
 
@@ -30,6 +33,9 @@ public class AdminIndexController {
 	
 	@Autowired
 	ProdCateService prodCateSvc;
+	
+	@Autowired
+	ProdPhotoService prodPhotoSvc;
 		
 	// === 後台首頁 ===
     @GetMapping("")
@@ -128,6 +134,7 @@ public class AdminIndexController {
     } 
     
     // === 商店管理 ===
+ // === 商店管理 ===
     @GetMapping("/prod/select_page")
     public String prod(HttpServletRequest request,Model model) {
 
@@ -165,28 +172,83 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
     } 
-    @GetMapping("/prodCate")
-    public String prodCate(HttpServletRequest request,Model model) {
+    @GetMapping("/prodCate/select_page")
+    public String prodCateSelectPage(HttpServletRequest request,Model model) {
 
-    	String mainFragment = "admin/fragments/shop/prodCate";
+    	String mainFragment = "admin/fragments/shop/prodCate/select_page";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	// 添加商品分類資料到 model 中
+    	List<com.prodCate.model.ProdCateVO> list = prodCateSvc.getAll();
+    	model.addAttribute("prodCateListData", list);
+    	
+    	// 檢查是否有錯誤訊息
+    	String errorMessage = request.getParameter("errorMessage");
+    	if (errorMessage != null && !errorMessage.isEmpty()) {
+    		model.addAttribute("errorMessage", errorMessage);
+    	}
+    	
+    	// 檢查是否有查詢結果
+    	String prodCateId = request.getParameter("prodCateId");
+    	if (prodCateId != null && !prodCateId.isEmpty()) {
+    		try {
+    			com.prodCate.model.ProdCateVO prodCateVO = prodCateSvc.getOneProdCate(Integer.valueOf(prodCateId));
+    			if (prodCateVO != null) {
+    				model.addAttribute("prodCateVO", prodCateVO);
+    			} else {
+    				model.addAttribute("errorMessage", "查無資料");
+    			}
+    		} catch (NumberFormatException e) {
+    			model.addAttribute("errorMessage", "商品分類編號格式錯誤");
+    		}
+    	}
 
     	return "admin/index_admin";
-    } 
+    }
+    
+    @GetMapping("/prodPhoto/select_page")
+	public String selectPage(HttpServletRequest request, Model model) {
+
+		String mainFragment = "admin/fragments/shop/prodPhoto/select_page";
+		model.addAttribute("mainFragment", mainFragment);
+		model.addAttribute("currentURI", request.getRequestURI());
+		
+		// 添加商品照片資料到 model 中
+		List<com.prodPhoto.model.ProdPhotoVO> list = prodPhotoSvc.getAll();
+    	model.addAttribute("prodPhotoListData", list);
+
+		List<com.prod.model.ProdVO> list2 = prodSvc.getAll();
+		model.addAttribute("prodListData", list2);
+		
+		// 檢查是否有錯誤訊息
+		String errorMessage = request.getParameter("errorMessage");
+		if (errorMessage != null && !errorMessage.isEmpty()) {
+			model.addAttribute("errorMessage", errorMessage);
+		}
+		
+		// 檢查是否有查詢結果
+		String prodPhotoId = request.getParameter("prodPhotoId");
+		if (prodPhotoId != null && !prodPhotoId.isEmpty()) {
+			try {
+				ProdPhotoVO prodPhotoVO = prodPhotoSvc.getOneProdPhoto(Integer.valueOf(prodPhotoId));
+				if (prodPhotoVO != null) {
+					model.addAttribute("prodPhotoVO", prodPhotoVO);
+				} else {
+					model.addAttribute("errorMessage", "查無資料");
+				}
+			} catch (NumberFormatException e) {
+				model.addAttribute("errorMessage", "商品照片編號格式錯誤");
+			}
+		}
+		
+		return "admin/index_admin";
+	}
+    
     @GetMapping("/prodCart")
     public String shop3(HttpServletRequest request,Model model) {
 
     	String mainFragment = "admin/fragments/shop/prodCart";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-
-    	return "admin/index_admin";
-    } 
-    @GetMapping("/prodPhoto")
-    public String shop4(HttpServletRequest request,Model model) {
-
-    	String mainFragment = "admin/fragments/shop/prodPhoto";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 
