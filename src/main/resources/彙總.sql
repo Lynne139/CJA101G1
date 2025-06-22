@@ -130,7 +130,7 @@ Is_active boolean not null default true
 INSERT INTO ROLE_LIST (ROLE_NAME, REMARK)
 VALUES 
 ('系統管理員', '擁有全站存取權限'),
-('客服專員', '可回覆顧客留言與查詢訂單');
+('客服部', '可回覆顧客留言與查詢訂單');
 
 -- 職稱表 
 create table job_title (
@@ -158,6 +158,7 @@ Name Varchar(50) not null,
 Status boolean default true not null,
 Created_date date not null,
 Password Varchar(50) not null,
+employee_photo LONGBLOB,
 foreign key (Role_id) references Role_list (Role_id),
 foreign key (job_title_id) references job_title (job_title_id)
 );

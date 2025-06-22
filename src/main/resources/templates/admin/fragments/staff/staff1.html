@@ -1,7 +1,7 @@
 <div th:fragment="content">
 	<div class="main_staff1 container py-4">
 		<h4>新增員工</h4>
-		<form id="addEmployeeForm" method="post" th:action="@{/employees}" enctype="multipart/form-data">
+		<form id="addEmployeeForm" method="post" th:action="@{/employees/form}" enctype="multipart/form-data">
 			<div class="mb-2">
 				<label>姓名</label>
 				<input type="text" name="name" class="form-control" required />
@@ -11,12 +11,16 @@
 				<input type="password" name="password" class="form-control" required />
 			</div>
 			<div class="mb-2">
-				<label>部門/角色</label>
-				<select name="roleId" class="form-select" id="roleSelect" required></select>
+				<label>部門</label>
+				<select name="roleId" class="form-select" id="roleSelect">
+					<option value="">部門</option>
+				</select>
 			</div>
 			<div class="mb-2">
 				<label>職稱</label>
-				<select name="jobTitleId" class="form-select" id="jobTitleSelect"></select>
+				<select name="jobTitleId" class="form-select" id="jobTitleSelect" required>
+					<option value="">請選擇職稱</option>
+				</select>
 			</div>
 			<div class="mb-2">
 				<label>狀態</label>

@@ -76,7 +76,7 @@ public class AdminIndexController {
     } 
     
     // === 員工管理 ===
-    // === 新增/查詢 ===
+    // === 新增 ===
     @GetMapping("/staff1")
     public String staff1(HttpServletRequest request,Model model) {
 
@@ -86,11 +86,21 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
     } 
-    // === 權限管理 ===
+    // === 查詢 ===
     @GetMapping("/staff2")
     public String staff2(HttpServletRequest request,Model model) {
 
     	String mainFragment = "admin/fragments/staff/staff2";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    }
+    // === 權限管理 ===
+    @GetMapping("/staff3")
+    public String staff3(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/staff/staff3";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 
