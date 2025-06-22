@@ -155,7 +155,9 @@
                   
 		          		<div class="submenu_block ps-4"
 		          			th:classappend="${currentURI.startsWith('/admin/news')} ? 'show'">
-		            		<a th:href="@{/admin/news1}" th:classappend="${currentURI == '/admin/news1'} ? '-active'" class="sidebar_sub_link">消息子頁1</a>
+		            		<a th:href="@{/admin/news1}" th:classappend="${currentURI == '/admin/news1'} ? '-active'" class="sidebar_sub_link">最新消息</a>
+							<a th:href="@{/admin/news2}" th:classappend="${currentURI == '/admin/news2'} ? '-active'" class="sidebar_sub_link">活動消息</a>
+							<a th:href="@{/admin/news3}" th:classappend="${currentURI == '/admin/news3'} ? '-active'" class="sidebar_sub_link">媒體消息</a>	          		
 		          		</div>
 		        	</div>
 		  		</nav>		
