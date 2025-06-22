@@ -45,9 +45,13 @@ public class ProdController {
 	@Autowired
 	ProdCateService prodCateSvc;
 	
-	@GetMapping("select_page")
-	public String selectPage() {
-		return "admin/fragments/shop/prod/select_page";
+	@GetMapping("/admin/prod/select_page")
+	public String selectPage(Model model) {
+		model.addAttribute("prodVO", new ProdVO());
+		model.addAttribute("prodCateListData", prodCateSvc.getAll());
+		model.addAttribute("prodListData", prodSvc.getAll());
+		model.addAttribute("mainFragment", "admin/fragments/shop/prod/select_page :: content");
+		return "admin/index_admin";
 	}
 	
 	@GetMapping("listAllProd")
@@ -79,6 +83,7 @@ public class ProdController {
 		ProdVO prodVO = new ProdVO();
 		prodVO.setProductStatus(true);
 		model.addAttribute("prodVO", prodVO);
+		model.addAttribute("prodCateListData", prodCateSvc.getAll());
 		return "admin/fragments/shop/prod/addProd";
 	}
 
@@ -97,11 +102,9 @@ public class ProdController {
 	    prodSvc.addProd(prodVO); // 呼叫你的 Service 層方法（這裡記得改成你對應的方法）
 
 	    /*************************** 3.新增完成,準備轉交(Send the Success view) **************/
-	    List<ProdVO> list = prodSvc.getAll();
-	    model.addAttribute("prodListData", list); // 頁面上顯示用的清單資料
-	    model.addAttribute("success", "- (新增成功)");
-
-	    return "redirect:/prod/listAllProd"; // 新增完成後導向商品分類列表
+	    // 取得新增後的商品ID，然後redirect到select_page並顯示該商品
+	    Integer newProductId = prodVO.getProductId();
+	    return "redirect:/admin/prod/select_page?productId=" + newProductId + "&success=true";
 	}
 
 	/*
@@ -132,13 +135,12 @@ public class ProdController {
 		}
 		/*************************** 2.開始修改資料 *****************************************/
 		// EmpService empSvc = new EmpService();
-		prodSvc.updateProd(prodVO);
 
+		prodSvc.updateProd(prodVO);
 		/*************************** 3.修改完成,準備轉交(Send the Success view) **************/
-		model.addAttribute("success", "- (修改成功)");
-		prodVO = prodSvc.getOneProd(Integer.valueOf(prodVO.getProductId()));
-		model.addAttribute("prodVO", prodVO);
-		return "admin/fragments/shop/prod/listOneProd"; // 修改成功後轉交listOneEmp.html
+		// 取得修改後的商品ID，然後redirect到select_page並顯示該商品
+		Integer productId = prodVO.getProductId();
+		return "redirect:/admin/prod/select_page?productId=" + productId + "&updateSuccess=true";
 	}
 
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品資料 - listOneProd.html</title>
+    <title>商品照片資料 - listOneProdPhoto.html</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -18,45 +18,40 @@
             <!-- 主內容 -->
             <main class="col-12 p-4">
                 <div class="w-100 mx-auto">
-                    <!-- 單一商品查詢結果 fragment -->
-                    <div th:fragment="listOneProd-div">
+                    <!-- 單一商品照片查詢結果 fragment -->
+                    <div th:fragment="listOneProdPhoto-div">
                         <div class="panel">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h3 class="panel-title">查詢結果</h3>
                                 <button type="button" class="btn btn_accent btn-sm" 
                                         data-bs-toggle="modal" 
-                                        data-bs-target="#editProdModal"
-                                        th:data-product-id="${prodVO.productId}"
-                                        onclick="loadEditProdModal(this)">
+                                        data-bs-target="#editProdPhotoModal"
+                                        th:data-prodPhoto-id="${prodPhotoVO.prodPhotoId}"
+                                        onclick="loadEditProdPhotoModal(this)">
                                     <i class="fas fa-edit me-1"></i>
-                                    修改商品資訊
+                                    修改商品照片資訊
                                 </button>
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-lined">
                                     <tbody>
                                         <tr>
-                                            <th class="w-25">商品編號</th>
-                                            <td th:text="${prodVO.productId}"></td>
+                                            <th class="w-25">商品照片編號</th>
+                                            <td th:text="${prodPhotoVO.prodPhotoId}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>商品編號</th>
+                                            <td th:text="${prodPhotoVO.prodVO.productId}"></td>
                                         </tr>
                                         <tr>
                                             <th>商品名稱</th>
-                                            <td th:text="${prodVO.productName}"></td>
+                                            <td th:text="${prodPhotoVO.prodVO.productName}"></td>
                                         </tr>
                                         <tr>
-                                            <th>商品價格</th>
-                                            <td th:text="${prodVO.productPrice}"></td>
-                                        </tr>
-                                        <tr>
-                                            <th>商品類別</th>
-                                            <td th:text="${prodVO.prodCateVO.prodCateId} + ' - ' + ${prodVO.prodCateVO.prodCateName}"></td>
-                                        </tr>
-                                        <tr>
-                                            <th>商品狀態</th>
+                                            <th>商品照片</th>
                                             <td>
-                                                <span th:classappend="${prodVO.productStatus == true} ? 'badge bg-success' : 'badge bg-danger'" class="badge">
-                                                    <span th:text="${prodVO.productStatus == true} ? '上架' : '下架'"></span>
-                                                </span>
+                                                <img th:src="@{/prodPhoto/DBGifReader} + '?prodPhotoId=' + ${prodPhotoVO.prodPhotoId}" 
+                                                     width="200px" class="img-thumbnail" alt="商品照片">
                                             </td>
                                         </tr>
                                     </tbody>
@@ -74,4 +69,4 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </body>
-</html> 
+</html>

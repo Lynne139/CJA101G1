@@ -1,12 +1,12 @@
 <div th:fragment="content">
     <div class="px-1 py-3">
-        <!-- 查詢區塊（商品篩選卡片） -->
+        <!-- 查詢區塊（商品照片篩選卡片） -->
         <div class="panel mb-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="panel-title">商品篩選</h2>
-                <button type="button" class="btn btn_accent" data-bs-toggle="modal" data-bs-target="#addProdModal">
+                <h2 class="panel-title">商品照片篩選</h2>
+                <button type="button" class="btn btn_accent" data-bs-toggle="modal" data-bs-target="#addProdPhotoModal">
                     <i class="fas fa-plus me-2"></i>
-                    新增商品
+                    新增商品照片
                 </button>
             </div>
             
@@ -17,7 +17,7 @@
             <div th:if="${param.success}" class="alert alert-success mb-3 d-flex justify-content-between align-items-center">
                 <div>
                     <i class="fas fa-check-circle me-2"></i>
-                    商品新增成功！新增的商品編號為 [[${param.productId}]]
+                    商品照片新增成功！新增的商品照片編號為 [[${param.prodPhotoId}]]
                 </div>
                 <button type="button" class="btn btn-outline-success btn-sm" onclick="clearSuccessMessage()">
                     <i class="fas fa-times me-1"></i>
@@ -28,7 +28,7 @@
             <div th:if="${param.updateSuccess}" class="alert alert-success mb-3 d-flex justify-content-between align-items-center">
                 <div>
                     <i class="fas fa-check-circle me-2"></i>
-                    商品修改成功！
+                    商品照片修改成功！
                 </div>
                 <button type="button" class="btn btn-outline-success btn-sm" onclick="clearSuccessMessage()">
                     <i class="fas fa-times me-1"></i>
@@ -37,13 +37,13 @@
             </div>
             
             <div class="row g-2">
-                <!-- 輸入商品編號 -->
+                <!-- 輸入商品照片編號 -->
                 <div class="col-md-4">
-                    <form method="get" th:action="@{/admin/prod/select_page}">
-                        <label class="form-label">商品編號</label>
+                    <form method="get" th:action="@{/admin/prodPhoto/select_page}">
+                        <label class="form-label">商品照片編號</label>
                         <div class="input-group">
-                            <input type="text" name="productId" th:value="${param.productId}" 
-                                   class="form-control" placeholder="輸入商品編號">
+                            <input type="text" name="prodPhotoId" th:value="${param.prodPhotoId}" 
+                                   class="form-control" placeholder="輸入商品照片編號">
                             <button type="submit" class="btn btn_secondary" title="查詢">
                                 <i class="fas fa-search"></i>
                             </button>
@@ -51,16 +51,16 @@
                     </form>
                 </div>
                 
-                <!-- 選擇商品編號 -->
+                <!-- 選擇商品照片編號 -->
                 <div class="col-md-4">
-                    <form method="get" th:action="@{/admin/prod/select_page}">
-                        <label class="form-label">商品編號</label>
+                    <form method="get" th:action="@{/admin/prodPhoto/select_page}">
+                        <label class="form-label">商品照片編號</label>
                         <div class="input-group">
-                            <select name="productId" class="form-select">
-                                <option value="" selected disabled>請選擇商品編號</option>
-                                <option th:each="prodVO : ${prodListData}" 
-                                        th:value="${prodVO.productId}" 
-                                        th:text="${prodVO.productId}"></option>
+                            <select name="prodPhotoId" class="form-select">
+                                <option value="" selected disabled>請選擇商品照片編號</option>
+                                <option th:each="prodPhotoVO : ${prodPhotoListData}" 
+                                        th:value="${prodPhotoVO.prodPhotoId}" 
+                                        th:text="${prodPhotoVO.prodPhotoId}"></option>
                             </select>
                             <button type="submit" class="btn btn_secondary" title="查詢">
                                 <i class="fas fa-search"></i>
@@ -69,47 +69,47 @@
                     </form>
                 </div>
                 
-                <!-- 選擇商品名稱 -->
-                <div class="col-md-4">
-                    <form method="get" th:action="@{/admin/prod/select_page}">
-                        <label class="form-label">商品名稱</label>
-                        <div class="input-group">
-                            <select name="productId" class="form-select">
-                                <option value="" selected disabled>請選擇商品名稱</option>
-                                <option th:each="prodVO : ${prodListData}" 
-                                        th:value="${prodVO.productId}" 
-                                        th:text="${prodVO.productName}"></option>
-                            </select>
-                            <button type="submit" class="btn btn_secondary" title="查詢">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                <!-- 選擇商品 -->
+<!--                 <div class="col-md-4"> -->
+<!--                     <form method="get" th:action="@{/admin/prodPhoto/select_page}"> -->
+<!--                         <label class="form-label">商品</label> -->
+<!--                         <div class="input-group"> -->
+<!--                             <select name="productId" class="form-select"> -->
+<!--                                 <option value="" selected disabled>請選擇商品</option> -->
+<!--                                 <option th:each="prodVO : ${prodListData}"  -->
+<!--                                         th:value="${prodVO.productId}"  -->
+<!--                                         th:text="${prodVO.productName}"></option> -->
+<!--                             </select> -->
+<!--                             <button type="submit" class="btn btn_secondary" title="查詢"> -->
+<!--                                 <i class="fas fa-search"></i> -->
+<!--                             </button> -->
+<!--                         </div> -->
+<!--                     </form> -->
+<!--                 </div> -->
             </div>
         </div>
 
         
         <!-- 查詢結果顯示區域 -->
-        <div th:if="${prodVO != null}">
-            <div th:insert="~{/admin/fragments/shop/prod/listOneProd :: listOneProd-div}"></div>
+        <div th:if="${prodPhotoVO != null}">
+            <div th:insert="~{/admin/fragments/shop/prodPhoto/listOneProdPhoto :: listOneProdPhoto-div}"></div>
         </div>
         
-        <div th:if="${prodVO == null}">
-            <div th:insert="~{/admin/fragments/shop/prod/listAllProd :: listAllProd-div}"></div>
+        <div th:if="${prodPhotoVO == null}">
+            <div th:insert="~{/admin/fragments/shop/prodPhoto/listAllProdPhoto :: listAllProdPhoto-div}"></div>
         </div>
     </div>
 </div>
 
-<!-- 新增商品 Modal -->
-<div class="modal fade" id="addProdModal" tabindex="-1" aria-labelledby="addProdModalLabel" aria-hidden="true">
+<!-- 新增商品照片 Modal -->
+<div class="modal fade" id="addProdPhotoModal" tabindex="-1" aria-labelledby="addProdPhotoModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addProdModalLabel">新增商品</h5>
+        <h5 class="modal-title" id="addProdPhotoModalLabel">新增商品照片</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body" id="addProdModalBody">
+      <div class="modal-body" id="addProdPhotoModalBody">
         <!-- 載入中... -->
         <div class="text-center">
           <div class="spinner-border" role="status">
@@ -121,15 +121,15 @@
   </div>
 </div>
 
-<!-- 修改商品 Modal -->
-<div class="modal fade" id="editProdModal" tabindex="-1" aria-labelledby="editProdModalLabel" aria-hidden="true">
+<!-- 修改商品照片 Modal -->
+<div class="modal fade" id="editProdPhotoModal" tabindex="-1" aria-labelledby="editProdPhotoModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editProdModalLabel">修改商品資訊</h5>
+        <h5 class="modal-title" id="editProdPhotoModalLabel">修改商品照片資訊</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body" id="editProdModalBody">
+      <div class="modal-body" id="editProdPhotoModalBody">
         <!-- 載入中... -->
         <div class="text-center">
           <div class="spinner-border" role="status">
@@ -142,9 +142,9 @@
 </div>
 
 <script>
-// 當 modal 開啟時載入 addProd 頁面內容
-document.getElementById('addProdModal').addEventListener('show.bs.modal', function () {
-  const modalBody = document.getElementById('addProdModalBody');
+// 當 modal 開啟時載入 addProdPhoto 頁面內容
+document.getElementById('addProdPhotoModal').addEventListener('show.bs.modal', function () {
+  const modalBody = document.getElementById('addProdPhotoModalBody');
   
   // 顯示載入中
   modalBody.innerHTML = `
@@ -155,8 +155,8 @@ document.getElementById('addProdModal').addEventListener('show.bs.modal', functi
     </div>
   `;
   
-  // 用 AJAX 載入 addProd 頁面內容
-  fetch('/prod/addProd')
+  // 用 AJAX 載入 addProdPhoto 頁面內容
+  fetch('/admin/prodPhoto/addProdPhoto')
     .then(response => response.text())
     .then(html => {
       // 解析 HTML 並提取表單內容
@@ -199,10 +199,10 @@ document.getElementById('addProdModal').addEventListener('show.bs.modal', functi
     });
 });
 
-// 載入修改商品 Modal 內容
-function loadEditProdModal(button) {
-  const productId = button.getAttribute('data-product-id');
-  const modalBody = document.getElementById('editProdModalBody');
+// 載入修改商品照片 Modal 內容
+function loadEditProdPhotoModal(button) {
+  const prodPhotoId = button.getAttribute('data-prodPhoto-id');
+  const modalBody = document.getElementById('editProdPhotoModalBody');
   
   // 顯示載入中
   modalBody.innerHTML = `
@@ -213,13 +213,13 @@ function loadEditProdModal(button) {
     </div>
   `;
   
-  // 用 AJAX 載入修改商品頁面內容
-  fetch('/prod/getOne_For_Update', {
+  // 用 AJAX 載入修改商品照片頁面內容
+  fetch('/admin/prodPhoto/getOne_For_Update', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: 'productId=' + productId
+    body: 'prodPhotoId=' + prodPhotoId
   })
     .then(response => response.text())
     .then(html => {
@@ -265,36 +265,37 @@ function loadEditProdModal(button) {
 
 // 關閉成功訊息
 function clearSuccessMessage() {
-  // 移除 URL 中的 productId、success 和 updateSuccess 參數
+  // 移除 URL 中的 prodPhotoId、success 和 updateSuccess 參數
   const url = new URL(window.location);
-  url.searchParams.delete('productId');
+  url.searchParams.delete('prodPhotoId');
   url.searchParams.delete('success');
   url.searchParams.delete('updateSuccess');
+  url.searchParams.delete('errorMessage');
   
   // 重新導向到沒有參數的頁面
-  window.location.href = url.toString();
+  window.location.href = '/admin/prodPhoto/select_page';
 }
 
 // 初始化 DataTables
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM Content Loaded');
+  console.log('DOM Content Loaded in select_page');
   
   // 延遲一點時間確保所有內容都載入完成
   setTimeout(function() {
-    console.log('Checking for prodTable...');
-    const prodTable = document.getElementById('prodTable');
+    console.log('Checking for prodPhotoTable...');
+    const prodPhotoTable = document.getElementById('prodPhotoTable');
     const tableLoading = document.getElementById('tableLoading');
     const tableContainer = document.getElementById('tableContainer');
     
-    console.log('prodTable found:', prodTable);
+    console.log('prodPhotoTable found:', prodPhotoTable);
     console.log('jQuery available:', typeof $ !== 'undefined');
     console.log('DataTable available:', typeof $.fn.DataTable !== 'undefined');
     
-    if (prodTable && typeof $ !== 'undefined' && typeof $.fn.DataTable !== 'undefined') {
+    if (prodPhotoTable && typeof $ !== 'undefined' && typeof $.fn.DataTable !== 'undefined') {
       console.log('Initializing DataTable...');
       
       // 初始化 DataTable
-      const dataTable = $('#prodTable').DataTable({
+      const dataTable = $('#prodPhotoTable').DataTable({
         "lengthMenu": [3, 5, 10, 20, 50, 100],
         "searching": true,  // 搜尋功能
         "paging": true,     // 分頁功能
@@ -350,7 +351,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }, 100); // 減少延遲時間
 });
-</script>
-
-
-
+</script> 

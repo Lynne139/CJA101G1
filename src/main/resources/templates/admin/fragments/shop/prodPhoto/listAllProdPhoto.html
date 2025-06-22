@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>所有商品資料 - listAllProd.html</title>
+    <title>所有商品照片資料 - listAllProdPhoto.html</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -20,12 +20,12 @@
             <!-- 主內容 -->
             <main class="col-12 p-4">
                 <div class="w-100 mx-auto">
-                    <!-- 商品列表 fragment，簡約設計，與整體風格呼應 -->
-                    <div th:fragment="listAllProd-div">
+                    <!-- 商品照片列表 fragment，簡約設計，與整體風格呼應 -->
+                    <div th:fragment="listAllProdPhoto-div">
                         <div class="panel">
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h3 class="panel-title">商品列表</h3>
-                                <span class="text-muted">共 <span th:text="${prodListData.size()}"></span> 項商品</span>
+                                <h3 class="panel-title">商品照片列表</h3>
+                                <span class="text-muted">共 <span th:text="${prodPhotoListData.size()}"></span> 項商品照片</span>
                             </div>
                             <div class="table-responsive">
                                 <!-- 載入動畫 -->
@@ -33,42 +33,48 @@
                                     <div class="spinner-border" role="status" style="color: var(--color-primary);">
                                         <span class="visually-hidden">載入中...</span>
                                     </div>
-                                    <p class="mt-2 text-muted">正在載入商品資料...</p>
+                                    <p class="mt-2 text-muted">正在載入商品照片資料...</p>
                                 </div>
                                 
                                 <!-- 表格容器，初始隱藏 -->
                                 <div id="tableContainer" style="display: none;">
-                                    <table id="prodTable" class="table table-lined">
+                                    <table id="prodPhotoTable" class="table table-lined">
                                         <thead>
                                             <tr>
-                                                <th style="width: 50px; text-align: center;">編號</th>
-                                                <th style="width: 120px; text-align: center;">名稱</th>
-                                                <th style="width: 80px; text-align: center;">價格</th>
-                                                <th style="width: 120px; text-align: center;">類別</th>
-                                                <th style="width: 70px; text-align: center;">狀態</th>
+
+                                                <th style="width: 50px; text-align: center;">照片編號</th>
+                                                <th style="width: 120px; text-align: center;">商品名稱</th>
+                                                <th style="width: 100px; text-align: center;">照片</th>
                                                 <th style="width: 70px; text-align: center;">修改</th>
+                                                <th style="width: 70px; text-align: center;">刪除</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr  th:each="prodVO : ${prodListData}">
-                                                <td style="text-align: center;" th:text="${prodVO.productId}"></td>
-                                                <td style="text-align: center;" th:text="${prodVO.productName}"></td>
-                                                <td style="text-align: center;" th:text="${prodVO.productPrice}"></td>
-                                                <td style="text-align: center;" th:text="${prodVO.prodCateVO.prodCateId} + ' - ' + ${prodVO.prodCateVO.prodCateName}"></td>
-                                                <td style="text-align: center;" class="text-center">
-                                                    <span th:classappend="${prodVO.productStatus == true} ? 'badge bg-success' : 'badge bg-danger'" 
-                                                          class="badge">
-                                                        <span th:text="${prodVO.productStatus == true} ? '上架' : '下架'"></span>
-                                                    </span>
+                                            <tr th:each="prodPhotoVO : ${prodPhotoListData}">
+
+                                                <td style="text-align: center;" th:text="${prodPhotoVO.prodPhotoId}"></td>
+                                                <td style="text-align: center;" th:text="${prodPhotoVO.prodVO.productId} + ' - ' + ${prodPhotoVO.prodVO.productName}"></td>
+                                                <td style="text-align: center;">
+                                                    <img th:src="@{/admin/prodPhoto/DBGifReader} + '?prodPhotoId=' + ${prodPhotoVO.prodPhotoId}" 
+                                                         width="80px" class="img-thumbnail" alt="商品照片">
                                                 </td>
                                                 <td class="text-center">
                                                     <button type="button" class="btn btn-sm btn-outline-primary" 
                                                             data-bs-toggle="modal" 
-                                                            data-bs-target="#editProdModal"
-                                                            th:data-product-id="${prodVO.productId}"
-                                                            onclick="loadEditProdModal(this)">
+                                                            data-bs-target="#editProdPhotoModal"
+                                                            th:data-prodPhoto-id="${prodPhotoVO.prodPhotoId}"
+                                                            onclick="loadEditProdPhotoModal(this)">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
+                                                </td>
+                                                <td class="text-center">
+                                                    <form method="post" th:action="@{/admin/prodPhoto/delete}" style="display: inline;">
+                                                        <input type="hidden" name="prodPhotoId" th:value="${prodPhotoVO.prodPhotoId}">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                                onclick="return confirm('確定要刪除這張商品照片嗎？')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -91,7 +97,8 @@
     
     <!-- DataTables 設定 -->
     <script>
-        $(document).ready(function() {
+        // DataTables 初始化由 select_page.html 處理
+          $(document).ready(function() {
             $('#prodTable').DataTable({
                 "lengthMenu": [3, 5, 10, 20, 50, 100],
                 "searching": true,  // 搜尋功能

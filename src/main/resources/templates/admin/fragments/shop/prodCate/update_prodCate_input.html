@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品資料修改 - update_prod_input.html</title>
+    <title>商品分類資料修改 - update_prodCate_input.html</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -20,41 +20,27 @@
             <!-- 主內容 -->
             <main class="col-12 p-4">
                 <div class="w-100 mx-auto">
-                    <!-- 修改商品表單 -->
+                    <!-- 修改商品分類表單 -->
                     <div class="panel">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h2 class="panel-title">商品資料</h2>
+                            <h2 class="panel-title">商品分類資料</h2>
                             <span class="text-muted">所有欄位皆為必填</span>
                         </div>
-                        <form th:action="@{/prod/update}" method="post" th:object="${prodVO}" enctype="multipart/form-data" id="editProdForm">
+                        <form th:action="@{/prodCate/update}" method="post" th:object="${prodCateVO}" enctype="multipart/form-data" id="editProdCateForm">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">商品編號</label>
-                                    <input type="text" th:field="*{productId}" class="form-control" readonly />
+                                    <label class="form-label">商品分類編號</label>
+                                    <input type="text" th:field="*{prodCateId}" class="form-control" readonly />
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">商品名稱</label>
-                                    <input type="text" th:field="*{productName}" onclick="hideContent('productName.errors');" class="form-control" />
-                                    <span th:if="${#fields.hasErrors('productName')}" th:errors="*{productName}" class="text-danger small" id="productName.errors"></span>
+                                    <label class="form-label">商品分類名稱</label>
+                                    <input type="text" th:field="*{prodCateName}" onclick="hideContent('prodCateName.errors');" class="form-control" />
+                                    <span th:if="${#fields.hasErrors('prodCateName')}" th:errors="*{prodCateName}" class="text-danger small" id="prodCateName.errors"></span>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">商品類別</label>
-                                    <select th:field="*{prodCateVO.prodCateId}" class="form-select">
-                                        <option th:each="prodCateVO : ${prodCateListData}" th:value="${prodCateVO.prodCateId}" th:text="${prodCateVO.prodCateName}"></option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">商品價錢</label>
-                                    <input type="text" th:field="*{productPrice}" onclick="hideContent('productPrice.errors');" class="form-control" />
-                                    <span th:if="${#fields.hasErrors('productPrice')}" th:errors="*{productPrice}" class="text-danger small" id="productPrice.errors"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">商品狀態</label>
-                                    <select th:field="*{productStatus}" class="form-select">
-                                        <option th:value="true">上架</option>
-                                        <option th:value="false">下架</option>
-                                    </select>
-                                    <span th:if="${#fields.hasErrors('productStatus')}" th:errors="*{productStatus}" class="text-danger small" id="productStatus.errors"></span>
+                                    <label class="form-label">商品分類說明</label>
+                                    <input type="text" th:field="*{prodCateDesc}" onclick="hideContent('prodCateDesc.errors');" class="form-control" />
+                                    <span th:if="${#fields.hasErrors('prodCateDesc')}" th:errors="*{prodCateDesc}" class="text-danger small" id="prodCateDesc.errors"></span>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end pt-4 border-top mt-4">
@@ -86,14 +72,14 @@
     
     // 處理 Modal 中的表單提交
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('editProdForm');
+        const form = document.getElementById('editProdCateForm');
         if (form) {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
                 const formData = new FormData(form);
                 
-                fetch('/prod/update', {
+                fetch('/prodCate/update', {
                     method: 'POST',
                     body: formData
                 })
@@ -102,11 +88,11 @@
                     // 檢查是否有錯誤訊息
                     if (html.includes('text-danger') || html.includes('has-error')) {
                         // 有錯誤，更新 Modal 內容
-                        const modalBody = document.getElementById('editProdModalBody');
+                        const modalBody = document.getElementById('editProdCateModalBody');
                         modalBody.innerHTML = html;
                     } else {
                         // 成功，關閉 Modal 並重新載入頁面
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('editProdModal'));
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('editProdCateModal'));
                         modal.hide();
                         
                         // 重新載入頁面以顯示更新後的資料
