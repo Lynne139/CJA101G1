@@ -1,5 +1,50 @@
 <div th:fragment="content">
-	<div class="main_staff1">
-		<p>新增</p>
+	<div class="main_staff1 container py-4">
+		<h4>新增員工</h4>
+		<form id="addEmployeeForm" method="post" th:action="@{/employees}" enctype="multipart/form-data">
+			<div class="mb-2">
+				<label>姓名</label>
+				<input type="text" name="name" class="form-control" required />
+			</div>
+			<div class="mb-2">
+				<label>密碼</label>
+				<input type="password" name="password" class="form-control" required />
+			</div>
+			<div class="mb-2">
+				<label>部門/角色</label>
+				<select name="roleId" class="form-select" id="roleSelect" required></select>
+			</div>
+			<div class="mb-2">
+				<label>狀態</label>
+				<select name="status" class="form-select">
+					<option value="true">啟用</option>
+					<option value="false">停用</option>
+				</select>
+			</div>
+			<div class="mb-2">
+				<label>建立日期</label>
+				<input type="date" name="createdDate" class="form-control" required />
+			</div>
+			<div class="mb-2">
+				<label>照片</label>
+				<input type="file" name="employeePhoto" class="form-control" />
+			</div>
+			<button type="submit" class="btn btn-primary">新增員工</button>
+		</form>
+
+		<hr/>
+		<h4>新增部門</h4>
+		<form id="addRoleForm">
+			<div class="mb-2">
+				<label>部門名稱</label>
+				<input type="text" name="roleName" class="form-control" required />
+			</div>
+			<div class="mb-2">
+				<label>備註</label>
+				<input type="text" name="remark" class="form-control" />
+			</div>
+			<button type="submit" class="btn btn-secondary">新增部門</button>
+		</form>
 	</div>
+	<script src="/js/admin/staff/staff_manage.js"></script>
 </div>

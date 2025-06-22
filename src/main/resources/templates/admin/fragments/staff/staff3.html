@@ -1,0 +1,21 @@
+<h2>權限管理</h2>
+<form method="get" action="/admin/permission">
+    <label>選擇部門：</label>
+    <select name="roleId" id="roleId" onchange="this.form.submit()">
+        <option th:each="role : ${roles}" th:value="${role.roleId}" th:text="${role.roleName}" th:selected="${role.roleId == selectedRoleId}"></option>
+    </select>
+</form>
+
+<form method="post" action="/admin/permission/save">
+    <input type="hidden" name="roleId" th:value="${selectedRoleId}" />
+    <div>
+        <label>權限選擇</label>
+        <div th:each="access : ${allAccessRights}">
+            <input type="checkbox" name="accessIds"
+                   th:value="${access.accessId}"
+                   th:checked="${assignedAccessIds.contains(access.accessId)}" />
+            <span th:text="${access.accessName}"></span>
+        </div>
+    </div>
+    <button type="submit">儲存</button>
+</form> 
