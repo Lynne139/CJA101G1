@@ -78,6 +78,7 @@
 				      	<div class="submenu_block ps-4"
 							th:classappend="${currentURI.startsWith('/admin/room')} ? 'show'">
 				        	<a th:href="@{/admin/room1}" th:classappend="${currentURI == '/admin/room1'} ? '-active'" class="sidebar_sub_link">房型子頁1</a>
+				        	<a th:href="@{/admin/listAllRoomType}" th:classappend="${currentURI == '/admin/listAllRoomType'} ? '-active'" class="sidebar_sub_link">房型資訊</a>
 				      	</div>
 			    	</div>
 			
