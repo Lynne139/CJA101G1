@@ -29,17 +29,32 @@
 		        		</tr>
 		      		</thead>
 		      		<tbody>
+<<<<<<< HEAD
+		        		<tr th:each="roomTypeVO : ${roomTypeVOList}">
+=======
 		        		<tr th:each="roomTypeVO : ${restoList}">
+>>>>>>> 874aaa6 (listAllRoomType update)
 						    <td class="text-center" th:text="${roomTypeVO.roomTypeId}"></td>
 						    <td th:text="${roomTypeVO.roomTypeName}"></td>
 						    <td class="text-center" th:text="${roomTypeVO.roomTypeAmount}"></td>
 						    <td th:text="${roomTypeVO.roomTypeContent}"></td>
 						    <td>
+<<<<<<< HEAD
+						        <span class="text-center" th:classappend="${roomTypeVO.roomSaleStatus == 0} ?  'badge bg-secondary':
+						        (${roomTypeVO.roomSaleStatus == 1} ? 'badge bg-success' :'badge bg-danger')"
+						            th:text="${roomTypeVO.roomSaleStatus == 0} ? '下架' :
+						            (${roomTypeVO.roomSaleStatus == 1} ? '上架' : '未知狀態')"></span>
+						    </td>
+						    <td>
+    							<img th:if="${base64Image}" th:src="'data:' + ${imageType} + ';base64,' + ${base64Image}" style="max-width: 200px;" />
+    							<span th:if="$${base64Image == ''}">&nbsp;</span> <!-- 當沒有圖片時顯示空白 -->
+=======
 						        <span class="text-center" th:classappend="${roomTypeVO.roomSaleStatus == 1} ? 'badge bg-success' : 'badge bg-secondary'"
 						            th:text="${roomTypeVO.roomSaleStatus == 1} ? '上架' : '下架'"></span>
 						    </td>
 						    <td th:if="${base64Image}">
     							<img th:src="'data:' + ${imageType} + ';base64,' + ${base64Image}" style="max-width: 200px;" />
+>>>>>>> 874aaa6 (listAllRoomType update)
 							</td>
 						    <td class="text-center" th:text="${roomTypeVO.roomTypePrice}"></td>
 						    <td>

@@ -3,6 +3,7 @@ package com.room.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +17,8 @@ import com.room.model.RoomVO;
 import com.roomtype.model.RoomTypeService;
 import com.roomtype.model.RoomTypeVO;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Max;
@@ -24,7 +27,7 @@ import jakarta.validation.constraints.NotEmpty;
 
 @Controller
 @Validated
-@RequestMapping("/room")
+@RequestMapping("/admin")
 public class RoomController {
 
 	@Autowired
@@ -33,15 +36,21 @@ public class RoomController {
 	@Autowired
 	RoomTypeService roomTypeSvc;
 	
-	@GetMapping("addRoom")
-	public String addRoom(ModelMap model) {
+	@GetMapping("/listAllRoom/addRoom")
+	public String addRoom(HttpServletRequest request,HttpServletResponse response,Model model) {
+		String mainFragment = "admin/fragments/room/addRoom";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
 		RoomVO roomVO = new RoomVO();
 		model.addAttribute("roomVO", roomVO);
-		return "back-end/room/addRoom";
+		List<RoomTypeVO> roomTypeVOList = roomTypeSvc.getAll();
+    	model.addAttribute("roomTypeVOList",roomTypeVOList);
+//		return "admin/fragments/room/addRoom :: addRoomContent";
+		return "admin/index_admin";
 	}
 	
 	
-	@PostMapping("insert")
+	@PostMapping("/listAllRoom/insertRoom")
 	public String insert(@Valid RoomVO roomVO, BindingResult result, ModelMap model) {
 
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
@@ -58,7 +67,7 @@ public class RoomController {
 	}	
 	
 	
-	@PostMapping("getOne_For_Update")
+	@PostMapping("getOneRoom_For_Update")
 	public String getOne_For_Update(@RequestParam("roomId") String roomId, ModelMap model) {
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		/*************************** 2.開始查詢資料 *****************************************/
@@ -69,7 +78,7 @@ public class RoomController {
 		return "back-end/room/update_room_input"; // 查詢完成後轉交update_room_input.html
 	}
 	
-	@PostMapping("update")
+	@PostMapping("roomUpdate")
 	public String update(@Valid RoomVO roomVO, BindingResult result, ModelMap model) {
 
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
@@ -92,7 +101,7 @@ public class RoomController {
 		return list;
 	}
 	
-	@PostMapping("getOne_For_Display")
+	@PostMapping("getOneRoom_For_Display")
 	public String getOne_For_Display(
 		/***************************1.接收請求參數 - 輸入格式的錯誤處理*************************/
 		@RequestParam("roomId") String roomId,

@@ -12,8 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
-=======
 import jakarta.persistence.Version;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -22,14 +20,12 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
->>>>>>> 3e353de listAllRoomType update
 
 @Entity
 @Table(name = "room_type")
 public class RoomTypeVO implements java.io.Serializable {
 	private static final long serialVersionUID = 11L;
 
-	//樂觀鎖設定
 	@Version
 	@Column(name = "version", nullable = false)
 	private Integer version = 0;
@@ -45,21 +41,14 @@ public class RoomTypeVO implements java.io.Serializable {
 	private String roomTypeName;
 
 	@Column(name = "room_type_amount")
-<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
-	@NotEmpty(message="房型數量: 請勿空白")
-=======
 	@NotNull(message = "房型數量: 請勿空白")
 	@DecimalMin(value = "1", message = "房型數量: 不能小於{value}")
 	@DecimalMax(value = "1000", message = "房型數量: 不能超過{value}")
->>>>>>> 3e353de listAllRoomType update
 	private Integer roomTypeAmount;
 
 	@Column(name = "room_type_content")
-<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
-=======
 	@Size(max = 1000, message = "房型介紹:請勿超過1000字")
 	@NotBlank(message = "房型介紹: 請勿空白")
->>>>>>> 3e353de listAllRoomType update
 	private String roomTypeContent;
 
 	@Column(name = "room_sale_status")
@@ -69,12 +58,9 @@ public class RoomTypeVO implements java.io.Serializable {
 	private byte[] roomTypePic;
 
 	@Column(name = "room_type_price")
-<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
-=======
 	@NotNull(message = "房型價格: 請勿空白")
 	@DecimalMin(value = "1000", message = "房型價格: 不能小於{value}")
 	@DecimalMax(value = "1000000", message = "房型價格: 不能超過{value}")
->>>>>>> 3e353de listAllRoomType update
 	private Integer roomTypePrice;
 
 	@OneToMany(mappedBy = "roomTypeVO", cascade = CascadeType.ALL)

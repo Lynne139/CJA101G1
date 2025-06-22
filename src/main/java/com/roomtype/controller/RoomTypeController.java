@@ -64,7 +64,7 @@ public class RoomTypeController {
 	
 	//====新增====
 	//第一步，畫面顯示填寫表單
-	@GetMapping("/roomType_info/addRoomType")//瀏覽器的get請求
+	@GetMapping("/listAllRoomType/addRoomType")//瀏覽器的get請求
 	public String addRoomType(ModelMap model) {
 		RoomTypeVO roomTypeVO = new RoomTypeVO();//建立空的roomTypeVO
 		model.addAttribute("roomTypeVO", roomTypeVO);//讓 Thymeleaf 可以綁定資料

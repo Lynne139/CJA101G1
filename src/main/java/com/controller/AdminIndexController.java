@@ -17,6 +17,12 @@ import com.prodPhoto.model.ProdPhotoVO;
 
 import com.resto.model.RestoService;
 import com.resto.model.RestoVO;
+import com.room.model.RoomService;
+import com.room.model.RoomVO;
+import com.roomtype.model.RoomTypeService;
+import com.roomtype.model.RoomTypeVO;
+import com.roomtypeschedule.model.RoomTypeScheduleService;
+import com.roomtypeschedule.model.RoomTypeScheduleVO;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,6 +42,16 @@ public class AdminIndexController {
 	
 	@Autowired
 	ProdPhotoService prodPhotoSvc;
+	
+	
+	@Autowired
+	RoomTypeService roomTypeService;
+	
+	@Autowired
+	RoomService roomService;
+	
+	@Autowired
+	RoomTypeScheduleService roomTypeScheduleService;
 		
 	// === 後台首頁 ===
     @GetMapping("")
@@ -89,6 +105,39 @@ public class AdminIndexController {
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 
+    	return "admin/index_admin";
+    } 
+    @GetMapping("/listAllRoomType")
+    public String listAllRoomType(HttpServletRequest request,HttpServletResponse response,Model model) {
+    	
+    	String mainFragment = "admin/fragments/room/listAllRoomType";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	List<RoomTypeVO> roomTypeVOList = roomTypeService.getAll();
+    	model.addAttribute("roomTypeVOList",roomTypeVOList);
+    	
+    	return "admin/index_admin";
+    } 
+    @GetMapping("/listAllRoomTypeSchedule")
+    public String listAllRoomTypeSchedule(HttpServletRequest request,HttpServletResponse response,Model model) {
+    	
+    	String mainFragment = "admin/fragments/room/listAllRoomTypeSchedule";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	List<RoomTypeScheduleVO> roomTypeScheduleVOList = roomTypeScheduleService.getAll();
+    	model.addAttribute("roomTypeScheduleVOList",roomTypeScheduleVOList);
+    	
+    	return "admin/index_admin";
+    } 
+    @GetMapping("/listAllRoom")
+    public String listAllRoom(HttpServletRequest request,HttpServletResponse response,Model model) {
+    	
+    	String mainFragment = "admin/fragments/room/listAllRoom";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	List<RoomVO> roomVOList = roomService.getAll();
+    	model.addAttribute("roomVOList",roomVOList);
+    	
     	return "admin/index_admin";
     } 
     
