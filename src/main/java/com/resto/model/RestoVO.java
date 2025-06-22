@@ -1,14 +1,20 @@
 package com.resto.model;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import org.springframework.data.annotation.Transient;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import jakarta.validation.constraints.Max;
@@ -19,8 +25,7 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "resto")
-public class RestoVO implements java.io.Serializable{
-	private static final long serialVersionUID = 1L;
+public class RestoVO{
 	
 	@Version
 	@Column(name = "version", nullable = false)
@@ -41,8 +46,7 @@ public class RestoVO implements java.io.Serializable{
 	private String restoNameEn;
 	
     @NotNull(message = "請填入可容納人數")
-    @Min(value = 1, message = "人數至少為 1")
-    @Max(value = 1000, message = "人數不得超過1000")
+    @Min(value = 1, message = "至少為 1")
 	@Column(name = "resto_seats_total")
 	private Integer restoSeatsTotal;
 	
@@ -57,7 +61,7 @@ public class RestoVO implements java.io.Serializable{
 	@Column(name = "resto_content", columnDefinition = "longtext")
 	private String restoContent;
 	
-	@Size(max = 16,message = "電話請勿超過16字")
+	@Size(max = 20,message = "電話請勿超過20字")
 	@Column(name = "resto_phone")
 	private String restoPhone;
 	
@@ -74,27 +78,17 @@ public class RestoVO implements java.io.Serializable{
 	@Column(name = "is_deleted") //軟刪除
 	private Boolean isDeleted = false;
 	
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="timeslotId")
+	@OrderBy("timeslot_id asc")
+	private Set<TimeslotVO> timeslots = new HashSet<TimeslotVO>();
+
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="periodId")
+	@OrderBy("period_id asc")
+	private Set<PeriodVO> periods = new HashSet<PeriodVO>();
 
 	public RestoVO() {
 		super();
 	}
-
-	public RestoVO(String restoName, String restoNameEn,Integer restoSeatsTotal, String restoInfo, String restoType,
-			String restoContent, String restoPhone, String restoLoc, byte[] restoImg, Boolean isEnabled, Boolean isDeleted) {
-		super();
-		this.restoName = restoName;
-		this.restoNameEn = restoNameEn;
-		this.restoSeatsTotal = restoSeatsTotal;
-		this.restoInfo = restoInfo;
-		this.restoType = restoType;
-		this.restoContent = restoContent;
-		this.restoPhone = restoPhone;
-		this.restoLoc = restoLoc;
-		this.restoImg = restoImg;
-		this.isEnabled = isEnabled;
-		this.isDeleted = isDeleted;
-	}
-	
 	
 	public Integer getVersion() {
 		return version;
@@ -188,7 +182,14 @@ public class RestoVO implements java.io.Serializable{
 		this.isDeleted = isDeleted;
 	}
 
-	
+	public Set<TimeslotVO> getTimeslots() {
+		return timeslots;
+	}
+
+	public void setTimeslots(Set<TimeslotVO> timeslots) {
+		this.timeslots = timeslots;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(restoId);
@@ -222,6 +223,5 @@ public class RestoVO implements java.io.Serializable{
 				+ ", isDeleted=" + isDeleted + "]";
 	}
 
-	
 	
 }
