@@ -78,8 +78,10 @@
 				      	<div class="submenu_block ps-4"
 							th:classappend="${currentURI.startsWith('/admin/room')} ? 'show'">
 				        	<a th:href="@{/admin/room1}" th:classappend="${currentURI == '/admin/room1'} ? '-active'" class="sidebar_sub_link">房型子頁1</a>
-							<a th:href="@{/admin/roomo_info}" th:classappend="${currentURI == '/admin/roomo_info'} ? '-active'" class="sidebar_sub_link">訂單查詢</a>
-						</div>
+				        	<a th:href="@{/admin/listAllRoomType}" th:classappend="${currentURI == '/admin/listAllRoomType'} ? '-active'" class="sidebar_sub_link">房型資訊</a>
+				        	<a th:href="@{/admin/listAllRoomTypeSchedule}" th:classappend="${currentURI == '/admin/listAllRoomTypeSchedule'} ? '-active'" class="sidebar_sub_link">房型預定表資訊</a>
+				        	<a th:href="@{/admin/listAllRoom}" th:classappend="${currentURI == '/admin/listAllRoom'} ? '-active'" class="sidebar_sub_link">房間資訊</a>
+				      	</div>
 			    	</div>
 			
 					<!-- 餐廳管理 -->
@@ -106,12 +108,12 @@
               
 			      		<div class="submenu_block ps-4"
 			      			th:classappend="${currentURI.startsWith('/admin/shop')} ? 'show'">
-			        		<a th:href="@{/admin/prod/select_page}"       th:classappend="${currentURI == '/admin/prod/select_page'} ? '-active'"       class="sidebar_sub_link">商品管理</a>
-			        		<a th:href="@{/admin/prodCate}"   th:classappend="${currentURI == '/admin/prodCate'} ? '-active'"   class="sidebar_sub_link">購物車項目</a>
-			        		<a th:href="@{/admin/prodCart}"   th:classappend="${currentURI == '/admin/prodCart'} ? '-active'"   class="sidebar_sub_link">商品類別管理</a>
-			        		<a th:href="@{/admin/prodPhoto}"  th:classappend="${currentURI == '/admin/prodPhoto'} ? '-active'"  class="sidebar_sub_link">商品圖片管理</a>
-			        		<a th:href="@{/admin/shopOrd}"    th:classappend="${currentURI == '/admin/shopOrd'} ? '-active'"    class="sidebar_sub_link">商城訂單</a>
-			        		<a th:href="@{/admin/shopOrdDet}" th:classappend="${currentURI == '/admin/shopOrdDet'} ? '-active'" class="sidebar_sub_link">商品訂單明細</a>
+			        		<a th:href="@{/admin/prod/select_page}"   th:classappend="${currentURI == '/admin/prod/select_page'} ? '-active'"       class="sidebar_sub_link">商品管理</a>
+			        		<a th:href="@{/admin/prodCart}"   th:classappend="${currentURI == '/admin/prodCart'} ? '-active'"   class="sidebar_sub_link">購物車項目</a>
+			        		<a th:href="@{/admin/prodCate/select_page}"   th:classappend="${currentURI == '/admin/prodCate/select_page'} ? '-active'"   class="sidebar_sub_link">商品類別管理</a>
+			        		<a th:href="@{/admin/prodPhoto/select_page}"   th:classappend="${currentURI == '/admin/prodPhoto/select_page'} ? '-active'"  class="sidebar_sub_link">商品圖片管理</a>
+			        		<a th:href="@{/admin/shopOrd}"   th:classappend="${currentURI == '/admin/shopOrd'} ? '-active'"    class="sidebar_sub_link">商城訂單</a>
+			        		<a th:href="@{/admin/shopOrdDet}"   th:classappend="${currentURI == '/admin/shopOrdDet'} ? '-active'" class="sidebar_sub_link">商品訂單明細</a>
 			      		</div>
 			    	</div>
 			

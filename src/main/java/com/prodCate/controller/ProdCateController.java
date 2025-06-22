@@ -1,10 +1,18 @@
 package com.prodCate.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +20,8 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,22 +34,18 @@ import com.prod.model.ProdVO;
 import com.prodCate.model.*;
 
 @Controller
+@Validated
 @RequestMapping("/prodCate")
 public class ProdCateController {
 
 	@Autowired
 	ProdCateService prodCateSvc;
 	
-	@GetMapping("select_page")
-	public String selectPage() {
-		return "back-end/prodCate/select_page";
-	}
-	
 	@GetMapping("listAllProdCate")
 	public String listAllProdCate(Model model) {
 	    List<ProdCateVO> list = prodCateSvc.getAll();
 	    model.addAttribute("prodCateListData", list);
-	    return "back-end/prodCate/listAllProdCate";
+	    return "admin/fragments/shop/prodCate/listAllProdCate";
 	}
 
 	@ModelAttribute("prodCateListData")  // for select_page.html 第97 109行用 // for listAllEmp.html 第85行用
@@ -57,7 +63,7 @@ public class ProdCateController {
 	public String addProdCate(ModelMap model) {
 		ProdCateVO prodCateVO = new ProdCateVO();
 		model.addAttribute("prodCateVO", prodCateVO);
-		return "back-end/prodCate/addProdCate";
+		return "admin/fragments/shop/prodCate/addProdCate";
 	}
 
 	/*
@@ -69,16 +75,15 @@ public class ProdCateController {
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		// 去除BindingResult中upFiles欄位的FieldError紀錄 --> 見第172行
 		if (result.hasErrors()) {
-	        return "back-end/prodCate/addProdCate"; // 修改成對應的商品分類新增頁面
+	        return "admin/fragments/shop/prodCate/addProdCate"; // 修改成對應的商品分類新增頁面
 	    }
 		/*************************** 2.開始新增資料 *****************************************/
 		// EmpService empSvc = new EmpService();
 		prodCateSvc.addProdCate(prodCateVO);
 		/*************************** 3.新增完成,準備轉交(Send the Success view) **************/
-		List<ProdCateVO> list = prodCateSvc.getAll();
-		model.addAttribute("prodCateListData", list); // for listAllEmp.html 第85行用
-		model.addAttribute("success", "- (新增成功)");
-		return "redirect:/prodCate/listAllProdCate"; // 新增成功後重導至IndexController_inSpringBoot.java的第58行@GetMapping("/emp/listAllEmp")
+		// 取得新增後的商品分類ID，然後redirect到select_page並顯示該商品分類
+		Integer newProdCateId = prodCateVO.getProdCateId();
+		return "redirect:/admin/prodCate/select_page?prodCateId=" + newProdCateId + "&success=true";
 	}
 
 	/*
@@ -93,7 +98,7 @@ public class ProdCateController {
 
 		/*************************** 3.查詢完成,準備轉交(Send the Success view) **************/
 		model.addAttribute("prodCateVO", prodCateVO);
-		return "back-end/prodCate/update_prodCate_input"; // 查詢完成後轉交update_emp_input.html
+		return "admin/fragments/shop/prodCate/update_prodCate_input"; // 查詢完成後轉交update_emp_input.html
 	}
 
 	/*
@@ -106,45 +111,17 @@ public class ProdCateController {
 		// 去除BindingResult中upFiles欄位的FieldError紀錄 --> 見第172行
 
 		if (result.hasErrors()) {
-	        return "back-end/prodCate/update_prodCate_input"; // 修改成對應的商品分類修改頁面
+	        return "admin/fragments/shop/prodCate/update_prodCate_input"; // 修改成對應的商品分類修改頁面
 	    }
 		/*************************** 2.開始修改資料 *****************************************/
 		// EmpService empSvc = new EmpService();
 		prodCateSvc.updateProdCate(prodCateVO);
 
 		/*************************** 3.修改完成,準備轉交(Send the Success view) **************/
-		model.addAttribute("success", "- (修改成功)");
-		prodCateVO = prodCateSvc.getOneProdCate(Integer.valueOf(prodCateVO.getProdCateId()));
-		model.addAttribute("prodCateVO", prodCateVO);
-		return "back-end/prodCate/listOneProdCate"; // 修改成功後轉交listOneEmp.html
+		// 取得修改後的商品分類ID，然後redirect到select_page並顯示該商品分類
+		Integer prodCateId = prodCateVO.getProdCateId();
+		return "redirect:/admin/prodCate/select_page?prodCateId=" + prodCateId + "&updateSuccess=true";
 	}
-
-
-
-//	/*
-//	 * 第一種作法 Method used to populate the List Data in view. 如 : 
-//	 * <form:select path="deptno" id="deptno" items="${deptListData}" itemValue="deptno" itemLabel="dname" />
-//	 */
-//	@ModelAttribute("deptListData")
-//	protected List<DeptVO> referenceListData() {
-//		// DeptService deptSvc = new DeptService();
-//		List<DeptVO> list = deptSvc.getAll();
-//		return list;
-//	}
-//
-//	/*
-//	 * 【 第二種作法 】 Method used to populate the Map Data in view. 如 : 
-//	 * <form:select path="deptno" id="deptno" items="${depMapData}" />
-//	 */
-//	@ModelAttribute("deptMapData") //
-//	protected Map<Integer, String> referenceMapData() {
-//		Map<Integer, String> map = new LinkedHashMap<Integer, String>();
-//		map.put(10, "財務部");
-//		map.put(20, "研發部");
-//		map.put(30, "業務部");
-//		map.put(40, "生管部");
-//		return map;
-//	}
 
 	// 去除BindingResult中某個欄位的FieldError紀錄
 	public BindingResult removeFieldError(ProdCateVO prodCateVO, BindingResult result, String removedFieldname) {
@@ -168,5 +145,20 @@ public class ProdCateController {
 //		model.addAttribute("empListData", list); // for listAllEmp.html 第85行用
 //		return "back-end/emp/listAllEmp";
 //	}
+
+	/*
+	 * This method will be called on select_page.html form submission, handling POST
+	 * request It also validates the user input
+	 */
+	@ExceptionHandler(value = { ConstraintViolationException.class })
+	public String handleError(HttpServletRequest req, ConstraintViolationException e, Model model) {
+		Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
+		StringBuilder strBuilder = new StringBuilder();
+		for (ConstraintViolation<?> violation : violations) {
+			strBuilder.append(violation.getMessage()).append(" ");
+		}
+		String message = strBuilder.toString();
+		return "redirect:/admin/prodCate/select_page?errorMessage=" + java.net.URLEncoder.encode(message, java.nio.charset.StandardCharsets.UTF_8);
+	}
 
 }

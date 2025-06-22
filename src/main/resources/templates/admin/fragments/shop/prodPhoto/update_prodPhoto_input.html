@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品照片資料修改 - update_prodPhoto_input.html</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- Admin CSS -->
+    <link rel="stylesheet" th:href="@{/css/all_admin.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 主內容 -->
+            <main class="col-12 p-4">
+                <div class="w-100 mx-auto">
+                    <!-- 修改商品照片表單 -->
+                    <div class="panel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="panel-title">商品照片資料</h2>
+                            <span class="text-muted">所有欄位皆為必填</span>
+                        </div>
+                        <form th:action="@{/admin/prodPhoto/update}" method="post" th:object="${prodPhotoVO}" enctype="multipart/form-data" id="editProdPhotoForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">商品照片編號</label>
+                                    <input type="text" th:field="*{prodPhotoId}" class="form-control" readonly />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">商品名稱</label>
+                                    <select th:field="*{prodVO.productId}" class="form-select">
+                                        <option th:each="prodVO : ${prodListData}" th:value="${prodVO.productId}" th:text="${prodVO.productName}"></option>
+                                    </select>
+                                    <span th:if="${#fields.hasErrors('prodVO.productId')}" th:errors="*{prodVO.productId}" class="text-danger small" id="prodVO.productId.errors"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">照片</label>
+                                    <input type="file" th:field="*{prodPhoto}" onclick="previewImage()" onchange="hideContent('prodPhoto.errors');" class="form-control" accept="image/*" />
+                                    <span class="text-danger" th:utext="${errorMessage}" id="prodPhoto.errors"></span>
+                                    <div id="blob_holder" class="mt-2"></div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end pt-4 border-top mt-4">
+                                <button type="submit" id="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save me-2"></i>
+                                    送出修改
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    
+    <script type="text/javascript">
+    //清除提示信息
+    function hideContent(d) {
+         var el = document.getElementById(d);
+         if(el) el.style.display = "none";
+    }
+
+    //照片上傳-預覽用
+    var filereader_support = typeof FileReader != 'undefined';
+    if (!filereader_support) {
+        alert("No FileReader support");
+    }
+    acceptedTypes = {
+            'image/png' : true,
+            'image/jpeg' : true,
+            'image/gif' : true
+    };
+    function previewImage() {
+        var upfile1 = document.getElementById("prodPhoto");
+        upfile1.addEventListener("change", function(event) {
+            var files = event.target.files || event.dataTransfer.files;
+            for (var i = 0; i < files.length; i++) {
+                previewfile(files[i])
+            }
+        }, false);
+    }
+    function previewfile(file) {
+        if (filereader_support === true && acceptedTypes[file.type] === true) {
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                var image = new Image();
+                image.src = event.target.result;
+                image.width = 100;
+                image.height = 75;
+                image.border = 2;
+                image.className = "img-thumbnail";
+                if (blob_holder.hasChildNodes()) {
+                    blob_holder.removeChild(blob_holder.childNodes[0]);
+                }
+                blob_holder.appendChild(image);
+            };
+            reader.readAsDataURL(file);
+            document.getElementById('submit').disabled = false;
+        } else {
+            blob_holder.innerHTML = "<div class='alert alert-warning' style='text-align: left;'>" + 
+                "<strong>檔案資訊:</strong><br>" +
+                "● 檔名: " + file.name + "<br>" + 
+                "● 類型: " + file.type + "<br>" + 
+                "● 大小: " + file.size + " bytes<br>" + 
+                "● 支援格式: <b><font color=red>image/png、image/jpeg、image/gif</font></b></div>";
+            document.getElementById('submit').disabled = true;
+        }
+    }
+    
+    // 處理 Modal 中的表單提交
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('editProdPhotoForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(form);
+                
+                fetch('/admin/prodPhoto/update', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // 檢查是否有錯誤訊息
+                    if (html.includes('text-danger') || html.includes('has-error')) {
+                        // 有錯誤，更新 Modal 內容
+                        const modalBody = document.getElementById('editProdPhotoModalBody');
+                        modalBody.innerHTML = html;
+                    } else {
+                        // 成功，關閉 Modal 並重新載入頁面
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('editProdPhotoModal'));
+                        modal.hide();
+                        
+                        // 重新載入頁面以顯示更新後的資料
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('提交失敗:', error);
+                    alert('提交失敗，請重新嘗試');
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>

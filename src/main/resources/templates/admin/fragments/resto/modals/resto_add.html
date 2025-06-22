@@ -23,7 +23,7 @@
 
             <div class="mb-3">
               <label for="restoName" class="form-label">餐廳名稱 <span class="text-danger">*</span> <small class="text-muted">最多可40字</small></label>
-              <input type="text" th:field="*{restoName}" id="restoName" class="form-control" required maxlength="100">
+              <input type="text" th:field="*{restoName}" id="restoName" class="form-control" required maxlength="40">
               
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('restoName')}">
@@ -35,7 +35,7 @@
 
             <div class="mb-3">
               <label for="restoNameEn" class="form-label">英文名稱 <small class="text-muted">最多可40字</small></label>
-              <input type="text" th:field="*{restoNameEn}" id="restoNameEn" class="form-control" maxlength="100">
+              <input type="text" th:field="*{restoNameEn}" id="restoNameEn" class="form-control" maxlength="40">
               
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('restoNameEn')}">
@@ -59,7 +59,7 @@
             </div>
             
             <div class="mb-3">
-              <label for="restoSeatsTotal" class="form-label">容納座數 <span class="text-danger">*</span> <small class="text-muted">上限1000</small></label>
+              <label for="restoSeatsTotal" class="form-label">容納座數 <span class="text-danger">*</span> <small class="text-muted">至少為1</small></label>
               <input type="text" inputmode="numeric" pattern="\d*" th:field="*{restoSeatsTotal}" id="restoSeatsTotal" class="form-control" required min="1">
               
               <!-- 錯誤提示 -->
@@ -71,7 +71,7 @@
             
             <div class="mb-3">
               <label for="restoType" class="form-label">餐廳類型 <small class="text-muted">最多可30字</small></label>
-              <input type="text" th:field="*{restoType}" id="restoType" class="form-control" maxlength="50">
+              <input type="text" th:field="*{restoType}" id="restoType" class="form-control" maxlength="30">
               
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('restoType')}">
@@ -82,7 +82,7 @@
             
             <div class="mb-3">
               <label for="restoLoc" class="form-label">樓層位置 <small class="text-muted">最多可30字</small></label>
-              <input type="text" th:field="*{restoLoc}" id="restoLoc" class="form-control" maxlength="50">
+              <input type="text" th:field="*{restoLoc}" id="restoLoc" class="form-control" maxlength="30">
               
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('restoLoc')}">
@@ -92,7 +92,7 @@
             </div>
             
             <div class="mb-3">
-              <label for="restoPhone" class="form-label">電話 <small class="text-muted">最多可16字</small></label>
+              <label for="restoPhone" class="form-label">電話 <small class="text-muted">最多可20字</small></label>
               <input type="tel" th:field="*{restoPhone}" id="restoPhone" class="form-control" maxlength="20">
               <div class="text-danger" th:if="${#fields.hasErrors('restoPhone')}">
                 <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
@@ -102,7 +102,7 @@
             
             <div class="mb-3">
               <label for="restoInfo" class="form-label">餐廳簡介 <small class="text-muted">最多可150字</small></label>
-              <textarea th:field="*{restoInfo}" id="restoInfo" class="form-control auto-expand"></textarea>
+              <textarea th:field="*{restoInfo}" id="restoInfo" class="form-control auto-expand" maxlength="150"></textarea>
               
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('restoInfo')}">

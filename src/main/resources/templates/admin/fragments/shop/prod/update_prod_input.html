@@ -20,21 +20,13 @@
             <!-- 主內容 -->
             <main class="col-12 p-4">
                 <div class="w-100 mx-auto">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h1 class="panel-title">商品資料修改</h1>
-                        <a th:href="@{/prod/select_page}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>
-                            回查詢頁
-                        </a>
-                    </div>
-
                     <!-- 修改商品表單 -->
                     <div class="panel">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h2 class="panel-title">商品資料</h2>
                             <span class="text-muted">所有欄位皆為必填</span>
                         </div>
-                        <form th:action="@{/prod/update}" method="post" th:object="${prodVO}" enctype="multipart/form-data">
+                        <form th:action="@{/prod/update}" method="post" th:object="${prodVO}" enctype="multipart/form-data" id="editProdForm">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">商品編號</label>
@@ -91,6 +83,43 @@
          var el = document.getElementById(d);
          if(el) el.style.display = "none";
     }
+    
+    // 處理 Modal 中的表單提交
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('editProdForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(form);
+                
+                fetch('/prod/update', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // 檢查是否有錯誤訊息
+                    if (html.includes('text-danger') || html.includes('has-error')) {
+                        // 有錯誤，更新 Modal 內容
+                        const modalBody = document.getElementById('editProdModalBody');
+                        modalBody.innerHTML = html;
+                    } else {
+                        // 成功，關閉 Modal 並重新載入頁面
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('editProdModal'));
+                        modal.hide();
+                        
+                        // 重新載入頁面以顯示更新後的資料
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('提交失敗:', error);
+                    alert('提交失敗，請重新嘗試');
+                });
+            });
+        }
+    });
     </script>
 </body>
 </html>

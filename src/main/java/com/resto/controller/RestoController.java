@@ -4,13 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,8 +28,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.resto.model.PeriodService;
 import com.resto.model.RestoService;
 import com.resto.model.RestoVO;
+import com.resto.model.TimeslotService;
 
 import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.Valid;
@@ -41,6 +43,14 @@ public class RestoController {
 	@Autowired
 	RestoService restoService;
 	
+	@Autowired
+	PeriodService periodService;
+	
+	@Autowired
+	TimeslotService timeslotService;
+	
+	// ===== restoInfo.html ====================================================== //
+	
 	// ===== 刪除 =====
 	@GetMapping("/resto_info/delete")
 	public String deleteResto(@RequestParam("restoId") Integer id, RedirectAttributes redirectAttributes) {
@@ -48,23 +58,23 @@ public class RestoController {
 	    redirectAttributes.addFlashAttribute("message", "刪除成功！");
 	    return "redirect:/admin/resto_info";
 	}
-
+	
+	
 	// ===== 細項檢視 =====
 	@GetMapping("/resto_info/view")
-	public String viewResto(@RequestParam("restoId") Integer id, Model model) {
+	public String showViewModal(@RequestParam("restoId") Integer id, Model model) {
 
 	    RestoVO resto = restoService.getById(id);
 	    model.addAttribute("resto", resto);
-
 	    return "admin/fragments/resto/modals/resto_view :: viewModalContent";
 	}
 	
+	
+	// ===== 顯示圖片 =====
 	@GetMapping("/resto_info/img/{id}")
 	public ResponseEntity<byte[]> getImage(@PathVariable Integer id) {
 	    RestoVO resto = restoService.getById(id);
 	    byte[] imageBytes = resto.getRestoImg();
-	    
-
 
 	    if (imageBytes == null || imageBytes.length == 0) {
 	    	// 回傳no_img.svg bytes
@@ -79,7 +89,6 @@ public class RestoController {
 	        } catch (IOException e) {
 	            // optional: log
 	        }
-
 	        return ResponseEntity
 	            .status(HttpStatus.NO_CONTENT)
 	            .build();
@@ -116,7 +125,6 @@ public class RestoController {
 	}
 	
 	
-	
 	// ===== 新增 =====
 	//取得add modal
 	@GetMapping("/resto_info/add")
@@ -124,7 +132,7 @@ public class RestoController {
 	    model.addAttribute("resto", new RestoVO()); // 傳入一個空的RestoVO
 	    return "admin/fragments/resto/modals/resto_add :: addModalContent";
 	}
-
+	
 	//寫入新增內容到資料庫
 	@PostMapping("/resto_info/insert")
 	public String insertResto(
@@ -135,14 +143,6 @@ public class RestoController {
 	        RedirectAttributes redirectAttributes,
 	        Model model
 	) {
-		
-		
-//	    System.out.println("表單資料：" + resto);
-		
-		
-		// 預設值補齊
-//	    resto.setIsDeleted(false);
-//	    if (resto.getIsEnabled() == null) resto.setIsEnabled(false);
 		
 	    // 錯誤 flag（初始 false）
 	    boolean hasImageError = false;
@@ -181,7 +181,6 @@ public class RestoController {
 	        model.addAttribute("resto", resto);
 	        return "admin/fragments/resto/modals/resto_add :: addModalContent";
 	    }
-	    
 
 	    // 寫入資料庫
 		restoService.saveWithImage(resto, imageFile , clearImgFlag);
@@ -273,7 +272,43 @@ public class RestoController {
 	}
 
 	
+	
+	// ===== restoTimeslot.html ====================================================== //
 
+	// ===== 餐廳選擇 =====
+	@GetMapping("/resto_timeslot/select")
+	public String showRestoPeriodTimeslotPage(
+	        @RequestParam(value = "restoId", required = false) Integer restoId,
+	        @Valid @ModelAttribute("resto") RestoVO resto,
+	        BindingResult result,
+	        Model model) {
+	    
+	    List<RestoVO> restoList = restoService.getAll();
+	    model.addAttribute("restoList", restoList);
+
+	    if (restoId != null) {
+	        model.addAttribute("selectedRestoId", restoId);
+	        model.addAttribute("periodList", periodService.getPeriodsByRestoId(restoId));
+	        model.addAttribute("timeslotList", timeslotService.getTimeslotsByRestoId(restoId));
+	    } else {
+	        model.addAttribute("selectedRestoId", null);
+	    }
+
+	    return "admin/fragments/resto/restoTimeslot";
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 
 	

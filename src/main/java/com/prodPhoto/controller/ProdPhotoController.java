@@ -28,7 +28,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/prodPhoto")
+@RequestMapping("/admin/prodPhoto")
 public class ProdPhotoController {
 	
 	@Autowired
@@ -37,16 +37,20 @@ public class ProdPhotoController {
 	@Autowired
 	ProdService prodSvc;
 	
-	@GetMapping("select_page")
-	public String selectPage() {
-		return "back-end/prodPhoto/select_page";
+	@GetMapping("/admin/prodPhoto/select_page")
+	public String selectPage(Model model) {
+		model.addAttribute("prodPhotoVO", new ProdPhotoVO());
+		model.addAttribute("prodPhotoListData", prodPhotoSvc.getAll());
+		model.addAttribute("prodListData", prodSvc.getAll());
+		model.addAttribute("mainFragment", "admin/fragments/shop/prodPhoto/select_page :: content");
+		return "admin/index_admin";
 	}
 	
 	@GetMapping("listAllProdPhoto")
 	public String listAllProdPhoto(Model model) {
 	    List<ProdPhotoVO> list = prodPhotoSvc.getAll();
 	    model.addAttribute("prodPhotoListData", list);
-	    return "back-end/prodPhoto/listAllProdPhoto";
+	    return "admin/fragments/shop/prodPhoto/listAllProdPhoto";
 	}
 
 	@ModelAttribute("prodPhotoListData")  // for select_page.html 第97 109行用 // for listAllEmp.html 第85行用
@@ -61,7 +65,8 @@ public class ProdPhotoController {
 	public String addProdPhoto(ModelMap model) {
 		ProdPhotoVO prodPhotoVO = new ProdPhotoVO();
 		model.addAttribute("prodPhotoVO", prodPhotoVO);
-		return "back-end/prodPhoto/addProdPhoto";
+		model.addAttribute("prodListData", prodSvc.getAll());
+		return "admin/fragments/shop/prodPhoto/addProdPhoto";
 	}
 	
 	/*
@@ -76,7 +81,7 @@ public class ProdPhotoController {
 		result = removeFieldError(prodPhotoVO, result, "prodPhoto");
 
 		if (parts[0].isEmpty()) { // 使用者未選擇要上傳的圖片時
-			model.addAttribute("errorMessage", "員工照片: 請上傳照片");
+			model.addAttribute("errorMessage", "商品照片: 請上傳照片");
 		} else {
 			for (MultipartFile multipartFile : parts) {
 				byte[] buf = multipartFile.getBytes();
@@ -84,16 +89,16 @@ public class ProdPhotoController {
 			}
 		}
 		if (result.hasErrors() || parts[0].isEmpty()) {
-			return "back-end/prodPhoto/addProdPhoto";
+			model.addAttribute("prodListData", prodSvc.getAll());
+			return "admin/fragments/shop/prodPhoto/addProdPhoto";
 		}
 		/*************************** 2.開始新增資料 *****************************************/
 		// EmpService empSvc = new EmpService();
 		prodPhotoSvc.addProdPhoto(prodPhotoVO);
 		/*************************** 3.新增完成,準備轉交(Send the Success view) **************/
-		List<ProdPhotoVO> list = prodPhotoSvc.getAll();
-		model.addAttribute("prodPhotoListData", list); // for listAllEmp.html 第85行用
-		model.addAttribute("success", "- (新增成功)");
-		return "redirect:/prodPhoto/listAllProdPhoto"; // 新增成功後重導至IndexController_inSpringBoot.java的第58行@GetMapping("/emp/listAllEmp")
+		// 取得新增後的商品照片ID，然後redirect到select_page並顯示該商品照片
+		Integer newProdPhotoId = prodPhotoVO.getProdPhotoId();
+		return "redirect:/admin/prodPhoto/select_page?prodPhotoId=" + newProdPhotoId + "&success=true";
 	}
 	
 	/*
@@ -108,7 +113,8 @@ public class ProdPhotoController {
 
 		/*************************** 3.查詢完成,準備轉交(Send the Success view) **************/
 		model.addAttribute("prodPhotoVO", prodPhotoVO);
-		return "back-end/prodPhoto/update_prodPhoto_input"; // 查詢完成後轉交update_emp_input.html
+		model.addAttribute("prodListData", prodSvc.getAll());
+		return "admin/fragments/shop/prodPhoto/update_prodPhoto_input"; // 查詢完成後轉交update_emp_input.html
 	}
 	
 	/*
@@ -133,17 +139,17 @@ public class ProdPhotoController {
 			}
 		}
 		if (result.hasErrors()) {
-			return "back-end/prodPhoto/update_prodPhoto_input";
+			model.addAttribute("prodListData", prodSvc.getAll());
+			return "admin/fragments/shop/prodPhoto/update_prodPhoto_input";
 		}
 		/*************************** 2.開始修改資料 *****************************************/
 		// EmpService empSvc = new EmpService();
 		prodPhotoSvc.updateProdPhoto(prodPhotoVO);
 
 		/*************************** 3.修改完成,準備轉交(Send the Success view) **************/
-		model.addAttribute("success", "- (修改成功)");
-		prodPhotoVO = prodPhotoSvc.getOneProdPhoto(Integer.valueOf(prodPhotoVO.getProdPhotoId()));
-		model.addAttribute("prodPhotoVO", prodPhotoVO);
-		return "back-end/prodPhoto/listOneProdPhoto"; // 修改成功後轉交listOneEmp.html
+		// 取得修改後的商品照片ID，然後redirect到select_page並顯示該商品照片
+		Integer prodPhotoId = prodPhotoVO.getProdPhotoId();
+		return "redirect:/admin/prodPhoto/select_page?prodPhotoId=" + prodPhotoId + "&updateSuccess=true";
 	}
 	
 	/*
@@ -159,7 +165,7 @@ public class ProdPhotoController {
 		List<ProdPhotoVO> list = prodPhotoSvc.getAll();
 		model.addAttribute("prodPhotoListData", list); // for listAllEmp.html 第85行用
 		model.addAttribute("success", "- (刪除成功)");
-		return "back-end/prodPhoto/listAllProdPhoto"; // 刪除完成後轉交listAllEmp.html
+		return "redirect:/admin/prodPhoto/select_page"; // 刪除完成後轉交listAllEmp.html
 	}
 	
 	/*
@@ -192,6 +198,16 @@ public class ProdPhotoController {
 //		model.addAttribute("prodPhotoListData", list); // for listAllEmp.html 第85行用
 //		return "back-end/prodPhoto/listAllProdPhoto";
 //	}
+	
+	@GetMapping("DBGifReader")
+    public void getPhoto(@RequestParam("prodPhotoId") Integer prodPhotoId, HttpServletResponse response) throws IOException {
+        ProdPhotoVO vo = prodPhotoSvc.getOneProdPhoto(prodPhotoId);
+        byte[] photo = vo != null ? vo.getProdPhoto() : null;
+        if (photo != null) {
+            response.setContentType("image/jpeg"); // 根據實際圖片格式調整
+            response.getOutputStream().write(photo);
+        }
+    }
 	
 	
 

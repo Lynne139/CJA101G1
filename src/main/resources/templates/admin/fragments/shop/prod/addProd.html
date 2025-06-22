@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品資料新增 - addProd.html</title>
+    <title>新增商品 - addProd.html</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <!-- Admin CSS -->
     <link rel="stylesheet" th:href="@{/css/all_admin.css}">
 </head>
@@ -22,10 +20,10 @@
                 <div class="w-100 mx-auto">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h1 class="panel-title">新增商品</h1>
-                        <a th:href="@{/prod/select_page}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>
-                            回查詢頁
-                        </a>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>
+                            關閉
+                        </button>
                     </div>
 
                     <!-- 新增商品表單 -->
@@ -39,7 +37,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label">商品類別</label>
                                     <select th:field="*{prodCateVO.prodCateId}" class="form-select">
-                                        <option th:each="prodCateVO : ${prodCateListData}" th:value="${prodCateVO.prodCateId}" th:text="${prodCateVO.prodCateName}"></option>
+                                        <option th:each="cate : ${prodCateListData}" th:value="${cate.prodCateId}" th:text="${cate.prodCateName}"></option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
@@ -78,15 +76,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     
     <script type="text/javascript">
-    //清除提示信息
-    function hideContent(d) {
-         var el = document.getElementById(d);
-         if(el) el.style.display = "none";
-    }
-    </script>
+     //清除提示信息 
+     function hideContent(d) { 
+          var el = document.getElementById(d); 
+          if(el) el.style.display = "none"; 
+     } 
+     </script>
 </body>
 </html>
