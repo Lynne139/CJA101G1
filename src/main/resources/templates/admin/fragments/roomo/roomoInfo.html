@@ -1,0 +1,110 @@
+<div th:fragment="content">
+    <div class="main_roomo_info">
+
+        <div class="mt-5 mb-5">
+            <h2 class="page_title">訂單查詢</h2>
+        </div>
+
+
+
+        <!-- 複合查詢 -->
+        <form class="filter panel p-4 mb-4" method="get" th:action="@{/admin/roomo_info}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">訂單狀態</label>
+                    <select class="form-select" name="isEnabled">
+                        <option value="">所有狀態</option>
+                        <option value="2" th:selected="${isEnabled} == '2'">完成</option>
+                        <option value="1" th:selected="${isEnabled} == '1'">成立</option>
+                        <option value="0" th:selected="${isEnabled} == '0'">取消</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">訂購人姓名</label>
+                    <input type="text" class="form-control" name="keyword" th:value="${keyword}">
+                </div>
+
+                <div class="search_btns col-md-4 d-flex justify-content-end align-items-end gap-2">
+                    <button type="button" class="btn btn_secondary btn_search_clear">清空</button>
+                    <button type="submit" class="btn btn_primary">搜尋</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- 資料表 -->
+        <div class="table panel p-4">
+            <div class="table_header d-flex justify-content-between align-items-end mb-4">
+                <h4 class="table_title">訂單列表</h4>
+                <!-- 新增餐廳 -->
+                <button class="btn btn_accent btn_add" id="btnAddroomo">新增訂單</button>
+            </div>
+            <div class="table-responsive">
+                <table id="roomoTable" class="table table-bordered align-top">
+                    <thead class="table_head align-top">
+                    <tr>
+                        <th>訂單編號</th>
+                        <th>會員名稱</th>
+                        <th>訂單日期</th>
+                        <th>訂單總金額</th>
+                        <th class="text-center">訂單狀態</th>
+                        <th class="text-center">入住日期</th>
+                        <th class="text-center">退房日期</th>
+                        <th>使用折價券</th>
+                        <th>折扣金額</th>
+                        <th>實際支付金額</th>
+                        <th>是否加購專案</th>
+                        <th>最後更新日期</th>
+                        <th>最後更新人</th>
+
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="roomo : ${roomoList}">
+                        <td th:text="${roomo.roomOrderId}"></td>
+                        <td th:text="${roomo.memberId}"></td>
+                        <td th:text="${roomo.orderDate}"></td>
+                        <td th:text="${roomo.roomAmount}"></td>
+                        <td class="text-center">
+                            <span th:classappend="${roomo.orderStatus} == 2 ? 'badge bg-success' : (${roomo.orderStatus} == 1 ? 'badge bg-primary' : 'badge bg-secondary')"
+                                  th:text="${roomo.orderStatus} == 2 ? '完成' : (${roomo.orderStatus} == 1 ? '成立' : '取消')"></span>
+                        </td>
+                        <td th:text="${roomo.checkInDate}"></td>
+                        <td th:text="${roomo.checkOutDate}"></td>
+                        <td th:text="${roomo.couponCode}"></td>
+                        <td th:text="${roomo.discountAmount}"></td>
+                        <td th:text="${roomo.actualAmount}"></td>
+                        <td th:text="${roomo.projectAddOn} == 1 ? '是' : '否'"></td>
+                        <!-- 若有 lastUpdateDate/lastUpdateBy 請補上 -->
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <div class="table_row_actions d-flex justify-content-center align-items-start">
+                                <button class="btn_icon btn_view" th:data-id="${roomo.roomOrderId}"><i class="fas fa-eye"></i></button>
+                                <button class="btn_icon btn_edit" th:data-id="${roomo.roomOrderId}"><i class="fas fa-edit"></i></button>
+                                <button class="btn_icon btn_delete" th:data-id="${roomo.roomOrderId}"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <!-- Modal -->
+            <div id="roomoInfoModalContainer"></div>
+
+
+            <!-- CRUD執行結果提示 -->
+            <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fa-solid fa-check-circle me-2"></i><span th:text="${message}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+
+
+        </div>
+
+
+    </div>
