@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 // 這段是假設已經有 Member 是從登入資訊中取得，以下提供 REST API 範例：
-// 若是用伺服器渲染，要重寫!!!
+// 若是用伺服器渲染，要重寫!!! 
 
 
 @RestController
