@@ -177,9 +177,14 @@ Access_name Varchar(50) not null
 );
 
 INSERT INTO FUNCTION_ACCESS_RIGHT (ACCESS_NAME) VALUES
-('查看最新消息'),
-('編輯員工資料'),
-('查看訂單紀錄');
+('會員管理權限'),
+('員工管理權限'),
+('住宿管理權限'),
+('餐廳管理權限'),
+('商店管理權限'),
+('優惠管理權限'),
+('客服管理權限'),
+('消息管理權限');
     
 -- 角色權限
  CREATE TABLE role_access_right (
@@ -332,7 +337,7 @@ INSERT INTO NEWS_LIST (TITLE, CONTENT, PUBLISHED_DATE, IS_DISPLAY, PROMO_PHOTO)
 VALUES 
 (
   '嶼蔻飯店榮獲2025年度最佳設計旅宿獎',
-  '嶼蔻 Maison d’Yuko 憑藉獨特海島設計與高品質服務，榮獲觀光局頒發「最佳設計旅宿獎」，感謝大家的支持與肯定。',
+  '嶼蔻 Maison d''Yuko 憑藉獨特海島設計與高品質服務，榮獲觀光局頒發「最佳設計旅宿獎」，感謝大家的支持與肯定。',
   '2025-04-20',
   TRUE,
   NULL
