@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.employee.entity.Role;
 import com.employee.entity.FunctionAccessRight;
 import com.employee.entity.RoleAccessRight;
+import com.employee.entity.JobTitle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import com.employee.repository.RoleRepository;
 import com.employee.repository.FunctionAccessRightRepository;
 import com.employee.repository.RoleAccessRightRepository;
+import com.employee.repository.JobTitleRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -29,6 +31,8 @@ public class EmployeeService {
     private FunctionAccessRightRepository functionAccessRightRepository;
     @Autowired
     private RoleAccessRightRepository roleAccessRightRepository;
+    @Autowired
+    private JobTitleRepository jobTitleRepository;
 
     // ====== 部門/權限/對應關係（僅存在於記憶體） ======
     // 已移除 roles、accessRights、roleAccessRights、roleAccessMap 相關欄位與初始化
@@ -61,6 +65,16 @@ public class EmployeeService {
     public Role addRole(Role role) {
         return roleRepository.save(role);
     }
+    
+    // 取得所有職稱
+    public List<JobTitle> getAllJobTitles() {
+        return jobTitleRepository.findAll();
+    }
+    // 新增職稱
+    public JobTitle addJobTitle(JobTitle jobTitle) {
+        return jobTitleRepository.save(jobTitle);
+    }
+    
     // 取得所有權限
     public List<FunctionAccessRight> getAllAccessRights() {
         return functionAccessRightRepository.findAll();

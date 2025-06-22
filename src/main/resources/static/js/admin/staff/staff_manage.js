@@ -7,6 +7,15 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // 載入職稱
+    fetch("/employees/job-titles").then(res => res.json()).then(data => {
+        const jobTitleSelect = document.getElementById("jobTitleSelect");
+        if (jobTitleSelect) {
+            jobTitleSelect.innerHTML = '<option value="">請選擇職稱</option>' + 
+                data.map(jt => `<option value="${jt.jobTitleId}">${jt.jobTitleName}</option>`).join("");
+        }
+    });
+
     // 僅保留權限管理（新增/編輯權限）功能
     const editAccessSelect = document.getElementById("editAccessSelect");
     if (editAccessSelect) {
@@ -16,6 +25,18 @@ document.addEventListener("DOMContentLoaded", function () {
             ).join("");
         });
     }
+
+    // 新增職稱
+    document.getElementById("addJobTitleForm")?.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const jobTitleName = this.jobTitleName.value;
+        const description = this.description.value;
+        fetch("/employees/job-titles", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ jobTitleName, description, isActive: true })
+        }).then(() => location.reload());
+    });
 
     // 新增部門
     document.getElementById("addRoleForm")?.addEventListener("submit", function (e) {

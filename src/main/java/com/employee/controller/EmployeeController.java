@@ -4,6 +4,7 @@ import com.employee.entity.Employee;
 import com.employee.entity.Role;
 import com.employee.entity.FunctionAccessRight;
 import com.employee.entity.RoleAccessRight;
+import com.employee.entity.JobTitle;
 import com.employee.service.EmployeeService;
 import com.employee.repository.RoleRepository;
 import com.employee.repository.FunctionAccessRightRepository;
@@ -61,6 +62,18 @@ public class EmployeeController {
     @PostMapping("/roles")
     public Role addRole(@RequestBody Role role) {
         return employeeService.addRole(role);
+    }
+
+    // 取得所有職稱
+    @GetMapping("/job-titles")
+    public List<JobTitle> getAllJobTitles() {
+        return employeeService.getAllJobTitles();
+    }
+
+    // 新增職稱
+    @PostMapping("/job-titles")
+    public JobTitle addJobTitle(@RequestBody JobTitle jobTitle) {
+        return employeeService.addJobTitle(jobTitle);
     }
 
     // 取得所有權限

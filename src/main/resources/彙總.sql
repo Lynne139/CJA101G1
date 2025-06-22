@@ -132,21 +132,40 @@ VALUES
 ('系統管理員', '擁有全站存取權限'),
 ('客服專員', '可回覆顧客留言與查詢訂單');
 
+-- 職稱表 
+create table job_title (
+job_title_id int auto_increment primary key not null,
+job_title_name Varchar(50) not null,
+description Varchar(200),
+is_active boolean not null default true
+);
+
+INSERT INTO JOB_TITLE (JOB_TITLE_NAME, DESCRIPTION)
+VALUES 
+('總經理', '負責公司整體營運管理'),
+('副總經理', '協助總經理管理公司業務'),
+('部門經理', '負責部門日常營運管理'),
+('資深專員', '具備豐富經驗的專業人員'),
+('專員', '一般業務處理人員'),
+('助理', '協助各項業務處理');
+
 -- 員工 
 Create table employee (
 Employee_id int auto_increment primary key not null,
 Role_id int not null,
+job_title_id int,
 Name Varchar(50) not null,
 Status boolean default true not null,
 Created_date date not null,
 Password Varchar(50) not null,
-foreign key (Role_id) references Role_list (Role_id)
+foreign key (Role_id) references Role_list (Role_id),
+foreign key (job_title_id) references job_title (job_title_id)
 );
 
-INSERT INTO EMPLOYEE (ROLE_ID, NAME, CREATED_DATE, PASSWORD)
+INSERT INTO EMPLOYEE (ROLE_ID, JOB_TITLE_ID, NAME, CREATED_DATE, PASSWORD)
 VALUES 
-(1, '吳永志', '2025-01-01', '1234'),
-(2, '吳冠宏', '2025-02-15', '1234');
+(1, 1, '吳永志', '2025-01-01', '1234'),
+(2, 5, '吳冠宏', '2025-02-15', '1234');
 
 
 -- 客服留言 

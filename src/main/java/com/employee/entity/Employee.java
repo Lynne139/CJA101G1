@@ -14,6 +14,9 @@ public class Employee {
     @Column(name = "Role_id", nullable = false)
     private Integer roleId;
 
+    @Column(name = "job_title_id")
+    private Integer jobTitleId;
+
     @Column(name = "Name", nullable = false, length = 50)
     private String name;
 
@@ -51,6 +54,14 @@ public class Employee {
 
     public void setRoleId(Integer roleId) {
         this.roleId = roleId;
+    }
+
+    public Integer getJobTitleId() {
+        return jobTitleId;
+    }
+
+    public void setJobTitleId(Integer jobTitleId) {
+        this.jobTitleId = jobTitleId;
     }
 
     public String getName() {
