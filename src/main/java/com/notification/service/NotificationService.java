@@ -1,8 +1,6 @@
 package com.notification.service;
 
-package com.notification.service;
-
-import com.notification.entity.Member;
+import com.member.model.MemberVO;
 import com.notification.entity.Notification;
 import com.notification.repository.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,7 @@ public class NotificationService {
     }
 
     // 取得某會員所有通知（不分頁）
-    public List<Notification> getNotificationsByMember(Member member) {
+    public List<Notification> getNotificationsByMember(MemberVO member) {
         return notificationRepository.findByMember(member);
     }
 }
