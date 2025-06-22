@@ -3,6 +3,8 @@ package com.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.roomOrder.model.RoomOrder;
+import com.roomOrder.model.RoomOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,7 +32,9 @@ public class AdminIndexController {
 	
 	@Autowired
 	ProdCateService prodCateSvc;
-		
+    @Autowired
+    private RoomOrderService roomOrderService;
+
 	// === 後台首頁 ===
     @GetMapping("")
     public String index(HttpServletRequest request,Model model) {
@@ -84,9 +88,25 @@ public class AdminIndexController {
     	model.addAttribute("currentURI", request.getRequestURI());
 
     	return "admin/index_admin";
-    } 
-    
-    // === 餐廳管理 ===
+    }
+
+	//===住宿訂單管理===
+	@GetMapping("/roomo_info")
+	public String roomoInfo(HttpServletRequest request,Model model) {
+
+		String mainFragment = "admin/fragments/roomo/roomoInfo";
+		model.addAttribute("mainFragment", mainFragment);
+		model.addAttribute("currentURI", request.getRequestURI());
+
+		// 複合查詢 + Datatables
+		Map<String, String[]> paramMap = request.getParameterMap();
+		List<RoomOrder> roomoList = roomOrderService.compositeQuery(paramMap);
+		model.addAttribute("roomoList", roomoList);
+
+        return "admin/index_admin";
+    }
+
+	// === 餐廳管理 ===
     @GetMapping("/resto_info")
     public String restoInfo(HttpServletRequest request,
     						HttpServletResponse response,
