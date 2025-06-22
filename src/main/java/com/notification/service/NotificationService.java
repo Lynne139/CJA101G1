@@ -1,6 +1,5 @@
 package com.notification.service;
 
-import com.member.model.MemberVO;
 import com.notification.entity.Notification;
 import com.notification.repository.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,19 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
-    // 取得某會員所有通知（不分頁）
-    public List<Notification> getNotificationsByMember(MemberVO member) {
-        return notificationRepository.findByMember(member);
+    // 取得某會員所有通知
+    public List<Notification> getNotificationsByMemberId(Integer memberId) {
+        return notificationRepository.findByMemberId(memberId);
+    }
+    
+    // 更新通知為已讀狀態
+    public boolean markAsRead(Integer notificationId, Integer memberId) {
+        Notification notification = notificationRepository.findByNotificationIdAndMemberId(notificationId, memberId);
+        if (notification != null && !notification.getIsRead()) {
+            notification.setIsRead(true);
+            notificationRepository.save(notification);
+            return true; // 表示更新成功
+        }
+        return false; // 找不到或已是已讀狀態
     }
 }
