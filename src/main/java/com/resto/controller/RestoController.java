@@ -55,7 +55,6 @@ public class RestoController {
 	@GetMapping("/resto_info/delete")
 	public String deleteResto(@RequestParam("restoId") Integer id, RedirectAttributes redirectAttributes) {
 	    restoService.softDelete(id); // isDeleted = true
-	    redirectAttributes.addFlashAttribute("message", "刪除成功！");
 	    return "redirect:/admin/resto_info";
 	}
 	
@@ -185,7 +184,6 @@ public class RestoController {
 	    // 寫入資料庫
 		restoService.saveWithImage(resto, imageFile , clearImgFlag);
 
-	    redirectAttributes.addFlashAttribute("message", "新增成功！");
 	    return "redirect:/admin/resto_info";
 	}
 
@@ -267,7 +265,6 @@ public class RestoController {
 	        model.addAttribute("resto", resto); // 回填原輸入
 	        return "admin/fragments/resto/modals/resto_edit :: editModalContent";
 	    }
-	    redirectAttributes.addFlashAttribute("message", "編輯成功！");
 	    return "redirect:/admin/resto_info";
 	}
 
@@ -275,27 +272,7 @@ public class RestoController {
 	
 	// ===== restoTimeslot.html ====================================================== //
 
-	// ===== 餐廳選擇 =====
-	@GetMapping("/resto_timeslot/select")
-	public String showRestoPeriodTimeslotPage(
-	        @RequestParam(value = "restoId", required = false) Integer restoId,
-	        @Valid @ModelAttribute("resto") RestoVO resto,
-	        BindingResult result,
-	        Model model) {
-	    
-	    List<RestoVO> restoList = restoService.getAll();
-	    model.addAttribute("restoList", restoList);
-
-	    if (restoId != null) {
-	        model.addAttribute("selectedRestoId", restoId);
-	        model.addAttribute("periodList", periodService.getPeriodsByRestoId(restoId));
-	        model.addAttribute("timeslotList", timeslotService.getTimeslotsByRestoId(restoId));
-	    } else {
-	        model.addAttribute("selectedRestoId", null);
-	    }
-
-	    return "admin/fragments/resto/restoTimeslot";
-	}
+	
 
 	
 	

@@ -16,6 +16,7 @@
 
         <div class="modal-body">
         
+        <!-- 若有不隸屬欄位而須統一顯示的錯誤提示 -->
         <div th:if="${errorMsg}" class="alert alert-danger">
           <i class="fa-solid fa-triangle-exclamation me-2"></i>
           <span th:text="${errorMsg}"></span>
@@ -32,11 +33,8 @@
 
             <div class="mb-3">
               <label class="form-label">餐廳編號</label>
-              <!-- 顯示編號 -->
               <input type="text" class="form-control"
-                th:value="*{restoId}" readonly>
-              <!-- 實際送出編號 -->
-              <input type="hidden" th:field="*{restoId}">
+                th:field="*{restoId}" readonly>
             </div>
 
             <div class="mb-3">

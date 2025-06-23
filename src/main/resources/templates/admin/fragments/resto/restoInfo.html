@@ -12,11 +12,13 @@
 			<div class="row g-3">
 				<div class="col-md-4">
 					<label class="form-label">餐廳狀態</label>
-					<select class="form-select" name="isEnabled">
-						<option value="">--- 所有狀態 ---</option>
-						<option value="true" th:selected="${isEnabled} == 'true'">上架</option>
-						<option value="false" th:selected="${isEnabled} == 'false'">下架</option>
-					</select>
+                        <select class="form-select" name="isEnabled">
+                          <option th:each="entry : ${isEnabledOptions}"
+                                  th:value="${entry.key}"
+                                  th:text="${entry.value}"
+                                  th:selected="${entry.key == isEnabled}">
+                          </option>
+                        </select>
 				</div>
 
 				<div class="col-md-4">
@@ -78,11 +80,7 @@
 			<div id="restoInfoModalContainer"></div>
 
 
-			<!-- CRUD執行結果提示 -->
-			<div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
-				<i class="fa-solid fa-check-circle me-2"></i><span th:text="${message}"></span>
-				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-			</div>
+			
 
 
 

@@ -1,39 +1,41 @@
 package com.controller;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.coupon.entity.Coupon;
+import com.coupon.service.CouponService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.member.model.MemberService;
 import com.member.model.MemberVO;
 import com.prod.model.ProdService;
 import com.prodCart.model.ProdCartService;
 import com.prodCart.model.ProdCartVO;
-import com.prodCart.model.ProdMemberIdVO;
 import com.prodCate.model.ProdCateService;
 import com.prodCate.model.ProdCateVO;
 import com.prodPhoto.model.ProdPhotoService;
 import com.prodPhoto.model.ProdPhotoVO;
-
+import com.resto.model.PeriodService;
 import com.resto.model.RestoService;
 import com.resto.model.RestoVO;
+import com.resto.model.TimeslotService;
+import com.roomOrder.model.RoomOrder;
+import com.roomOrder.model.RoomOrderService;
 import com.shopOrd.model.ShopOrdService;
 import com.shopOrd.model.ShopOrdVO;
+import com.shopOrdDet.model.ShopOrdDetService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import com.coupon.entity.Coupon;
-import com.coupon.service.CouponService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.shopOrdDet.model.ShopOrdDetService;
 
 @Controller
 @RequestMapping("/admin")
@@ -41,6 +43,10 @@ public class AdminIndexController {
 	
 	@Autowired
 	RestoService restoService;
+	@Autowired
+	PeriodService periodService;
+	@Autowired
+	TimeslotService timeslotService;
 	
 	@Autowired
 	ProdService prodSvc;
@@ -65,6 +71,9 @@ public class AdminIndexController {
 	
 	@Autowired
 	ShopOrdDetService shopOrdDetSvc;
+	
+	@Autowired
+	RoomOrderService roomOrderService;
 	
 		
 	// === 後台首頁 ===
@@ -146,15 +155,43 @@ public class AdminIndexController {
         List<RestoVO> restoList = restoService.compositeQuery(paramMap);
     	model.addAttribute("restoList", restoList);
     	
+    	// 給下拉選單用的isEnabled
+        Map<String, String> isEnabledOptions = new LinkedHashMap<>();
+        isEnabledOptions.put("", "--- 所有狀態 ---"); // 空字串代表不篩選
+        isEnabledOptions.put("true", "上架");
+        isEnabledOptions.put("false", "下架");
+        model.addAttribute("isEnabledOptions", isEnabledOptions);
+    	
     	// 讓複合查詢欄位保持原值（用於 th:selected / th:value）
         for (String key : paramMap.keySet()) {
             model.addAttribute(key, paramMap.get(key)[0]);
         }
 
     	return "admin/index_admin";
-    } 
-    @GetMapping("/resto_timeslot")
-    public String restoTimeslot(HttpServletRequest request,Model model) {
+    	} 
+    
+    	@GetMapping("/resto_timeslot")
+    	public String restoTimeslot(HttpServletRequest request,
+	        @RequestParam(value = "restoId", required = false) Integer restoId,
+    		Model model) {
+    		
+		// 把所有餐廳都傳給下拉選單使用
+        List<RestoVO> restoList = restoService.getAll();
+        model.addAttribute("restoList", restoList);
+
+        // 若選定某餐廳，才撈出該餐廳的區段與時段
+        if (restoId != null) {
+            model.addAttribute("selectedRestoId", restoId);
+            model.addAttribute("periodList", periodService.getPeriodsByRestoId(restoId));
+            model.addAttribute("timeslotList", timeslotService.getTimeslotsByRestoId(restoId));
+            
+           
+        } else {
+            model.addAttribute("selectedRestoId", null);
+            // 在else中補空清單進入model，避免Null
+            model.addAttribute("periodList", new ArrayList<>());
+            model.addAttribute("timeslotList", new ArrayList<>());
+        }
     	
     	String mainFragment = "admin/fragments/resto/restoTimeslot";
     	model.addAttribute("mainFragment", mainFragment);
@@ -162,6 +199,7 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
     } 
+    	
     @GetMapping("/resto_order")
     public String restoOrder(HttpServletRequest request,Model model) {
     	

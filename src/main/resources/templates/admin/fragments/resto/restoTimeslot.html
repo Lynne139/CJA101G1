@@ -1,21 +1,25 @@
-<div class="panel mb-4">
-  <h2 class="panel-title mb-4">餐廳區段與時段管理</h2>
+<div class="main_resto_timeslot">
+
+      <div class="mt-5 mb-5">
+        <h2 class="page_title">餐廳資訊</h2>
+      </div>
 
   <!-- 餐廳選擇器 -->
-  <form method="get" th:action="@{/admin/resto_timeslot/select}">
+  <form class="select_resto filter panel p-4 mb-4" method="get" th:action="@{/admin/resto_timeslot}">
   <div class="row mb-3">
     <div class="col-12">
+      <label class="form-label text-muted mt-2" th:if="${selectedRestoId == null}">請先選擇餐廳以顯示區段與時段</label>
       <select id="restoSelect" class="form-select w-100" name="restoId"
               onchange="this.form.submit()">
-        <option disabled th:selected="${selectedRestoId == null}">--- 請選擇餐廳 --</option>
+        <option selected disabled>--- 餐廳 ---</option>
         <option th:each="resto : ${restoList}"
                 th:value="${resto.restoId}" th:text="${resto.restoName}"
                 th:selected="${resto.restoId == selectedRestoId}"></option>
       </select>
+  
     </div>
   </div>
 </form>
-
 
   <div class="row">
     <!-- 區段清單 -->
@@ -24,19 +28,20 @@
         <div
           class="panel-heading d-flex justify-content-between align-items-center mb-2">
           <h3 class="panel-subtitle mb-0">餐廳區段</h3>
-          <button class="btn btn_accent btn-sm">新增區段</button>
+          <button class="btn btn_accent btn-sm">新增</button>
         </div>
-        <ul class="list-group list-group-flush">
+        <ul class="list-group list-group-flush" th:if="${periodList != null}">
           <li
             class="list-group-item bg-transparent d-flex justify-content-between align-items-center"
-            th:each="period : ${periodList}"><span
-            th:text="${period.name}">區段名稱</span> <span>
+            th:each="period : ${periodList}">
+            <span th:text="${period.periodName}">區段名稱</span> 
+            <span>
               <button class="btn_icon btn_edit" title="編輯"
-                th:data-id="${period.id}">
+                th:data-id="${period.periodId}">
                 <i class="fas fa-edit"></i>
               </button>
               <button class="btn_icon btn_delete" title="刪除"
-                th:data-id="${period.id}">
+                th:data-id="${period.periodId}">
                 <i class="fas fa-trash"></i>
               </button>
           </span></li>
@@ -50,7 +55,7 @@
         <div
           class="panel-heading d-flex justify-content-between align-items-center mb-2">
           <h3 class="panel-subtitle mb-0">時段對應區段</h3>
-          <button class="btn btn_secondary btn-sm">新增時段</button>
+          <button class="btn btn_accent btn-sm">新增</button>
         </div>
         <div class="table-responsive table-wrapper">
           <table class="table align-top mb-0">
@@ -58,17 +63,17 @@
               <tr>
                 <th>時段</th>
                 <th th:each="period : ${periodList}"
-                  th:text="${period.name}">區段</th>
+                  th:text="${period.periodName}">區段</th>
               </tr>
             </thead>
-            <tbody>
-              <tr th:each="slot : ${timeslotList}" class="border-bottom">
-                <td th:text="${slot.timeText}">07:00</td>
+            <tbody th:if="${timeslotList != null}">
+              <tr th:each="timeslot : ${timeslotList}" class="border-bottom">
+                <td th:text="${timeslot.timeslotName}"></td>
                 <td class="text-center" th:each="period : ${periodList}">
                   <input type="radio"
-                  th:name="'selectedPeriodMap[' + ${slot.id} + ']'"
-                  th:value="${period.id}"
-                  th:checked="${selectedPeriodMap[slot.id]} == period.id"
+                  th:name="'selectedPeriodMap[' + ${timeslot.timeslotId} + ']'"
+                  th:value="${period.periodId}"
+                  th:checked="${selectedPeriodMap[timeslot.timeslotId]} == period.periodId"
                   class="btn-outline-primary border rounded">
                 </td>
               </tr>
@@ -78,4 +83,6 @@
       </div>
     </div>
   </div>
+  
+  
 </div>

@@ -17,10 +17,10 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -42,11 +42,12 @@ public class RestoVO{
 	private String restoName;
 	
     @Size(max = 40, message = "英文名稱請勿超過40字")
+    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ\\s\\-'\\.]+$|^$", message = "請輸入英文字母，可含空格、點、連字符（西歐語系皆可）")
 	@Column(name = "resto_name_en")
 	private String restoNameEn;
 	
     @NotNull(message = "請填入可容納人數")
-    @Min(value = 1, message = "至少為 1")
+    @Min(value = 1)
 	@Column(name = "resto_seats_total")
 	private Integer restoSeatsTotal;
 	
@@ -78,11 +79,11 @@ public class RestoVO{
 	@Column(name = "is_deleted") //軟刪除
 	private Boolean isDeleted = false;
 	
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="timeslotId")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="restoVO")
 	@OrderBy("timeslot_id asc")
 	private Set<TimeslotVO> timeslots = new HashSet<TimeslotVO>();
 
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="periodId")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="restoVO")
 	@OrderBy("period_id asc")
 	private Set<PeriodVO> periods = new HashSet<PeriodVO>();
 

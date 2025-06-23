@@ -37,7 +37,7 @@ public class PeriodVO{
 	@JoinColumn(name="resto_id")
 	private RestoVO restoVO;
 	
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="timeslotId")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="periodVO")
 	@OrderBy("timeslot_id asc")
 	private Set<TimeslotVO> timeslots = new HashSet<TimeslotVO>();
 
@@ -56,11 +56,28 @@ public class PeriodVO{
 	public void setPeriodName(String periodName) {
 		this.periodName = periodName;
 	}
+	
+	public Set<TimeslotVO> getTimeslots() {
+		return timeslots;
+	}
+
+	public void setTimeslots(Set<TimeslotVO> timeslots) {
+		this.timeslots = timeslots;
+	}
+
+	public RestoVO getRestoVO() {
+		return restoVO;
+	}
+
+	public void setRestoVO(RestoVO restoVO) {
+		this.restoVO = restoVO;
+	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(periodId, periodName);
+		return Objects.hash(periodId);
 	}
+	
 
 	@Override
 	public boolean equals(Object obj) {
@@ -71,12 +88,12 @@ public class PeriodVO{
 		if (getClass() != obj.getClass())
 			return false;
 		PeriodVO other = (PeriodVO) obj;
-		return Objects.equals(periodId, other.periodId) && Objects.equals(periodName, other.periodName);
+		return Objects.equals(periodId, other.periodId);
 	}
 
 	@Override
 	public String toString() {
-		return "PeriodVO [periodId=" + periodId + ", periodName=" + periodName + "]";
+		return "PeriodVO [periodId=" + periodId + "]";
 	}
 	
 	

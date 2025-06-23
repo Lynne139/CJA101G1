@@ -65,13 +65,14 @@ document.addEventListener("DOMContentLoaded", function () {
         })
 		.then(res => {
 		  if (res.redirected) {
+			sessionStorage.setItem("toastMessage", "封存成功！");
 		    window.location.href = res.url; // 讓DataTables因為整頁刷新而重載資料
 		    return;
 		  }
 		  return res.text(); // 若失敗沒redirect，才繼續處理
 		})
 		.catch(err => {
-		  alert("刪除失敗：" + err.message);
+		  alert("封存失敗：" + err.message);
 		});
       }
     }
@@ -319,17 +320,20 @@ function bindImagePreview() {
         body: formData
       })
         .then(res => {
-
+			
 			if (res.redirected) {
-				window.location.href = res.url; // 讓瀏覽器照後端redirect去重新載入頁面
 				
-			      // 成功，清空並關閉modal
-			      document.getElementById("restoAddForm").reset();
-			      tinymce.get("restoContent")?.setContent("");
-			      document.getElementById("imgPreview").src = "";
+				sessionStorage.setItem("toastMessage", "新增成功！");
 
-			      const modal = bootstrap.Modal.getInstance(document.getElementById("restoAddModal"));
-			      modal.hide();
+			    // 成功，清空並關閉modal
+			    document.getElementById("restoAddForm").reset();
+			    tinymce.get("restoContent")?.setContent("");
+			    document.getElementById("imgPreview").src = "";
+
+			    const modal = bootstrap.Modal.getInstance(document.getElementById("restoAddModal"));
+			    modal.hide();
+				  
+				window.location.href = res.url; // 讓瀏覽器照後端redirect去重新載入頁面
 				  
 				} else {
 			      return res.text(); // 失敗時回傳HTML
@@ -461,6 +465,7 @@ function bindImagePreview() {
           .then(res => {
 
   			if (res.redirected) {
+				sessionStorage.setItem("toastMessage", "編輯成功！");				
   				window.location.href = res.url; // 讓瀏覽器照後端redirect去重新載入頁面
   				
   			      // 成功，清空並關閉modal
