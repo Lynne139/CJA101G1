@@ -4,11 +4,13 @@ import java.sql.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
@@ -47,6 +49,7 @@ public class MemberVO implements java.io.Serializable {
 	@Id //@Id代表這個屬性是這個Entity的唯一識別屬性，並且對映到Table的主鍵
 	@Column(name = "member_id")  //@Column指這個屬性是對應到資料庫Table的哪一個欄位   //【非必要，但當欄位名稱與屬性名稱不同時則一定要用】
 	@GeneratedValue(strategy = GenerationType.IDENTITY) //@GeneratedValue的generator屬性指定要用哪個generator //【strategy的GenerationType, 有四種值: AUTO, IDENTITY, SEQUENCE, TABLE】 
+//	@OneToMany(mappedBy = "roomTypeVO", cascade = CascadeType.ALL)
 	public Integer getMemberId() {
 		return memberId;
 	}
