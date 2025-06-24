@@ -1,100 +1,150 @@
 package com.employee.service;
 
 import com.employee.entity.Employee;
+import com.employee.entity.EmployeeDTO;
+import com.employee.entity.Role;
+import com.employee.entity.JobTitle;
 import com.employee.repository.EmployeeRepository;
+import com.employee.repository.RoleRepository;
+import com.employee.repository.JobTitleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.employee.entity.Role;
-import com.employee.entity.FunctionAccessRight;
-import com.employee.entity.RoleAccessRight;
-import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Optional;
-import com.employee.repository.RoleRepository;
-import com.employee.repository.FunctionAccessRightRepository;
-import com.employee.repository.RoleAccessRightRepository;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
 
 @Service
 public class EmployeeService {
+    
     @Autowired
     private EmployeeRepository employeeRepository;
+    
     @Autowired
     private RoleRepository roleRepository;
+    
     @Autowired
-    private FunctionAccessRightRepository functionAccessRightRepository;
-    @Autowired
-    private RoleAccessRightRepository roleAccessRightRepository;
+    private JobTitleRepository jobTitleRepository;
 
-    // ====== 部門/權限/對應關係（僅存在於記憶體） ======
-    // 已移除 roles、accessRights、roleAccessRights、roleAccessMap 相關欄位與初始化
+    // 取得所有員工（包含部門名稱和職稱名稱）
+    public List<EmployeeDTO> getAllEmployeesWithDetails() {
+        List<Employee> employees = employeeRepository.findAll();
+        List<Role> roles = roleRepository.findAll();
+        List<JobTitle> jobTitles = jobTitleRepository.findAll();
+        
+        // 建立角色映射
+        Map<Integer, String> roleMap = new HashMap<>();
+        for (Role role : roles) {
+            roleMap.put(role.getRoleId(), role.getRoleName());
+        }
+        
+        // 建立職稱映射
+        Map<Integer, String> jobTitleMap = new HashMap<>();
+        for (JobTitle jobTitle : jobTitles) {
+            jobTitleMap.put(jobTitle.getJobTitleId(), jobTitle.getJobTitleName());
+        }
+        
+        // 轉換為 DTO
+        return employees.stream()
+                .map(employee -> {
+                    String roleName = roleMap.get(employee.getRoleId());
+                    String jobTitleName = jobTitleMap.get(employee.getJobTitleId());
+                    return new EmployeeDTO(employee, roleName, jobTitleName);
+                })
+                .toList();
+    }
 
+    // 取得所有員工（基本資料）
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
     }
 
+    // 根據 ID 取得員工
     public Optional<Employee> getEmployeeById(Integer id) {
         return employeeRepository.findById(id);
     }
 
+    // 新增員工
     public Employee createEmployee(Employee employee) {
         return employeeRepository.save(employee);
     }
 
+    // 更新員工
     public Employee updateEmployee(Integer id, Employee employeeDetails) {
-        return employeeRepository.findById(id).map(employee -> {
-            employee.setName(employeeDetails.getName());
-            // 根據你的 Employee 欄位補上其他 set
-            return employeeRepository.save(employee);
-        }).orElseThrow(() -> new RuntimeException("Employee not found"));
+        return employeeRepository.findById(id)
+                .map(employee -> {
+                    if (employeeDetails.getName() != null) {
+                        employee.setName(employeeDetails.getName());
+                    }
+                    if (employeeDetails.getRoleId() != null) {
+                        employee.setRoleId(employeeDetails.getRoleId());
+                    }
+                    if (employeeDetails.getJobTitleId() != null) {
+                        employee.setJobTitleId(employeeDetails.getJobTitleId());
+                    }
+                    if (employeeDetails.getStatus() != null) {
+                        employee.setStatus(employeeDetails.getStatus());
+                    }
+                    return employeeRepository.save(employee);
+                })
+                .orElseThrow(() -> new RuntimeException("Employee not found with ID: " + id));
     }
 
     // 取得所有部門
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
     }
+
     // 新增部門
     public Role addRole(Role role) {
         return roleRepository.save(role);
     }
-    // 取得所有權限
-    public List<FunctionAccessRight> getAllAccessRights() {
-        return functionAccessRightRepository.findAll();
-    }
-    // 新增權限
-    public FunctionAccessRight addAccessRight(FunctionAccessRight accessRight) {
-        return functionAccessRightRepository.save(accessRight);
-    }
-    // 新增部門權限對應
-    public RoleAccessRight addRoleAccessRight(RoleAccessRight roleAccessRight) {
-        return roleAccessRightRepository.save(roleAccessRight);
-    }
-    // 查詢部門對應的權限
-    public List<RoleAccessRight> getAccessIdsByRoleId(Integer roleId) {
-        return roleAccessRightRepository.findAll().stream().filter(rar -> rar.getRoleId().equals(roleId)).toList();
+
+    // 更新部門
+    public Role updateRole(Integer id, Role roleDetails) {
+        return roleRepository.findById(id)
+                .map(role -> {
+                    role.setRoleName(roleDetails.getRoleName());
+                    role.setRemark(roleDetails.getRemark());
+                    return roleRepository.save(role);
+                })
+                .orElseThrow(() -> new RuntimeException("Role not found"));
     }
 
-    // 取得權限編號對應
-    public Map<Integer, String> getPermissionMap() {
-        Map<Integer, String> permissionMap = new HashMap<>();
-        List<FunctionAccessRight> permissions = functionAccessRightRepository.findAll();
-        for (FunctionAccessRight permission : permissions) {
-            permissionMap.put(permission.getAccessId(), permission.getAccessName());
-        }
-        return permissionMap;
+    // 取得所有職稱
+    public List<JobTitle> getAllJobTitles() {
+        return jobTitleRepository.findAll();
     }
 
-    // 檢查員工是否有特定權限
-    public boolean hasPermission(Integer employeeId, Integer permissionId) {
-        Employee employee = employeeRepository.findById(employeeId).orElse(null);
-        if (employee == null) return false;
-        
-        // 這裡可以根據你的需求實作權限檢查邏輯
-        // 例如：根據員工的 role_id 或其他欄位判斷權限
-        return true; // 暫時回傳 true，你可以根據需求調整
+    // 新增職稱
+    public JobTitle addJobTitle(JobTitle jobTitle) {
+        return jobTitleRepository.save(jobTitle);
+    }
+
+    // 更新職稱
+    public JobTitle updateJobTitle(Integer id, JobTitle jobTitleDetails) {
+        return jobTitleRepository.findById(id)
+                .map(jobTitle -> {
+                    jobTitle.setJobTitleName(jobTitleDetails.getJobTitleName());
+                    jobTitle.setDescription(jobTitleDetails.getDescription());
+                    return jobTitleRepository.save(jobTitle);
+                })
+                .orElseThrow(() -> new RuntimeException("JobTitle not found"));
+    }
+
+    // 更新員工照片
+    public void updateEmployeePhoto(Integer employeeId, byte[] photoData) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found with ID: " + employeeId));
+        employee.setEmployeePhoto(photoData);
+        employeeRepository.save(employee);
+    }
+
+    // 取得員工照片
+    public byte[] getEmployeePhoto(Integer employeeId) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found with ID: " + employeeId));
+        return employee.getEmployeePhoto();
     }
 } 

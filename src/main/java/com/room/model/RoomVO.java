@@ -13,7 +13,6 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
@@ -33,11 +32,21 @@ public class RoomVO {
 	private RoomTypeVO roomTypeVO;
 	
 	@Column(name = "room_guest_name", nullable = true)
+	@Pattern(
+		    regexp = "^[\\u4e00-\\u9fa5a-zA-Z0-9\\-]{2,50}$",
+		    message = "房客名稱: 只能是中、英文字母、數字與 -，長度需在 2 到 50 字內"
+		)
 	private String roomGuestName;
 	
+	@NotNull(message = "上下架狀態: 請選擇一個狀態")
+	@Min(value = 0, message = "")
+	@Max(value = 1, message = "")
 	@Column(name = "room_sale_status")
 	private Byte roomSaleStatus;
 	
+	@NotNull(message = "房間狀態: 請選擇一個狀態")
+	@Min(value = 0, message = "")
+	@Max(value = 2, message = "")
 	@Column(name = "room_status")
 	private Byte roomStatus;
 	
@@ -71,4 +80,7 @@ public class RoomVO {
 	public void setRoomStatus(Byte roomStatus) {
 		this.roomStatus = roomStatus;
 	}
+	public RoomVO() {
+	}
+	
 }

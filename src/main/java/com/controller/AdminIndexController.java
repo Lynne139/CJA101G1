@@ -3,6 +3,8 @@ package com.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.roomOrder.model.RoomOrder;
+import com.roomOrder.model.RoomOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,15 +36,16 @@ import jakarta.servlet.http.HttpServletResponse;
 @Controller
 @RequestMapping("/admin")
 public class AdminIndexController {
-	
+
 	@Autowired
 	RestoService restoService;
-	
+
 	@Autowired
 	ProdService prodSvc;
-	
+
 	@Autowired
 	ProdCateService prodCateSvc;
+
 	
 	@Autowired
 	ProdPhotoService prodPhotoSvc;
@@ -53,15 +56,19 @@ public class AdminIndexController {
 	@Autowired
 	MemberService memberSvc;
 	
+
 	@Autowired
 	RoomTypeService roomTypeService;
-	
+
 	@Autowired
 	RoomService roomService;
-	
+
 	@Autowired
 	RoomTypeScheduleService roomTypeScheduleService;
-		
+	
+    @Autowired
+    private RoomOrderService roomOrderService;
+
 	// === 後台首頁 ===
     @GetMapping("")
     public String index(HttpServletRequest request,Model model) {
@@ -85,7 +92,7 @@ public class AdminIndexController {
     } 
     
     // === 員工管理 ===
-    // === 新增/查詢 ===
+    // === 新增 ===
     @GetMapping("/staff1")
     public String staff1(HttpServletRequest request,Model model) {
 
@@ -95,11 +102,21 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
     } 
-    // === 權限管理 ===
+    // === 查詢 ===
     @GetMapping("/staff2")
     public String staff2(HttpServletRequest request,Model model) {
 
     	String mainFragment = "admin/fragments/staff/staff2";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    }
+    // === 權限管理 ===
+    @GetMapping("/staff3")
+    public String staff3(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/staff/staff3";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 
@@ -115,42 +132,58 @@ public class AdminIndexController {
     	model.addAttribute("currentURI", request.getRequestURI());
 
     	return "admin/index_admin";
-    } 
-    @GetMapping("/listAllRoomType")
-    public String listAllRoomType(HttpServletRequest request,HttpServletResponse response,Model model) {
-    	
-    	String mainFragment = "admin/fragments/room/listAllRoomType";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-    	List<RoomTypeVO> roomTypeVOList = roomTypeService.getAll();
-    	model.addAttribute("roomTypeVOList",roomTypeVOList);
-    	
-    	return "admin/index_admin";
-    } 
-    @GetMapping("/listAllRoomTypeSchedule")
-    public String listAllRoomTypeSchedule(HttpServletRequest request,HttpServletResponse response,Model model) {
-    	
-    	String mainFragment = "admin/fragments/room/listAllRoomTypeSchedule";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-    	List<RoomTypeScheduleVO> roomTypeScheduleVOList = roomTypeScheduleService.getAll();
-    	model.addAttribute("roomTypeScheduleVOList",roomTypeScheduleVOList);
-    	
-    	return "admin/index_admin";
-    } 
-    @GetMapping("/listAllRoom")
-    public String listAllRoom(HttpServletRequest request,HttpServletResponse response,Model model) {
-    	
-    	String mainFragment = "admin/fragments/room/listAllRoom";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-    	List<RoomVO> roomVOList = roomService.getAll();
-    	model.addAttribute("roomVOList",roomVOList);
-    	
-    	return "admin/index_admin";
-    } 
-    
-    // === 餐廳管理 ===
+	}
+	@GetMapping("/listAllRoomType")
+	public String listAllRoomType(HttpServletRequest request,HttpServletResponse response,Model model) {
+
+		String mainFragment = "admin/fragments/room/listAllRoomType";
+		model.addAttribute("mainFragment", mainFragment);
+		model.addAttribute("currentURI", request.getRequestURI());
+		List<RoomTypeVO> roomTypeVOList = roomTypeService.getAll();
+		model.addAttribute("roomTypeVOList",roomTypeVOList);
+
+		return "admin/index_admin";
+	}
+	@GetMapping("/listAllRoomTypeSchedule")
+	public String listAllRoomTypeSchedule(HttpServletRequest request,HttpServletResponse response,Model model) {
+
+		String mainFragment = "admin/fragments/room/listAllRoomTypeSchedule";
+		model.addAttribute("mainFragment", mainFragment);
+		model.addAttribute("currentURI", request.getRequestURI());
+		List<RoomTypeScheduleVO> roomTypeScheduleVOList = roomTypeScheduleService.getAll();
+		model.addAttribute("roomTypeScheduleVOList",roomTypeScheduleVOList);
+
+		return "admin/index_admin";
+	}
+	@GetMapping("/listAllRoom")
+	public String listAllRoom(HttpServletRequest request,HttpServletResponse response,Model model) {
+
+		String mainFragment = "admin/fragments/room/listAllRoom";
+		model.addAttribute("mainFragment", mainFragment);
+		model.addAttribute("currentURI", request.getRequestURI());
+		List<RoomVO> roomVOList = roomService.getAll();
+		model.addAttribute("roomVOList",roomVOList);
+
+		return "admin/index_admin";
+	}
+
+	//===住宿訂單管理===
+	@GetMapping("/roomo_info")
+	public String roomoInfo(HttpServletRequest request,Model model) {
+
+		String mainFragment = "admin/fragments/roomo/roomoInfo";
+		model.addAttribute("mainFragment", mainFragment);
+		model.addAttribute("currentURI", request.getRequestURI());
+
+		// 複合查詢 + Datatables
+		Map<String, String[]> paramMap = request.getParameterMap();
+		List<RoomOrder> roomoList = roomOrderService.compositeQuery(paramMap);
+		model.addAttribute("roomoList", roomoList);
+
+        return "admin/index_admin";
+    }
+
+	// === 餐廳管理 ===
     @GetMapping("/resto_info")
     public String restoInfo(HttpServletRequest request,
     						HttpServletResponse response,
@@ -230,39 +263,15 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
     } 
-    @GetMapping("/prodCate/select_page")
-    public String prodCateSelectPage(HttpServletRequest request,Model model) {
+    @GetMapping("/prodCate")
+    public String prodCate(HttpServletRequest request,Model model) {
 
-    	String mainFragment = "admin/fragments/shop/prodCate/select_page";
+    	String mainFragment = "admin/fragments/shop/prodCate";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
-    	
-    	// 添加商品分類資料到 model 中
-    	List<com.prodCate.model.ProdCateVO> list = prodCateSvc.getAll();
-    	model.addAttribute("prodCateListData", list);
-    	
-    	// 檢查是否有錯誤訊息
-    	String errorMessage = request.getParameter("errorMessage");
-    	if (errorMessage != null && !errorMessage.isEmpty()) {
-    		model.addAttribute("errorMessage", errorMessage);
-    	}
-    	
-    	// 檢查是否有查詢結果
-    	String prodCateId = request.getParameter("prodCateId");
-    	if (prodCateId != null && !prodCateId.isEmpty()) {
-    		try {
-    			com.prodCate.model.ProdCateVO prodCateVO = prodCateSvc.getOneProdCate(Integer.valueOf(prodCateId));
-    			if (prodCateVO != null) {
-    				model.addAttribute("prodCateVO", prodCateVO);
-    			} else {
-    				model.addAttribute("errorMessage", "查無資料");
-    			}
-    		} catch (NumberFormatException e) {
-    			model.addAttribute("errorMessage", "商品分類編號格式錯誤");
-    		}
-    	}
 
     	return "admin/index_admin";
+
     }
     
     @GetMapping("/prodPhoto/select_page")
@@ -305,6 +314,7 @@ public class AdminIndexController {
     
     @GetMapping("/prodCart/select_page")
     public String prodCartselectPage(HttpServletRequest request,Model model) {
+
 
     	String mainFragment = "admin/fragments/shop/prodCart/select_page";
 		model.addAttribute("mainFragment", mainFragment);
@@ -362,7 +372,17 @@ public class AdminIndexController {
 		
 		return "admin/index_admin";
     } 
-    
+
+    @GetMapping("/prodPhoto")
+    public String shop4(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/shop/prodPhoto";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    } 
+
     @GetMapping("/shopOrd")
     public String shop5(HttpServletRequest request,Model model) {
 

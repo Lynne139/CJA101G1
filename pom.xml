@@ -159,13 +159,6 @@
 			<version>1.1.4</version>
 		</dependency>
 
-		<!-- com.sun.mail -->                        <!-- spring-boot 未內建依賴 -->
-		<dependency>
-			<groupId>com.sun.mail</groupId>
-			<artifactId>javax.mail</artifactId>
-			<version>1.6.2</version>
-		</dependency>
-
 		<!-- Spring Boot Mail Starter -->
 		<!-- 用於發送電子郵件的 Spring Boot 起始器 -->
 		<dependency>
