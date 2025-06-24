@@ -1,5 +1,7 @@
 package com.roomOrder.model;
 
+import com.member.model.MemberVO;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -9,8 +11,9 @@ public class RoomOrder {
     @Column(name = "ROOM_ORDER_ID")
     private Integer roomOrderId;
 
-    @Column(name = "MEMBER_ID")
-    private Integer memberId;
+    @ManyToOne
+    @JoinColumn(name = "MEMBER_ID", referencedColumnName = "member_id")
+    private MemberVO member;
 
     @Column(name = "ORDER_DATE")
     private String orderDate;
@@ -47,12 +50,12 @@ public class RoomOrder {
         this.roomOrderId = roomOrderId;
     }
 
-    public Integer getMemberId() {
-        return memberId;
+    public MemberVO getMember() {
+        return member;
     }
 
-    public void setMemberId(Integer memberId) {
-        this.memberId = memberId;
+    public void setMember(MemberVO member) {
+        this.member = member;
     }
 
     public String getOrderDate() {
