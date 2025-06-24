@@ -3,24 +3,29 @@ package com.controller;
 import java.util.List;
 import java.util.Map;
 
-import com.roomOrder.model.RoomOrder;
-import com.roomOrder.model.RoomOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+
+import com.member.model.MemberVO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.member.model.MemberService;
 import com.prod.model.ProdService;
+import com.prodCart.model.ProdCartService;
+import com.prodCart.model.ProdCartVO;
 import com.prodCate.model.ProdCateService;
 import com.prodCate.model.ProdCateVO;
 import com.prodPhoto.model.ProdPhotoService;
 import com.prodPhoto.model.ProdPhotoVO;
-
 import com.resto.model.RestoService;
 import com.resto.model.RestoVO;
 import com.room.model.RoomService;
 import com.room.model.RoomVO;
+import com.roomOrder.model.RoomOrder;
+import com.roomOrder.model.RoomOrderService;
 import com.roomtype.model.RoomTypeService;
 import com.roomtype.model.RoomTypeVO;
 import com.roomtypeschedule.model.RoomTypeScheduleService;
@@ -32,6 +37,9 @@ import jakarta.servlet.http.HttpServletResponse;
 @Controller
 @RequestMapping("/admin")
 public class AdminIndexController {
+	
+	@Autowired
+    MemberService memberSvc;
 
 	@Autowired
 	RestoService restoService;
@@ -42,6 +50,12 @@ public class AdminIndexController {
 	@Autowired
 	ProdCateService prodCateSvc;
 
+	
+	@Autowired
+	ProdPhotoService prodPhotoSvc;
+	
+	@Autowired
+	ProdCartService prodCartSvc;
 
 	@Autowired
 	RoomTypeService roomTypeService;
@@ -74,6 +88,18 @@ public class AdminIndexController {
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
     	
+    	return "admin/index_admin";
+    } 
+    // === 會員列表 ===
+    @GetMapping("/listAllMember")
+    public String listAllMember(HttpServletRequest request,Model model) {
+    	String mainFragment = "admin/fragments/member/listAllMember";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	List<MemberVO> list = memberSvc.getAll();
+        model.addAttribute("memberListData", list);
+        
     	return "admin/index_admin";
     } 
     
@@ -211,6 +237,7 @@ public class AdminIndexController {
     } 
     
     // === 商店管理 ===
+
     @GetMapping("/prod/select_page")
     public String prod(HttpServletRequest request,Model model) {
 
@@ -256,16 +283,108 @@ public class AdminIndexController {
     	model.addAttribute("currentURI", request.getRequestURI());
 
     	return "admin/index_admin";
-    } 
-    @GetMapping("/prodCart")
-    public String shop3(HttpServletRequest request,Model model) {
 
-    	String mainFragment = "admin/fragments/shop/prodCart";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
+    }
+    
+    @GetMapping("/prodPhoto/select_page")
+	public String prodPhotoselectPage(HttpServletRequest request, Model model) {
 
-    	return "admin/index_admin";
+		String mainFragment = "admin/fragments/shop/prodPhoto/select_page";
+		model.addAttribute("mainFragment", mainFragment);
+		model.addAttribute("currentURI", request.getRequestURI());
+		
+		// 添加商品照片資料到 model 中
+		List<com.prodPhoto.model.ProdPhotoVO> list = prodPhotoSvc.getAll();
+    	model.addAttribute("prodPhotoListData", list);
+
+		List<com.prod.model.ProdVO> list2 = prodSvc.getAll();
+		model.addAttribute("prodListData", list2);
+		
+		// 檢查是否有錯誤訊息
+		String errorMessage = request.getParameter("errorMessage");
+		if (errorMessage != null && !errorMessage.isEmpty()) {
+			model.addAttribute("errorMessage", errorMessage);
+		}
+		
+		// 檢查是否有查詢結果
+		String prodPhotoId = request.getParameter("prodPhotoId");
+		if (prodPhotoId != null && !prodPhotoId.isEmpty()) {
+			try {
+				ProdPhotoVO prodPhotoVO = prodPhotoSvc.getOneProdPhoto(Integer.valueOf(prodPhotoId));
+				if (prodPhotoVO != null) {
+					model.addAttribute("prodPhotoVO", prodPhotoVO);
+				} else {
+					model.addAttribute("errorMessage", "查無資料");
+				}
+			} catch (NumberFormatException e) {
+				model.addAttribute("errorMessage", "商品照片編號格式錯誤");
+			}
+		}
+		
+		return "admin/index_admin";
+	}
+    
+    @GetMapping("/prodCart/select_page")
+    public String prodCartselectPage(HttpServletRequest request,Model model) {
+
+
+    	String mainFragment = "admin/fragments/shop/prodCart/select_page";
+		model.addAttribute("mainFragment", mainFragment);
+		model.addAttribute("currentURI", request.getRequestURI());
+		
+		// 添加購物車資料到 model 中
+		List<ProdCartVO> list = prodCartSvc.getAll();
+    	model.addAttribute("prodCartListData", list);
+		
+		// 添加會員資料到 model 中
+		List<com.member.model.MemberVO> memberList = memberSvc.getAll();
+    	model.addAttribute("memberListData", memberList);
+    	
+    	// 添加商品資料到 model 中
+		List<com.prod.model.ProdVO> prodList = prodSvc.getAll();
+		model.addAttribute("prodListData", prodList);
+		
+		// 檢查是否有錯誤訊息
+		String errorMessage = request.getParameter("errorMessage");
+		if (errorMessage != null && !errorMessage.isEmpty()) {
+			model.addAttribute("errorMessage", errorMessage);
+		}
+		
+		// 檢查 Session 中是否有表單資料（來自驗證錯誤）
+		ProdCartVO formData = (ProdCartVO) request.getSession().getAttribute("formData");
+		if (formData != null) {
+			// 將表單資料轉換為 JSON 字串，傳遞給前端 JavaScript
+			ObjectMapper mapper = new ObjectMapper();
+			try {
+				String formDataJson = mapper.writeValueAsString(formData);
+				model.addAttribute("formDataJson", formDataJson);
+			} catch (Exception e) {
+				// 如果轉換失敗，忽略錯誤
+			}
+			// 清除 Session 中的表單資料
+			request.getSession().removeAttribute("formData");
+			request.getSession().removeAttribute("formErrors");
+		}
+		
+		// 檢查是否有查詢結果（複合主鍵查詢）
+		String productId = request.getParameter("productId");
+		String memberId = request.getParameter("memberId");
+		if (productId != null && !productId.isEmpty() && memberId != null && !memberId.isEmpty()) {
+			try {
+				ProdCartVO prodCartVO = prodCartSvc.getOneProdCart(Integer.valueOf(productId), Integer.valueOf(memberId));
+				if (prodCartVO != null) {
+					model.addAttribute("prodCartVO", prodCartVO);
+				} else {
+					model.addAttribute("errorMessage", "查無資料");
+				}
+			} catch (NumberFormatException e) {
+				model.addAttribute("errorMessage", "商品編號或會員編號格式錯誤");
+			}
+		}
+		
+		return "admin/index_admin";
     } 
+
     @GetMapping("/prodPhoto")
     public String shop4(HttpServletRequest request,Model model) {
 
@@ -275,6 +394,7 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
     } 
+
     @GetMapping("/shopOrd")
     public String shop5(HttpServletRequest request,Model model) {
 

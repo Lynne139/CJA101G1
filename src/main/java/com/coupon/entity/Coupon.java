@@ -110,5 +110,7 @@ public class Coupon {
         return createdAt;
     }
 
+
     // 不需要 setter for createdAt，讓DB自動產生
+
 }

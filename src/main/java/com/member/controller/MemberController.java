@@ -37,6 +37,16 @@ public class MemberController {
 	}
 	
 	/*
+	 * This method will serve as listAllMember.html handler.
+	 */
+	@GetMapping("listAllMember")
+	public String listAllMember(ModelMap model) {
+	    List<MemberVO> list = memberSvc.getAll();
+	    model.addAttribute("memberListData", list);
+	    return "back-end/member/listAllMember";
+	}
+	
+	/*
 	 * This method will be called on addMember.html form submission, handling POST request It also validates the user input
 	 */
 	@PostMapping("insert")
