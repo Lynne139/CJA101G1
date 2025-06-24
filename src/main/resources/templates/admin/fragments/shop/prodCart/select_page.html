@@ -1,0 +1,498 @@
+<div th:fragment="content">
+    <div class="px-1 py-3">
+        <!-- 查詢區塊（商品分類篩選卡片） -->
+        <div class="panel mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="panel-title">購物車資料篩選</h2>
+                <button type="button" class="btn btn_accent" data-bs-toggle="modal" data-bs-target="#addProdCartModal">
+                    <i class="fas fa-plus me-2"></i>
+                    新增購物車資料
+                </button>
+            </div>
+            
+            <div th:if="${errorMessage}" class="alert alert-danger mb-3">
+                [[${errorMessage}]]
+            </div>
+            
+            <div th:if="${param.success}" class="alert alert-success mb-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-check-circle me-2"></i>
+                    購物車商品新增成功！
+                </div>
+                <button type="button" class="btn btn-outline-success btn-sm" onclick="clearSuccessMessage()">
+                    <i class="fas fa-times me-1"></i>
+                    關閉
+                </button>
+            </div>
+            
+            <div th:if="${param.updateSuccess}" class="alert alert-success mb-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-check-circle me-2"></i>
+                    購物車商品資料修改成功！
+                </div>
+                <button type="button" class="btn btn-outline-success btn-sm" onclick="clearSuccessMessage()">
+                    <i class="fas fa-times me-1"></i>
+                    關閉
+                </button>
+            </div>
+            
+            <div th:if="${param.deleteSuccess}" class="alert alert-success mb-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-check-circle me-2"></i>
+                    購物車商品資料刪除成功！
+                </div>
+                <button type="button" class="btn btn-outline-success btn-sm" onclick="clearSuccessMessage()">
+                    <i class="fas fa-times me-1"></i>
+                    關閉
+                </button>
+            </div>
+            
+            <div class="row g-2">
+
+                
+                <!-- 選擇商品分類編號 -->
+                <div class="col-md-8">
+                    <form method="get" th:action="@{/admin/prodCart/select_page}">
+                        <label class="form-label">選擇會員編號與商品編號</label>
+                        <div class="input-group">
+                        
+                            <select name="memberId" class="form-select" style="min-width: 200px;">
+                                <option value="" selected disabled>請選擇會員編號</option>
+                                <option th:each="memberVO : ${memberListData}" 
+                                        th:value="${memberVO.memberId}" 
+                                        th:text="${memberVO.memberId + ' - ' + memberVO.memberName}"></option>
+                            </select>
+                            
+                            <select name="productId" class="form-select" style="min-width: 200px;">
+                                <option value="" selected disabled>請選擇商品編號</option>
+                                <option th:each="prodVO : ${prodListData}" 
+                                        th:value="${prodVO.productId}" 
+                                        th:text="${ prodVO.productId+ ' - ' + prodVO.productName}"></option>
+                            </select>
+                            
+                            <button type="submit" class="btn btn_secondary" title="查詢">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+
+
+            </div>
+        </div>
+
+        
+        <!-- 查詢結果顯示區域 -->
+        <div th:if="${prodCartVO != null}">
+            <div th:insert="~{/admin/fragments/shop/prodCart/listOneProdCart :: listOneProdCart-div}"></div>
+        </div>
+        
+        <div th:if="${prodCartVO == null}">
+            <div th:insert="~{/admin/fragments/shop/prodCart/listAllProdCart :: listAllProdCart-div}"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 新增商品分類 Modal -->
+<div class="modal fade" id="addProdCartModal" tabindex="-1" aria-labelledby="addProdCartModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addProdCartModalLabel">新增購物車商品</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="addProdCartModalBody">
+        <!-- 載入中... -->
+        <div class="text-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">載入中...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 修改商品分類 Modal -->
+<div class="modal fade" id="editProdCartModal" tabindex="-1" aria-labelledby="editProdCartModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editProdCartModalLabel">修改購物車商品</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="editProdCartModalBody">
+        <!-- 載入中... -->
+        <div class="text-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">載入中...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:inline="javascript">
+// 接收來自後端的表單資料（如果有驗證錯誤）
+window.formDataFromServer = null;
+var formDataJson = /*[[${formDataJson}]]*/ null;
+if (formDataJson) {
+  try {
+    window.formDataFromServer = JSON.parse(formDataJson);
+  } catch (e) {
+    console.error('解析表單資料失敗:', e);
+  }
+}
+
+// 當 modal 開啟時載入 addProdCart 頁面內容
+document.getElementById('addProdCartModal').addEventListener('show.bs.modal', function () {
+  const modalBody = document.getElementById('addProdCartModalBody');
+  
+  // 顯示載入中
+  modalBody.innerHTML = `
+    <div class="text-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">載入中...</span>
+      </div>
+    </div>
+  `;
+  
+  // 用 AJAX 載入 addProdCart 頁面內容
+  fetch('/prodCart/addProdCart')
+    .then(response => response.text())
+    .then(html => {
+      // 解析 HTML 並提取表單內容
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // 只提取 form 和相關內容而不是整個 body
+      const formContainer = doc.querySelector('.panel');
+      if (formContainer) {
+        modalBody.innerHTML = formContainer.outerHTML;
+      } else {
+        // 如果找不到 .panel，就提取 body 內容但移除多餘的容器
+        const bodyContent = doc.body.innerHTML;
+        // 移除 container-fluid, row, main 等容器
+        const cleanContent = bodyContent
+          .replace(/<div class="container-fluid">[\s\S]*?<main[^>]*>/g, '')
+          .replace(/<\/main>[\s\S]*?<\/div>/g, '')
+          .replace(/<div class="w-100 mx-auto">/g, '')
+          .replace(/<\/div>/g, '');
+        modalBody.innerHTML = cleanContent;
+      }
+      
+      // 檢查是否有表單資料需要預填（來自驗證錯誤）
+      const formData = window.formDataFromServer;
+      if (formData) {
+        // 預填表單資料
+        const form = modalBody.querySelector('form');
+        if (form) {
+          // 預填會員選擇
+          if (formData.memberVO && formData.memberVO.memberId) {
+            const memberSelect = form.querySelector('select[name="memberVO"]');
+            if (memberSelect) {
+              memberSelect.value = formData.memberVO.memberId;
+            }
+          }
+          
+          // 預填商品選擇
+          if (formData.prodVO && formData.prodVO.productId) {
+            const prodSelect = form.querySelector('select[name="prodVO"]');
+            if (prodSelect) {
+              prodSelect.value = formData.prodVO.productId;
+            }
+          }
+          
+          // 預填數量
+          if (formData.quantity) {
+            const quantityInput = form.querySelector('input[name="quantity"]');
+            if (quantityInput) {
+              quantityInput.value = formData.quantity;
+            }
+          }
+        }
+        
+        // 清除全域變數
+        delete window.formDataFromServer;
+      }
+      
+      // 重新初始化 Bootstrap 元件
+      if (typeof bootstrap !== 'undefined') {
+        // 重新初始化 tooltips、popovers 等
+        const tooltipTriggerList = [].slice.call(modalBody.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+      }
+      
+      // 為新增表單添加提交處理
+      const addForm = modalBody.querySelector('#addProdCartForm');
+      if (addForm) {
+        addForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const formData = new FormData(addForm);
+          const urlEncodedData = new URLSearchParams(formData).toString();
+          
+          fetch('/prodCart/insert', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: urlEncodedData
+          })
+          .then(response => {
+            if (response.redirected) {
+              // 如果有重定向，表示成功
+              window.location.href = response.url;
+            } else {
+              return response.text();
+            }
+          })
+          .then(html => {
+            if (html) {
+              // 檢查是否有錯誤訊息
+              if (html.includes('text-danger') || html.includes('has-error') || html.includes('請檢查輸入資料')) {
+                // 有錯誤，更新 Modal 內容
+                modalBody.innerHTML = html;
+              } else {
+                // 成功，關閉 Modal 並重新載入頁面
+                const modal = bootstrap.Modal.getInstance(document.querySelector('#addProdCartModal'));
+                if (modal) {
+                  modal.hide();
+                }
+                
+                // 重新載入頁面以顯示更新後的資料
+                window.location.reload();
+              }
+            }
+          })
+          .catch(error => {
+            console.error('提交失敗:', error);
+            alert('提交失敗，請重新嘗試');
+          });
+        });
+      }
+    })
+    .catch(error => {
+      console.error('載入失敗:', error);
+      modalBody.innerHTML = `
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          載入失敗，請重新整理頁面再試
+        </div>
+      `;
+    });
+});
+
+// 載入修改購物車 Modal 內容
+function loadEditProdCartModal(button) {
+  const prodCartId = button.getAttribute('data-prodCart-id');
+  const modalBody = document.getElementById('editProdCartModalBody');
+  
+  // 顯示載入中
+  modalBody.innerHTML = `
+    <div class="text-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">載入中...</span>
+      </div>
+    </div>
+  `;
+  
+  // 用 AJAX 載入修改購物車頁面內容
+  fetch('/prodCart/getOne_For_Update', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    },
+    body: 'productId=' + prodCartId.split(',')[0] + '&memberId=' + prodCartId.split(',')[1]
+  })
+    .then(response => {
+      // 確保響應使用正確的字符編碼
+      return response.text();
+    })
+    .then(html => {
+      // 解析 HTML 並提取表單內容
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // 只提取 form 和相關內容而不是整個 body
+      const formContainer = doc.querySelector('.panel');
+      if (formContainer) {
+        modalBody.innerHTML = formContainer.outerHTML;
+      } else {
+        // 如果找不到 .panel，就提取 body 內容但移除多餘的容器
+        const bodyContent = doc.body.innerHTML;
+        // 移除 container-fluid, row, main 等容器
+        const cleanContent = bodyContent
+          .replace(/<div class="container-fluid">[\s\S]*?<main[^>]*>/g, '')
+          .replace(/<\/main>[\s\S]*?<\/div>/g, '')
+          .replace(/<div class="w-100 mx-auto">/g, '')
+          .replace(/<\/div>/g, '');
+        modalBody.innerHTML = cleanContent;
+      }
+      
+      // 重新初始化 Bootstrap 元件
+      if (typeof bootstrap !== 'undefined') {
+        // 重新初始化 tooltips、popovers 等
+        const tooltipTriggerList = [].slice.call(modalBody.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+      }
+      
+      // 為修改表單添加提交處理
+      const editForm = modalBody.querySelector('#editProdCartForm');
+      if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const formData = new FormData(editForm);
+          const urlEncodedData = new URLSearchParams(formData).toString();
+          
+          fetch('/prodCart/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: urlEncodedData
+          })
+          .then(response => {
+            if (response.redirected) {
+              // 如果有重定向，表示成功
+              window.location.href = response.url;
+            } else {
+              return response.text();
+            }
+          })
+          .then(html => {
+            if (html) {
+              // 檢查是否有錯誤訊息
+              if (html.includes('text-danger') || html.includes('has-error') || html.includes('請檢查輸入資料')) {
+                // 有錯誤，更新 Modal 內容
+                modalBody.innerHTML = html;
+              } else {
+                // 成功，關閉 Modal 並重新載入頁面
+                const modal = bootstrap.Modal.getInstance(document.querySelector('#editProdCartModal'));
+                if (modal) {
+                  modal.hide();
+                }
+                
+                // 重新載入頁面以顯示更新後的資料
+                window.location.reload();
+              }
+            }
+          })
+          .catch(error => {
+            console.error('提交失敗:', error);
+            alert('提交失敗，請重新嘗試');
+          });
+        });
+      }
+    })
+    .catch(error => {
+      console.error('載入失敗:', error);
+      modalBody.innerHTML = `
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          載入失敗，請重新整理頁面再試
+        </div>
+      `;
+    });
+}
+
+// 關閉成功訊息
+function clearSuccessMessage() {
+  // 移除 URL 中的參數
+  const url = new URL(window.location);
+  url.searchParams.delete('productId');
+  url.searchParams.delete('memberId');
+  url.searchParams.delete('success');
+  url.searchParams.delete('updateSuccess');
+  url.searchParams.delete('deleteSuccess');
+  url.searchParams.delete('errorMessage');
+  
+  // 重新導向到沒有參數的頁面
+  window.location.href = '/admin/prodCart/select_page';
+}
+
+// 初始化 DataTables
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM Content Loaded');
+  
+  // 延遲一點時間確保所有內容都載入完成
+  setTimeout(function() {
+    console.log('Checking for prodCartTable...');
+    const prodCartTable = document.getElementById('prodCartTable');
+    const tableLoading = document.getElementById('tableLoading');
+    const tableContainer = document.getElementById('tableContainer');
+    
+    console.log('prodCartTable found:', prodCartTable);
+    console.log('jQuery available:', typeof $ !== 'undefined');
+    console.log('DataTable available:', typeof $.fn.DataTable !== 'undefined');
+    
+    if (prodCartTable && typeof $ !== 'undefined' && typeof $.fn.DataTable !== 'undefined') {
+      console.log('Initializing DataTable...');
+      
+      // 初始化 DataTable
+      const dataTable = $('#prodCartTable').DataTable({
+        "lengthMenu": [3, 5, 10, 20, 50, 100],
+        "searching": true,  // 搜尋功能
+        "paging": true,     // 分頁功能
+        "ordering": true,   // 排序功能
+        "language": {
+          "processing": "處理中...",
+          "loadingRecords": "載入中...",
+          "lengthMenu": "顯示 _MENU_ 筆結果",
+          "zeroRecords": "沒有符合的結果",
+          "info": "顯示第 _START_ 至 _END_ 筆結果，共 <font color=red>_TOTAL_</font> 筆",
+          "infoEmpty": "顯示第 0 至 0 筆結果，共 0 筆",
+          "infoFiltered": "(從 _MAX_ 筆結果中過濾)",
+          "infoPostFix": "",
+          "search": "搜尋:",
+          "paginate": {
+            "first": "第一頁",
+            "previous": "上一頁",
+            "next": "下一頁",
+            "last": "最後一頁"
+          },
+          "aria": {
+            "sortAscending": ": 升冪排列",
+            "sortDescending": ": 降冪排列"
+          }
+        },
+        "initComplete": function() {
+          // DataTable 初始化完成後的回調
+          console.log('DataTable initialization completed');
+          
+          // 隱藏載入動畫
+          if (tableLoading) {
+            tableLoading.style.display = 'none';
+          }
+          
+          // 顯示表格容器
+          if (tableContainer) {
+            tableContainer.style.display = 'block';
+          }
+        }
+      });
+      
+      console.log('DataTable initialized successfully');
+    } else {
+      console.log('DataTable initialization failed');
+      
+      // 如果初始化失敗，也要隱藏載入動畫並顯示原始表格
+      if (tableLoading) {
+        tableLoading.style.display = 'none';
+      }
+      if (tableContainer) {
+        tableContainer.style.display = 'block';
+      }
+    }
+  }, 100); // 減少延遲時間
+});
+</script> 
