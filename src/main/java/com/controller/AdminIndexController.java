@@ -3,14 +3,14 @@ package com.controller;
 import java.util.List;
 import java.util.Map;
 
-import com.roomOrder.model.RoomOrder;
-import com.roomOrder.model.RoomOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+
+import com.member.model.MemberVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.member.model.MemberService;
 import com.prod.model.ProdService;
@@ -18,13 +18,12 @@ import com.prodCart.model.ProdCartService;
 import com.prodCart.model.ProdCartVO;
 import com.prodCate.model.ProdCateService;
 import com.prodCate.model.ProdCateVO;
-import com.prodPhoto.model.ProdPhotoService;
-import com.prodPhoto.model.ProdPhotoVO;
-
 import com.resto.model.RestoService;
 import com.resto.model.RestoVO;
 import com.room.model.RoomService;
 import com.room.model.RoomVO;
+import com.roomOrder.model.RoomOrder;
+import com.roomOrder.model.RoomOrderService;
 import com.roomtype.model.RoomTypeService;
 import com.roomtype.model.RoomTypeVO;
 import com.roomtypeschedule.model.RoomTypeScheduleService;
@@ -36,6 +35,9 @@ import jakarta.servlet.http.HttpServletResponse;
 @Controller
 @RequestMapping("/admin")
 public class AdminIndexController {
+	
+	@Autowired
+    MemberService memberSvc;
 
 	@Autowired
 	RestoService restoService;
@@ -88,6 +90,18 @@ public class AdminIndexController {
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
     	
+    	return "admin/index_admin";
+    } 
+    // === 會員列表 ===
+    @GetMapping("/listAllMember")
+    public String listAllMember(HttpServletRequest request,Model model) {
+    	String mainFragment = "admin/fragments/member/listAllMember";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	List<MemberVO> list = memberSvc.getAll();
+        model.addAttribute("memberListData", list);
+        
     	return "admin/index_admin";
     } 
     
