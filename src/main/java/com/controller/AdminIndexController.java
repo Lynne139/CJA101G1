@@ -131,6 +131,16 @@ public class AdminIndexController {
     	return "admin/index_admin";
     } 
     
+    // === 新增會員 ===
+    @GetMapping("/addMember")
+    public String addMember(HttpServletRequest request,Model model) {
+    	String mainFragment = "admin/fragments/member/addMember";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	     
+    	return "admin/index_admin";
+    } 
+    
     // === 員工管理 ===
     // === 新增 ===
     @GetMapping("/staff1")

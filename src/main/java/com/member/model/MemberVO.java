@@ -3,15 +3,15 @@ package com.member.model;
 import java.sql.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -41,6 +41,7 @@ public class MemberVO implements java.io.Serializable {
 	private Integer memberPoints;
 	private Integer memberAccumulativeConsumption;
 	
+	private MultipartFile uploadPic;
 	
 	public MemberVO() {//必需有一個不傳參數建構子
 		
@@ -53,7 +54,7 @@ public class MemberVO implements java.io.Serializable {
 	public Integer getMemberId() {
 		return memberId;
 	}
-	
+
 	public void setMemberId(Integer memberId) {
 		this.memberId = memberId;
 	}
@@ -181,5 +182,12 @@ public class MemberVO implements java.io.Serializable {
 		this.memberAccumulativeConsumption = memberAccumulativeConsumption;
 	}
 	
-	
+	@Transient
+	public MultipartFile getUploadPic() {
+		return uploadPic;
+	}
+
+	public void setUploadPic(MultipartFile uploadPic) {
+		this.uploadPic = uploadPic;
+	}
 }
