@@ -2,6 +2,8 @@ package com.news.controller;
 
 import com.news.entity.News;
 import com.news.service.NewsService;
+import com.news.service.HotNewsService;
+import com.news.service.PromotionNewsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,10 @@ import java.util.Optional;
 public class NewsController {
     @Autowired
     private NewsService service;
+    @Autowired
+    private HotNewsService hotNewsService;
+    @Autowired
+    private PromotionNewsService promotionNewsService;
 
     @PostMapping("/add")
     public String add(@ModelAttribute News news, @RequestParam(value = "photo", required = false) MultipartFile photo) throws IOException {
@@ -56,5 +62,11 @@ public class NewsController {
     public byte[] image(@PathVariable Integer id) {
         Optional<News> news = service.findById(id);
         return news.map(News::getNewsPhoto).orElse(null);
+    }
+
+    @GetMapping("/admin/news3")
+    public String showNews3(Model model) {
+        model.addAttribute("newsList", service.findAll());
+        return "admin/fragments/news/news3";
     }
 } 

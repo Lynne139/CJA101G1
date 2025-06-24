@@ -3,6 +3,10 @@ package com.news.controller;
 import com.news.entity.HotNews;
 import com.news.service.HotNewsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -59,9 +63,14 @@ public class HotNewsController {
     }
 
     @GetMapping("/image/{id}")
-    @ResponseBody
-    public byte[] image(@PathVariable Integer id) {
+    public ResponseEntity<byte[]> image(@PathVariable Integer id) {
         Optional<HotNews> news = service.findById(id);
-        return news.map(HotNews::getNewsPhoto).orElse(null);
+        if (news.isPresent() && news.get().getNewsPhoto() != null) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+            return new ResponseEntity<>(news.get().getNewsPhoto(), headers, HttpStatus.OK);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

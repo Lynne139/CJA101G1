@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>最新公告</title>
+    <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+    <div class="container mt-4">
+        <h2>最新公告</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>標題</th>
+                    <th>內容</th>
+                    <th>圖片</th>
+                    <th>發布日期</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="news : ${hotNewsList}">
+                    <td th:text="${news.title}"></td>
+                    <td th:text="${news.content}"></td>
+                    <td class="text-center">
+                        <img th:src="${news.newsPhoto != null} ? @{'/admin/news/image/' + ${news.hotNewsNo}} : @{/images/no_img.svg}"
+                             style="max-width: 120px; max-height: 80px; border-radius: 8px; object-fit: contain;"
+                             alt="公告圖片"/>
+                    </td>
+                    <td th:text="${news.createdDate}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

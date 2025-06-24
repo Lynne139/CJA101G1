@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maison d’Yuko</title>
+  <title>Maison d'Yuko</title>
   <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
   <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
@@ -26,7 +26,7 @@
 
     <!-- 前景文字 -->
     <div id="banner-text">
-      <h1 class="text-white mid-right">Bienvenue à la Maison d’Yuko</h1>
+      <h1 class="text-white mid-right">Bienvenue à la Maison d'Yuko</h1>
       <p class="text-white mid-right-p">在這座海島，我們邀請您慢下來</p>
     </div>
 
@@ -65,11 +65,11 @@
   <div class="overlay-menu" id="overlayMenu">
     <div class="overlay-menu-header d-flex justify-content-between align-items-start">
       <div class="overlay-mobile-menu d-flex justify-content-between align-items-center p-3">
-        <div class="mb-menu-header">Maison d’Yuko</div>
+        <div class="mb-menu-header">Maison d'Yuko</div>
       </div>
       <div class="overlay-logo-contact mb-5">
         <img th:src="@{/images/logo/logo_hp.png}" alt="logo" class="overlay-logo mb-3" />
-        <div class="overlay-title">嶼蔻渡假村 Maison d’Yuko</div>
+        <div class="overlay-title">嶼蔻渡假村 Maison d'Yuko</div>
         <div class="overlay-contact">
           <div>+886-7-123-4567</div>
           <div>service@maisondyuko.com</div>
@@ -95,9 +95,9 @@
         </div>
         <div class="overlay-menu-col">
           <h5>最新消息</h5>
-          <a href="#">最新公告</a>
-          <a href="#">活動通知</a>
-          <a href="#">媒體報導</a>
+          <a th:href="@{/news/notice}">最新公告</a>
+          <a th:href="@{/news/promotion}">活動通知</a>
+          <a th:href="@{/news/news}">媒體報導</a>
         </div>
         <div class="overlay-menu-col">
           <h5>探索嶼蔻</h5>
