@@ -115,7 +115,6 @@ public class Coupon {
         return createdAt;
     }
 
-
     // 不需要 setter for createdAt，讓DB自動產生
     
     @JsonIgnore // 這樣在回傳 JSON 結果時就不會暴露這個關聯欄位。
