@@ -99,7 +99,7 @@ section {
 /* 子選單 navbar */
 .sub-navbar {
   position: sticky;
-  top: 0px;
+  top: 0;
   background-color: #F4EDE1;
   z-index: 1000;
   /* border-top: 1px solid #ddd; */
@@ -680,7 +680,7 @@ section {
 .room-img-lg {
   width: 482px;
   height: 252px;
-  border-radius: 180px 36px 0px 180px;
+  border-radius: 180px 36px 0 180px;
   background-color: #F4EDE1;
 
 }
@@ -688,14 +688,14 @@ section {
 .room-img-md {
   width: 383px;
   height: 252px;
-  border-radius: 0px 180px 180px 36px;
+  border-radius: 0 180px 180px 36px;
 }
 
 .room-img-lgd {
   padding-top: 9px;
   width: 482px;
   height: 252px;
-  border-radius: 0px 180px 180px 36px;
+  border-radius: 0 180px 180px 36px;
   background-color: #F4EDE1;
 }
 
@@ -703,7 +703,7 @@ section {
   padding-top: 9px;
   width: 383px;
   height: 252px;
-  border-radius: 180px 36px 0px 180px;
+  border-radius: 180px 36px 0 180px;
   background-color: #F4EDE1;
 }
 
@@ -1107,7 +1107,7 @@ section {
   .room-img-lg {
     width: 482px;
     height: 252px;
-    border-radius: 180px 0px 0px 180px;
+    border-radius: 180px 0 0 180px;
     background-color: #F4EDE1;
 
   }
@@ -1115,14 +1115,14 @@ section {
   .room-img-md {
     width: 383px;
     height: 252px;
-    border-radius: 0px 180px 180px 0px;
+    border-radius: 0 180px 180px 0;
   }
 
   .room-img-lgd {
     padding-top: 9px;
     width: 482px;
     height: 252px;
-    border-radius: 0px 180px 180px 0px;
+    border-radius: 0 180px 180px 0;
     background-color: #F4EDE1;
   }
 
@@ -1130,7 +1130,7 @@ section {
     padding-top: 9px;
     width: 383px;
     height: 252px;
-    border-radius: 180px 0px 0px 180px;
+    border-radius: 180px 0 0 180px;
     background-color: #F4EDE1;
   }
 
@@ -1434,7 +1434,6 @@ section {
     /* border-bottom: #7E4E24 2px solid; */
     display: inline-block;
     padding: 16px;
-    background: #F4EDE1;
     position: absolute;
     right: 20px;
     background-color: #F4EDE1;

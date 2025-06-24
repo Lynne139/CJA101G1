@@ -18,10 +18,6 @@ public class RoomoCriteriaHelper {
 
         switch (column) {
             case "isEnabled":
-                Integer p = Integer.valueOf(value);
-
-
-
             case "keyword":
                 // ✅ 關鍵字查詢多欄位 OR
                 String pattern = "%" + value + "%";
@@ -62,3 +58,4 @@ public class RoomoCriteriaHelper {
     }
 
 }
+//         
