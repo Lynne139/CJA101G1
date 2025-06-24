@@ -18,6 +18,8 @@ import com.prodCart.model.ProdCartService;
 import com.prodCart.model.ProdCartVO;
 import com.prodCate.model.ProdCateService;
 import com.prodCate.model.ProdCateVO;
+import com.prodPhoto.model.ProdPhotoService;
+import com.prodPhoto.model.ProdPhotoVO;
 import com.resto.model.RestoService;
 import com.resto.model.RestoVO;
 import com.room.model.RoomService;
@@ -54,10 +56,6 @@ public class AdminIndexController {
 	
 	@Autowired
 	ProdCartService prodCartSvc;
-	
-	@Autowired
-	MemberService memberSvc;
-	
 
 	@Autowired
 	RoomTypeService roomTypeService;
