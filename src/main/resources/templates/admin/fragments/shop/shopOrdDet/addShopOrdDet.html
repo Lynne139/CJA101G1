@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增訂單明細 - addShopOrdDet.html</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Admin CSS -->
+    <link rel="stylesheet" th:href="@{/css/all_admin.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 主內容 -->
+            <main class="col-12 p-4">
+                <div class="w-100 mx-auto">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="panel-title">新增訂單明細</h1>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>
+                            關閉
+                        </button>
+                    </div>
+
+                    <!-- 新增訂單明細表單 -->
+                    <div class="panel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="panel-title">訂單明細資料</h2>
+                            <span class="text-muted">所有欄位皆為必填</span>
+                        </div>
+                        <form th:action="@{/admin/shopOrdDet/addShopOrdDet}" method="post" th:object="${shopOrdDetVO}" enctype="multipart/form-data">
+                            <div class="row g-3">
+                            
+                                <div class="col-md-6">
+                                    <label class="form-label">訂單編號</label>
+                                    <select th:field="*{shopOrdVO.prodOrdId}" class="form-select">
+                                        <option value="" selected disabled>請選擇訂單編號</option>
+                                        <option th:each="shopOrdVO : ${shopOrdListData}" th:value="${shopOrdVO.prodOrdId}" th:text="${shopOrdVO.prodOrdId + ' - ' + shopOrdVO.memberVO.memberName}"></option>
+                                    </select>
+                                    <span th:if="${#fields.hasErrors('shopOrdVO.prodOrdId')}" th:errors="*{shopOrdVO.prodOrdId}" class="text-danger small" id="shopOrdVO.prodOrdId.errors"></span>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">商品</label>
+                                    <select th:field="*{prodVO.productId}" class="form-select">
+                                        <option value="" selected disabled>請選擇商品</option>
+                                        <option th:each="prodVO : ${prodListData}" th:value="${prodVO.productId}" th:text="${prodVO.productName + ' - $' + prodVO.productPrice}"></option>
+                                    </select>
+                                    <span th:if="${#fields.hasErrors('prodVO.productId')}" th:errors="*{prodVO.productId}" class="text-danger small" id="prodVO.productId.errors"></span>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">購買價格</label>
+                                    <input type="number" th:field="*{purchasePrice}" class="form-control" placeholder="請輸入購買價格" min="0">
+                                    <span th:if="${#fields.hasErrors('purchasePrice')}" th:errors="*{purchasePrice}" class="text-danger small" id="purchasePrice.errors"></span>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">數量</label>
+                                    <input type="number" th:field="*{prodQuantity}" class="form-control" placeholder="請輸入數量" min="1" max="999">
+                                    <span th:if="${#fields.hasErrors('prodQuantity')}" th:errors="*{prodQuantity}" class="text-danger small" id="prodQuantity.errors"></span>
+                                </div>
+                                
+                            </div>
+                            <div class="d-flex justify-content-end pt-4 border-top mt-4">
+                                <button type="submit" id="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-plus me-2"></i>
+                                    送出新增
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <script type="text/javascript">
+     //清除提示信息 
+     function hideContent(d) { 
+          var el = document.getElementById(d); 
+          if(el) el.style.display = "none"; 
+     } 
+     
+     // 當選擇商品時，自動填入商品價格
+     document.addEventListener('DOMContentLoaded', function() {
+         const productSelect = document.querySelector('select[name="prodVO.productId"]');
+         const purchasePriceInput = document.querySelector('input[name="purchasePrice"]');
+         
+         if (productSelect && purchasePriceInput) {
+             productSelect.addEventListener('change', function() {
+                 const selectedOption = this.options[this.selectedIndex];
+                 if (selectedOption.value) {
+                     // 從選項文字中提取價格（格式：商品名稱 - $價格）
+                     const priceText = selectedOption.text.split(' - $')[1];
+                     if (priceText) {
+                         purchasePriceInput.value = priceText;
+                     }
+                 }
+             });
+         }
+     });
+     </script>
+</body>
+</html> 
