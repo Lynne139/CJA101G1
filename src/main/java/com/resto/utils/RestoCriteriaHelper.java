@@ -25,7 +25,7 @@ public class RestoCriteriaHelper {
 	        case "isDeleted":
 	            return cb.equal(root.get(column), Boolean.valueOf(value));
 	        case "keyword":
-	            // ✅ 關鍵字查詢多欄位 OR
+	            // 關鍵字查詢多欄位 OR
 	            String pattern = "%" + value + "%";
 	            Predicate nameLike = cb.like(root.get("restoName"), pattern);
 	            Predicate nameEnLike = cb.like(root.get("restoNameEn"), pattern);

@@ -268,9 +268,6 @@ public class RestoController {
 	    return "redirect:/admin/resto_info";
 	}
 
-	
-	
-	// ===== restoTimeslot.html ====================================================== //
 
 	
 

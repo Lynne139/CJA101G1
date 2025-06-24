@@ -25,6 +25,7 @@ import com.prodCate.model.ProdCateVO;
 import com.prodPhoto.model.ProdPhotoService;
 import com.prodPhoto.model.ProdPhotoVO;
 import com.resto.model.PeriodService;
+import com.resto.model.PeriodVO;
 import com.resto.model.RestoService;
 import com.resto.model.RestoVO;
 import com.resto.model.TimeslotService;
@@ -33,6 +34,13 @@ import com.roomOrder.model.RoomOrderService;
 import com.shopOrd.model.ShopOrdService;
 import com.shopOrd.model.ShopOrdVO;
 import com.shopOrdDet.model.ShopOrdDetService;
+import com.resto.model.TimeslotVO;
+import com.room.model.RoomService;
+import com.room.model.RoomVO;
+import com.roomtype.model.RoomTypeService;
+import com.roomtype.model.RoomTypeVO;
+import com.roomtypeschedule.model.RoomTypeScheduleService;
+import com.roomtypeschedule.model.RoomTypeScheduleVO;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -181,14 +189,19 @@ public class AdminIndexController {
 
         // 若選定某餐廳，才撈出該餐廳的區段與時段
         if (restoId != null) {
-            model.addAttribute("selectedRestoId", restoId);
-            model.addAttribute("periodList", periodService.getPeriodsByRestoId(restoId));
-            model.addAttribute("timeslotList", timeslotService.getTimeslotsByRestoId(restoId));
+        	// 把選到的餐廳的詳細資訊放進 model 以顯示餐廳名稱
+            RestoVO selectedResto = restoService.getById(restoId);
+            model.addAttribute("selectedResto", selectedResto);
             
-           
+         // 該餐廳的所有區段（period）與時段（timeslot）
+            List<PeriodVO> periodList = periodService.getPeriodsByRestoId(restoId);
+            List<TimeslotVO> timeslotList = timeslotService.getTimeslotsByRestoId(restoId);
+            model.addAttribute("periodList", periodList);
+            model.addAttribute("timeslotList", timeslotList);
+
         } else {
-            model.addAttribute("selectedRestoId", null);
-            // 在else中補空清單進入model，避免Null
+        	// 若沒選餐廳，仍補空值避免渲染錯誤
+            model.addAttribute("selectedResto", null);
             model.addAttribute("periodList", new ArrayList<>());
             model.addAttribute("timeslotList", new ArrayList<>());
         }

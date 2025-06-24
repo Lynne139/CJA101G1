@@ -1,3 +1,20 @@
-.main_resto_timeslot .select_resto{
+.main_resto_timeslot .timeslot_name {
+	color:var(--color-black);
+}
+
+.main_resto_timeslot .timeslot_block{
 	background-color:var(--color-white);
+	border-radius:24px;
+	padding: 0 0.75rem;
+}
+
+.main_resto_timeslot .timeslot_name{
+	font-weight:var(--fw-medium);
+}
+
+.main_resto_timeslot #btnAddTimeslot{
+	color:var(--color-white);
+	border-radius:24px;
+	padding: 0 0.75rem;
+	font-weight:var(--fw-medium);
 }
