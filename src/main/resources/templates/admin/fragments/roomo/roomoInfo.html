@@ -13,7 +13,7 @@
                 <div class="col-md-4">
                     <label class="form-label">訂單狀態</label>
                     <select class="form-select" name="isEnabled">
-                        <option value="">所有狀態</option>
+                        <option value="">---所有狀態---</option>
                         <option value="2" th:selected="${isEnabled} == '2'">完成</option>
                         <option value="1" th:selected="${isEnabled} == '1'">成立</option>
                         <option value="0" th:selected="${isEnabled} == '0'">取消</option>
@@ -63,7 +63,7 @@
                     <tbody>
                     <tr th:each="roomo : ${roomoList}">
                         <td th:text="${roomo.roomOrderId}"></td>
-                        <td th:text="${roomo.memberId}"></td>
+                        <td th:text="${roomo.member.memberName}"></td>
                         <td th:text="${roomo.orderDate}"></td>
                         <td th:text="${roomo.roomAmount}"></td>
                         <td class="text-center">
@@ -76,9 +76,8 @@
                         <td th:text="${roomo.discountAmount}"></td>
                         <td th:text="${roomo.actualAmount}"></td>
                         <td th:text="${roomo.projectAddOn} == 1 ? '是' : '否'"></td>
-                        <!-- 若有 lastUpdateDate/lastUpdateBy 請補上 -->
-                        <td></td>
-                        <td></td>
+                        <td th:text="${roomo.updateDate}"></td>
+                        <td th:text="${roomo.employee.name}"></td>
                         <td>
                             <div class="table_row_actions d-flex justify-content-center align-items-start">
                                 <button class="btn_icon btn_view" th:data-id="${roomo.roomOrderId}"><i class="fas fa-eye"></i></button>
