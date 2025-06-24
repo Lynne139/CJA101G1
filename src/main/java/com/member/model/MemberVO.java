@@ -21,7 +21,7 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-
+ 
 
 @Entity
 @Table(name = "member")
