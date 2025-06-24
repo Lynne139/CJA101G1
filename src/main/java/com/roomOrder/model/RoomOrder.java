@@ -9,7 +9,8 @@ public class RoomOrder {
     @Column(name = "ROOM_ORDER_ID")
     private Integer roomOrderId;
 
-    @Column(name = "MEMBER_ID")
+    @ManyToOne
+    @JoinColumn(name = "MEMBER_ID", referencedColumnName = "MEMBER_ID")
     private Integer memberId;
 
     @Column(name = "ORDER_DATE")
