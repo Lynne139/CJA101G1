@@ -5,6 +5,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.coupon.enums.OrderType;
+import com.coupon.enums.OrderTypeConverter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "coupon")
 public class Coupon {
@@ -16,9 +20,10 @@ public class Coupon {
     @Column(name = "coupon_name", length = 50, nullable = false) //最大長度是 50 個字元
     private String couponName; // 折價券名稱
 
+    @Convert(converter = OrderTypeConverter.class)
     @Column(name = "order_type", nullable = false)
-    private Integer orderType; // 適用的訂單種類
-
+    private OrderType orderType; // 適用的訂單種類
+    
     @Column(name = "discount_value", nullable = false)
     private Integer discountValue; // 折價金額
 
@@ -38,7 +43,7 @@ public class Coupon {
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdAt; // 建立時間
     
-    @OneToMany(mappedBy = "coupon", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "coupon", fetch = FetchType.LAZY)
     private List<MemberCoupon> memberCoupons;
     
     // Getters and Setters
@@ -58,14 +63,14 @@ public class Coupon {
         this.couponName = couponName;
     }
 
-    public Integer getOrderType() {
+    public OrderType getOrderType() {
         return orderType;
     }
 
-    public void setOrderType(Integer orderType) {
+    public void setOrderType(OrderType orderType) {
         this.orderType = orderType;
     }
-
+    
     public Integer getDiscountValue() {
         return discountValue;
     }
@@ -112,5 +117,14 @@ public class Coupon {
 
 
     // 不需要 setter for createdAt，讓DB自動產生
+    
+    @JsonIgnore // 這樣在回傳 JSON 結果時就不會暴露這個關聯欄位。
+    public List<MemberCoupon> getMemberCoupons() {
+        return memberCoupons;
+    }
+
+    public void setMemberCoupons(List<MemberCoupon> memberCoupons) {
+        this.memberCoupons = memberCoupons;
+    }
 
 }
