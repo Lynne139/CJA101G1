@@ -18,10 +18,11 @@ public class RoomoCriteriaHelper {
 
         switch (column) {
             case "isEnabled":
+                return cb.equal(root.get(column), Integer.valueOf(value));
             case "keyword":
                 // ✅ 關鍵字查詢多欄位 OR
                 String pattern = "%" + value + "%";
-                // Predicate nameLike = cb.like(root.get("memberName"), pattern);
+                 Predicate nameLike = cb.like(root.get("memberName"), pattern);
                 // Predicate emailLike = cb.like(root.get("memberEmail"), pattern);
                 Predicate orderLike = cb.like(root.get("roomOrderId"), pattern);
                 Predicate midLike = cb.like(root.get("memberId"), pattern);

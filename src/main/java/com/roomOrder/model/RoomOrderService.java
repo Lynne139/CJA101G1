@@ -25,16 +25,16 @@ public class RoomOrderService {
         return repository.findAll();
     }
 
-    public Optional<RoomOrder> findById(Long id) {
-        return repository.findById(id);
-    }
+    // public Optional<RoomOrder> findById(Long roomOrderId) {
+    //     return repository.findById(roomOrderId);
+    // }
 
     public RoomOrder save(RoomOrder order) {
         return repository.save(order);
     }
 
-    public void deleteById(Long id) {
-        repository.deleteById(id);
+    public void deleteById(Long roomOrderId) {
+        repository.deleteById(roomOrderId);
     }
 
     // 複合查詢（Criteria 結構）
@@ -42,5 +42,8 @@ public class RoomOrderService {
         return RoomoCriteriaHelper.getAll(map, em);
     }
 
+    public RoomOrder getById(Integer roomOrderId) {
+        return repository.findByRoomOrderId(roomOrderId);
+    }
 
 }

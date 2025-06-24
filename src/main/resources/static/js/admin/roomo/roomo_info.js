@@ -399,7 +399,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
 
-            fetch(`/admin/roomo_info/edit?roomoId=${roomoId}`)
+            fetch(`/admin/roomo_info/edit?roomOrderId=${roomoId}`)
                 .then(res => res.text())
                 .then(html => {
 

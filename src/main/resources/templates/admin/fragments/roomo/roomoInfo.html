@@ -21,7 +21,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label class="form-label">訂購人姓名</label>
+                    <label class="form-label">訂單會員姓名</label>
                     <input type="text" class="form-control" name="keyword" th:value="${keyword}">
                 </div>
 
@@ -72,7 +72,7 @@
                         </td>
                         <td th:text="${roomo.checkInDate}"></td>
                         <td th:text="${roomo.checkOutDate}"></td>
-                        <td th:text="${roomo.couponCode}"></td>
+                        <td th:text="${roomo.coupon.couponCode}"></td>
                         <td th:text="${roomo.discountAmount}"></td>
                         <td th:text="${roomo.actualAmount}"></td>
                         <td th:text="${roomo.projectAddOn} == 1 ? '是' : '否'"></td>

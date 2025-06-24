@@ -39,7 +39,7 @@ public class RoomOrder {
     @Column(name = "CHECK_OUT_DATE")
     private String checkOutDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @Size(min=8,max=8,message = "折價券號碼為8碼")
     @JoinColumn(name = "COUPON_CODE",referencedColumnName = "coupon_code")
     private Coupon coupon;
