@@ -83,6 +83,14 @@ public class ProdPhotoController {
 		if (parts[0].isEmpty()) { // 使用者未選擇要上傳的圖片時
 			model.addAttribute("errorMessage", "商品照片: 請上傳照片");
 		} else {
+			// 檢查檔案大小 (5MB = 5 * 1024 * 1024 bytes)
+			long maxFileSize = 5 * 1024 * 1024; // 5MB
+			if (parts[0].getSize() > maxFileSize) {
+				model.addAttribute("errorMessage", "商品照片: 檔案大小不能超過 5MB");
+				model.addAttribute("prodListData", prodSvc.getAll());
+				return "admin/fragments/shop/prodPhoto/addProdPhoto";
+			}
+			
 			for (MultipartFile multipartFile : parts) {
 				byte[] buf = multipartFile.getBytes();
 				prodPhotoVO.setProdPhoto(buf);
@@ -133,6 +141,14 @@ public class ProdPhotoController {
 			byte[] prodPhoto = prodPhotoSvc.getOneProdPhoto(prodPhotoVO.getProdPhotoId()).getProdPhoto();
 			prodPhotoVO.setProdPhoto(prodPhoto);
 		} else {
+			// 檢查檔案大小 (5MB = 5 * 1024 * 1024 bytes)
+			long maxFileSize = 5 * 1024 * 1024; // 5MB
+			if (parts[0].getSize() > maxFileSize) {
+				model.addAttribute("errorMessage", "商品照片: 檔案大小不能超過 5MB");
+				model.addAttribute("prodListData", prodSvc.getAll());
+				return "admin/fragments/shop/prodPhoto/update_prodPhoto_input";
+			}
+			
 			for (MultipartFile multipartFile : parts) {
 				byte[] prodPhoto = multipartFile.getBytes();
 				prodPhotoVO.setProdPhoto(prodPhoto);
