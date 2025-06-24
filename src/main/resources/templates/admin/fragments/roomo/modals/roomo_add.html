@@ -1,0 +1,161 @@
+<div th:fragment="addModalContent">
+
+
+  <div class="modal fade no-transform" id="roomoAddModal" tabindex="-1"
+    aria-hidden="true">
+    <div
+      class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content rounded-4 p-4"
+        style="background-color: var(--color-background);">
+
+        <div class="modal-header">
+          <h5 class="modal-title">新增餐廳</h5>
+          <button type="button" class="btn-close"
+            data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <form id="roomoAddForm" data-parsley-validate
+            th:object="${roomo}" th:action="@{/admin/roomo_info/insert}"
+            method="post" enctype="multipart/form-data"
+            onsubmit="this.querySelector('button[type=submit]').disabled=true">
+            <div class="mb-3">
+              <label for="roomoName" class="form-label">餐廳名稱 <span class="text-danger">*</span> <small class="text-muted">最多可40字</small></label>
+              <input type="text" th:field="*{roomoName}" id="roomoName" class="form-control" required maxlength="40">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomoName')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomoName')}" th:text="${err}"></span>
+              </div>
+            </div>
+
+
+            <div class="mb-3">
+              <label for="roomoNameEn" class="form-label">英文名稱 <small class="text-muted">最多可40字</small></label>
+              <input type="text" th:field="*{roomoNameEn}" id="roomoNameEn" class="form-control" maxlength="40">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomoNameEn')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomoNameEn')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">狀態 <span class="text-danger">*</span></label>
+              <div>
+                <div class="form-check form-check-inline">
+                  <input type="radio" th:field="*{isEnabled}" id="isEnabledTrue" class="form-check-input" value="true">
+                  <label for="isEnabledTrue" class="form-check-label">上架</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input type="radio" th:field="*{isEnabled}" id="isEnabledFalse" class="form-check-input" value="false">
+                  <label for="isEnabledFalse" class="form-check-label">下架</label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="roomoSeatsTotal" class="form-label">容納座數 <span class="text-danger">*</span> <small class="text-muted">至少為1</small></label>
+              <input type="text" inputmode="numeric" pattern="\d*" th:field="*{roomoSeatsTotal}" id="roomoSeatsTotal" class="form-control" required min="1">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomoSeatsTotal')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomoSeatsTotal')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="roomoType" class="form-label">餐廳類型 <small class="text-muted">最多可30字</small></label>
+              <input type="text" th:field="*{roomoType}" id="roomoType" class="form-control" maxlength="30">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomoType')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomoType')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="roomoLoc" class="form-label">樓層位置 <small class="text-muted">最多可30字</small></label>
+              <input type="text" th:field="*{roomoLoc}" id="roomoLoc" class="form-control" maxlength="30">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomoLoc')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomoLoc')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="roomoPhone" class="form-label">電話 <small class="text-muted">最多可20字</small></label>
+              <input type="tel" th:field="*{roomoPhone}" id="roomoPhone" class="form-control" maxlength="20">
+              <div class="text-danger" th:if="${#fields.hasErrors('roomoPhone')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomoPhone')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="roomoInfo" class="form-label">餐廳簡介 <small class="text-muted">最多可150字</small></label>
+              <textarea th:field="*{roomoInfo}" id="roomoInfo" class="form-control auto-expand" maxlength="150"></textarea>
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomoInfo')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomoInfo')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="roomoContent" class="form-label">餐廳文案</label>
+              <textarea th:field="*{roomoContent}" id="roomoContent" class="form-control"></textarea>
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomoContent')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomoContent')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="uploadImg" class="form-label">圖片上傳 <small class="text-muted">只接受 PNG/JPEG/GIF 格式，檔案上限16MB</small></label>
+              <input type="file" name="uploadImg" id="uploadImg" class="form-control" accept="image/png,image/jpeg,image/gif">
+              <img id="imgPreview"
+                 th:src="@{/images/admin/no_img.svg}"
+                 class="img-fluid mt-2 rounded mx-auto d-block"
+                 style="max-height: 200px;" />        
+                 
+                 <div id="btnClearImageContainer" class="d-flex justify-content-center">
+                    <button type="button" id="btnClearImage" class="btn btn-outline-danger btn-sm mt-2 d-none">
+                      <i class="fa-solid fa-trash-can me-1 mt-2"></i> 清除圖片
+                    </button>
+                  </div>
+      
+                  <input type="hidden" id="clearImgFlag" name="clearImgFlag" value="false" /> 
+                    
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${imageError}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:text="${imageError}"></span>
+              </div>
+            </div>
+
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn_secondary "
+            data-bs-dismiss="modal">取消</button>
+          <button type="submit" id="btnSubmitAdd"
+            class="btn btn_accent ">新增</button>
+          </form>
+
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
