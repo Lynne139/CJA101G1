@@ -12,14 +12,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 
 @Controller
-@RequestMapping("/notifications")
+@RequestMapping("/members")
 public class NotificationController {
 
     @Autowired
     private NotificationService notificationService;
 
-    // 查詢指定會員通知（預設每頁15筆）
-    @GetMapping("/member/{memberId}")
+    // 查詢指定會員通知（預設每頁10筆）
+    @GetMapping("/{memberId}/notifications")
     public String getNotificationsByMember(
             @PathVariable("memberId") Integer memberId,
             @RequestParam(defaultValue = "0") int page,
@@ -27,7 +27,7 @@ public class NotificationController {
 
         List<Notification> allNotifications = notificationService.getNotificationsByMemberId(memberId);
 
-        int pageSize = 15;
+        int pageSize = 10;
         int total = allNotifications.size();
         int start = page * pageSize;
         int end = Math.min(start + pageSize, total);
@@ -41,7 +41,7 @@ public class NotificationController {
         return "notifications";
     }
     
-    @PostMapping("/{notificationId}/read")
+    @PostMapping("/{memberId}/notifications/{notificationId}/read")
     public String markNotificationAsRead(
             @PathVariable("notificationId") Integer notificationId,
             @RequestParam("memberId") Integer memberId,
@@ -56,7 +56,7 @@ public class NotificationController {
         }
 
         // 導回會員的通知頁面
-        return "redirect:/notifications/member/" + memberId;
+        return "redirect:/members/" + memberId + "/notifications";
     }
 }
 

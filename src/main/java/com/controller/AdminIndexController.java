@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 
 import com.member.model.MemberVO;
+import com.coupon.entity.Coupon;
+import com.coupon.entity.CouponService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.member.model.MemberService;
 import com.prod.model.ProdService;
@@ -36,7 +38,9 @@ import com.news.entity.PromotionNews;
 import com.news.service.PromotionNewsService;
 import com.news.service.NewsService;
 import com.news.entity.News;
-
+import com.shopOrd.model.ShopOrdService;
+import com.shopOrd.model.ShopOrdVO;
+import com.shopOrdDet.model.ShopOrdDetService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -62,6 +66,15 @@ public class AdminIndexController {
 	
 	@Autowired
 	ProdCartService prodCartSvc;
+	
+	@Autowired
+	ShopOrdService shopOrdSvc;
+	
+	@Autowired
+	CouponService couponSvc;
+	
+	@Autowired
+	ShopOrdDetService shopOrdDetSvc;
 
 	@Autowired
 	RoomTypeService roomTypeService;
@@ -290,15 +303,39 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
     } 
-    @GetMapping("/prodCate")
-    public String prodCate(HttpServletRequest request,Model model) {
+    @GetMapping("/prodCate/select_page")
+    public String prodCateSelectPage(HttpServletRequest request,Model model) {
 
-    	String mainFragment = "admin/fragments/shop/prodCate";
+    	String mainFragment = "admin/fragments/shop/prodCate/select_page";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	// 添加商品分類資料到 model 中
+    	List<com.prodCate.model.ProdCateVO> list = prodCateSvc.getAll();
+    	model.addAttribute("prodCateListData", list);
+    	
+    	// 檢查是否有錯誤訊息
+    	String errorMessage = request.getParameter("errorMessage");
+    	if (errorMessage != null && !errorMessage.isEmpty()) {
+    		model.addAttribute("errorMessage", errorMessage);
+    	}
+    	
+    	// 檢查是否有查詢結果
+    	String prodCateId = request.getParameter("prodCateId");
+    	if (prodCateId != null && !prodCateId.isEmpty()) {
+    		try {
+    			com.prodCate.model.ProdCateVO prodCateVO = prodCateSvc.getOneProdCate(Integer.valueOf(prodCateId));
+    			if (prodCateVO != null) {
+    				model.addAttribute("prodCateVO", prodCateVO);
+    			} else {
+    				model.addAttribute("errorMessage", "查無資料");
+    			}
+    		} catch (NumberFormatException e) {
+    			model.addAttribute("errorMessage", "商品分類編號格式錯誤");
+    		}
+    	}
 
     	return "admin/index_admin";
-
     }
     
     @GetMapping("/prodPhoto/select_page")
@@ -341,7 +378,6 @@ public class AdminIndexController {
     
     @GetMapping("/prodCart/select_page")
     public String prodCartselectPage(HttpServletRequest request,Model model) {
-
 
     	String mainFragment = "admin/fragments/shop/prodCart/select_page";
 		model.addAttribute("mainFragment", mainFragment);
@@ -399,32 +435,85 @@ public class AdminIndexController {
 		
 		return "admin/index_admin";
     } 
-
-    @GetMapping("/prodPhoto")
-    public String shop4(HttpServletRequest request,Model model) {
-
-    	String mainFragment = "admin/fragments/shop/prodPhoto";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-
-    	return "admin/index_admin";
-    } 
-
-    @GetMapping("/shopOrd")
+    
+    @GetMapping("/shopOrd/select_page")
     public String shop5(HttpServletRequest request,Model model) {
 
-    	String mainFragment = "admin/fragments/shop/shopOrd";
+    	String mainFragment = "admin/fragments/shop/shopOrd/select_page";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	// 添加商品資料到 model 中
+    	List<com.shopOrd.model.ShopOrdVO> list = shopOrdSvc.getAll();
+    	model.addAttribute("shopOrdListData", list);
+    	model.addAttribute("memberVO", new MemberVO());
+    	List<Coupon> list2 = couponSvc.getAll();
+    	model.addAttribute("couponListData", list2);
+    	
+    	// 檢查是否有錯誤訊息（來自 ProductIdController）
+    	String errorMessage = request.getParameter("errorMessage");
+    	if (errorMessage != null && !errorMessage.isEmpty()) {
+    		model.addAttribute("errorMessage", errorMessage);
+    	}
+    	
+    	// 檢查是否有查詢結果
+    	String prodOrdId = request.getParameter("prodOrdId");
+    	if (prodOrdId != null && !prodOrdId.isEmpty()) {
+    		try {
+    			ShopOrdVO shopOrdVO = shopOrdSvc.getOneShopOrd(Integer.valueOf(prodOrdId));
+    			if (shopOrdVO != null) {
+    				model.addAttribute("shopOrdVO", shopOrdVO);
+    			} else {
+    				model.addAttribute("errorMessage", "查無資料");
+    			}
+    		} catch (NumberFormatException e) {
+    			model.addAttribute("errorMessage", "訂單編號格式錯誤");
+    		}
+    	}
 
     	return "admin/index_admin";
     } 
-    @GetMapping("/shopOrdDet")
+    
+    @GetMapping("/shopOrdDet/select_page")
     public String shop6(HttpServletRequest request,Model model) {
 
-    	String mainFragment = "admin/fragments/shop/shopOrdDet";
+    	String mainFragment = "admin/fragments/shop/shopOrdDet/select_page";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	// 添加訂單明細資料到 model 中
+    	List<com.shopOrdDet.model.ShopOrdDetVO> list = shopOrdDetSvc.getAll();
+    	model.addAttribute("shopOrdDetListData", list);
+    	
+    	// 添加商品資料到 model 中
+    	List<com.prod.model.ProdVO> prodList = prodSvc.getAll();
+    	model.addAttribute("prodListData", prodList);
+    	
+    	// 添加訂單資料到 model 中
+    	List<com.shopOrd.model.ShopOrdVO> shopOrdList = shopOrdSvc.getAll();
+    	model.addAttribute("shopOrdListData", shopOrdList);
+    	
+    	// 檢查是否有錯誤訊息
+    	String errorMessage = request.getParameter("errorMessage");
+    	if (errorMessage != null && !errorMessage.isEmpty()) {
+    		model.addAttribute("errorMessage", errorMessage);
+    	}
+    	
+    	// 檢查是否有查詢結果（複合主鍵查詢）
+    	String prodOrdId = request.getParameter("prodOrdId");
+    	String productId = request.getParameter("productId");
+    	if (prodOrdId != null && !prodOrdId.isEmpty() && productId != null && !productId.isEmpty()) {
+    		try {
+    			com.shopOrdDet.model.ShopOrdDetVO shopOrdDetVO = shopOrdDetSvc.getOneShopOrdDet(Integer.valueOf(prodOrdId), Integer.valueOf(productId));
+    			if (shopOrdDetVO != null) {
+    				model.addAttribute("shopOrdDetVO", shopOrdDetVO);
+    			} else {
+    				model.addAttribute("errorMessage", "查無資料");
+    			}
+    		} catch (NumberFormatException e) {
+    			model.addAttribute("errorMessage", "訂單編號或商品編號格式錯誤");
+    		}
+    	}
 
     	return "admin/index_admin";
     } 
