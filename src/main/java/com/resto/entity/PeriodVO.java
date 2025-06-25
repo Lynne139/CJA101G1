@@ -1,6 +1,7 @@
-package com.resto.model;
+package com.resto.entity;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -28,18 +29,21 @@ public class PeriodVO{
 	@Column(name = "period_id", updatable = false)
 	private Integer periodId;
 	
-	@NotBlank(message = "區段設置不得為空")
-	@Size(max = 10, message = "區段設置請勿超過10字")
+	@NotBlank
+	@Size(max = 10, message = "類別名稱請勿超過10字")
 	@Column(name = "period_name")
 	private String periodName;
+	
+	@Column(name = "sort_order")
+	private Integer sortOrder;
 
 	@ManyToOne
 	@JoinColumn(name="resto_id")
 	private RestoVO restoVO;
 	
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="periodVO")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="periodVO", orphanRemoval = true)
 	@OrderBy("timeslot_id asc")
-	private Set<TimeslotVO> timeslots = new HashSet<TimeslotVO>();
+	private List<TimeslotVO> timeslots = new ArrayList<>();
 
 	public Integer getPeriodId() {
 		return periodId;
@@ -57,11 +61,19 @@ public class PeriodVO{
 		this.periodName = periodName;
 	}
 	
-	public Set<TimeslotVO> getTimeslots() {
+	public Integer getSortOrder() {
+		return sortOrder;
+	}
+
+	public void setSortOrder(Integer sortOrder) {
+		this.sortOrder = sortOrder;
+	}
+
+	public List<TimeslotVO> getTimeslots() {
 		return timeslots;
 	}
 
-	public void setTimeslots(Set<TimeslotVO> timeslots) {
+	public void setTimeslots(List<TimeslotVO> timeslots) {
 		this.timeslots = timeslots;
 	}
 
@@ -93,8 +105,11 @@ public class PeriodVO{
 
 	@Override
 	public String toString() {
-		return "PeriodVO [periodId=" + periodId + "]";
+		return "PeriodVO [periodId=" + periodId + ", periodName=" + periodName + ", sortOrder=" + sortOrder
+				+ ", restoVO=" + restoVO + ", timeslots=" + timeslots + "]";
 	}
+
+	
 	
 	
 }

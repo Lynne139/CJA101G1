@@ -16,7 +16,7 @@
 
         <div class="modal-body">
 
-          <form id="restoAddForm" data-parsley-validate
+          <form id="restoAddForm"
             th:object="${resto}" th:action="@{/admin/resto_info/insert}"
             method="post" enctype="multipart/form-data"
             onsubmit="this.querySelector('button[type=submit]').disabled=true">
@@ -143,16 +143,16 @@
                 <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
                 <span th:text="${imageError}"></span>
               </div>
-            </div>
-
-
+                    
+          </form>
+        
+        </div>
+        
         <div class="modal-footer">
           <button type="button" class="btn btn_secondary "
             data-bs-dismiss="modal">取消</button>
-          <button type="submit" id="btnSubmitAdd"
+          <button type="submit" form="restoAddForm" id="btnSubmitAdd"
             class="btn btn_accent ">新增</button>
-          </form>
-
         </div>
 
 

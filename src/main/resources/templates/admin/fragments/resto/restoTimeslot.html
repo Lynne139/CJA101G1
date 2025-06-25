@@ -22,7 +22,7 @@
 
     <!-- 區段與時段 Panel -->
     
-    <div class="panel p-4">
+    <div class="panel panel_periodntimeslot p-4">
 
         <div th:if="${selectedResto == null}" class="text-center">請先選擇餐廳，以載入開放時段</div>
         
@@ -32,36 +32,75 @@
         
         <!-- 新增類別按鈕 -->
         <div class="d-flex justify-content-end">
-            <button th:if="${selectedResto != null}" class="btn btn_primary btn_add col-12 mt-5 mb-4" id="btnAddPeriod">新增類別</button>
+            <button th:if="${selectedResto != null}" class="btn btn_primary btn_add col-12 mt-4 mb-4" id="btnAddPeriod">新增類別</button>
         </div>
         
         <!-- 若餐廳無區段內容提示 -->
-        <div class="text-center mb-4" th:if="${selectedResto != null And #lists.isEmpty(periodList)}">目前無設置類別，請先新增至少一項類別以加入時段</div>
+        <div class="text-center mb-4" th:if="${selectedResto != null and #lists.isEmpty(periodList)}">目前無設置類別，請先新增至少一項類別以加入時段</div>
         
         
         <div class="d-flex flex-column gap-5">
         
             
-            <div th:if="${periodList != null}" th:each="period,iter : ${periodList}" th:class="'pt-1'">
+            <div th:if="${periodList != null}" th:each="period,iter : ${periodList}" th:class="'period_block'">
                 <div class="d-flex justify-content-between align-items-center">
+                
+                    <!-- 標題 -->
                     <h5 class="panel-subtitle mb-0" th:text="${period.periodName}">類別名稱</h5>
-                    <div>
-                        <button class="btn_icon btn_edit me-1" title="編輯區段" th:data-id="${period.periodId}">
+                    
+                    <!-- 操作 -->
+                    <div class="d-flex align-items-center gap-1">
+                    
+                        <!-- 排序 -->
+                        <button class="btn_icon btn_move_up"
+                                th:data-id="${period.periodId}"
+                                data-dir="up" 
+                                th:disabled="${iter.index == 0}">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                
+                        <button class="btn_icon btn_move_down"
+                                th:data-id="${period.periodId}"
+                                data-dir="down"
+                                th:disabled="${iter.index + 1 == periodList.size()}">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                    
+                    
+                        <!-- 編輯/刪除 -->
+                        <button class="btn_icon btn_edit me-1" title="編輯類別" th:data-id="${period.periodId}">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn_icon btn_delete me-1" title="刪除區段" th:data-id="${period.periodId}">
+                        <!-- 若可刪除 -->
+                        <button class="btn_icon btn_delete me-1"
+                                th:if="${deletableMap[period.periodId]}"
+                                title="刪除類別"
+                                th:data-id="${period.periodId}">
                             <i class="fas fa-trash"></i>
                         </button>
+                        
+                        <!-- 若不可刪除 -->
+                        <button class="btn_icon btn_delete me-1"
+                                th:unless="${deletableMap[period.periodId]}"
+                                disabled
+                                title="仍有時段綁定此類別，無法刪除">
+                            <i class="fas fa-trash"></i>
+                        </button>
+
                     </div>
                 </div>
                 <!-- 分隔線 -->
                 <hr class="my-3">
     
-                <div class="d-flex flex-wrap gap-2 mt-2">
+                <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+                
+                    <!-- 若區段無時段內容提示 -->
+                    <div class="text-center" th:if="${ !#lists.isEmpty(periodList) and #lists.isEmpty(timeslotList)}">尚無設置時段，新增時段 →</div>
+        
                     <!-- 過濾屬於此 period 的 timeslot -->
-                    <div th:each="timeslot : ${timeslotList}"
+                    <div class="timeslot_wrapper" th:each="timeslot : ${timeslotList}"
                         th:if="${timeslot.periodVO != null and timeslot.periodVO.periodId == period.periodId}"
-                        th:data-timeslot-id="${timeslot.timeslotId}">
+                        th:data-id="${timeslot.timeslotId}">
                         
                         <div class="timeslot_block d-flex justify-content-between align-items-center">
                             <div class="px-2 timeslot_name" th:text="${timeslot.timeslotName}">07:00</div>
@@ -79,13 +118,17 @@
                         </div>
                     </div>
                     <!-- 新增時段按鈕 -->
-                    <button class=" btn btn_primary" id="btnAddTimeslot">+</button>
+                    <button class=" btn btn_primary btn_add_timeslot" th:attr="data-period-id=${period.periodId}">+</button>
                 </div>
             </div>
         </div>
         
         
     </div>
+    
+    
+    <!-- Modal -->
+      <div id="restoTimeslotModalContainer"></div>
 
 
 </div>

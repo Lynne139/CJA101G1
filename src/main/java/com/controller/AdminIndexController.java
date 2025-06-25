@@ -1,6 +1,7 @@
 package com.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,23 +25,18 @@ import com.prodCate.model.ProdCateService;
 import com.prodCate.model.ProdCateVO;
 import com.prodPhoto.model.ProdPhotoService;
 import com.prodPhoto.model.ProdPhotoVO;
+import com.resto.dto.RestoDTO;
+import com.resto.entity.PeriodVO;
+import com.resto.entity.RestoVO;
+import com.resto.entity.TimeslotVO;
 import com.resto.model.PeriodService;
-import com.resto.model.PeriodVO;
 import com.resto.model.RestoService;
-import com.resto.model.RestoVO;
 import com.resto.model.TimeslotService;
 import com.roomOrder.model.RoomOrder;
 import com.roomOrder.model.RoomOrderService;
 import com.shopOrd.model.ShopOrdService;
 import com.shopOrd.model.ShopOrdVO;
 import com.shopOrdDet.model.ShopOrdDetService;
-import com.resto.model.TimeslotVO;
-import com.room.model.RoomService;
-import com.room.model.RoomVO;
-import com.roomtype.model.RoomTypeService;
-import com.roomtype.model.RoomTypeVO;
-import com.roomtypeschedule.model.RoomTypeScheduleService;
-import com.roomtypeschedule.model.RoomTypeScheduleVO;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -148,7 +144,6 @@ public class AdminIndexController {
     }
 
 	// === 餐廳管理 ===
-
     @GetMapping("/resto_info")
     public String restoInfo(HttpServletRequest request,
     						HttpServletResponse response,
@@ -160,15 +155,15 @@ public class AdminIndexController {
     	
     	// 複合查詢 + Datatables
     	Map<String, String[]> paramMap = request.getParameterMap();
-        List<RestoVO> restoList = restoService.compositeQuery(paramMap);
+        List<RestoDTO> restoList = restoService.compositeQueryAsDTO(paramMap);
     	model.addAttribute("restoList", restoList);
     	
     	// 給下拉選單用的isEnabled
-        Map<String, String> isEnabledOptions = new LinkedHashMap<>();
-        isEnabledOptions.put("", "--- 所有狀態 ---"); // 空字串代表不篩選
-        isEnabledOptions.put("true", "上架");
-        isEnabledOptions.put("false", "下架");
-        model.addAttribute("isEnabledOptions", isEnabledOptions);
+    	 Map<String, String> isEnabledOptions = new LinkedHashMap<>();
+         isEnabledOptions.put("", "--- 所有狀態 ---"); // 空字串代表不篩選
+         isEnabledOptions.put("true", "上架");
+         isEnabledOptions.put("false", "下架");
+         model.addAttribute("isEnabledOptions", isEnabledOptions);
     	
     	// 讓複合查詢欄位保持原值（用於 th:selected / th:value）
         for (String key : paramMap.keySet()) {
@@ -192,12 +187,23 @@ public class AdminIndexController {
         	// 把選到的餐廳的詳細資訊放進 model 以顯示餐廳名稱
             RestoVO selectedResto = restoService.getById(restoId);
             model.addAttribute("selectedResto", selectedResto);
+            model.addAttribute("selectedRestoId", restoId);
             
          // 該餐廳的所有區段（period）與時段（timeslot）
             List<PeriodVO> periodList = periodService.getPeriodsByRestoId(restoId);
             List<TimeslotVO> timeslotList = timeslotService.getTimeslotsByRestoId(restoId);
             model.addAttribute("periodList", periodList);
             model.addAttribute("timeslotList", timeslotList);
+            
+            // 判斷區段有無綁定任何timeslot的period
+            Map<Integer, Boolean> deletableMap = new HashMap<>();
+            for (PeriodVO period : periodList) {
+                boolean hasTimeslot = timeslotList.stream()
+                    .anyMatch(ts -> ts.getPeriodVO() != null && ts.getPeriodVO().getPeriodId().equals(period.getPeriodId()));
+                deletableMap.put(period.getPeriodId(), !hasTimeslot);
+            }
+            model.addAttribute("deletableMap", deletableMap);
+
 
         } else {
         	// 若沒選餐廳，仍補空值避免渲染錯誤

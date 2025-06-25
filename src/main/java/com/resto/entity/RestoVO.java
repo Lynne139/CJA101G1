@@ -1,4 +1,4 @@
-package com.resto.model;
+package com.resto.entity;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -36,7 +36,7 @@ public class RestoVO{
 	@Column(name = "resto_id", updatable = false)
 	private Integer restoId;
 
-	@NotBlank(message = "餐廳名稱不得為空")
+	@NotBlank
 	@Size(max = 40, message = "餐廳名稱請勿超過40字")
 	@Column(name = "resto_name")
 	private String restoName;
@@ -46,7 +46,7 @@ public class RestoVO{
 	@Column(name = "resto_name_en")
 	private String restoNameEn;
 	
-    @NotNull(message = "請填入可容納人數")
+    @NotNull
     @Min(value = 1)
 	@Column(name = "resto_seats_total")
 	private Integer restoSeatsTotal;
@@ -79,11 +79,11 @@ public class RestoVO{
 	@Column(name = "is_deleted") //軟刪除
 	private Boolean isDeleted = false;
 	
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="restoVO")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="restoVO")
 	@OrderBy("timeslot_id asc")
 	private Set<TimeslotVO> timeslots = new HashSet<TimeslotVO>();
 
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="restoVO")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="restoVO")
 	@OrderBy("period_id asc")
 	private Set<PeriodVO> periods = new HashSet<PeriodVO>();
 

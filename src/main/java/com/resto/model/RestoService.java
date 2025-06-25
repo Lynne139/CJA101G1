@@ -3,12 +3,16 @@ package com.resto.model;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.resto.dto.RestoDTO;
+import com.resto.entity.RestoVO;
 import com.resto.utils.RestoCriteriaHelper;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceContext;
@@ -20,40 +24,55 @@ public class RestoService {
     private EntityManager em;
 
     private final RestoRepository restoRepository;
-
+    
     public RestoService(RestoRepository restoRepository) {
         this.restoRepository = restoRepository;
     }
 
+    
+    // 複合查詢（Criteria 結構）
+//    @Transactional(readOnly = true)
+//    public List<RestoVO> compositeQuery(Map<String, String[]> map) {
+//        return RestoCriteriaHelper.getAll(map, em);
+//    }
+   
+    @Transactional(readOnly = true)
+    public List<RestoDTO> compositeQueryAsDTO(Map<String, String[]> paramMap) {
+        List<RestoDTO> voList = RestoCriteriaHelper.getAllDTO(paramMap, em);
+        return voList.stream()
+            .map(vo -> new RestoDTO(
+                vo.getRestoId(),
+                vo.getRestoName(),
+                vo.getRestoNameEn(),
+                vo.getRestoLoc(),
+                vo.getRestoSeatsTotal(),
+                vo.getIsEnabled()
+            ))
+            .collect(Collectors.toList());
+    }
+    
+    // 多筆
+    @Transactional(readOnly = true)
     public List<RestoVO> getAll() {
         return restoRepository.findByIsDeletedFalse();
     }
     
+    // id拿單筆
+    @Transactional(readOnly = true)
     public RestoVO getById(Integer id) {
         return restoRepository.findById(id).orElse(null);
     }
 
-    public RestoVO insert(RestoVO vo) {
-        return restoRepository.save(vo);
-    }
-
-    public RestoVO save(RestoVO vo) {
-    	return restoRepository.save(vo);
-    }
-
+    // 軟刪除
+    @Transactional
     public void softDelete(Integer id) {
         restoRepository.findById(id).ifPresent(vo -> {
             vo.setIsDeleted(true);
             restoRepository.save(vo);
         });
     }
-
-    // 複合查詢（Criteria 結構）
-    public List<RestoVO> compositeQuery(Map<String, String[]> map) {
-        return RestoCriteriaHelper.getAll(map, em);
-    }
     
-    
+    // 檢查重名
     public boolean existsDuplicateName(RestoVO resto) {
         List<RestoVO> matches = restoRepository.findAllByRestoNameAndIsDeletedFalse(resto.getRestoName());
 
@@ -64,7 +83,7 @@ public class RestoService {
         }
     }
 
-    
+    // 重組欄位與圖片存入資料庫
     @Transactional
     public void saveWithImage(RestoVO vo, MultipartFile img, String clearImgFlag) {
         RestoVO target;

@@ -576,16 +576,19 @@ CREATE TABLE resto_period (
   resto_id INT NOT NULL,
   period_name VARCHAR(10) NOT NULL,
   
+  sort_order INT NOT NULL DEFAULT 0,
+
   CONSTRAINT resto_period_pk PRIMARY KEY (period_id),
-  CONSTRAINT resto_period_resto_fk FOREIGN KEY (resto_id) REFERENCES resto (resto_id)
+  CONSTRAINT resto_period_resto_fk FOREIGN KEY (resto_id) REFERENCES resto (resto_id),
+  CONSTRAINT resto_period_uk UNIQUE KEY (resto_id, sort_order)
 );
 -- PK編號從1開始
-ALTER TABLE resto AUTO_INCREMENT = 1;
+ALTER TABLE resto_period AUTO_INCREMENT = 1;
 
-INSERT INTO resto_period (resto_id, period_name)
+INSERT INTO resto_period (resto_id, period_name,sort_order)
 VALUES 
-  (1,'早餐'), (1,'午餐'), (1,'午茶'), (1,'晚餐'),
-  (2,'早午餐'), (2,'晚餐');
+  (1,'早餐',1), (1,'午餐',2), (1,'午茶',3), (1,'晚餐',4),
+  (2,'早午餐',1), (2,'晚餐',2);
   
   
   -- 時段(與日期+餐廳去判斷滿額)
@@ -602,7 +605,7 @@ VALUES
   CONSTRAINT resto_timeslot_period_fk FOREIGN KEY (period_id) REFERENCES resto_period(period_id) -- 方便前端依區段渲染
 );
 -- PK編號從1開始
-ALTER TABLE resto AUTO_INCREMENT = 1;
+ALTER TABLE resto_timeslot AUTO_INCREMENT = 1;
 
 INSERT INTO resto_timeslot (resto_id, period_id, timeslot_name)
 VALUES 

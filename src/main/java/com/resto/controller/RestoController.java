@@ -28,9 +28,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.resto.entity.RestoVO;
 import com.resto.model.PeriodService;
 import com.resto.model.RestoService;
-import com.resto.model.RestoVO;
 import com.resto.model.TimeslotService;
 
 import jakarta.persistence.OptimisticLockException;
@@ -144,7 +144,7 @@ public class RestoController {
 	) {
 		
 	    // 錯誤 flag（初始 false）
-	    boolean hasImageError = false;
+	    boolean hasAnyError = false;
 
 	    // 檢查圖片格式與大小
 	    if (imageFile != null && !imageFile.isEmpty()) {
@@ -153,16 +153,16 @@ public class RestoController {
 
 	        if (!isValidImageType(contentType)) {
 	            model.addAttribute("imageError", "只接受 PNG / JPEG / GIF 格式圖片");
-	            hasImageError = true;
+	            hasAnyError = true;
 	        } else if (imageFile.getSize() > maxSize) {
 	            model.addAttribute("imageError", "圖片大小不得超過 16MB");
-	            hasImageError = true;
+	            hasAnyError = true;
 	        } else {
 	            try {
 	                resto.setRestoImg(imageFile.getBytes());
 	            } catch (IOException e) {
 	                model.addAttribute("imageError", "圖片處理失敗");
-	                hasImageError = true;
+	                hasAnyError = true;
 	            }
 	        }
 	    }
@@ -170,11 +170,11 @@ public class RestoController {
 	    // 驗證名稱重複
 	    if (restoService.existsDuplicateName(resto)) {
 	        result.rejectValue("restoName", null, "餐廳名稱已存在，請重新輸入！");
-	        hasImageError = true;
+	        hasAnyError = true;
 	    }
 
 	    // 若欄位驗證有錯，或圖片錯誤，回填 modal
-	    if (result.hasErrors() || hasImageError) {
+	    if (result.hasErrors() || hasAnyError) {
 	    	// 避免input有新選其他圖，但表單驗證被擋時，回填的model記成input失敗的內容導致preview錯亂
 	    	resto.setRestoImg(null);
 	        model.addAttribute("resto", resto);
@@ -219,7 +219,7 @@ public class RestoController {
 	) {
 		
 	    // 錯誤 flag（初始 false）
-	    boolean hasImageError = false;
+	    boolean hasAnyError = false;
 
 	    // 處理圖片格式與大小
 	    if (imageFile != null && !imageFile.isEmpty()) {
@@ -228,16 +228,16 @@ public class RestoController {
 
 	        if (!isValidImageType(contentType)) {
 	            model.addAttribute("imageError", "只接受 PNG / JPEG / GIF 格式圖片");
-	            hasImageError = true;
+	            hasAnyError = true;
 	        } else if (imageFile.getSize() > maxSize) {
 	            model.addAttribute("imageError", "圖片大小不得超過 16MB");
-	            hasImageError = true;
+	            hasAnyError = true;
 	        } else {
 	            try {
 	                resto.setRestoImg(imageFile.getBytes());
 	            } catch (IOException e) {
 	                model.addAttribute("imageError", "圖片處理失敗");
-	                hasImageError = true;
+	                hasAnyError = true;
 	            }
 	        }
 	    }
@@ -248,7 +248,7 @@ public class RestoController {
 	    }
 
 	    // 若欄位驗證有錯，或圖片錯誤，回填 modal
-	    if (result.hasErrors() || hasImageError) {
+	    if (result.hasErrors() || hasAnyError) {
 	    	// 把資料庫圖片補回去(避免input有新選其他圖，但表單驗證被擋時，回填的model記成input失敗的內容導致preview錯亂)
 	        byte[] originalImg = restoService.getById(resto.getRestoId()).getRestoImg();
 	        resto.setRestoImg(originalImg);
