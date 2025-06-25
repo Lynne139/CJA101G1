@@ -43,7 +43,7 @@ import com.shopOrd.model.ShopOrdVO;
 import com.shopOrdDet.model.ShopOrdDetService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+ 
 @Controller
 @RequestMapping("/admin")
 public class AdminIndexController {
@@ -128,6 +128,16 @@ public class AdminIndexController {
     	List<MemberVO> list = memberSvc.getAll();
         model.addAttribute("memberListData", list);
         
+    	return "admin/index_admin";
+    } 
+    
+    // === 新增會員 ===
+    @GetMapping("/addMember")
+    public String addMember(HttpServletRequest request,Model model) {
+    	String mainFragment = "admin/fragments/member/addMember";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	     
     	return "admin/index_admin";
     } 
     

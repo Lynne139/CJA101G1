@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>會員新增 - addMember.html</title>
+<style>
+  table#table-1 {
+	background-color: #CCCCFF;
+    border: 2px solid black;
+    text-align: center;
+  }
+  table#table-1 h4 {
+    color: red;
+    display: block;
+    margin-bottom: 1px;
+  }
+  h4 {
+    color: blue;
+    display: inline;
+  }
+
+  table {
+	width: 450px;
+	background-color: white;
+	margin-top: 1px;
+	margin-bottom: 1px;
+  }
+  table, th, td {
+    border: 0px solid #CCCCFF;
+  }
+  th, td {
+    padding: 1px;
+  }
+</style>
+	
+</head>
+<body>
+
+<h3>會員新增 - addMember.html</h3>
+<div th:fragment="addMember">
+    <form th:action="@{/member/insert}" method="post" th:object="${memberVO}" enctype="multipart/form-data">
+    
+        <div th:if="${#fields.hasErrors()}">
+            <font style="color:red">請修正以下錯誤:</font>
+            <ul>
+                <li class="error" th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
+            </ul>
+        </div>
+
+      
+    <table>
+        <tr>
+            <td>會員等級:</td>
+            <td>
+                <input type="text" th:field="*{memberLevel}" />
+                <div class="error" th:errors="*{memberLevel}"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>密碼:</td>
+            <td>
+                <input type="password" th:field="*{memberPassword}" />
+                <div class="error" th:errors="*{memberPassword}"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>會員名稱:</td>
+            <td>
+                <input type="text" th:field="*{memberName}" />
+                <div class="error" th:errors="*{memberName}"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>會員生日:</td>
+            <td>
+                <input type="date" th:field="*{memberBirthday}" />
+                <div class="error" th:errors="*{memberBirthday}"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>電話:</td>
+            <td>
+                <input type="text" th:field="*{memberPhone}" />
+                <div class="error" th:errors="*{memberPhone}"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>地址:</td>
+            <td>
+                <input type="text" th:field="*{memberAddress}" />
+                <div class="error" th:errors="*{memberAddress}"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>會員照片:</td>
+            <td>
+                <input type="file" th:field="*{uploadPic}" />
+            </td>
+        </tr>
+        <tr>
+            <td>會員狀態:</td>
+            <td>
+                <input type="text" th:field="*{memberStatus}" />
+                <div class="error" th:errors="*{memberStatus}"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>電子信箱:</td>
+            <td>
+                <input type="text" th:field="*{memberEmail}" />
+                <div class="error" th:errors="*{memberEmail}"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>會員積分:</td>
+            <td>
+                <input type="number" th:field="*{memberPoints}" />
+                <div class="error" th:errors="*{memberPoints}"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>會員累積消費金額:</td>
+            <td>
+                <input type="number" th:field="*{memberAccumulativeConsumption}" />
+                <div class="error" th:errors="*{memberAccumulativeConsumption}"></div>
+            </td>
+        </tr>
+    </table>
+    <br />
+     <div style="text-align:center">
+            <button type="submit">送出新增</button>
+            <button type="reset">重設</button>
+       </div>
+</form>
+ </div>
+</body>
+</html>

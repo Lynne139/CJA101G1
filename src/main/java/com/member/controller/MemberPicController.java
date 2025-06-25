@@ -13,7 +13,7 @@ import com.member.model.MemberService;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+ 
 @Controller
 @RequestMapping("/member")
 public class MemberPicController {
