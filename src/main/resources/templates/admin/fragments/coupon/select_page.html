@@ -68,8 +68,8 @@
                 document.querySelectorAll('.btn-edit').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const code = btn.getAttribute('data-code');
-                        // 假設修改頁面路徑為 /coupons/edit/{couponCode}
-                        window.location.href = `/coupons/edit/${code}`;
+                        // 假設修改頁面路徑為 /coupon/update/{couponCode}
+                        window.location.href = `/coupon/update/${code}`;
                     });
                 });
 
@@ -107,8 +107,8 @@
 
             // 新增折價券按鈕事件
             document.getElementById('btnAddCoupon').addEventListener('click', () => {
-                // 假設新增頁面路徑為 /coupons/new
-                window.location.href = '/coupons/new';
+                // 假設新增頁面路徑為 /coupon/add
+                window.location.href = '/coupon/add';
             });
         });
     </script>
