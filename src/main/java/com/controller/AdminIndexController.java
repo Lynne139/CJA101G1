@@ -32,10 +32,15 @@ import com.roomtype.model.RoomTypeService;
 import com.roomtype.model.RoomTypeVO;
 import com.roomtypeschedule.model.RoomTypeScheduleService;
 import com.roomtypeschedule.model.RoomTypeScheduleVO;
+import com.news.service.HotNewsService;
+import com.news.entity.HotNews;
+import com.news.entity.PromotionNews;
+import com.news.service.PromotionNewsService;
+import com.news.service.NewsService;
+import com.news.entity.News;
 import com.shopOrd.model.ShopOrdService;
 import com.shopOrd.model.ShopOrdVO;
 import com.shopOrdDet.model.ShopOrdDetService;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -55,7 +60,7 @@ public class AdminIndexController {
 	@Autowired
 	ProdCateService prodCateSvc;
 
-	
+
 	@Autowired
 	ProdPhotoService prodPhotoSvc;
 	
@@ -82,6 +87,15 @@ public class AdminIndexController {
 	
     @Autowired
     private RoomOrderService roomOrderService;
+
+    @Autowired
+    private HotNewsService hotNewsService;
+
+    @Autowired
+    private PromotionNewsService promotionNewsService;
+
+    @Autowired
+    private NewsService newsService;
 
 	// === 後台首頁 ===
     @GetMapping("")
@@ -527,14 +541,38 @@ public class AdminIndexController {
     } 
     
     // === 消息管理 ===
+    // === 最新消息 ===
     @GetMapping("/news1")
     public String news1(HttpServletRequest request,Model model) {
 
     	String mainFragment = "admin/fragments/news/news1";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
-
+        // 查詢所有HotNews
+        List<HotNews> hotNewsList = hotNewsService.findAll();
+        model.addAttribute("hotNewsList", hotNewsList);
     	return "admin/index_admin";
     } 
-	
+    // === 媒體報導 ===
+    @GetMapping("/news2")
+    public String news2(HttpServletRequest request,Model model) {
+        String mainFragment = "admin/fragments/news/news2";
+        model.addAttribute("mainFragment", mainFragment);
+        model.addAttribute("currentURI", request.getRequestURI());
+        // 查詢所有PromotionNews
+        List<PromotionNews> promotionNewsList = promotionNewsService.findAll();
+        model.addAttribute("promotionNewsList", promotionNewsList);
+        return "admin/index_admin";
+    } 
+    // === 活動通知 ===
+    @GetMapping("/news3")
+    public String news3(HttpServletRequest request,Model model) {
+        String mainFragment = "admin/fragments/news/news3";
+        model.addAttribute("mainFragment", mainFragment);
+        model.addAttribute("currentURI", request.getRequestURI());
+        // 查詢所有News
+        List<News> newsList = newsService.findAll();
+        model.addAttribute("newsList", newsList);
+        return "admin/index_admin";
+    } 
 }

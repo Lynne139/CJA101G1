@@ -350,9 +350,9 @@ Title varchar(100) not null,
 Content Varchar(1000) not null,
 Published_date date not null,
 Is_display boolean default true not null,
-Promo_photo longblob);
+News_photo longblob);
 
-INSERT INTO NEWS_LIST (TITLE, CONTENT, PUBLISHED_DATE, IS_DISPLAY, PROMO_PHOTO)
+INSERT INTO NEWS_LIST (TITLE, CONTENT, PUBLISHED_DATE, IS_DISPLAY, NEWS_PHOTO)
 VALUES 
 (
   '嶼蔻飯店榮獲2025年度最佳設計旅宿獎',
@@ -377,9 +377,9 @@ Title Varchar(100) not null,
 Content Varchar(1000) not null,
 Created_date date not null,
 Is_display boolean default true not null,
-News_photo longblob);
+Hotnews_photo longblob);
 
-INSERT INTO HOT_NEWS_LIST (TITLE, CONTENT, CREATED_DATE, IS_DISPLAY, NEWS_PHOTO)
+INSERT INTO HOT_NEWS_LIST (TITLE, CONTENT, CREATED_DATE, IS_DISPLAY, HOTNEWS_PHOTO)
 VALUES 
 (
   '嶼蔻飯店全新開幕，打造奢華海島體驗',

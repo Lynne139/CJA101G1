@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>活動通知</title>
+    <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+    <div class="container mt-4">
+        <h2>活動通知</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>標題</th>
+                    <th>內容</th>
+                    <th>開始日期</th>
+                    <th>結束日期</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="news : ${promotionNewsList}">
+                    <td th:text="${news.title}"></td>
+                    <td th:text="${news.content}"></td>
+                    <td th:text="${news.startDate}"></td>
+                    <td th:text="${news.endDate}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div th:replace="fragments/footer :: footer"></div>
+</body>
+</html> 
