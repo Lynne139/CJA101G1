@@ -23,7 +23,7 @@ import jakarta.validation.Valid;
 @Controller
 @RequestMapping("/member")
 public class MemberController {
-
+ 
 	@Autowired
 	MemberService memberSvc;
 
