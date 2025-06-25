@@ -12,15 +12,51 @@
                 method="post" enctype="multipart/form-data"
                 onsubmit="this.querySelector('button[type=submit]').disabled=true">
 
-            <!-- 會員選擇 -->
+            <!-- 會員編號 -->
             <div class="mb-3">
-              <label for="member" class="form-label">會員 <span class="text-danger">*</span></label>
-              <select th:field="*{member}" id="member" class="form-select" required>
-                <option th:each="mem : ${memberList}" th:value="${mem.memberId}" th:text="${mem.memberName}"></option>
+              <label for="memberId" class="form-label">會員編號 <span class="text-danger">*</span></label>
+              <input type="number" id="memberId" name="memberId" class="form-control" required>
+            </div>
+            <!-- 會員姓名（自動帶出，不可編輯） -->
+            <div class="mb-3">
+              <label for="memberName" class="form-label">會員姓名</label>
+              <input type="text" id="memberName" class="form-control" readonly>
+            </div>
+
+            <!-- RoomOList 相關欄位 -->
+            <div class="mb-3">
+              <label for="roomType" class="form-label">房型 <span class="text-danger">*</span></label>
+              <select id="roomType" name="roomTypeId" class="form-select" required>
+                <option value="">請選擇</option>
+                <option th:each="rt : ${roomTypeList}" th:value="${rt.roomTypeId}" th:text="${rt.roomTypeName}"></option>
               </select>
-              <div class="text-danger" th:if="${#fields.hasErrors('member')}">
-                <span th:each="err : ${#fields.errors('member')}" th:text="${err}"></span>
-              </div>
+            </div>
+            <div class="mb-3">
+              <label for="room" class="form-label">房間</label>
+              <select id="room" name="roomId" class="form-select">
+                <option value="">請選擇</option>
+                <option th:each="r : ${roomList}" th:value="${r.roomId}" th:text="${r.roomId}"></option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="numberOfPeople" class="form-label">入住人數 <span class="text-danger">*</span></label>
+              <input type="number" id="numberOfPeople" name="numberOfPeople" class="form-control" min="1" required>
+            </div>
+            <div class="mb-3">
+              <label for="roomAmount" class="form-label">房間數量 <span class="text-danger">*</span></label>
+              <input type="number" id="roomAmount" name="roomAmount" class="form-control" min="1" required>
+            </div>
+            <div class="mb-3">
+              <label for="roomPrice" class="form-label">房間價格 <span class="text-danger">*</span></label>
+              <input type="number" id="roomPrice" name="roomPrice" class="form-control" min="0" required>
+            </div>
+            <div class="mb-3">
+              <label for="roomGuestName" class="form-label">入住人姓名</label>
+              <input type="text" id="roomGuestName" name="roomGuestName" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label for="specialReq" class="form-label">特殊需求</label>
+              <input type="text" id="specialReq" name="specialReq" class="form-control" maxlength="50">
             </div>
 
             <!-- 訂單狀態 -->
@@ -31,15 +67,6 @@
                 <option value="2">完成</option>
                 <option value="0">取消</option>
               </select>
-            </div>
-
-            <!-- 房間數量 -->
-            <div class="mb-3">
-              <label for="roomAmount" class="form-label">房間數量 <span class="text-danger">*</span></label>
-              <input type="number" th:field="*{roomAmount}" id="roomAmount" class="form-control" min="1" required>
-              <div class="text-danger" th:if="${#fields.hasErrors('roomAmount')}">
-                <span th:each="err : ${#fields.errors('roomAmount')}" th:text="${err}"></span>
-              </div>
             </div>
 
             <!-- 入住日期 -->

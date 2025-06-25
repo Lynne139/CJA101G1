@@ -1,52 +1,40 @@
 <div th:fragment="viewModalContent">
 
-	<div class="modal fade" id="restoViewModal" tabindex="-1" aria-hidden="true">
-  		<div class="modal-dialog modal-dialog-scrollable">
-    		<div class="modal-content rounded-4 p-4" style="background-color: var(--color-background);">
-     			
-				<!-- Modal標題與關閉按鈕 -->
-     			<div class="modal-header d-flex justify-content-between align-items-center mb-2 mt-2 px-3">
-        			<h5 class="modal-title">餐廳資訊</h5>
-        			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      			</div>
+    <div class="modal fade" id="roomoViewModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content rounded-4 p-4" style="background-color: var(--color-background);">
+                 
+                <!-- Modal標題與關閉按鈕 -->
+                 <div class="modal-header d-flex justify-content-between align-items-center mb-2 mt-2 px-3">
+                    <h5 class="modal-title">住宿訂單明細</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
 
-				<!-- Modal內容 -->
-      			<div class="modal-body">
-      				<h6 class="modal_sub_title d-flex justify-content-start align-items-center gap-2">餐廳編號
-      					<span th:text="'#' + ${resto.restoId}"></span>
-      				</h6>
-					
-					<div class="modal_section">
-					
-					<div>
-						<img th:src="@{/admin/resto_info/img/{id}(id=${resto.restoId})}"
-     						alt="餐廳圖片" class="resto_img img-fluid mb-4 d-block mx-auto">
-					</div>
-     				
-     				<div class="modal_detail d-flex flex-column align-items-start">
-	     				<p><strong>餐廳名稱：</strong> <span th:text="${resto.restoName}"></span></p>
-				        <p><strong>英文名稱：</strong> <span th:text="${resto.restoNameEn}"></span></p>
-				        <p><strong>樓層位置：</strong> <span th:text="${resto.restoLoc}"></span></p>
-				        <p><strong>容納座數：</strong> <span th:text="${resto.restoSeatsTotal}"></span></p>
-				        <p><strong>餐廳類型：</strong> <span th:text="${resto.restoType}"></span></p>
-				        <p><strong>餐廳簡介：</strong> <div th:utext="${resto.restoInfo}"></div> </p>
-				        <p><strong>餐廳文案：</strong> <div th:utext="${resto.restoContent}"></div> </p>
-				        	
-				        <p><strong>電話：</strong> <span th:text="${resto.restoPhone}"></span></p>
-				        <p><strong>狀態：</strong> 
-				        	<span th:text="${resto.isEnabled} ? '上架' : '下架'"></span>
-				        </p>
-     				</div>
-			        
-					</div>
-      			</div>
-      			
-      			
-    		</div>
-  		</div>
-	</div>
+                <!-- Modal內容 -->
+                  <div class="modal-body">
+                      <h6 class="modal_sub_title d-flex justify-content-start align-items-center gap-2">
+                        明細編號
+                          <span th:text="'#' + ${roomOList.roomOrderListId}"></span>
+                      </h6>
+                    
+                    <div class="modal_section">
+                     
+                     <div class="modal_detail d-flex flex-column align-items-start">
+                        <p><strong>訂單編號：</strong> <span th:text="${roomOList.roomOrder.roomOrderId}"></span></p>
+                        <p><strong>房型名稱：</strong> <span th:text="${roomOList.roomType.roomTypeName}"></span></p>
+                        <p><strong>房間編號：</strong> <span th:text="${roomOList.room.roomId}"></span></p>
+                        <p><strong>入住人數：</strong> <span th:text="${roomOList.numberOfPeople}"></span></p>
+                        <p><strong>房間價格：</strong> <span th:text="${roomOList.roomPrice}"></span></p>
+                        <p><strong>房間數量：</strong> <span th:text="${roomOList.roomAmount}"></span></p>
+                        <p><strong>入住人姓名：</strong> <span th:text="${roomOList.roomGuestName}"></span></p>
+                        <p><strong>特殊需求：</strong> <span th:text="${roomOList.specialReq}"></span></p>
+                        <p><strong>建立日期：</strong> <span th:text="${roomOList.createDate}"></span></p>
+                        <p><strong>明細狀態：</strong> <span th:text="${roomOList.listStatus}"></span></p>
+                     </div>
+                    </div>
+                  </div>
+            </div>
+          </div>
+    </div>
 
 </div>
-
-
-

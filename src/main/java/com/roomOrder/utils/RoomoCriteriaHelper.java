@@ -18,15 +18,24 @@ public class RoomoCriteriaHelper {
 
         switch (column) {
             case "isEnabled":
-                return cb.equal(root.get(column), Integer.valueOf(value));
+                // 改成正確的欄位名稱
+                return cb.equal(root.get("orderStatus"), Integer.valueOf(value));
             case "keyword":
-                // ✅ 關鍵字查詢多欄位 OR
                 String pattern = "%" + value + "%";
-                 Predicate nameLike = cb.like(root.get("memberName"), pattern);
-                // Predicate emailLike = cb.like(root.get("memberEmail"), pattern);
-                Predicate orderLike = cb.like(root.get("roomOrderId"), pattern);
-                Predicate midLike = cb.like(root.get("memberId"), pattern);
-                return cb.or(orderLike, midLike);
+                List<Predicate> orList = new ArrayList<>();
+                // 會員姓名模糊查詢
+                orList.add(cb.like(root.get("member").get("memberName"), pattern));
+                // 訂單編號精確查詢（若輸入為數字）
+                try {
+                    Integer orderId = Integer.valueOf(value);
+                    orList.add(cb.equal(root.get("roomOrderId"), orderId));
+                } catch (NumberFormatException ignored) {}
+                // 會員ID精確查詢（若輸入為數字）
+                try {
+                    Integer memberId = Integer.valueOf(value);
+                    orList.add(cb.equal(root.get("member").get("memberId"), memberId));
+                } catch (NumberFormatException ignored) {}
+                return cb.or(orList.toArray(new Predicate[0]));
             default:
                 return cb.like(root.get(column), "%" + value + "%");
         }
@@ -59,4 +68,3 @@ public class RoomoCriteriaHelper {
     }
 
 }
-//         

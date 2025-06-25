@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class RoomOrderService {
         return repository.save(order);
     }
 
-    public void deleteById(Long roomOrderId) {
+    public void deleteById(Integer roomOrderId) {
         repository.deleteById(roomOrderId);
     }
 
@@ -45,5 +46,7 @@ public class RoomOrderService {
     public RoomOrder getById(Integer roomOrderId) {
         return repository.findByRoomOrderId(roomOrderId);
     }
+
+    
 
 }

@@ -195,7 +195,14 @@
 
 		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrder'}"
         th:src="@{/js/admin/resto/resto_order.js}"></script>
-		
+
+		<!-- 住宿訂單 -->
+		<script th:if="${mainFragment == 'admin/fragments/roomo/roomoInfo'}"
+        src="https://cdn.tiny.cloud/1/5ydxgx8itt1g2ztd9z0kgct3fry3wndyy5h3mgq55cfw1xxx/tinymce/6/tinymce.min.js"
+        referrerpolicy="origin"></script> 
+		<script th:if="${mainFragment == 'admin/fragments/roomo/roomoInfo'}"
+        th:src="@{/js/admin/roomo/roomo_info.js}"></script>
+
 		
 
 	</body>

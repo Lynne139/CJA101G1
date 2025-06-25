@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
 
     //modal載入位置
@@ -79,30 +78,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ===== Modal - View =====
-    document.addEventListener("click", function (e) {
+    document.addEventListener("click", async function (e) {
         if (e.target.closest(".btn_view")) {
-            const btn = e.target.closest(".btn_view");
-            const roomoId = btn.getAttribute("data-id");
-
-            if (!container) return;
-
-            fetch(`/admin/roomo_info/view?roomoId=${roomoId}`)
-                .then(res => res.text())
-                .then(html => {
-
-                    container.innerHTML = html;
-
-                    const modalEl = document.getElementById("roomoViewModal");
-                    if (!modalEl) {
-                        alert("無法載入 modal 結構");
-                        return;
-                    }
-                    const modal = new bootstrap.Modal(modalEl);
-                    modal.show();
-                })
-                .catch(err => {
-                    alert("載入資料失敗：" + err.message);
-                });
+            const roomOrderId = e.target.closest(".btn_view").dataset.id;
+            const res = await fetch(`/admin/roomo_info/view?roomOrderId=${roomOrderId}`);
+            const html = await res.text();
+            container.innerHTML = html;
+            const modalEl = document.getElementById("roomoViewModal");
+            if (modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
         }
     });
 
@@ -287,7 +273,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     initTinyMCE();
                     bindImagePreview();
                     bindFormSubmitAdd();
-
+                    bindMemberIdAutoFill();
+                    bindRoomTypeRoomCascade();
 
                 });
 
@@ -497,6 +484,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         initTinyMCE();    //重新初始化
                         bindImagePreview();
                         bindFormSubmitEdit();
+                        
                     }, 300); // 與動畫一致延遲時間
 
 
@@ -510,9 +498,67 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // ...在 modal 載入後呼叫此函數...
+function bindMemberIdAutoFill() {
+    const memberIdInput = document.getElementById("memberId");
+    const memberNameInput = document.getElementById("memberName");
+    if (!memberIdInput || !memberNameInput) return;
 
+    let lastQuery = "";
+    let timer = null;
 
+    memberIdInput.addEventListener("input", function () {
+        const memberId = memberIdInput.value.trim();
+        if (!memberId) {
+            memberNameInput.value = "";
+            lastQuery = "";
+            return;
+        }
+        // 防止重複查詢與過快請求
+        if (memberId === lastQuery) return;
+        lastQuery = memberId;
 
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            fetch(`/admin/member/name?memberId=${memberId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.memberName) {
+                        memberNameInput.value = data.memberName;
+                    } else {
+                        memberNameInput.value = "查無此會員";
+                    }
+                })
+                .catch(() => {
+                    memberNameInput.value = "查詢失敗";
+                });
+        }, 300); // 300ms debounce
+    });
+}
+
+function bindRoomTypeRoomCascade() {
+    const roomTypeSelect = document.getElementById("roomType");
+    const roomSelect = document.getElementById("room");
+    if (!roomTypeSelect || !roomSelect) return;
+
+    roomTypeSelect.addEventListener("change", function () {
+        const roomTypeId = this.value;
+        // 清空房間選單
+        roomSelect.innerHTML = '<option value="">請選擇</option>';
+        if (!roomTypeId) return;
+
+        fetch(`/admin/room/byType?roomTypeId=${roomTypeId}`)
+            .then(res => res.json())
+            .then(list => {
+                list.forEach(room => {
+                    const opt = document.createElement("option");
+                    opt.value = room.roomId;
+                    opt.textContent = room.roomId;
+                    roomSelect.appendChild(opt);
+                });
+            });
+    });
+}
 
 
 
