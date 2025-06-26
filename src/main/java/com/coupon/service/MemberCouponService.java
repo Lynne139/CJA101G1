@@ -33,13 +33,24 @@ public class MemberCouponService {
         return memberCouponRepository.findUsedCouponsByMemberId(memberId);
     }
 
-    // 2. 查詢會員符合指定訂單類型、未過期、未使用的折價券
-    public List<Coupon> getAvailableCouponsByOrderType(Integer memberId, OrderType orderType) {
-        return memberCouponRepository.findAvailableCouponsByMemberIdAndOrderType(
-                memberId,
-                orderType.getValue(),
-                LocalDate.now()
-        );
+    // 2. 查詢會員可用於訂房或商城、未過期、未使用的折價券
+    public List<Coupon> getAvailableCouponsByOrderTypes(Integer memberId, OrderType selectedOrderType) {
+        List<Integer> orderTypes;
+
+        // 根據前端選擇的訂單類型組成對應的可接受類型清單
+        if (selectedOrderType == OrderType.ROOM_ONLY) {
+            // 前端選擇「訂房」時，允許 ROOM_ONLY 和 ROOM_AND_PROD
+            orderTypes = List.of(OrderType.ROOM_ONLY.getValue(), OrderType.ROOM_AND_PROD.getValue());
+        } else if (selectedOrderType == OrderType.PROD_ONLY) {
+            // 前端選擇「商城」時，允許 PROD_ONLY 和 ROOM_AND_PROD
+            orderTypes = List.of(OrderType.PROD_ONLY.getValue(), OrderType.ROOM_AND_PROD.getValue());
+        } else {
+            // 若傳入 ROOM_AND_PROD 或其他，僅回傳完全通用型
+            orderTypes = List.of(OrderType.ROOM_AND_PROD.getValue());
+        }
+
+        return memberCouponRepository.findAvailableCouponsByMemberIdAndOrderTypes(
+        		memberId, orderTypes, LocalDate.now());
     }
 
     // 3. 查詢會員可用於某筆訂房訂單的折價券

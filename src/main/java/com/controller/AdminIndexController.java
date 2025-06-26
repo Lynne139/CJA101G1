@@ -109,9 +109,13 @@ public class AdminIndexController {
     	model.addAttribute("currentURI", request.getRequestURI());
 
     	return "admin/index_admin";
+
     } 
 
+<<<<<<< Faith
      
+=======
+>>>>>>> master
 
 	//===住宿訂單管理===
 	@GetMapping("/roomo_info")
@@ -484,7 +488,7 @@ public class AdminIndexController {
     @GetMapping("/coupon/select")
     public String couponSelectPage(HttpServletRequest request,Model model) {
 
-    	String mainFragment = "admin/fragments/coupon/coupon-select-page";
+    	String mainFragment = "admin/fragments/coupon/admin-select-coupon";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 
