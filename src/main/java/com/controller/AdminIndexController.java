@@ -551,10 +551,10 @@ public class AdminIndexController {
     } 
     
     // === 優惠管理 ===
-    @GetMapping("/coupon1")
-    public String coupon1(HttpServletRequest request,Model model) {
+    @GetMapping("/coupon/select")
+    public String couponSelectPage(HttpServletRequest request,Model model) {
 
-    	String mainFragment = "admin/fragments/coupon/coupon1";
+    	String mainFragment = "admin/fragments/coupon/coupon-select-page";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 

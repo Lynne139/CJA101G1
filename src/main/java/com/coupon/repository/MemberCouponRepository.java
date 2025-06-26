@@ -39,11 +39,11 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Memb
     @Query(value = """
             SELECT c.* FROM member_coupon mc
             JOIN coupon c ON mc.coupon_code = c.coupon_code
-            WHERE mc.member_id = :memberId // 屬於某會員
-              AND mc.is_used = false // 尚未使用
-              AND (c.order_type = 1 OR c.order_type = 3) // 可用於訂房
-              AND c.expiry_date >= :currentDate // 未過期
-              AND c.min_purchase <= :priceBeforeUsingCoupon // 符合低消門檻
+            WHERE mc.member_id = :memberId -- 屬於某會員
+              AND mc.is_used = false -- 尚未使用
+              AND (c.order_type = 1 OR c.order_type = 3) -- 可用於訂房
+              AND c.expiry_date >= :currentDate -- 未過期
+              AND c.min_purchase <= :priceBeforeUsingCoupon -- 符合低消門檻
             """, nativeQuery = true)
     List<Coupon> findRoomOnlyOrAllCoupons(
             @Param("memberId") Integer memberId,
@@ -54,11 +54,11 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Memb
     @Query(value = """
             SELECT c.* FROM member_coupon mc
             JOIN coupon c ON mc.coupon_code = c.coupon_code
-            WHERE mc.member_id = :memberId // 屬於某會員
-              AND mc.is_used = false // 尚未使用
-              AND (c.order_type = 2 OR c.order_type = 3) // 可用於商城
-              AND c.expiry_date >= :currentDate // 未過期
-              AND c.min_purchase <= :priceBeforeUsingCoupon // 符合低消門檻
+            WHERE mc.member_id = :memberId -- 屬於某會員
+              AND mc.is_used = false -- 尚未使用
+              AND (c.order_type = 2 OR c.order_type = 3) -- 可用於商城
+              AND c.expiry_date >= :currentDate -- 未過期
+              AND c.min_purchase <= :priceBeforeUsingCoupon -- 符合低消門檻
             """, nativeQuery = true)
     List<Coupon> findProdOnlyOrAllCoupons(
             @Param("memberId") Integer memberId,
