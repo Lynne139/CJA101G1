@@ -183,6 +183,12 @@ public class AdminIndexController {
     	model.addAttribute("currentURI", request.getRequestURI());
 
     	return "admin/index_admin";
+<<<<<<< Lynne
+    } 
+     
+    
+    // === 餐廳管理 ===
+=======
 	}
 	@GetMapping("/listAllRoomType")
 	public String listAllRoomType(HttpServletRequest request,HttpServletResponse response,Model model) {
@@ -235,6 +241,7 @@ public class AdminIndexController {
     }
 
 	// === 餐廳管理 ===
+>>>>>>> master
     @GetMapping("/resto_info")
     public String restoInfo(HttpServletRequest request,
     						HttpServletResponse response,

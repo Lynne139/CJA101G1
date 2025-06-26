@@ -1,16 +1,13 @@
 
 document.addEventListener("DOMContentLoaded", function() {
 
-	//modal載入位置
-	//刪掉，因頁面刷新時，原本綁的就不見了
-	//	const container = document.getElementById("roomInfoModalContainer");
 
 
-	initRoomTable(); // 初次載入表格
+	initRoomTypeScheduleTable(); // 初次載入表格
 
 	// ===== DataTables =====
-	function initRoomTable() {
-		const table = $('#roomTable');
+	function initRoomTypeScheduleTable() {
+		const table = $('#roomTypeScheduleTable');
 
 		if ($.fn.DataTable.isDataTable(table)) {
 			table.DataTable().clear().destroy(); // 清除舊實例
@@ -24,12 +21,13 @@ document.addEventListener("DOMContentLoaded", function() {
 			order: [[0, 'asc']],
 			autoWidth: false,
 			columnDefs: [
-				{ targets: [0], width: "20%" },
-				{ targets: [1], width: "25%" },
-				{ targets: [2], width: "25%" },
-				{ targets: [3], width: "10%", orderable: false },
-				{ targets: [4], width: "10%", orderable: false },
-				{ targets: [5], width: "10%", orderable: false }
+				{ targets: [0], width: "10%" },
+				{ targets: [1], width: "15%", orderable: false },
+				{ targets: [2], width: "15%" },
+				{ targets: [3], width: "15%" },
+				{ targets: [4], width: "15%" },
+				{ targets: [5], width: "20%" },
+				{ targets: [6], width: "10%", orderable: false }
 			],
 			searching: false,
 			ordering: true,
@@ -44,11 +42,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	clearBtn.addEventListener("click", () => {
 		// 清空欄位值
-		form.querySelector("input[name='roomId']").value = "";
-		form.querySelector("input[name='roomGuestName']").value = "";
 		form.querySelector("select[name='roomTypeId']").value = "";
-		form.querySelector("select[name='roomStatus']").value = "";
-		form.querySelector("select[name='roomSaleStatus']").value = "";
+		form.querySelector("input[name='minDate']").value = "";
+		form.querySelector("input[name='maxDate']").value = "";
+		form.querySelector("input[name='minAmount']").value = "";
+		form.querySelector("input[name='maxAmount']").value = "";
 
 		// 自動提交清空後的查詢表單
 		form.submit();
@@ -59,15 +57,15 @@ document.addEventListener("DOMContentLoaded", function() {
 		// 把所有 form 欄位包成 query string
 		const params = new URLSearchParams(new FormData(this)).toString();
 		// fetch 帶上 XMLHttpRequest header 讓後端判定為 AJAX
-		fetch(`/admin/listAllRoom?${params}`, {
+		fetch(`/admin/listAllRoomTypeSchedule?${params}`, {
 			headers: { 'X-Requested-With': 'XMLHttpRequest' }
 		})
 			.then(res => res.text())
 			.then(html => {
-				// 把回傳的 fragment 注入到 roomResult
-				document.getElementById('roomResult').innerHTML = html; // 渲染結果
+				// 把回傳的 fragment 注入到 roomScheduleResult
+				document.getElementById('roomTypeScheduleResult').innerHTML = html; // 渲染結果
 				// 重新啟用 DataTables
-				initRoomTable();
+				initRoomTypeScheduleTable();
 			})
 			.catch(err => {
 				console.error('複合查詢失敗：', err);
@@ -86,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		e.preventDefault();
 
 		// 如果 modal 已經存在，先強制關掉並移除 DOM
-		const oldModalEl = document.getElementById("roomAddModal");
+		const oldModalEl = document.getElementById("roomTypeScheduleAddModal");
 		if (oldModalEl) {
 			const modal = bootstrap.Modal.getInstance(oldModalEl);
 			if (modal) modal.hide();
@@ -100,11 +98,11 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 
 
-		fetch("/admin/listAllRoom/add")
+		fetch("/admin/listAllRoomTypeSchedule/add")
 			.then(res => res.text())
 			.then(html => {
 				// container 一定要在這裡重新抓一次
-				const container = document.getElementById("roomInfoModalContainer");
+				const container = document.getElementById("roomTypeScheduleInfoModalContainer");
 
 				if (!container) {
 					alert("找不到 modal 插入位置");
@@ -119,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				container.innerHTML = html;
 
 				setTimeout(() => {
-					const modalEl = document.getElementById("roomAddModal");
+					const modalEl = document.getElementById("roomTypeScheduleAddModal");
 					if (!modalEl) {
 						alert("無法載入modal結構");
 						return;
@@ -150,11 +148,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			showBtnOverlay(submitBtn); // 加入 loading 遮罩
 
-			const form = document.getElementById("roomAddForm");
+			const form = document.getElementById("roomTypeScheduleAddForm");
 			const formData = new FormData(form);
 
 
-			fetch("/admin/listAllRoom/insert", {
+			fetch("/admin/listAllRoomTypeSchedule/insert", {
 				method: "POST",
 				body: formData
 			})
@@ -164,9 +162,9 @@ document.addEventListener("DOMContentLoaded", function() {
 						window.location.href = res.url; // 讓瀏覽器照後端redirect去重新載入頁面
 
 						// 成功，清空並關閉modal
-						document.getElementById("roomAddForm").reset();
+						document.getElementById("roomTypeScheduleAddForm").reset();
 
-						const modal = bootstrap.Modal.getInstance(document.getElementById("roomAddModal"));
+						const modal = bootstrap.Modal.getInstance(document.getElementById("roomTypeScheduleAddModal"));
 						modal.hide();
 
 					} else {
@@ -183,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					const doc = parser.parseFromString(html, "text/html");
 
 					const newBody = doc.querySelector(".modal-body");
-					const oldBody = document.querySelector("#roomAddModal .modal-body");
+					const oldBody = document.querySelector("#roomTypeScheduleAddModal .modal-body");
 
 					if (newBody && oldBody) {
 						oldBody.replaceWith(newBody);
@@ -227,7 +225,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		// 1. 移除舊的 modal
 		// 如果 modal 已經存在，先強制關掉並移除 DOM
-		const oldModalEl = document.getElementById("roomEditModal");
+		const oldModalEl = document.getElementById("roomTypeScheduleEditModal");
 		if (oldModalEl) {
 			const modal = bootstrap.Modal.getInstance(oldModalEl);
 			if (modal) modal.hide();
@@ -240,12 +238,12 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 
 		// 2. 不論是否有舊 modal，都要 fetch 新的
-		fetch(`/admin/listAllRoom/edit?roomId=${roomId}`)
+		fetch(`/admin/listAllRoomTypeSchedule/edit?roomId=${roomTypeScheduleId}`)
 			.then(res => res.text())
 			.then(html => {
 
 				// container 一定要在這裡重新抓一次
-				const container = document.getElementById("roomInfoModalContainer");
+				const container = document.getElementById("roomTypeScheduleInfoModalContainer");
 
 				if (!container) {
 					alert("找不到 modal 插入位置");
@@ -255,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				container.innerHTML = html;
 
 				setTimeout(() => {
-					const modalEl = document.getElementById("roomEditModal");
+					const modalEl = document.getElementById("roomTypeScheduleEditModal");
 					if (!modalEl) {
 						alert("無法載入modal結構");
 						return;
@@ -285,11 +283,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			showBtnOverlay(submitBtn); // 加入 loading 遮罩
 
-			const form = document.getElementById("roomEditForm");
+			const form = document.getElementById("roomTypeScheduleEditForm");
 			const formData = new FormData(form);
 
 
-			fetch("/admin/listAllRoom/update", {
+			fetch("/admin/listAllRoomTypeSchedule/update", {
 				method: "POST",
 				body: formData
 			})
@@ -299,9 +297,9 @@ document.addEventListener("DOMContentLoaded", function() {
 						window.location.href = res.url; // 讓瀏覽器照後端redirect去重新載入頁面
 
 						// 成功，清空並關閉modal
-						document.getElementById("roomEditForm").reset();
+						document.getElementById("roomTypeScheduleEditForm").reset();
 
-						const modal = bootstrap.Modal.getInstance(document.getElementById("roomEditModal"));
+						const modal = bootstrap.Modal.getInstance(document.getElementById("roomTypeScheduleEditModal"));
 						modal.hide();
 
 					} else {
@@ -318,7 +316,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					const doc = parser.parseFromString(html, "text/html");
 
 					const newBody = doc.querySelector(".modal-body");
-					const oldBody = document.querySelector("#roomEditModal .modal-body");
+					const oldBody = document.querySelector("#roomTypeScheduleEditModal .modal-body");
 
 					if (newBody && oldBody) {
 						oldBody.replaceWith(newBody);

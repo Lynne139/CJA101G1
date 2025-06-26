@@ -1,7 +1,7 @@
-<div th:fragment="addRoomTypeModelContent">
+<div th:fragment="addRoomTypeScheduleModelContent">
 
 
-  <div class="modal fade no-transform" id="restoAddModal" tabindex="-1"
+  <div class="modal fade no-transform" id="RoomTypeScheduleAddModal" tabindex="-1"
     aria-hidden="true">
     <div
       class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -16,8 +16,8 @@
 
         <div class="modal-body">
 
-          <form id="restoAddForm" data-parsley-validate
-            th:object="${roomTypeVO}" th:action="@{/admin//roomType_info/insert}"
+          <form id="RoomTypeScheduleAddForm" data-parsley-validate
+            th:object="${roomTypeVO}" th:action="@{/admin/listAllRoomTypeSchedule/insert}"
             method="post" enctype="multipart/form-data"
             onsubmit="this.querySelector('button[type=submit]').disabled=true">
 
