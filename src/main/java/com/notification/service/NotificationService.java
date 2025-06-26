@@ -21,10 +21,20 @@ public class NotificationService {
     public Notification createNotification(Notification notification) {
         return notificationRepository.save(notification);
     }
+    
+    // 更簡單使用的新增通知
+    public Notification createNotification(Integer memberId, String title, String content) {
+        Notification notification = new Notification();
+        notification.setMemberId(memberId);
+        notification.setTitle(title);
+        notification.setContent(content);
+        notification.setIsRead(false); // 預設未讀
+        return notificationRepository.save(notification);
+    }
 
     // 取得某會員所有通知
     public List<Notification> getNotificationsByMemberId(Integer memberId) {
-        return notificationRepository.findByMemberId(memberId);
+        return notificationRepository.findByMemberIdOrderByCreatedAtDesc(memberId);
     }
     
     // 更新通知為已讀狀態
@@ -33,8 +43,9 @@ public class NotificationService {
         if (notification != null && !notification.getIsRead()) {
             notification.setIsRead(true);
             notificationRepository.save(notification);
-            return true; // 表示更新成功
+            return true; // 成功更新為已讀
         }
-        return false; // 找不到或已是已讀狀態
+        return false; // 通知不存在或已是已讀
     }
+
 }

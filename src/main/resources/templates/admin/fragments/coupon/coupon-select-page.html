@@ -88,14 +88,15 @@
 
             function renderResults(coupons) {
                 const tbody = document.getElementById('resultBody');
+                // 清空原本的 <tbody>
                 tbody.innerHTML = '';
-
+				// 如果是空的 ➜ 顯示「查無資料」紅字
                 if (!coupons || coupons.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="10" class="text-center text-danger">查無資料</td></tr>';
                     resultSection.style.display = 'block';
                     return;
                 }
-
+				// 否則動態建立 <tr> 資料列、插入對應欄位。
                 coupons.forEach(coupon => {
                     let orderTypeText = '未知';
 
@@ -103,7 +104,9 @@
                         orderTypeText = '未知';
                     } else if (typeof coupon.orderType === 'number') {
                         orderTypeText = orderTypeLabels[coupon.orderType] || '未知';
-                    } else if (typeof coupon.orderType === 'string') {
+                    } 
+                    // 目前我的後端是傳字串e.g.'ROOM_ONLY'過來的
+                    else if (typeof coupon.orderType === 'string') {
                         const key = coupon.orderType.toUpperCase();
                         switch (key) {
                             case 'ROOM_ONLY': orderTypeText = '限訂房'; break;
@@ -135,11 +138,10 @@
                     tbody.appendChild(tr);
                 });
 
-                // 綁定修改按鈕事件
+                // 綁定修改按鈕事件，點擊就會跳轉到 /coupon/update/{couponCode}。
                 document.querySelectorAll('.btn-edit').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const code = btn.getAttribute('data-code');
-                        // 假設修改頁面路徑為 /coupon/update/{couponCode}
                         window.location.href = `/coupon/update/${code}`;
                     });
                 });

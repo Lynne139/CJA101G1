@@ -4,14 +4,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
+@RequestMapping("/coupon")
 public class CouponPageController {
 
 	// 顯示查詢折價券頁面
-	@GetMapping("/coupon/select")
+	@GetMapping("/select")
     public String couponSelectPage(HttpServletRequest request, Model model) {
         model.addAttribute("mainFragment", "admin/fragments/coupon/coupon-select-page");
         model.addAttribute("currentURI", request.getRequestURI());
@@ -19,7 +21,7 @@ public class CouponPageController {
     }
 	
 	// 顯示新增折價券頁面
-    @GetMapping("/coupon/add")
+    @GetMapping("/add")
     public String couponAddPage(HttpServletRequest request, Model model) {
         model.addAttribute("mainFragment", "admin/fragments/coupon/add-coupon");
         model.addAttribute("currentURI", request.getRequestURI());
@@ -27,7 +29,7 @@ public class CouponPageController {
     }
     
     // 顯示修改折價券頁面
-    @GetMapping("/coupon/update/{couponCode}")
+    @GetMapping("/update/{couponCode}")
     public String couponUpdatePage(@PathVariable String couponCode, HttpServletRequest request, Model model) {
         model.addAttribute("couponCode", couponCode); // 把 couponcode 傳給前端 JS 用
         model.addAttribute("mainFragment", "admin/fragments/coupon/update-coupon");

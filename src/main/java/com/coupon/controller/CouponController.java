@@ -29,6 +29,7 @@ public class CouponController {
         Optional<Coupon> coupon = couponService.getCouponByCode(couponCode);
         return coupon.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+        // 註：傳給前端時，預設 Jackson 會把 enum 的名稱變成字串來傳 e.g."ROOM_ONLY"
     }
 
     // 2. 依 couponName 查詢

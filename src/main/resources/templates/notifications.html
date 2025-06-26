@@ -1,67 +1,166 @@
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>我的通知</title>
-    <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>會員通知 - Maison d'Yuko</title>
+  <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+  <style>
+    /* 讓通知列表置中且寬度較寬 */
+    .notification-list {
+      margin: 30px auto;
+      max-width: 700px;
+      width: 90%;
+    }
+
+    /* 我的通知標題左對齊通知列表左緣 */
+    section.container > h2 {
+      max-width: 700px;
+      width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 1rem;
+      /* 取消 Bootstrap 的置中效果 */
+      text-align: left;
+    }
+
+    .notification-item {
+      border-bottom: 1px solid #ddd;
+      padding: 15px;
+      cursor: pointer;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .notification-content {
+      flex: 1;
+      padding-right: 15px;
+    }
+
+    .notification-item.unread {
+      font-weight: bold;
+      background-color: #f9f1e9;
+    }
+    .notification-item.read {
+      color: #999;
+    }
+
+    /* 分頁按鈕置中 */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .pagination button {
+      margin: 5px;
+      padding: 6px 12px;
+      border: none;
+      background-color: #ccc;
+      cursor: pointer;
+    }
+    .pagination button.active {
+      background-color: #6c4d3c;
+      color: white;
+    }
+    .notification-time {
+      font-size: 0.85em;
+      color: #777;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+  </style>
 </head>
 <body>
 
-<!-- Header -->
-<div th:replace="~{fragments/header :: header}"></div>
+  <!-- 匯入 header -->
+  <div th:replace="~{fragments/header :: header}"></div>
 
-<section class="section" style="padding: 60px 0; background-color: #fdf6ef;">
-    <div class="container">
-        <h2 class="text-center mb-4">系統通知</h2>
+  <!-- 通知內容 -->
+  <section class="section container">
+    <h2 class="mt-5 mb-4">我的通知</h2>
+    <div id="notificationList" class="notification-list"></div>
+    <div class="pagination" id="pagination"></div>
+  </section>
 
-        <div th:if="${notificationPage.totalElements == 0}">
-            <p class="text-center">目前沒有任何通知。</p>
-        </div>
+  <!-- 匯入 footer -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
 
-        <div th:if="${notificationPage.totalElements > 0}">
-            <div class="list-group">
-                <div th:each="note : ${notificationPage.content}" class="list-group-item list-group-item-action mb-3"
-                     th:classappend="${note.isRead} ? 'list-group-item-light' : 'list-group-item-warning'">
-                    <h5 class="mb-1" th:text="${note.title}">通知標題</h5>
-                    <p class="mb-1" th:text="${note.content}">通知內容</p>
-                    <small th:text="${#temporals.format(note.createdAt, 'yyyy-MM-dd HH:mm')}">建立時間</small>
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script th:inline="javascript">
+    const memberId = '[[${memberId}]]';
+    let notifications = [];
+    let pageSize = 10;
+    let currentPage = 1;
 
-                    <!-- 新增：設為已讀按鈕，若已讀則不顯示 -->
-                    <div th:if="${!note.isRead}" class="mt-2">
-                        <form th:action="@{'/notifications/' + ${note.notificationId} + '/read'}" method="post">
-                            <input type="hidden" name="memberId" th:value="${memberId}" />
-                            <button type="submit" class="btn btn-sm btn-primary">設為已讀</button>
-                        </form>
-                    </div>
-                </div>
+    function fetchNotifications() {
+      $.get(`/api/notifications/member/${memberId}`, function (data) {
+        notifications = data;
+        renderPage(1);
+      });
+    }
+
+    function renderPage(page) {
+      currentPage = page;
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+      const pageData = notifications.slice(start, end);
+
+      let html = "";
+      pageData.forEach(n => {
+        const createdAt = new Date(n.createdAt);
+        const formattedTime = createdAt.toLocaleString("zh-TW");
+
+        html += `
+          <div id="notification-${n.notificationId}" 
+               class="notification-item ${n.isRead ? 'read' : 'unread'}"
+               onclick="markAsRead(${n.notificationId})">
+            <div class="notification-content">
+              <div><strong>${n.title}</strong></div>
+              <div>${n.content}</div>
             </div>
+            <div class="notification-time">${formattedTime}</div>
+          </div>
+        `;
+      });
 
-            <!-- 分頁控制 -->
-            <nav aria-label="通知分頁" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item" th:classappend="${notificationPage.first} ? 'disabled'">
-                        <a class="page-link"
-                           th:href="@{|/notifications/member/${memberId}?page=${notificationPage.number - 1}|}">上一頁</a>
-                    </li>
-                    <li class="page-item" th:each="i : ${#numbers.sequence(0, notificationPage.totalPages - 1)}"
-                        th:classappend="${i == notificationPage.number} ? 'active'">
-                        <a class="page-link"
-                           th:href="@{|/notifications/member/${memberId}?page=${i}|}"
-                           th:text="${i + 1}">1</a>
-                    </li>
-                    <li class="page-item" th:classappend="${notificationPage.last} ? 'disabled'">
-                        <a class="page-link"
-                           th:href="@{|/notifications/member/${memberId}?page=${notificationPage.number + 1}|}">下一頁</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-</section>
+      $("#notificationList").html(html);
+      renderPagination();
+    }
 
-<!-- Footer -->
-<div th:replace="~{fragments/footer :: footer}"></div>
+    function renderPagination() {
+      const totalPages = Math.ceil(notifications.length / pageSize);
+      let html = "";
 
+      for (let i = 1; i <= totalPages; i++) {
+        html += `<button class="${i === currentPage ? 'active' : ''}" onclick="renderPage(${i})">${i}</button>`;
+      }
+
+      $("#pagination").html(html);
+    }
+
+    function markAsRead(notificationId) {
+      const notificationDiv = $(`#notification-${notificationId}`);
+      if (notificationDiv.hasClass("read")) return;
+
+      $.post(`/api/notifications/${memberId}/${notificationId}/read`, function (response) {
+        if (response === "success") {
+          notificationDiv.removeClass("unread").addClass("read");
+          const target = notifications.find(n => n.notificationId === notificationId);
+          if (target) target.isRead = true;
+        } else {
+          alert("設為已讀失敗");
+        }
+      });
+    }
+
+    $(document).ready(function () {
+      fetchNotifications();
+    });
+  </script>
 </body>
 </html>
