@@ -1,75 +1,146 @@
 <div th:fragment="roomList">
 	<div class="main_room_info">
-	
+
 		<div class="mt-5 mb-5">
 			<h2 class="page_title">房間資訊</h2>
 		</div>
-	
 
-		
+
+		<!-- 複合查詢 -->
+		<form class="filter panel p-4 mb-4" method="get"
+			th:action="@{/admin/listAllRoom}">
+			<div class="row g-3">
+			
+
+				<div class="col-md-4">
+					<label for="qRoomId" class="form-label">房間編號</label> <input
+						type="text" class="form-control" id="qRoomId" name="roomId"
+						th:value="${roomId}" >
+				</div>
+
+				<div class="col-md-4">
+					<label for="qRoomType" class="form-label">房型</label> <select
+						id="qRoomType" name="roomTypeId" class="form-select">
+						<option value="">--- 所有房型 ---</option>
+						<option th:each="rt : ${roomTypeVOList}"
+							th:value="${rt.roomTypeId}" th:text="${rt.roomTypeName}"
+							th:selected="${roomTypeId} == ${rt.roomTypeId}"></option>
+					</select>
+				</div>
+
+				<div class="col-md-4">
+					<label for="qroomGuestName" class="form-label">住客姓名</label> <input
+						type="text" class="form-control" id="qroomGuestName"
+						name="roomGuestName" th:value="${roomGuestName}">
+				</div>
+
+				<div class="col-md-4">
+					<label class="form-label">房間狀態</label> <select class="form-select"
+						name="roomStatus">
+						<option value="">--- 所有狀態 ---</option>
+						<option value="0" th:selected="${roomStatus} == '0'">未入住</option>
+						<option value="1" th:selected="${roomStatus} == '1'">已入住</option>
+						<option value="2" th:selected="${roomStatus} == '2'">待清潔</option>
+					</select>
+				</div>
+
+				<div class="col-md-4">
+					<label class="form-label">上下架狀態</label> <select class="form-select"
+						name="roomSaleStatus">
+						<option value="">--- 所有狀態 ---</option>
+						<option value="1" th:selected="${roomSaleStatus} == '1'">上架</option>
+						<option value="0" th:selected="${roomSaleStatus} == '0'">下架</option>
+					</select>
+				</div>
+
+				<div
+					class="search_btns col-md-4 d-flex justify-content-end align-items-end gap-2">
+					<button type="button" class="btn btn_secondary btn_search_clear">清空</button>
+					<button type="submit" class="btn btn_primary">搜尋</button>
+				</div>
+			</div>
+		</form>
+
+
+
+
+
 		<!-- 資料表 -->
-		<div class="table panel p-4">
-			<div class="table_header d-flex justify-content-between align-items-end mb-4">
-		    	<h4 class="table_title">房間列表</h4>
-		    	<!-- 新增房間 -->
-				<button class="btn btn_accent btn_add" id="btnAddResto">新增房間</button>
-				<a th:href="@{/admin/listAllRoom/addRoom}" class="add_room_link">新增房間</a>
-		  	</div>
-		  	<div class="table-responsive">
-		    	<table id="restoTable" class="table table-bordered align-top">
-		      		<thead class="table_head align-top">
-		        		<tr>
-					        <th class="text-center">房間編號</th>
-		          			<th class="text-center">房型編號</th>
-					        <th class="text-center">住客姓名</th>
-					        <th class="text-center">上下架狀態</th>
-					        <th class="text-center">房間狀態</th>
-					        <th class="text-center">操作</th>
-		        		</tr>
-		      		</thead>
-		      		<tbody>
-		        		<tr th:each="roomVO : ${roomVOList}">
-						    <td class="text-center" th:text="${roomVO.roomId}"></td>
-						    <td class="text-center" th:text="${roomVO.roomTypeVO.roomTypeId}"></td>
-						    <td class="text-center" th:text="${roomVO.roomGuestName}"></td>
-						    <td class="text-center">
-						        <span th:classappend="${roomVO.roomSaleStatus == 1} ? 'badge bg-success' : 'badge bg-secondary'"
-						            th:text="${roomVO.roomSaleStatus == 1} ? '上架' : '下架'"></span>
-						    </td>
-						    <td class="text-center">
-						    	<span th:classappend="${roomVO.roomSaleStatus == 0} ? 'badge bg-secondary': 
-						    	(${roomVO.roomSaleStatus == 1} ? 'badge bg-success' : 
-						    	(${roomVO.roomSaleStatus == 2} ? 'badge bg-warning' : 'badge bg-danger'))"
-						            th:text="${roomVO.roomStatus == 0} ? '未入住' : 
+		<div id="roomResult" th:fragment="roomResult">
+		<!-- 錯誤提示 -->
+<!-- 			<div th:if="${errorMessage}" class="alert alert-danger mb-3"> -->
+<!--                 <i class="fa-solid fa-circle-exclamation me-1"></i>[[${errorMessage}]] -->
+<!--             </div> -->
+			<div class="table panel p-4">
+				<div
+					class="table_header d-flex justify-content-between align-items-end mb-4">
+					<h4 class="table_title">房間列表</h4>
+					<!-- 新增房間 -->
+					<button class="btn btn_accent btn_add" id="btnAddRoom">新增房間</button>
+				</div>
+				<div class="table-responsive">
+					<table id="roomTable" class="table table-bordered align-top">
+						<thead class="table_head align-top">
+							<tr>
+								<th class="text-center">房間編號</th>
+								<th class="text-center">房型名稱</th>
+								<th class="text-center">住客姓名</th>
+								<th class="text-center">上下架狀態</th>
+								<th class="text-center">房間狀態</th>
+								<th class="text-center">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="roomVO : ${roomVOList}">
+								<td class="text-center" th:text="${roomVO.roomId}"></td>
+								<td class="text-center"
+									th:text="${roomVO.roomTypeVO.roomTypeName}"></td>
+								<td class="text-center" th:text="${roomVO.roomGuestName}"></td>
+								<td class="text-center"><span
+									th:class="${roomVO.roomSaleStatus == 1} ? 'badge bg-success' : 'badge bg-secondary'"
+									th:text="${roomVO.roomSaleStatus == 1} ? '上架' : '下架'"></span></td>
+								<td class="text-center"><span
+									th:class="${roomVO.roomStatus == 0} ? 'badge bg-secondary': 
+						    	(${roomVO.roomStatus == 1} ? 'badge bg-success' : 
+						    	(${roomVO.roomStatus == 2} ? 'badge bg-warning' : 'badge bg-danger'))"
+									th:text="${roomVO.roomStatus == 0} ? '未入住' : 
 						            (${roomVO.roomStatus == 1} ? '已入住' : 
 						            (${roomVO.roomStatus == 2} ? '待清潔' : '未知狀態'))"></span>
-						    </td>
-						    <td>
-						        <div class="table_row_actions d-flex justify-content-center align-items-start">
-									<button class="btn_icon btn_view" th:data-id="${roomVO.roomId}"><i class="fas fa-eye"></i></button>
-						        	<button class="btn_icon btn_edit" th:data-id="${roomVO.roomId}"><i class="fas fa-edit"></i></button>
-<!-- 						        	<button class="btn_icon btn_delete" th:data-id="${roomVO.roomId}"><i class="fas fa-trash"></i></button> -->
-						        </div>
-						    </td>
-						</tr>
-		      		</tbody>
-		    	</table>
-		  	</div>
-		  	
-		  	
-			<!-- Modal -->
-		  	<div id="restoInfoModalContainer"></div>
+								</td>
+								<td>
+									<div
+										class="table_row_actions d-flex justify-content-center align-items-start">
+										<!-- 									<button class="btn_icon btn_view" th:data-id="${roomVO.roomId}"><i class="fas fa-eye"></i></button> -->
+										<button class="btn_icon btn_edit"
+											th:data-id="${roomVO.roomId}">
+											<i class="fas fa-edit"></i>
+										</button>
+										<!-- 						        	<button class="btn_icon btn_delete" th:data-id="${roomVO.roomId}"><i class="fas fa-trash"></i></button> -->
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 
-		
-			<!-- CRUD執行結果提示 -->
-			<div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
-  				<i class="fa-solid fa-check-circle me-2"></i><span th:text="${message}"></span>
-  				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+				<!-- Modal -->
+				<div id="roomInfoModalContainer"></div>
+
+
+				<!-- CRUD執行結果提示 -->
+				<div th:if="${message}"
+					class="alert alert-success alert-dismissible fade show"
+					role="alert">
+					<i class="fa-solid fa-check-circle me-2"></i><span
+						th:text="${message}"></span>
+					<button type="button" class="btn-close" data-bs-dismiss="alert"
+						aria-label="Close"></button>
+				</div>
+
+
+
 			</div>
-		
 
-		
-	</div>		
-	
-	
-</div>
+
+		</div>

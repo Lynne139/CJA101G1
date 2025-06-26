@@ -110,8 +110,27 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
     } 
-    
-    // === 餐廳管理 ===
+
+     
+
+	//===住宿訂單管理===
+	@GetMapping("/roomo_info")
+	public String roomoInfo(HttpServletRequest request,Model model) {
+
+		String mainFragment = "admin/fragments/roomo/roomoInfo";
+		model.addAttribute("mainFragment", mainFragment);
+		model.addAttribute("currentURI", request.getRequestURI());
+
+		// 複合查詢 + Datatables
+		Map<String, String[]> paramMap = request.getParameterMap();
+		List<RoomOrder> roomoList = roomOrderService.compositeQuery(paramMap);
+		model.addAttribute("roomoList", roomoList);
+
+        return "admin/index_admin";
+    }
+
+	// === 餐廳管理 ===
+
     @GetMapping("/resto_info")
     public String restoInfo(HttpServletRequest request,
     						HttpServletResponse response,
@@ -462,10 +481,10 @@ public class AdminIndexController {
     } 
     
     // === 優惠管理 ===
-    @GetMapping("/coupon1")
-    public String coupon1(HttpServletRequest request,Model model) {
+    @GetMapping("/coupon/select")
+    public String couponSelectPage(HttpServletRequest request,Model model) {
 
-    	String mainFragment = "admin/fragments/coupon/coupon1";
+    	String mainFragment = "admin/fragments/coupon/coupon-select-page";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 

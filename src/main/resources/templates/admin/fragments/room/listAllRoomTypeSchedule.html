@@ -5,37 +5,90 @@
 			<h2 class="page_title">房型預定表資訊</h2>
 		</div>
 	
+<!-- 複合查詢 -->
+		<form class="filter panel p-4 mb-4" method="get"
+			th:action="@{/admin/listAllRoomTypeSchedule}">
+			<div class="row g-3">
+
+
+
+				<div class="col-md-4">
+					<label for="qRoomType" class="form-label">房型</label> <select
+						id="qRoomType" name="roomTypeId" class="form-select">
+						<option value="">--- 所有房型 ---</option>
+						<option th:each="rt : ${roomTypeVOList}"
+							th:value="${rt.roomTypeId}" th:text="${rt.roomTypeName}"
+							th:selected="${roomTypeId} == ${rt.roomTypeId}"></option>
+					</select>
+				</div>
+
+				<div class="col-md-4">
+					<label for="minDate" class="form-label">日期（起）</label> <input
+						type="date" class="form-control" id="minDate" name="minDate"
+						th:value="${minDate}">
+				</div>
+				<div class="col-md-4">
+					<label for="maxDate" class="form-label">日期（迄）</label> <input
+						type="date" class="form-control" id="maxDate" name="maxDate"
+						th:value="${maxDate}">
+				</div>
+				
+				<div class="col-md-4">
+					<label for="minAmount" class="form-label">剩餘間數（最低）</label> <input
+						type="number" class="form-control" id="minAmount" name="minAmount"
+						th:value="${minAmount}">
+				</div>
+				<div class="col-md-4">
+					<label for="maxAmount" class="form-label">剩餘間數（最高）</label> <input
+						type="number" class="form-control" id="maxAmount" name="maxAmount"
+						th:value="${maxAmount}">
+				</div>
+
+				<div
+					class="search_btns col-md-4 d-flex justify-content-end align-items-end gap-2">
+					<button type="button" class="btn btn_secondary btn_search_clear">清空</button>
+					<button type="submit" class="btn btn_primary">搜尋</button>
+				</div>
+			</div>
+		</form>
 
 		
 		<!-- 資料表 -->
+		<div id="roomTypeScheduleResult" th:fragment="roomTypeScheduleResult">
+		<!-- 錯誤提示 -->
+<!-- 			<div th:if="${errorMessage}" class="alert alert-danger mb-3"> -->
+<!--                 <i class="fa-solid fa-circle-exclamation me-1"></i>[[${errorMessage}]] -->
+<!--             </div> -->
 		<div class="table panel p-4">
 			<div class="table_header d-flex justify-content-between align-items-end mb-4">
 		    	<h4 class="table_title">房型預定表列表</h4>
 		    	<!-- 新增房間 -->
-				<button class="btn btn_accent btn_add" id="btnAddResto">新增房型預定表</button>
+				<button class="btn btn_accent btn_add" id="btnAddRoomTypeSchedule">新增房型預定表</button>
 		  	</div>
 		  	<div class="table-responsive">
-		    	<table id="restoTable" class="table table-bordered align-top">
+		    	<table id="roomTypeScheduleTable" class="table table-bordered align-top">
 		      		<thead class="table_head align-top">
 		        		<tr>
-					        <th class="text-center">房型預定表編號</th>
-		          			<th class="text-center">房型編號</th>
+					        <th class="text-center">編號</th>
+		          			<th class="text-center">房型</th>
 					        <th class="text-center">房間數量</th>
-					        <th class="text-center">已訂房間數量</th>
+					        <th class="text-center">已訂間數</th>
+					        <th class="text-center">剩餘間數</th>
 					        <th class="text-center">日期</th>
-					        <th>操作</th>
+					        <th class="text-center">操作</th>
 		        		</tr>
 		      		</thead>
 		      		<tbody>
 		        		<tr th:each="roomTypeScheduleVO : ${roomTypeScheduleVOList}">
 						    <td class="text-center" th:text="${roomTypeScheduleVO.roomTypeScheduleId}"></td>
-						    <td class="text-center" th:text="${roomTypeScheduleVO.roomTypeVO.roomTypeId}"></td>
+						    <td class="text-center" th:text="${roomTypeScheduleVO.roomTypeVO.roomTypeName}"></td>
 						    <td class="text-center" th:text="${roomTypeScheduleVO.roomAmount}"></td>
 						    <td class="text-center" th:text="${roomTypeScheduleVO.roomRSVBooked}"></td>
+						    <td class="text-center" th:text="${roomTypeScheduleVO.roomAmount - roomTypeScheduleVO.roomRSVBooked}"></td>
 						    <td class="text-center" th:text="${roomTypeScheduleVO.roomOrderDate}"></td>
 						    <td>
 						        <div class="table_row_actions d-flex justify-content-center align-items-start">
-									<button class="btn_icon btn_view" th:data-id="${roomTypeScheduleVO.roomTypeScheduleId}"><i class="fas fa-eye"></i></button>
+<!-- 									<button class="btn_icon btn_view" th:data-id="${roomTypeScheduleVO.roomTypeScheduleId}"><i class="fas fa-eye"></i></button> -->
 						        	<button class="btn_icon btn_edit" th:data-id="${roomTypeScheduleVO.roomTypeScheduleId}"><i class="fas fa-edit"></i></button>
 <!-- 						        	<button class="btn_icon btn_delete" th:data-id="${roomVO.roomId}"><i class="fas fa-trash"></i></button> -->
 						        </div>
@@ -47,7 +100,7 @@
 		  	
 		  	
 			<!-- Modal -->
-		  	<div id="restoInfoModalContainer"></div>
+		  	<div id="roomTypeScheduleInfoModalContainer"></div>
 
 		
 			<!-- CRUD執行結果提示 -->

@@ -1,88 +1,165 @@
 <div th:fragment="roomTypeList">
 	<div class="main_roomType_info">
-	
+
 		<div class="mt-5 mb-5">
 			<h2 class="page_title">房型資訊</h2>
 		</div>
-	
 
-		
-		<!-- 資料表 -->
-		<div class="table panel p-4">
-			<div class="table_header d-flex justify-content-between align-items-end mb-4">
-		    	<h4 class="table_title">房型列表</h4>
-		    	<!-- 新增房型 -->
-				<button class="btn btn_accent btn_add" id="btnAddResto">新增房型</button>
-		  	</div>
-		  	<div class="table-responsive">
-		    	<table id="restoTable" class="table table-bordered align-top">
-		      		<thead class="table_head align-top">
-		        		<tr>
-					        <th class="text-center">房型編號</th>
-		          			<th>房型名稱</th>
-					        <th class="text-center">房型數量</th>
-					        <th>房型介紹</th>
-					        <th class="text-center">上下架狀態</th>
-					        <th>房型照片</th>
-					        <th class="text-center">房型價格</th>
-					        <th>操作</th>
-		        		</tr>
-		      		</thead>
-		      		<tbody>
-<<<<<<< HEAD
-		        		<tr th:each="roomTypeVO : ${roomTypeVOList}">
-=======
-		        		<tr th:each="roomTypeVO : ${restoList}">
->>>>>>> 874aaa6 (listAllRoomType update)
-						    <td class="text-center" th:text="${roomTypeVO.roomTypeId}"></td>
-						    <td th:text="${roomTypeVO.roomTypeName}"></td>
-						    <td class="text-center" th:text="${roomTypeVO.roomTypeAmount}"></td>
-						    <td th:text="${roomTypeVO.roomTypeContent}"></td>
-						    <td>
-<<<<<<< HEAD
-						        <span class="text-center" th:classappend="${roomTypeVO.roomSaleStatus == 0} ?  'badge bg-secondary':
-						        (${roomTypeVO.roomSaleStatus == 1} ? 'badge bg-success' :'badge bg-danger')"
-						            th:text="${roomTypeVO.roomSaleStatus == 0} ? '下架' :
-						            (${roomTypeVO.roomSaleStatus == 1} ? '上架' : '未知狀態')"></span>
-						    </td>
-						    <td>
-    							<img th:if="${base64Image}" th:src="'data:' + ${imageType} + ';base64,' + ${base64Image}" style="max-width: 200px;" />
-    							<span th:if="$${base64Image == ''}">&nbsp;</span> <!-- 當沒有圖片時顯示空白 -->
-=======
-						        <span class="text-center" th:classappend="${roomTypeVO.roomSaleStatus == 1} ? 'badge bg-success' : 'badge bg-secondary'"
-						            th:text="${roomTypeVO.roomSaleStatus == 1} ? '上架' : '下架'"></span>
-						    </td>
-						    <td th:if="${base64Image}">
-    							<img th:src="'data:' + ${imageType} + ';base64,' + ${base64Image}" style="max-width: 200px;" />
->>>>>>> 874aaa6 (listAllRoomType update)
-							</td>
-						    <td class="text-center" th:text="${roomTypeVO.roomTypePrice}"></td>
-						    <td>
-						        <div class="table_row_actions d-flex justify-content-center align-items-start">
-									<button class="btn_icon btn_view" th:data-id="${roomTypeVO.roomTypeId}"><i class="fas fa-eye"></i></button>
-						        	<button class="btn_icon btn_edit" th:data-id="${roomTypeVO.roomTypeId}"><i class="fas fa-edit"></i></button>
-						        	<button class="btn_icon btn_delete" th:data-id="${roomTypeVO.roomTypeId}"><i class="fas fa-trash"></i></button>
-						        </div>
-						    </td>
-						</tr>
-		      		</tbody>
-		    	</table>
-		  	</div>
-		  	
-		  	
-			<!-- Modal -->
-		  	<div id="restoInfoModalContainer"></div>
+		<!-- 複合查詢 -->
+		<form class="filter panel p-4 mb-4" method="get"
+			th:action="@{/admin/listAllRoomType}">
+			<div class="row g-3">
 
-		
-			<!-- CRUD執行結果提示 -->
-			<div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
-  				<i class="fa-solid fa-check-circle me-2"></i><span th:text="${message}"></span>
-  				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+				<div class="col-md-4">
+					<label for="qRoomTypeId" class="form-label">房型編號</label> <input
+						type="text" class="form-control" id="qRoomTypeId"
+						name="roomTypeId" th:value="${roomTypeId}">
+				</div>
+
+				<div class="col-md-4">
+					<label for="qRoomTypeName" class="form-label">房型名稱</label> <select
+						id="qRoomTypeName" name="roomTypeName" class="form-select">
+						<option value="">--- 所有房型 ---</option>
+						<option th:each="rt : ${roomTypeVOListData}"
+							th:value="${rt.roomTypeId}" th:text="${rt.roomTypeName}"
+							th:selected="${roomTypeId} == ${rt.roomTypeId}"></option>
+					</select>
+				</div>
+
+				<div class="col-md-4">
+					<label class="form-label">上下架狀態</label> <select class="form-select"
+						name="roomSaleStatus">
+						<option value="">--- 所有狀態 ---</option>
+						<option value="1" th:selected="${roomSaleStatus} == '1'">上架</option>
+						<option value="0" th:selected="${roomSaleStatus} == '0'">下架</option>
+					</select>
+				</div>
+
+				<div class="col-md-4">
+					<label for="minPrice" class="form-label">價格（最低）</label> <input
+						type="number" class="form-control" id="minPrice" name="minPrice"
+						th:value="${minPrice}">
+				</div>
+				<div class="col-md-4">
+					<label for="maxPrice" class="form-label">價格（最高）</label> <input
+						type="number" class="form-control" id="maxPrice" name="maxPrice"
+						th:value="${maxPrice}">
+				</div>
+				<div class="col-md-4">
+					<label for="roomTypeContent" class="form-label">介紹關鍵字</label> <input
+						type="text" class="form-control" id="roomTypeContent"
+						name="roomTypeContent" th:value="${roomTypeContent}">
+				</div>
+				
+				<div class="col-md-4">
+					<label for="minAmount" class="form-label">間數（最低）</label> <input
+						type="number" class="form-control" id="minAmount" name="minAmount"
+						th:value="${minAmount}">
+				</div>
+				<div class="col-md-4">
+					<label for="maxAmount" class="form-label">間數（最高）</label> <input
+						type="number" class="form-control" id="maxAmount" name="maxAmount"
+						th:value="${maxAmount}">
+				</div>
+
+				<div
+					class="search_btns col-md-4 d-flex justify-content-end align-items-end gap-2">
+					<button type="button" class="btn btn_secondary btn_search_clear">清空</button>
+					<button type="submit" class="btn btn_primary">搜尋</button>
+				</div>
 			</div>
-		
+		</form>
 
-		
-	</div>		
-	
-	
-</div>
+		<!-- 資料表 -->
+		<div id="roomTypeResult" th:fragment="roomTypeResult">
+			<!-- 錯誤提示 -->
+			<!-- 			<div th:if="${errorMessage}" class="alert alert-danger mb-3"> -->
+			<!--                 <i class="fa-solid fa-circle-exclamation me-1"></i>[[${errorMessage}]] -->
+			<!--             </div> -->
+			<div class="table panel p-4">
+				<div
+					class="table_header d-flex justify-content-between align-items-end mb-4">
+					<h4 class="table_title">房型列表</h4>
+					<!-- 新增房型 -->
+					<button class="btn btn_accent btn_add" id="btnAddRoomType">新增房型</button>
+				</div>
+				<div class="table-responsive">
+					<table id="roomTypeTable" class="table table-bordered align-top">
+						<thead class="table_head align-top">
+							<tr>
+								<th class="text-center">房型編號</th>
+								<th class="text-center">房型名稱</th>
+								<th class="text-center">房型數量</th>
+<!-- 								<th class="text-center">房型介紹</th> -->
+								<th class="text-center">上下架狀態</th>
+								<!-- 								<th class="text-center">房型照片</th> -->
+								<th class="text-center">房型價格</th>
+								<th class="text-center">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+
+							<tr th:each="roomTypeVO : ${roomTypeVOList}">
+								<td class="text-center" th:text="${roomTypeVO.roomTypeId}"></td>
+								<td class="text-center" th:text="${roomTypeVO.roomTypeName}"></td>
+								<td class="text-center" th:text="${roomTypeVO.roomTypeAmount}"></td>
+<!-- 								<td th:text="${roomTypeVO.roomTypeContent}"></td> -->
+								<td class="text-center"><span
+									th:class="${roomTypeVO.roomSaleStatus == 0} ?  'badge bg-secondary':
+						        (${roomTypeVO.roomSaleStatus == 1} ? 'badge bg-success' :'badge bg-danger')"
+									th:text="${roomTypeVO.roomSaleStatus == 0} ? '下架' :
+						            (${roomTypeVO.roomSaleStatus == 1} ? '上架' : '未知狀態')"></span>
+								</td>
+								<!-- 								<td><img th:if="${base64Image}" -->
+								<!-- 									th:src="'data:' + ${imageType} + ';base64,' + ${base64Image}" -->
+								<!-- 									style="max-width: 200px;" /> <span -->
+								<!-- 									th:if="$${base64Image == ''}">&nbsp;</span> 當沒有圖片時顯示空白 -->
+								<!-- 								</td> -->
+								<!-- 								<td th:if="${base64Image}"><img -->
+								<!-- 									th:src="'data:' + ${imageType} + ';base64,' + ${base64Image}" -->
+								<!-- 									style="max-width: 200px;" /></td> -->
+								<td class="text-center" th:text="${roomTypeVO.roomTypePrice}"></td>
+								<td>
+									<div
+										class="table_row_actions d-flex justify-content-center align-items-start">
+										<button class="btn_icon btn_view"
+											th:data-id="${roomTypeVO.roomTypeId}">
+											<i class="fas fa-eye"></i>
+										</button>
+										<button class="btn_icon btn_edit"
+											th:data-id="${roomTypeVO.roomTypeId}">
+											<i class="fas fa-edit"></i>
+										</button>
+										<!-- 										<button class="btn_icon btn_delete" -->
+										<!-- 											th:data-id="${roomTypeVO.roomTypeId}"> -->
+										<!-- 											<i class="fas fa-trash"></i> -->
+										<!-- 										</button> -->
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+
+				<!-- Modal -->
+				<div id="roomTypeInfoModalContainer"></div>
+
+
+				<!-- CRUD執行結果提示 -->
+				<div th:if="${message}"
+					class="alert alert-success alert-dismissible fade show"
+					role="alert">
+					<i class="fa-solid fa-check-circle me-2"></i><span
+						th:text="${message}"></span>
+					<button type="button" class="btn-close" data-bs-dismiss="alert"
+						aria-label="Close"></button>
+				</div>
+
+
+
+			</div>
+
+
+		</div>

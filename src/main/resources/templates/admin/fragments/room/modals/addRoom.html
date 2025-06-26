@@ -1,0 +1,112 @@
+<div th:fragment="addRoomModalContent">
+  <div class="modal fade no-transform" id="roomAddModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content rounded-4 p-4" style="background-color: var(--color-background);">
+
+        <div class="modal-header">
+          <h5 class="modal-title">新增房間</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <form id="roomAddForm" data-parsley-validate
+                th:object="${roomVO}"
+                th:action="@{/admin/listAllRoom/insert}"
+                method="post" enctype="multipart/form-data"
+                onsubmit="this.querySelector('button[type=submit]').disabled=true">
+
+            <div class="mb-3">
+              <label for="roomId" class="form-label">房間編號 <span class="text-danger">*</span><small class="text-muted">請填100~9999數字</small></label>
+              <input type="text" th:field="*{roomId}" id="roomId" class="form-control" >
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomId')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomId')}" th:text="${err}"></span>
+              </div>
+              <!-- ...existing code... -->
+<!-- <div class="text-danger" th:if="${typeError}"> -->
+<!--   <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i> -->
+<!--   <span th:text="${typeError}"></span> -->
+<!-- </div> -->
+<!-- ...existing code... -->
+            </div>
+
+<!--             <div class="mb-3"> -->
+<!--               <label for="roomGuestName" class="form-label">住客姓名<small class="text-muted">最多可50字</small></label> -->
+<!--               <input type="text" th:field="*{roomGuestName}" id="roomGuestName" class="form-control" maxlength="50"> -->
+<!--               錯誤提示 -->
+<!--               <div class="text-danger" th:if="${#fields.hasErrors('roomGuestName')}"> -->
+<!--                 <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i> -->
+<!--                 <span th:each="err : ${#fields.errors('roomGuestName')}" th:text="${err}"></span> -->
+<!--               </div> -->
+<!--             </div> -->
+
+            <div class="mb-3">
+              <label class="form-label">上下架狀態 <span class="text-danger">*</span></label>
+              <div>
+                <div class="form-check form-check-inline">
+                  <input type="radio" th:field="*{roomSaleStatus}" id="roomSaleStatus1" class="form-check-input" value="1" checked>
+                  <label for="roomSaleStatus1" class="form-check-label">上架</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input type="radio" th:field="*{roomSaleStatus}" id="roomSaleStatus0" class="form-check-input" value="0">
+                  <label for="roomSaleStatus0" class="form-check-label">下架</label>
+                </div>
+              </div>
+               <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomSaleStatus')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomSaleStatus')}" th:text="${err}"></span>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">房間狀態 <span class="text-danger">*</span></label>
+              <div>
+                <div class="form-check form-check-inline">
+                  <input type="radio" th:field="*{roomStatus}" id="roomStatus0" class="form-check-input" value="0" checked>
+                  <label for="roomStatus0" class="form-check-label">未入住</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input type="radio" th:field="*{roomStatus}" id="roomStatus1" class="form-check-input" value="1">
+                  <label for="roomStatus1" class="form-check-label">已入住</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input type="radio" th:field="*{roomStatus}" id="roomStatus2" class="form-check-input" value="2">
+                  <label for="roomStatus2" class="form-check-label">待清潔</label>
+                </div>
+              </div>
+               <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomStatus')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomStatus')}" th:text="${err}"></span>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="roomTypeSelect" class="form-label">房型</label>
+              <select id="roomTypeSelect" class="form-select" th:field="*{roomTypeVO.roomTypeId}">
+                <option th:each="roomType : ${roomTypeVOList}" 
+                        th:value="${roomType.roomTypeId}" 
+                        th:text="${roomType.roomTypeName}">
+                </option>
+              </select>
+               <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('roomTypeVO.roomTypeId')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('roomTypeVO.roomTypeId')}" th:text="${err}"></span>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn_secondary" data-bs-dismiss="modal">取消</button>
+              <button type="submit" id="btnSubmitAdd" class="btn btn_accent">新增</button>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

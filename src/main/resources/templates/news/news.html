@@ -4,27 +4,74 @@
     <title>媒體報導</title>
     <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+    <style>
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            margin-top: 32px;
+        }
+        .news-card {
+            display: flex;
+            background: #f6efe4;
+            border-radius: 16px;
+            border: 1.5px solid #e0d6c3;
+            box-shadow: 0 2px 12px #0001;
+            overflow: hidden;
+            align-items: center;
+            padding: 24px;
+            gap: 32px;
+        }
+        .news-img img {
+            width: 200px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1.5px solid #ccc;
+            box-shadow: 0 2px 8px #0001;
+            background: #f8f8f8;
+        }
+        .news-content {
+            flex: 1;
+        }
+        .news-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #5a3c1a;
+            margin-bottom: 10px;
+        }
+        .news-text {
+            color: #444;
+            margin-bottom: 14px;
+            font-size: 1.05rem;
+        }
+        .news-date {
+            font-size: 0.98rem;
+            color: #888;
+        }
+    </style>
 </head>
 <body>
     <div th:replace="fragments/header :: header"></div>
     <div class="container mt-4">
         <h2>媒體報導</h2>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>標題</th>
-                    <th>內容</th>
-                    <th>發布日期</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="news : ${newsList}">
-                    <td th:text="${news.title}"></td>
-                    <td th:text="${news.content}"></td>
-                    <td th:text="${news.publishedDate}"></td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="news-list">
+            <div class="news-card" th:each="news : ${newsList}">
+                <div class="news-img">
+                    <img th:if="${news.newsPhoto != null and #arrays.length(news.newsPhoto) > 0}"
+                         th:src="@{/admin/news/image/{id}(id=${news.newsNo})}"
+                         alt="媒體圖片"/>
+                    <img th:if="${news.newsPhoto == null or #arrays.length(news.newsPhoto) == 0}"
+                         th:src="@{/images/no_img.svg}"
+                         alt="無圖片"/>
+                </div>
+                <div class="news-content">
+                    <div class="news-title" th:text="${news.title}"></div>
+                    <div class="news-text" th:text="${news.content}"></div>
+                    <div class="news-date">發布日期：<span th:text="${news.publishedDate}"></span></div>
+                </div>
+            </div>
+        </div>
     </div>
     <div th:replace="fragments/footer :: footer"></div>
 </body>
