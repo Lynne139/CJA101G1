@@ -31,7 +31,7 @@ public class EmployeeFunctionAccessRight {
     public EmployeeFunctionAccessRight() {}
 
     public EmployeeFunctionAccessRight(Employee employee, FunctionAccessRight functionAccessRight, LocalDate startDate, LocalDate endDate, Boolean enabled) {
-        this.id = new EmployeeFunctionAccessRightId(employee.getEmployeeId(), functionAccessRight.getId());
+        this.id = new EmployeeFunctionAccessRightId(employee.getEmployeeId(), functionAccessRight.getAccessId());
         this.employee = employee;
         this.functionAccessRight = functionAccessRight;
         this.startDate = startDate;
