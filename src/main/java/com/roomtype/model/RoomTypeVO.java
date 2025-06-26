@@ -17,6 +17,8 @@ import jakarta.persistence.Transient;
 import jakarta.persistence.Version;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -36,7 +38,8 @@ public class RoomTypeVO implements java.io.Serializable {
 
 	@Column(name = "room_type_name")
 	@NotBlank(message = "房型名稱: 請勿空白", groups = Save.class)
-	@Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)]{2,50}$", message = "房型名稱: 只能是中、英文字母、數字和_ , 且長度必需在2到50之間", groups = Save.class)
+	@Pattern(regexp = "^$|[\\u4e00-\\u9fa5a-zA-Z0-9\\-, ]{2,50}$",
+		    message = "房型名稱: 只能是中、英文字母、數字、空白、逗號與 -，長度需在 2 到 50 字內", groups = Save.class)
 	private String roomTypeName;
 
 	@Transient
@@ -47,6 +50,9 @@ public class RoomTypeVO implements java.io.Serializable {
 	@NotBlank(message = "房型介紹: 請勿空白", groups = Save.class)
 	private String roomTypeContent;
 
+	@NotNull(message = "上下架狀態: 請選擇一個狀態", groups = Save.class)
+	@Min(value = 0, message = "")
+	@Max(value = 1, message = "")
 	@Column(name = "room_sale_status")
 	private Byte roomSaleStatus;
 
@@ -128,6 +134,7 @@ public class RoomTypeVO implements java.io.Serializable {
 
 
 	public RoomTypeVO() {
+		this.roomSaleStatus = 1; // 預設上架
 	}
 	public interface Save {}    // 只是個標記介面，驗證群組（Validation Groups）
 }

@@ -78,7 +78,9 @@ document.addEventListener("DOMContentLoaded", function() {
 	document.addEventListener("click", function(e) {
 		if (e.target.closest(".btn_view")) {
 			const btn = e.target.closest(".btn_view");
-			const restoId = btn.getAttribute("data-id");
+			const roomTypeId = btn.getAttribute("data-id");
+			// container 一定要在這裡重新抓一次
+			const container = document.getElementById("roomTypeInfoModalContainer");
 
 			if (!container) return;
 
@@ -105,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	//===== Modal Add + Edit 共用 =====
 	function initTinyMCE() {
 		tinymce.init({
-			selector: '#roomTypeContent',
+			selector: '#roomTypeContentEditor',
 			toolbar_mode: 'sliding',
 			language: 'zh_TW',
 			height: 300,
@@ -256,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 
 
-		fetch("/admin/listAllRoomType/add")
+		fetch("/admin/listAllRoomType/addRoomType")
 			.then(res => res.text())
 			.then(html => {
 				// container 一定要在這裡重新抓一次
@@ -316,10 +318,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			const form = document.getElementById("roomTypeAddForm");
 			const formData = new FormData(form);
+			// 防呆：TinyMCE 是否已經初始化？
+			const editor = tinymce.get("roomTypeContentEditor");
+			if (!editor) {
+				alert("TinyMCE 尚未初始化完成！");
+				removeBtnOverlay(submitBtn); // 不要卡住按鈕
+				return;
+			}
 
 			// 將 TinyMCE 的內容寫回 textarea
-			const content = tinymce.get("restoContent")?.getContent();
-			formData.set("restoContent", content || "");
+			const content = editor.getContent();
+			formData.set("roomTypeContent", content || "");
 
 			fetch("/admin/listAllRoomType/insert", {
 				method: "POST",
@@ -335,7 +344,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 						// 成功，清空並關閉modal
 						document.getElementById("roomTypeAddForm").reset();
-						tinymce.get("restoContent")?.setContent("");
+						editor.setContent("");
 						document.getElementById("imgPreview").src = "";
 
 						const modal = bootstrap.Modal.getInstance(document.getElementById("roomTypeAddModal"));
@@ -388,8 +397,8 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (!editBtn) return;
 		e.preventDefault();
 
-		const roomId = editBtn.getAttribute("data-id");
-		if (!roomId) return;
+		const roomTypeId = editBtn.getAttribute("data-id");
+		if (!roomTypeId) return;
 
 		//		// 關鍵：URL 要跟 Controller 的 GET Mapping 一致
 		//		  const res = await fetch(`/admin/listAllRoom/edit?roomId=${roomId}`);
@@ -412,15 +421,20 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			// 清掉 modal DOM
 			oldModalEl.remove();
+
+			// 同時清除 TinyMCE（保險起見）
+			if (window.tinymce && Array.isArray(tinymce.editors) && tinymce.editors.length > 0) {
+				await tinymce.remove();
+			}
 		}
 
 		// 2. 不論是否有舊 modal，都要 fetch 新的
-		fetch(`/admin/listAllRoom/edit?roomId=${roomId}`)
+		fetch(`/admin/listAllRoomType/edit?roomTypeId=${roomTypeId}`)
 			.then(res => res.text())
 			.then(html => {
 
 				// container 一定要在這裡重新抓一次
-				const container = document.getElementById("roomInfoModalContainer");
+				const container = document.getElementById("roomTypeInfoModalContainer");
 
 				if (!container) {
 					alert("找不到 modal 插入位置");
@@ -430,7 +444,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				container.innerHTML = html;
 
 				setTimeout(() => {
-					const modalEl = document.getElementById("roomEditModal");
+					const modalEl = document.getElementById("roomTypeEditModal");
 					if (!modalEl) {
 						alert("無法載入modal結構");
 						return;
@@ -439,8 +453,15 @@ document.addEventListener("DOMContentLoaded", function() {
 					const modal = new bootstrap.Modal(modalEl);
 					modal.show();
 					// Modal 顯示後，綁定表單驗證&送出功能
-					modalEl.addEventListener("shown.bs.modal", () => {
+					modalEl.addEventListener("shown.bs.modal", async () => {
+						await new Promise(resolve => setTimeout(resolve, 300)); // 等Bootstrap完成動畫
+						//保險先清掉原本的tinymce以及重新初始化以下功能
+						//必須這樣是因為每次modal開啟都是fetch後動態載入插入的新dom
 						//addEventListener()是一次性的綁定，綁舊dom上的會失效，必須重新綁新渲染的dom
+						//timymce須清除，因為舊的tinymce編輯器有實體殘留
+						tinymce.remove();
+						initTinyMCE();
+						bindImagePreview();
 						bindFormSubmitEdit();
 					});
 				}, 50);// 50ms 較安全
@@ -460,11 +481,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			showBtnOverlay(submitBtn); // 加入 loading 遮罩
 
-			const form = document.getElementById("roomEditForm");
+			const form = document.getElementById("roomTypeEditForm");
 			const formData = new FormData(form);
+			// 防呆：TinyMCE 是否已經初始化？
+			const editor = tinymce.get("roomTypeContentEditor");
+			if (!editor) {
+				alert("TinyMCE 尚未初始化完成！");
+				removeBtnOverlay(submitBtn); // 不要卡住按鈕
+				return;
+			}
 
+			// 有 editor 才取得內容
+			const content = editor.getContent();
+			formData.set("roomTypeContent", content || "");
 
-			fetch("/admin/listAllRoom/update", {
+			fetch("/admin/listAllRoomType/update", {
 				method: "POST",
 				body: formData
 			})
@@ -474,9 +505,11 @@ document.addEventListener("DOMContentLoaded", function() {
 						window.location.href = res.url; // 讓瀏覽器照後端redirect去重新載入頁面
 
 						// 成功，清空並關閉modal
-						document.getElementById("roomEditForm").reset();
+						document.getElementById("roomTypeEditForm").reset();
+						tinymce.get("roomTypeContent")?.setContent("");
+						document.getElementById("imgPreview").src = "";
 
-						const modal = bootstrap.Modal.getInstance(document.getElementById("roomEditModal"));
+						const modal = bootstrap.Modal.getInstance(document.getElementById("roomTypeEditModal"));
 						modal.hide();
 
 					} else {
@@ -493,7 +526,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					const doc = parser.parseFromString(html, "text/html");
 
 					const newBody = doc.querySelector(".modal-body");
-					const oldBody = document.querySelector("#roomEditModal .modal-body");
+					const oldBody = document.querySelector("#roomTypeEditModal .modal-body");
 
 					if (newBody && oldBody) {
 						oldBody.replaceWith(newBody);
@@ -501,6 +534,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 					// 模擬動畫結束後再初始化TinyMCE（因為modal沒重新開不能用shown.bs.modal來監聽）
 					setTimeout(() => {
+						tinymce.remove(); //清掉舊的
+						initTinyMCE();    //重新初始化
+						bindImagePreview();
 						bindFormSubmitEdit();
 					}, 300); // 與動畫一致延遲時間
 

@@ -104,33 +104,7 @@ public class RoomTypeService {
 		roomTypeRepository.save(newData);
 	}
 
-	// 這是處理圖片轉換為 Base64 字串的邏輯
-//	public String convertImageToBase64(byte[] imageBytes) {
-//		if (imageBytes != null) {
-//			return Base64.getEncoder().encodeToString(imageBytes);
-//		}
-//		return ""; // 如果圖片為 null，返回空字串
-//	}
-	
-//	public List<RoomTypeVO> getAll() {
-//        List<RoomTypeVO> roomTypeVOList = roomTypeRepository.findAll();  // 假設從資料庫取得所有資料
-//
-//        // 對每個 RoomTypeVO 處理圖片
-//        for (RoomTypeVO roomTypeVO : roomTypeVOList) {
-//            if (roomTypeVO.getRoomTypePic() != null) {
-//                // 轉換圖片為 Base64 並設定到 VO 上
-//                String base64Image = convertImageToBase64(roomTypeVO.getRoomTypePic());
-//                String imageType = "image/png"; // 假設圖片格式是 PNG，根據你的需求可以變動
-//                roomTypeVO.setBase64Image(base64Image);
-//                roomTypeVO.setImageType(imageType); // 假設 RoomTypeVO 有這個屬性來儲存圖片類型
-//            } else {
-//                roomTypeVO.setBase64Image(""); // 沒有圖片時設為空
-//                roomTypeVO.setImageType(""); // 沒有圖片時設為空
-//            }
-//        }
-//
-//        return roomTypeVOList;
-//    }
+
 	
 	// 複合查詢（Criteria 結構）
     public List<RoomTypeVO> compositeQuery(Map<String, String[]> map) {
@@ -172,10 +146,15 @@ public class RoomTypeService {
         }
     }
     
-    //計算房型數量
-    public void updateRoomTypeAmount(RoomTypeVO roomTypeVO) {
-        int amount = roomRepository.countByRoomTypeVOAndRoomSaleStatus(roomTypeVO, (byte)1);
-        roomTypeVO.setRoomTypeAmount(amount); // 這是 Transient 欄位，不會寫入 DB
+    //計算房型數量(view用)
+    public RoomTypeVO getRoomTypeAmountForOne(RoomTypeVO roomTypeVO) {
+        RoomTypeVO roomType = roomTypeRepository.findById(roomTypeVO.getRoomTypeId()).orElse(null);
+        if (roomType != null) {
+            int count = roomRepository.countByRoomTypeVOAndRoomSaleStatus(roomTypeVO, (byte) 1);
+            roomType.setRoomTypeAmount(count);
+        }
+        return roomType;
     }
+
 }	
 	
