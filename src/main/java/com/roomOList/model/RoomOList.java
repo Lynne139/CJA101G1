@@ -1,6 +1,7 @@
-package com.roomOrder.model;
+package com.roomOList.model;
 
 import com.room.model.RoomVO;
+import com.roomOrder.model.RoomOrder;
 import com.roomtype.model.RoomTypeVO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;

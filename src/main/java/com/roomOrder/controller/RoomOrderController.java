@@ -3,8 +3,11 @@ package com.roomOrder.controller;
 import com.member.model.MemberVO;
 //import com.room.model.RoomVO;
 import com.roomOrder.model.RoomOrder;
+import com.roomOList.model.RoomOList;
+import com.roomOList.model.RoomOListService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,9 @@ public class RoomOrderController {
 	RoomOrderService orderService;
 	@Autowired
 	private com.roomtype.model.RoomTypeService roomTypeService;
+
+	@Autowired
+	private RoomOListService roomOListService;
 
 	// ===== 新增 =====
 
@@ -67,6 +73,26 @@ public class RoomOrderController {
 			response.put("memberName", "查無此會員");
 		}
 		return response;
+	}
+
+	// 新增訂單（含多筆明細）
+	@PostMapping("/roomo_info/insert")
+	public String insertOrderAndDetails(
+			@ModelAttribute RoomOrder roomOrder,
+			@RequestParam("orderDetails") List<RoomOList> orderDetails,
+			Model model) {
+
+		// 1. 先存主表（訂單）
+		RoomOrder savedOrder = orderService.save(roomOrder);
+
+		// 2. 存明細表（訂單明細），每筆都設 roomOrder
+		for (RoomOList detail : orderDetails) {
+			detail.setRoomOrder(savedOrder);
+			roomOListService.save(detail);
+		}
+
+		// 3. 回到列表或顯示成功
+		return "redirect:/admin/roomo_info/list";
 	}
 
 }

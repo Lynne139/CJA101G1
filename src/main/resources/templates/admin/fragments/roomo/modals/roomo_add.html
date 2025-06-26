@@ -3,14 +3,13 @@
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content rounded-4 p-4" style="background-color: var(--color-background);">
         <div class="modal-header">
-          <h5 class="modal-title">新增房間訂單</h5>
+          <h5 class="modal-title">新增訂單</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="roomOrderAddForm" data-parsley-validate
-                th:object="${roomOrder}" th:action="@{/admin/roomorder/insert}"
-                method="post" enctype="multipart/form-data"
-                onsubmit="this.querySelector('button[type=submit]').disabled=true">
+          <form id="roomOrderAddForm" data-parsley-validate th:object="${roomOrder}"
+            th:action="@{/admin/roomorder/insert}" method="post" enctype="multipart/form-data"
+            onsubmit="this.querySelector('button[type=submit]').disabled=true">
 
             <!-- 會員編號 -->
             <div class="mb-3">
@@ -23,51 +22,15 @@
               <input type="text" id="memberName" class="form-control" readonly>
             </div>
 
-            <!-- RoomOList 相關欄位 -->
-            <div class="mb-3">
-              <label for="roomType" class="form-label">房型 <span class="text-danger">*</span></label>
-              <select id="roomType" name="roomTypeId" class="form-select" required>
-                <option value="">請選擇</option>
-                <option th:each="rt : ${roomTypeList}" th:value="${rt.roomTypeId}" th:text="${rt.roomTypeName}"></option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="room" class="form-label">房間</label>
-              <select id="room" name="roomId" class="form-select">
-                <option value="">請選擇</option>
-                <option th:each="r : ${roomList}" th:value="${r.roomId}" th:text="${r.roomId}"></option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="numberOfPeople" class="form-label">入住人數 <span class="text-danger">*</span></label>
-              <input type="number" id="numberOfPeople" name="numberOfPeople" class="form-control" min="1" required>
-            </div>
-            <div class="mb-3">
-              <label for="roomAmount" class="form-label">房間數量 <span class="text-danger">*</span></label>
-              <input type="number" id="roomAmount" name="roomAmount" class="form-control" min="1" required>
-            </div>
-            <div class="mb-3">
-              <label for="roomPrice" class="form-label">房間價格 <span class="text-danger">*</span></label>
-              <input type="number" id="roomPrice" name="roomPrice" class="form-control" min="0" required>
-            </div>
-            <div class="mb-3">
-              <label for="roomGuestName" class="form-label">入住人姓名</label>
-              <input type="text" id="roomGuestName" name="roomGuestName" class="form-control">
-            </div>
-            <div class="mb-3">
-              <label for="specialReq" class="form-label">特殊需求</label>
-              <input type="text" id="specialReq" name="specialReq" class="form-control" maxlength="50">
-            </div>
-
             <!-- 訂單狀態 -->
-            <div class="mb-3">
+            <!-- <div class="mb-3">
               <label class="form-label">訂單狀態 <span class="text-danger">*</span></label>
               <select th:field="*{orderStatus}" class="form-select" required>
                 <option value="1">成立</option>
                 <option value="2">完成</option>
                 <option value="0">取消</option>
               </select>
-            </div>
+            </div>  -->
 
             <!-- 入住日期 -->
             <div class="mb-3">
@@ -86,6 +49,59 @@
                 <span th:each="err : ${#fields.errors('checkOutDate')}" th:text="${err}"></span>
               </div>
             </div>
+
+            <!-- RoomOList 明細動態區塊 -->
+            <div id="orderDetailList">
+              <div class="order-detail-item mb-3 border rounded p-3">
+                <div class="row g-2 align-items-end" style="margin-bottom: 10px;">
+                  <div class="col-md-3">
+                    <!-- 此處之後要改抓房型預定表 -->
+                    <label class="form-label">房型 <span class="text-danger">*</span></label>
+                    <select name="orderDetails[0].roomTypeId" class="form-select roomTypeSelect" required>
+                      <option value="">請選擇</option>
+                      <option th:each="rt : ${roomTypeList}" th:value="${rt.roomTypeId}" th:text="${rt.roomTypeName}"
+                        th:attr="data-price=${rt.roomTypePrice}">
+                      </option>
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">房間數量 <span class="text-danger">*</span></label>
+                    <input type="number" name="orderDetails[0].roomAmount" class="form-control roomAmountInput" min="1"
+                      value="1" required>
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">房間價格 <span class="text-danger">*</span></label>
+                    <input type="number" name="orderDetails[0].roomPrice" class="form-control roomPriceInput" min="0"
+                      required readonly>
+                  </div>
+                </div>
+                <div class="row g-2 align-items-end">
+                  <div class="col-md-3">
+                    <label class="form-label" style="padding: 5px;">住客代表姓名</label>
+                    <input type="text" name="orderDetails[0].roomGuestName" class="form-control">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label" style="padding: 5px;">入住人數 <span class="text-danger">*</span></label>
+                    <input type="number" name="orderDetails[0].numberOfPeople" class="form-control" min="1"
+                      style="width:100px" required>
+                  </div>
+                </div>
+                <div class="row mt-2">
+                  <div class="col">
+                    <label class="form-label">特殊需求</label>
+                    <input type="text" name="orderDetails[0].specialReq" class="form-control" maxlength="50">
+                  </div>
+                </div>
+                <div class="text-end mt-2">
+                  <button type="button" class="btn btn-danger remove-detail-btn">移除</button>
+                </div>
+
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary mb-3" id="btnAddDetail">加入其他房型...</button>
+
+
 
             <!-- 折價券選擇 -->
             <div class="mb-3">
@@ -124,10 +140,10 @@
             <div class="mb-3">
               <label for="employee" class="form-label">最後更新人</label>
               <select th:field="*{employee}" id="employee" class="form-select">
-                <option th:each="emp : ${employeeList}" th:value="${emp.employeeId}" th:text="${emp.employeeName}"></option>
+                <option th:each="emp : ${employeeList}" th:value="${emp.employeeId}" th:text="${emp.employeeName}">
+                </option>
               </select>
             </div>
-
             <div class="modal-footer">
               <button type="button" class="btn btn_secondary" data-bs-dismiss="modal">取消</button>
               <button type="submit" id="btnSubmitAdd" class="btn btn_accent">新增</button>

@@ -275,6 +275,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     bindFormSubmitAdd();
                     bindMemberIdAutoFill();
                     bindRoomTypeRoomCascade();
+                    bindRoomDetailPriceAutoFill();
 
                 });
 
@@ -557,6 +558,26 @@ function bindRoomTypeRoomCascade() {
                     roomSelect.appendChild(opt);
                 });
             });
+    });
+}
+
+function bindRoomDetailPriceAutoFill() {
+    // 綁定所有 order-detail-item 的房型與房間數量
+    document.getElementById("orderDetailList").addEventListener("change", function (e) {
+        // 房型選擇時
+        if (e.target.classList.contains("roomTypeSelect")) {
+            const item = e.target.closest(".order-detail-item");
+            const price = e.target.selectedOptions[0].getAttribute("data-price") || 0;
+            const amountInput = item.querySelector(".roomAmountInput");
+            const priceInput = item.querySelector(".roomPriceInput");
+            priceInput.value = price * (amountInput.value || 1);
+        }
+        // 房間數量變動時
+        if (e.target.classList.contains("roomAmountInput")) {
+            const item = e.target.closest(".order-detail-item");
+            const price = item.querySelector(".roomTypeSelect").selectedOptions[0].getAttribute("data-price") || 0;
+            item.querySelector(".roomPriceInput").value = price * (e.target.value || 1);
+        }
     });
 }
 
