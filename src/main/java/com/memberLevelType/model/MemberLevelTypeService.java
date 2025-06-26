@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service("memberLevelTypeService")
 public class MemberLevelTypeService {
-
+ 
 	@Autowired
     MemberLevelTypeRepository repository; 
    
