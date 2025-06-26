@@ -216,7 +216,7 @@ INSERT INTO FUNCTION_ACCESS_RIGHT (ACCESS_NAME) VALUES
 );
 
 INSERT INTO Role_access_right (Role_id, Access_id) VALUES
-(1, 1), (1, 2), (1, 3);
+(1, 1), (1, 2), (1, 3),(1, 4),(1, 5),(1, 6),(1, 7),(1, 8);
 
 
 -- 商品類別 

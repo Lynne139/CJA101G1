@@ -4,9 +4,15 @@ import com.employee.entity.Employee;
 import com.employee.entity.EmployeeDTO;
 import com.employee.entity.Role;
 import com.employee.entity.JobTitle;
+import com.employee.entity.EmployeeFunctionAccessRight;
+import com.employee.entity.FunctionAccessRight;
+import com.employee.entity.RoleAccessRight;
 import com.employee.repository.EmployeeRepository;
 import com.employee.repository.RoleRepository;
 import com.employee.repository.JobTitleRepository;
+import com.employee.repository.EmployeeFunctionAccessRightRepository;
+import com.employee.repository.FunctionAccessRightRepository;
+import com.employee.repository.RoleAccessRightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +32,15 @@ public class EmployeeService {
     
     @Autowired
     private JobTitleRepository jobTitleRepository;
+
+    @Autowired
+    private EmployeeFunctionAccessRightRepository employeeFunctionAccessRightRepository;
+
+    @Autowired
+    private FunctionAccessRightRepository functionAccessRightRepository;
+
+    @Autowired
+    private RoleAccessRightRepository roleAccessRightRepository;
 
     // 取得所有員工（包含部門名稱和職稱名稱）
     public List<EmployeeDTO> getAllEmployeesWithDetails() {
@@ -146,5 +161,84 @@ public class EmployeeService {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found with ID: " + employeeId));
         return employee.getEmployeePhoto();
+    }
+
+    // 取得員工的所有權限（改為從角色權限表查）
+    public List<FunctionAccessRight> getEmployeePermissions(Integer employeeId) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+        Integer roleId = employee.getRoleId();
+        List<RoleAccessRight> roleAccessRights = roleAccessRightRepository.findByIdRoleId(roleId);
+        List<Integer> accessIds = roleAccessRights.stream()
+                .map(RoleAccessRight::getAccessId)
+                .toList();
+        return functionAccessRightRepository.findAllById(accessIds);
+    }
+
+    // 檢查員工是否有特定權限
+    public boolean hasPermission(Integer employeeId, String permissionName) {
+        return getEmployeePermissions(employeeId)
+                .stream()
+                .anyMatch(access -> access.getAccessName().equals(permissionName));
+    }
+
+    // 檢查員工是否有任一權限
+    public boolean hasAnyPermission(Integer employeeId, List<String> permissionNames) {
+        return getEmployeePermissions(employeeId)
+                .stream()
+                .anyMatch(access -> permissionNames.contains(access.getAccessName()));
+    }
+
+    // 取得所有權限列表
+    public List<FunctionAccessRight> getAllPermissions() {
+        return functionAccessRightRepository.findAll();
+    }
+
+    // 根據員工ID取得權限名稱列表
+    public List<String> getEmployeePermissionNames(Integer employeeId) {
+        return getEmployeePermissions(employeeId)
+                .stream()
+                .map(FunctionAccessRight::getAccessName)
+                .toList();
+    }
+
+    // 新增權限
+    public FunctionAccessRight addPermission(FunctionAccessRight permission) {
+        return functionAccessRightRepository.save(permission);
+    }
+
+    // 刪除權限
+    public void deletePermission(Integer permissionId) {
+        functionAccessRightRepository.deleteById(permissionId);
+    }
+
+    // 更新員工權限
+    public void updateEmployeePermissions(Integer employeeId, List<String> permissionNames) {
+        // 先刪除現有權限
+        List<EmployeeFunctionAccessRight> existingPermissions = 
+            employeeFunctionAccessRightRepository.findByEmployeeEmployeeIdAndEnabledTrue(employeeId);
+        
+        for (EmployeeFunctionAccessRight existing : existingPermissions) {
+            existing.setEnabled(false);
+            employeeFunctionAccessRightRepository.save(existing);
+        }
+        
+        // 添加新權限
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+        
+        for (String permissionName : permissionNames) {
+            FunctionAccessRight permission = functionAccessRightRepository.findByAccessName(permissionName);
+            if (permission != null) {
+                EmployeeFunctionAccessRight newAccess = new EmployeeFunctionAccessRight(
+                    employee, permission, java.time.LocalDate.now(), null, true);
+                employeeFunctionAccessRightRepository.save(newAccess);
+            }
+        }
+    }
+
+    // 檢查員工是否有管理員權限
+    public boolean isAdmin(Integer employeeId) {
+        return hasPermission(employeeId, "ADMIN");
     }
 } 

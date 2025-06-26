@@ -35,14 +35,15 @@
 			    </div>
 			
 			    <div class="admin_block d-flex justify-content-between align-items-center p-4">
-			        <span class="">管理員：Admin</span>
-			        <a href="#" class="btn btn_logout">登出</a>
+			        <span class="">管理員：<span th:text="${session.adminEmployeeName}">Admin</span></span>
+			        <a th:href="@{/admin/logout}" class="btn btn_logout">登出</a>
 			    </div>
 			
 			    <nav class="sidebar_nav mt-4">
 					<!-- 會員管理 -->
 			    	<div class="sidebar_section"
-						th:classappend="${currentURI.startsWith('/admin/member')} ? '-active'">
+						th:classappend="${currentURI.startsWith('/admin/member')} ? '-active'"
+						th:if="${adminPermissions.contains('會員管理權限')}">
 			       		<a class="sidebar_link">
 			        		<i class="fa-solid fa-user"></i> 會員管理
 			      		</a>
@@ -58,7 +59,8 @@
 			
 					<!-- 員工管理 -->
 			    	<div class="sidebar_section"
-			    		th:classappend="${currentURI.startsWith('/admin/staff')} ? '-active'">
+			    		th:classappend="${currentURI.startsWith('/admin/staff')} ? '-active'"
+			    		th:if="${adminPermissions.contains('員工管理權限')}">
 			     		<a class="sidebar_link">
 			        		<i class="fa-solid fa-user-tie"></i> 員工管理
 			      		</a>
@@ -73,7 +75,8 @@
 			
 					<!-- 住宿管理 -->
 			    	<div class="sidebar_section"
-			    		th:classappend="${currentURI.startsWith('/admin/room')} ? '-active'">
+			    		th:classappend="${currentURI.startsWith('/admin/room')} ? '-active'"
+			    		th:if="${adminPermissions.contains('住宿管理權限')}">
 			      		<a class="sidebar_link">
 			        		<i class="fa-solid fa-bed"></i> 住宿管理
 			      		</a>
@@ -88,7 +91,8 @@
 			
 					<!-- 餐廳管理 -->
 			    	<div class="sidebar_section"
-			    		th:classappend="${currentURI.startsWith('/admin/resto')} ? '-active'">
+			    		th:classappend="${currentURI.startsWith('/admin/resto')} ? '-active'"
+			    		th:if="${adminPermissions.contains('餐廳管理權限')}">
 			      		<a class="sidebar_link">
 			        		<i class="fa-solid fa-utensils"></i> 餐廳管理
 			      		</a>
@@ -103,7 +107,8 @@
 			
 					<!-- 商店管理 -->
 				    <div class="sidebar_section"
-				    	th:classappend="${currentURI.startsWith('/admin/shop')} ? '-active'">
+				    	th:classappend="${currentURI.startsWith('/admin/shop')} ? '-active'"
+				    	th:if="${adminPermissions.contains('商店管理權限')}">
 						<a class="sidebar_link">
 					    	<i class="fa-solid fa-bag-shopping"></i> 商店管理
 					    </a>
@@ -121,7 +126,8 @@
 			
 					<!-- 優惠管理 -->
 				    <div class="sidebar_section"
-				    	th:classappend="${currentURI.startsWith('/admin/coupon')} ? '-active'">
+				    	th:classappend="${currentURI.startsWith('/admin/coupon')} ? '-active'"
+				    	th:if="${adminPermissions.contains('優惠管理權限')}">
 			      		<a class="sidebar_link">
 			        		<i class="fa-solid fa-ticket"></i> 優惠管理
 			      		</a>
@@ -134,7 +140,8 @@
 			
 					<!-- 客服管理 -->
 				    <div class="sidebar_section"
-				    	th:classappend="${currentURI.startsWith('/admin/cs')} ? '-active'">
+				    	th:classappend="${currentURI.startsWith('/admin/cs')} ? '-active'"
+				    	th:if="${adminPermissions.contains('客服管理權限')}">
 			      		<a class="sidebar_link">
 			        		<i class="fa-solid fa-bell-concierge"></i> 客服管理
 			      		</a>
@@ -147,7 +154,8 @@
 			
 					<!-- 消息管理 -->
 				    <div class="sidebar_section"
-				    	th:classappend="${currentURI.startsWith('/admin/news')} ? '-active'">
+				    	th:classappend="${currentURI.startsWith('/admin/news')} ? '-active'"
+				    	th:if="${adminPermissions.contains('消息管理權限')}">
 		     	  		<a class="sidebar_link">
 		            		<i class="fa-solid fa-bullhorn"></i> 消息管理
 		          		</a>

@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FunctionAccessRightRepository extends JpaRepository<FunctionAccessRight, Integer> {
+    
+    // 根據權限名稱查詢
+    FunctionAccessRight findByAccessName(String accessName);
 } 

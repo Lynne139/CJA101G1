@@ -10,41 +10,43 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.member.model.MemberVO;
-import com.coupon.entity.Coupon;
-import com.coupon.service.CouponService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.member.model.MemberService;
+import com.resto.model.RestoService;
+import com.resto.model.RestoVO;
 import com.prod.model.ProdService;
-import com.prodCart.model.ProdCartService;
-import com.prodCart.model.ProdCartVO;
 import com.prodCate.model.ProdCateService;
 import com.prodCate.model.ProdCateVO;
 import com.prodPhoto.model.ProdPhotoService;
 import com.prodPhoto.model.ProdPhotoVO;
-import com.resto.model.RestoService;
-import com.resto.model.RestoVO;
-import com.room.model.RoomService;
-import com.room.model.RoomVO;
-import com.roomOrder.model.RoomOrder;
-import com.roomOrder.model.RoomOrderService;
-import com.roomtype.model.RoomTypeService;
-import com.roomtype.model.RoomTypeVO;
-import com.roomtypeschedule.model.RoomTypeScheduleService;
-import com.roomtypeschedule.model.RoomTypeScheduleVO;
-import com.news.service.HotNewsService;
-import com.news.entity.HotNews;
-import com.news.entity.PromotionNews;
-import com.news.service.PromotionNewsService;
-import com.news.service.NewsService;
-import com.news.entity.News;
+import com.prodCart.model.ProdCartService;
+import com.prodCart.model.ProdCartVO;
 import com.shopOrd.model.ShopOrdService;
 import com.shopOrd.model.ShopOrdVO;
 import com.shopOrdDet.model.ShopOrdDetService;
+import com.coupon.service.CouponService;
+import com.coupon.entity.Coupon;
+import com.roomtype.model.RoomTypeService;
+import com.room.model.RoomService;
+import com.roomtypeschedule.model.RoomTypeScheduleService;
+import com.roomOrder.model.RoomOrderService;
+import com.roomOrder.model.RoomOrder;
+import com.news.service.HotNewsService;
+import com.news.service.PromotionNewsService;
+import com.news.service.NewsService;
+import com.news.entity.HotNews;
+import com.news.entity.News;
+import com.news.entity.PromotionNews;
+
+import com.employee.service.EmployeeService;
+import com.employee.entity.Employee;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
- 
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 @RequestMapping("/admin")
 public class AdminIndexController {
@@ -98,6 +100,9 @@ public class AdminIndexController {
     @Autowired
     private NewsService newsService;
 
+    @Autowired
+    private EmployeeService employeeService;
+
 	// === 後台首頁 ===
     @GetMapping("")
     public String index(HttpServletRequest request,Model model) {
@@ -105,6 +110,7 @@ public class AdminIndexController {
     	String mainFragment = "admin/fragments/default";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
 
     	return "admin/index_admin";
     } 
@@ -116,6 +122,7 @@ public class AdminIndexController {
     	String mainFragment = "admin/fragments/member/member1";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
     	
     	return "admin/index_admin";
     } 
@@ -125,6 +132,7 @@ public class AdminIndexController {
     	String mainFragment = "admin/fragments/member/listAllMember";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
     	
     	List<MemberVO> list = memberSvc.getAll();
         model.addAttribute("memberListData", list);
@@ -134,10 +142,11 @@ public class AdminIndexController {
     
     // === 新增會員 ===
     @GetMapping("/addMember")
-    public String addMember(HttpServletRequest request,Model model) {
+    public String addMember(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/member/addMember";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
     	     
     	return "admin/index_admin";
     } 
@@ -145,42 +154,42 @@ public class AdminIndexController {
     // === 員工管理 ===
     // === 新增 ===
     @GetMapping("/staff1")
-    public String staff1(HttpServletRequest request,Model model) {
-
+    public String staff1(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/staff/staff1";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
 
     	return "admin/index_admin";
     } 
     // === 查詢 ===
     @GetMapping("/staff2")
-    public String staff2(HttpServletRequest request,Model model) {
-
+    public String staff2(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/staff/staff2";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
 
     	return "admin/index_admin";
     }
     // === 權限管理 ===
     @GetMapping("/staff3")
-    public String staff3(HttpServletRequest request,Model model) {
-
+    public String staff3(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/staff/staff3";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
 
     	return "admin/index_admin";
     }
     
     // === 房間管理 ===
     @GetMapping("/room1")
-    public String room1(HttpServletRequest request,Model model) {
-
+    public String room1(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/room/room1";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
 
     	return "admin/index_admin";
     } 
@@ -188,11 +197,11 @@ public class AdminIndexController {
 
 	//===住宿訂單管理===
 	@GetMapping("/roomo_info")
-	public String roomoInfo(HttpServletRequest request,Model model) {
-
+	public String roomoInfo(HttpServletRequest request, Model model) {
 		String mainFragment = "admin/fragments/roomo/roomoInfo";
 		model.addAttribute("mainFragment", mainFragment);
 		model.addAttribute("currentURI", request.getRequestURI());
+		addPermissionInfo(request, model);
 
 		// 複合查詢 + Datatables
 		Map<String, String[]> paramMap = request.getParameterMap();
@@ -207,10 +216,10 @@ public class AdminIndexController {
     public String restoInfo(HttpServletRequest request,
     						HttpServletResponse response,
     						Model model) {
-
     	String mainFragment = "admin/fragments/resto/restoInfo";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
     	
     	// 複合查詢 + Datatables
     	Map<String, String[]> paramMap = request.getParameterMap();
@@ -225,20 +234,20 @@ public class AdminIndexController {
     	return "admin/index_admin";
     } 
     @GetMapping("/resto_timeslot")
-    public String restoTimeslot(HttpServletRequest request,Model model) {
-    	
+    public String restoTimeslot(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/resto/restoTimeslot";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
 
     	return "admin/index_admin";
     } 
     @GetMapping("/resto_order")
-    public String restoOrder(HttpServletRequest request,Model model) {
-    	
+    public String restoOrder(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/resto/restoOrder";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
 
     	return "admin/index_admin";
     } 
@@ -246,11 +255,11 @@ public class AdminIndexController {
     // === 商店管理 ===
 
     @GetMapping("/prod/select_page")
-    public String prod(HttpServletRequest request,Model model) {
-
+    public String prod(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/shop/prod/select_page";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
     	
     	// 添加商品資料到 model 中
     	List<com.prod.model.ProdVO> list = prodSvc.getAll();
@@ -279,15 +288,15 @@ public class AdminIndexController {
     			model.addAttribute("errorMessage", "商品編號格式錯誤");
     		}
     	}
-
+    	
     	return "admin/index_admin";
     } 
     @GetMapping("/prodCate/select_page")
-    public String prodCateSelectPage(HttpServletRequest request,Model model) {
-
+    public String prodCateSelectPage(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/shop/prodCate/select_page";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
     	
     	// 添加商品分類資料到 model 中
     	List<com.prodCate.model.ProdCateVO> list = prodCateSvc.getAll();
@@ -319,10 +328,10 @@ public class AdminIndexController {
     
     @GetMapping("/prodPhoto/select_page")
 	public String prodPhotoselectPage(HttpServletRequest request, Model model) {
-
 		String mainFragment = "admin/fragments/shop/prodPhoto/select_page";
 		model.addAttribute("mainFragment", mainFragment);
 		model.addAttribute("currentURI", request.getRequestURI());
+		addPermissionInfo(request, model);
 		
 		// 添加商品照片資料到 model 中
 		List<com.prodPhoto.model.ProdPhotoVO> list = prodPhotoSvc.getAll();
@@ -341,7 +350,7 @@ public class AdminIndexController {
 		String prodPhotoId = request.getParameter("prodPhotoId");
 		if (prodPhotoId != null && !prodPhotoId.isEmpty()) {
 			try {
-				ProdPhotoVO prodPhotoVO = prodPhotoSvc.getOneProdPhoto(Integer.valueOf(prodPhotoId));
+				com.prodPhoto.model.ProdPhotoVO prodPhotoVO = prodPhotoSvc.getOneProdPhoto(Integer.valueOf(prodPhotoId));
 				if (prodPhotoVO != null) {
 					model.addAttribute("prodPhotoVO", prodPhotoVO);
 				} else {
@@ -353,14 +362,14 @@ public class AdminIndexController {
 		}
 		
 		return "admin/index_admin";
-	}
+    }
     
     @GetMapping("/prodCart/select_page")
-    public String prodCartselectPage(HttpServletRequest request,Model model) {
-
+    public String prodCartselectPage(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/shop/prodCart/select_page";
 		model.addAttribute("mainFragment", mainFragment);
 		model.addAttribute("currentURI", request.getRequestURI());
+		addPermissionInfo(request, model);
 		
 		// 添加購物車資料到 model 中
 		List<ProdCartVO> list = prodCartSvc.getAll();
@@ -416,11 +425,11 @@ public class AdminIndexController {
     } 
     
     @GetMapping("/shopOrd/select_page")
-    public String shop5(HttpServletRequest request,Model model) {
-
+    public String shop5(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/shop/shopOrd/select_page";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
     	
     	// 添加商品資料到 model 中
     	List<com.shopOrd.model.ShopOrdVO> list = shopOrdSvc.getAll();
@@ -472,16 +481,16 @@ public class AdminIndexController {
     	}
 
     	return "admin/index_admin";
-    } 
+    }
     
     @GetMapping("/shopOrdDet/select_page")
-    public String shop6(HttpServletRequest request,Model model) {
-
+    public String shop6(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/shop/shopOrdDet/select_page";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
     	
-    	// 添加訂單明細資料到 model 中
+    	// 添加商品訂單明細資料到 model 中
     	List<com.shopOrdDet.model.ShopOrdDetVO> list = shopOrdDetSvc.getAll();
     	model.addAttribute("shopOrdDetListData", list);
     	
@@ -489,7 +498,7 @@ public class AdminIndexController {
     	List<com.prod.model.ProdVO> prodList = prodSvc.getAll();
     	model.addAttribute("prodListData", prodList);
     	
-    	// 添加訂單資料到 model 中
+    	// 添加商城訂單資料到 model 中
     	List<com.shopOrd.model.ShopOrdVO> shopOrdList = shopOrdSvc.getAll();
     	model.addAttribute("shopOrdListData", shopOrdList);
     	
@@ -516,63 +525,100 @@ public class AdminIndexController {
     	}
 
     	return "admin/index_admin";
-    } 
+    }
     
     // === 優惠管理 ===
     @GetMapping("/coupon/select")
-    public String couponSelectPage(HttpServletRequest request,Model model) {
-
-    	String mainFragment = "admin/fragments/coupon/coupon-select-page";
+    public String couponSelectPage(HttpServletRequest request, Model model) {
+    	String mainFragment = "admin/fragments/coupon/coupon_select";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
-
+    	addPermissionInfo(request, model);
+    	
     	return "admin/index_admin";
-    } 
+    }
     
     // === 客服管理 ===
     @GetMapping("/cs1")
-    public String cs1(HttpServletRequest request,Model model) {
-
+    public String cs1(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/cs/cs1";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
-
+    	addPermissionInfo(request, model);
+    	
     	return "admin/index_admin";
-    } 
+    }
     
     // === 消息管理 ===
     // === 最新消息 ===
     @GetMapping("/news1")
-    public String news1(HttpServletRequest request,Model model) {
-
+    public String news1(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/news/news1";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
-        // 查詢所有HotNews
-        List<HotNews> hotNewsList = hotNewsService.findAll();
-        model.addAttribute("hotNewsList", hotNewsList);
+    	addPermissionInfo(request, model);
+    	
+    	// 查詢最新消息資料
+    	List<HotNews> hotNewsList = hotNewsService.findAll();
+    	model.addAttribute("hotNewsList", hotNewsList);
+    	
     	return "admin/index_admin";
-    } 
+    }
+    
     // === 媒體報導 ===
     @GetMapping("/news2")
-    public String news2(HttpServletRequest request,Model model) {
-        String mainFragment = "admin/fragments/news/news2";
-        model.addAttribute("mainFragment", mainFragment);
-        model.addAttribute("currentURI", request.getRequestURI());
-        // 查詢所有PromotionNews
-        List<PromotionNews> promotionNewsList = promotionNewsService.findAll();
-        model.addAttribute("promotionNewsList", promotionNewsList);
-        return "admin/index_admin";
-    } 
+    public String news2(HttpServletRequest request, Model model) {
+    	String mainFragment = "admin/fragments/news/news2";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
+    	
+    	// 查詢活動通知資料
+    	List<PromotionNews> promotionNewsList = promotionNewsService.findAll();
+    	model.addAttribute("promotionNewsList", promotionNewsList);
+    	
+    	return "admin/index_admin";
+    }
+    
     // === 活動通知 ===
     @GetMapping("/news3")
-    public String news3(HttpServletRequest request,Model model) {
-        String mainFragment = "admin/fragments/news/news3";
-        model.addAttribute("mainFragment", mainFragment);
-        model.addAttribute("currentURI", request.getRequestURI());
-        // 查詢所有News
-        List<News> newsList = newsService.findAll();
-        model.addAttribute("newsList", newsList);
-        return "admin/index_admin";
-    } 
+    public String news3(HttpServletRequest request, Model model) {
+    	String mainFragment = "admin/fragments/news/news3";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	addPermissionInfo(request, model);
+    	
+    	// 查詢媒體報導資料
+    	List<News> newsList = newsService.findAll();
+    	model.addAttribute("newsList", newsList);
+    	
+    	return "admin/index_admin";
+    }
+
+    // 添加權限資訊到model的輔助方法
+    private void addPermissionInfo(HttpServletRequest request, Model model) {
+        // 暫時給所有權限，方便開發測試
+        List<String> allPermissions = List.of(
+            "會員管理權限",
+            "員工管理權限", 
+            "住宿管理權限",
+            "餐廳管理權限",
+            "商店管理權限",
+            "優惠管理權限",
+            "客服管理權限",
+            "消息管理權限"
+        );
+        model.addAttribute("adminPermissions", allPermissions);
+        
+        /*
+        HttpSession session = request.getSession(false);
+        if (session != null && session.getAttribute("adminEmployee") != null) {
+            Employee employee = (Employee) session.getAttribute("adminEmployee");
+            List<String> permissions = employeeService.getEmployeePermissionNames(employee.getEmployeeId());
+            model.addAttribute("adminPermissions", permissions);
+        } else {
+            model.addAttribute("adminPermissions", new ArrayList<>());
+        }
+        */
+    }
 }
