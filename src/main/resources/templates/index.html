@@ -32,8 +32,19 @@
 
     <!-- 疊加 LOGO -->
     <img th:src="@{/images/logo/logo_hp.png}" alt="浮出的logo" class="logo-overlay">
+  
+  	<!-- 會員模組內容區塊（登入/會員中心） -->
+	<main class="container my-5">
+	  <div th:if="${mainFragment != null}" th:replace="~{${mainFragment} :: ${fragmentName}}"></div>
+	</main>
+  
   </section>
 
+
+	<main>
+	  <div th:replace="~{${mainFragment} :: memberCenterFragment}"></div>
+	</main>
+	
   <!-- 子選單 Navbar -->
   <nav class="sub-navbar d-flex justify-content-center align-items-center">
     <ul class="nav">
@@ -50,6 +61,14 @@
       <li class="nav-item"><a class="nav-link" href="#faq">交通資訊</a></li>
       <li class="nav-item"><a class="nav-link" href="#footer">聯絡我們</a></li>
       <li class="nav-item"><a class="nav-link" href="#faq">常見問題</a></li>
+      
+      <li class="nav-item" th:if="${session.loginMember == null}">
+	  	<a class="nav-link" th:href="@{/member/login}">會員登入</a>
+	  </li>
+	  <li class="nav-item" th:if="${session.loginMember != null}">
+	  	<span class="nav-link" th:text="'歡迎，' + ${session.loginMember.memberName}"></span>
+		<a class="nav-link" th:href="@{/member/logout}">登出</a>
+	  </li>
     </ul>
 
   </nav>
@@ -80,7 +99,8 @@
     <div class="overlay-center">
       <div class="overlay-menu-member px-5 mb-5 d-flex justify-content-center">
         <img th:src="@{/images/icon/member.svg}" alt="member" class="text-center" style="padding:0 5px" />
-        <a href="#" class="text-center">會員登入</a>
+        <a th:if="${session.loginMember == null}" th:href="@{/member/login}" class="text-center">會員登入</a>
+		<a th:if="${session.loginMember != null}" th:href="@{/member/logout}" class="text-center">登出</a>
       </div>
       <div class="px-5 mb-5 d-flex justify-content-between">
         <a href="#" class="text-center"><img th:src="@{/images/icon/menu_bed.svg}" alt="bed" class="menu-icon"/><br>線上訂房</span></a>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>會員登入</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+</head>
+<body class="bg-light">
+<div th:fragment="memberLoginFragment">
+    <div class="container mt-5" style="max-width: 400px;">
+        <h3 class="text-center mb-4">會員登入</h3>
+
+        <!-- 錯誤訊息顯示區 -->
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <form th:action="@{/member/login}" method="post" th:object="${memberVO}">
+            <div class="mb-3">
+                <label for="memberEmail" class="form-label">電子信箱</label>
+                <input type="text" th:field="*{memberEmail}" class="form-control" id="memberEmail" required>
+                <div class="text-danger" th:errors="*{memberEmail}"></div>
+            </div>
+
+            <div class="mb-3">
+                <label for="memberPassword" class="form-label">密碼</label>
+                <input type="password" th:field="*{memberPassword}" class="form-control" id="memberPassword" required>
+                <div class="text-danger" th:errors="*{memberPassword}"></div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">登入</button>
+            </div>
+        </form>
+    </div>
+</div>    
+</body>
+</html>

@@ -7,8 +7,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.prod.model.ProdRepository;
-import com.prod.model.ProdVO;
+import com.coupon.repository.CouponRepository;
 
 @Service("CouponService")
 public class CouponService {

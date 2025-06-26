@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>會員中心</title>
+  <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+  <style>
+    body {
+      padding: 2rem;
+      background-color: #f5f5f5;
+    }
+    .member-card {
+      max-width: 500px;
+      margin: auto;
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .member-card h2 {
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div th:fragment="memberCenterFragment" class="member-card">
+    <h2>會員中心</h2>
+	<p>歡迎回來：<span th:text="${session.loginMember.memberName}"></span></p>
+    <div>
+      <p><strong>會員姓名：</strong> <span th:text="${session.loginMember.memberName}"></span></p>
+      <p><strong>會員信箱：</strong> <span th:text="${session.loginMember.memberEmail}"></span></p>
+      <p><strong>會員等級：</strong> <span th:text="${session.loginMember.memberLevel}"></span></p>
+      <p><strong>會員積分：</strong> <span th:text="${session.loginMember.memberPoints}"></span></p>
+      <p><strong>累積消費金額：</strong> <span th:text="${session.loginMember.memberAccumulativeConsumption} + ' 元'"></span></p>
+    </div>
+
+    <div class="mt-4">
+      <a th:href="@{/member/memberLogout}" class="btn btn-danger">登出</a>
+    </div>
+  </div>
+
+</body>
+</html>

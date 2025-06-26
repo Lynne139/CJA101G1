@@ -8,7 +8,14 @@
         <a href="#" id="menu-Toggle" class="ml-lg-3">☰ MENU</a>
         <span class="mx-3"></span>
         <img th:src="@{/images/icon/member.svg}" alt="member" class="logo-header" />
-        <a href="#">會員登入</a>
+        <!-- 判斷登入狀態 -->
+	      <span th:if="${session.loginMember == null}">
+	        <a th:href="@{/member/memberLogin}">會員登入</a>
+	      </span>
+	      <span th:if="${session.loginMember != null}">
+	        <span th:text="'歡迎，' + ${session.loginMember.memberName}"></span>
+	        <a th:href="@{/member/memberLogout}">登出</a>
+	      </span>
       </div>
     </div>
 </header>
