@@ -59,8 +59,33 @@ import com.resto.entity.TimeslotVO;
 	    
 	    // 更新入資料庫
 	    @Transactional
-	    public void update(TimeslotVO timeslotVO) {
-	        timeslotRepository.save(timeslotVO);
+	    public void update(TimeslotVO updated) {
+	    	TimeslotVO original = timeslotRepository.findById(updated.getTimeslotId()).orElseThrow();
+
+	        // 若名稱沒變，不更新
+	        if (original.getTimeslotName().equals(updated.getTimeslotName())) {
+	            return;
+	        }
+
+	        // 若名稱改變，檢查是否已有軟刪版
+	        Optional<TimeslotVO> softDeleted = timeslotRepository
+	            .findByRestoVO_RestoIdAndTimeslotNameAndIsDeletedTrue(updated.getRestoVO().getRestoId(),
+	                                              updated.getTimeslotName());
+	        // 有同名軟刪便救回資料
+	        if (softDeleted.isPresent()) {
+	            TimeslotVO toRestore = softDeleted.get();
+	            toRestore.setIsDeleted(false);
+	            timeslotRepository.save(toRestore);
+
+	            // 將原本的資料軟刪
+	            original.setIsDeleted(true);
+	            timeslotRepository.save(original);
+
+	        } else {
+	            // 沒有同名軟刪，正常更新
+	            original.setTimeslotName(updated.getTimeslotName());
+	            timeslotRepository.save(original);
+	        }
 	    }
 
 	    // 軟刪除
