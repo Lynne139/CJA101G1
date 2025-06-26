@@ -63,7 +63,7 @@
 			<div class="table_header d-flex justify-content-between align-items-end mb-4">
 		    	<h4 class="table_title">房型預定表列表</h4>
 		    	<!-- 新增房間 -->
-				<button class="btn btn_accent btn_add" id="btnAddRoomTypeSchedule">新增房型預定表</button>
+<!-- 				<button class="btn btn_accent btn_add" id="btnAddRoomTypeSchedule">新增房型預定表</button> -->
 		  	</div>
 		  	<div class="table-responsive">
 		    	<table id="roomTypeScheduleTable" class="table table-bordered align-top">
@@ -75,7 +75,7 @@
 					        <th class="text-center">已訂間數</th>
 					        <th class="text-center">剩餘間數</th>
 					        <th class="text-center">日期</th>
-					        <th class="text-center">操作</th>
+<!-- 					        <th class="text-center">操作</th> -->
 		        		</tr>
 		      		</thead>
 		      		<tbody>
@@ -86,13 +86,13 @@
 						    <td class="text-center" th:text="${roomTypeScheduleVO.roomRSVBooked}"></td>
 						    <td class="text-center" th:text="${roomTypeScheduleVO.roomAmount - roomTypeScheduleVO.roomRSVBooked}"></td>
 						    <td class="text-center" th:text="${roomTypeScheduleVO.roomOrderDate}"></td>
-						    <td>
-						        <div class="table_row_actions d-flex justify-content-center align-items-start">
+<!-- 						    <td> -->
+<!-- 						        <div class="table_row_actions d-flex justify-content-center align-items-start"> -->
 <!-- 									<button class="btn_icon btn_view" th:data-id="${roomTypeScheduleVO.roomTypeScheduleId}"><i class="fas fa-eye"></i></button> -->
-						        	<button class="btn_icon btn_edit" th:data-id="${roomTypeScheduleVO.roomTypeScheduleId}"><i class="fas fa-edit"></i></button>
+<!-- 						        	<button class="btn_icon btn_edit" th:data-id="${roomTypeScheduleVO.roomTypeScheduleId}"><i class="fas fa-edit"></i></button> -->
 <!-- 						        	<button class="btn_icon btn_delete" th:data-id="${roomVO.roomId}"><i class="fas fa-trash"></i></button> -->
-						        </div>
-						    </td>
+<!-- 						        </div> -->
+<!-- 						    </td> -->
 						</tr>
 		      		</tbody>
 		    	</table>

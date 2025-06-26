@@ -183,8 +183,10 @@ public class AdminIndexController {
     	model.addAttribute("currentURI", request.getRequestURI());
 
     	return "admin/index_admin";
+
     } 
      
+
 
 	//===住宿訂單管理===
 	@GetMapping("/roomo_info")
@@ -203,6 +205,7 @@ public class AdminIndexController {
     }
 
 	// === 餐廳管理 ===
+
     @GetMapping("/resto_info")
     public String restoInfo(HttpServletRequest request,
     						HttpServletResponse response,

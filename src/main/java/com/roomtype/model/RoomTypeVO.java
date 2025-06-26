@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.Version;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -38,10 +39,7 @@ public class RoomTypeVO implements java.io.Serializable {
 	@Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)]{2,50}$", message = "房型名稱: 只能是中、英文字母、數字和_ , 且長度必需在2到50之間", groups = Save.class)
 	private String roomTypeName;
 
-	@Column(name = "room_type_amount")
-	@NotNull(message = "房型數量: 請勿空白", groups = Save.class)
-	@DecimalMin(value = "1", message = "房型數量: 不能小於{value}", groups = Save.class)
-	@DecimalMax(value = "1000", message = "房型數量: 不能超過{value}", groups = Save.class)
+	@Transient
 	private Integer roomTypeAmount;
 
 	@Column(name = "room_type_content")

@@ -5,11 +5,14 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.room.model.RoomRepository;
 import com.room.utils.RoomTypeCriteriaHelper;
 
 import jakarta.persistence.EntityManager;
@@ -18,14 +21,17 @@ import jakarta.persistence.PersistenceContext;
 @Service("roomTypeService")
 public class RoomTypeService {
 
-	@PersistenceContext
-	private EntityManager em;
-
 	private final RoomTypeRepository roomTypeRepository;
+    private final RoomRepository roomRepository;
 
-	public RoomTypeService(RoomTypeRepository roomTypeRepository) {
-		this.roomTypeRepository = roomTypeRepository;
-	}
+    @PersistenceContext
+    private EntityManager em;
+
+    @Autowired
+    public RoomTypeService(RoomTypeRepository roomTypeRepository, RoomRepository roomRepository) {
+        this.roomTypeRepository = roomTypeRepository;
+        this.roomRepository = roomRepository;
+    }
 
 	public void addRoomType(RoomTypeVO roomTypeVO) {
 		roomTypeRepository.save(roomTypeVO);
@@ -128,7 +134,48 @@ public class RoomTypeService {
 	
 	// 複合查詢（Criteria 結構）
     public List<RoomTypeVO> compositeQuery(Map<String, String[]> map) {
-        return RoomTypeCriteriaHelper.getRoomTypeCriteria(map, em);
+    	// 1. 先用 CriteriaHelper 查出符合條件的資料（不含間數過濾）
+    	List<RoomTypeVO> resultList = RoomTypeCriteriaHelper.getRoomTypeCriteria(map, em);
+     // 2. 動態補上每筆房型的房間數量
+        for (RoomTypeVO rt : resultList) {
+            int count = roomRepository.countByRoomTypeVOAndRoomSaleStatus(rt, (byte) 1); // 計算上架房間數
+            rt.setRoomTypeAmount(count); // 設定進 transient 欄位
+        }
+     // 3. 解析 minAmount / maxAmount
+        Integer minAmount = getInt(map, "minAmount");
+        Integer maxAmount = getInt(map, "maxAmount");
+
+        // 4. 手動過濾
+        if (minAmount != null) {
+            resultList = resultList.stream()
+                .filter(rt -> rt.getRoomTypeAmount() >= minAmount)
+                .collect(Collectors.toList());
+        }
+        if (maxAmount != null) {
+            resultList = resultList.stream()
+                .filter(rt -> rt.getRoomTypeAmount() <= maxAmount)
+                .collect(Collectors.toList());
+        }
+
+        return resultList;
+    }
+    
+ // 工具方法：字串轉 Integer，避免 try-catch 重複
+    private Integer getInt(Map<String, String[]> map, String key) {
+        try {
+            String[] values = map.get(key);
+            return (values != null && values.length > 0 && !values[0].isEmpty())
+                ? Integer.valueOf(values[0])
+                : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+    
+    //計算房型數量
+    public void updateRoomTypeAmount(RoomTypeVO roomTypeVO) {
+        int amount = roomRepository.countByRoomTypeVOAndRoomSaleStatus(roomTypeVO, (byte)1);
+        roomTypeVO.setRoomTypeAmount(amount); // 這是 Transient 欄位，不會寫入 DB
     }
 }	
 	
