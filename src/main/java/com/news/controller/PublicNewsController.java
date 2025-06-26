@@ -23,13 +23,13 @@ public class PublicNewsController {
 
     @GetMapping("/news")
     public String showMediaNews(Model model) {
-        model.addAttribute("newsList", service.findAll());
+        model.addAttribute("newsList", service.findByIsDisplayTrue());
         return "news/news";
     }
 
     @GetMapping("/notice")
     public String showNotice(Model model) {
-        List<HotNews> hotNewsList = hotNewsService.findAll();
+        List<HotNews> hotNewsList = hotNewsService.findByIsDisplayTrue();
         // 強制觸發 newsPhoto，避免 LazyInitializationException 或 null
         for (HotNews news : hotNewsList) {
             if (news.getNewsPhoto() != null) {
@@ -42,7 +42,7 @@ public class PublicNewsController {
 
     @GetMapping("/promotion")
     public String showPromotion(Model model) {
-        model.addAttribute("promotionNewsList", promotionNewsService.findAll());
+        model.addAttribute("promotionNewsList", promotionNewsService.findByIsDisplayTrue());
         return "news/promotion";
     }
 } 

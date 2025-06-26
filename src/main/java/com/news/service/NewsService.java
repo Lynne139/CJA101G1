@@ -28,4 +28,8 @@ public class NewsService {
     public void deleteById(Integer id) {
         repo.deleteById(id);
     }
+
+    public List<News> findByIsDisplayTrue() {
+        return repo.findByIsDisplayTrue();
+    }
 } 

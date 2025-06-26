@@ -28,4 +28,8 @@ public class HotNewsService {
     public void deleteById(Integer id) {
         repo.deleteById(id);
     }
+
+    public List<HotNews> findByIsDisplayTrue() {
+        return repo.findByIsDisplayTrue();
+    }
 }
