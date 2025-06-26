@@ -42,13 +42,7 @@ public class RestoController {
 	
 	@Autowired
 	RestoService restoService;
-	
-	@Autowired
-	PeriodService periodService;
-	
-	@Autowired
-	TimeslotService timeslotService;
-	
+
 	// ===== restoInfo.html ====================================================== //
 	
 	// ===== 刪除 =====
@@ -169,7 +163,7 @@ public class RestoController {
 	    
 	    // 驗證名稱重複
 	    if (restoService.existsDuplicateName(resto)) {
-	        result.rejectValue("restoName", null, "餐廳名稱已存在，請重新輸入！");
+	        result.rejectValue("restoName", null, "該餐廳名稱已存在，請重新輸入！");
 	        hasAnyError = true;
 	    }
 

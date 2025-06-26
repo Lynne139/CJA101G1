@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.coupon.entity.Coupon;
@@ -173,10 +174,13 @@ public class AdminIndexController {
     	return "admin/index_admin";
     	} 
     
+//    	@RequestMapping(value = "/resto_timeslot",
+//            method = {RequestMethod.GET, RequestMethod.POST})
     	@GetMapping("/resto_timeslot")
     	public String restoTimeslot(HttpServletRequest request,
-	        @RequestParam(value = "restoId", required = false) Integer restoId,
-    		Model model) {
+    								@RequestParam(value = "restoId", required = false) Integer restoId,
+    								Model model
+    	) {
     		
 		// 把所有餐廳都傳給下拉選單使用
         List<RestoVO> restoList = restoService.getAll();
@@ -203,8 +207,6 @@ public class AdminIndexController {
                 deletableMap.put(period.getPeriodId(), !hasTimeslot);
             }
             model.addAttribute("deletableMap", deletableMap);
-
-
         } else {
         	// 若沒選餐廳，仍補空值避免渲染錯誤
             model.addAttribute("selectedResto", null);
@@ -212,12 +214,29 @@ public class AdminIndexController {
             model.addAttribute("timeslotList", new ArrayList<>());
         }
     	
-    	String mainFragment = "admin/fragments/resto/restoTimeslot";
+//    	// 判斷是否是 fetch 請求（自訂header）
+//        boolean isAjax =
+//        	      "Fetch".equals(request.getHeader("X-Requested-With"))
+//        	   || "POST".equalsIgnoreCase(request.getMethod());        
+//        
+//        if (isAjax) {
+//            return "admin/fragments/resto/restoTimeslot"; // 只回panel（右側）
+//        } else {
+//        	String mainFragment = "admin/fragments/resto/restoTimeslot";
+//        	model.addAttribute("mainFragment", mainFragment);
+//        	model.addAttribute("currentURI", request.getRequestURI());
+//            return "admin/index_admin"; // 回整頁layout
+//        }
+        
+        String mainFragment = "admin/fragments/resto/restoTimeslot";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
-
-    	return "admin/index_admin";
+        return "admin/index_admin";
+        
+        
     } 
+    	
+
     	
     @GetMapping("/resto_order")
     public String restoOrder(HttpServletRequest request,Model model) {

@@ -32,9 +32,6 @@ public class PeriodController {
 	@Autowired
 	PeriodService periodService;
 	
-	@Autowired
-	TimeslotService timeslotService;
-	
 	
 	// ===== restoInfo.html ====================================================== //
 	
@@ -50,6 +47,7 @@ public class PeriodController {
 		    return "redirect:/admin/resto_timeslot";
 		}
 	
+		
 	// ===== 新增區段 =====
 	//取得add modal	
 	@GetMapping("/resto_timeslot/period/add")
@@ -82,7 +80,7 @@ public class PeriodController {
 		
 	    if (result.hasErrors() || hasAnyError) {
 	    	model.addAttribute("period", period);
-	        return "admin/fragments/resto/modals/period_add"; // 回傳含錯誤的 modal
+	        return "admin/fragments/resto/modals/period_add"; // 回傳含錯誤的modal
 	    }
 	    
 	    // 寫入資料庫
@@ -107,7 +105,6 @@ public class PeriodController {
 	    return "admin/fragments/resto/modals/period_edit";
 	}
 
-	
 	//寫入編輯內容到資料庫
 	@PostMapping("/resto_timeslot/period/update")
 	public String updatePeriod(
@@ -124,7 +121,8 @@ public class PeriodController {
 
 	    // 驗證名稱重複
 	    if (periodService.existsDuplicateName(period)) {
-	        result.rejectValue("periodName", null, "類別名稱已存在，請重新輸入！");
+	        result.rejectValue("periodName", null, "該類別名稱已存在，請重新輸入！");
+            hasAnyError = true;
 	    }
 
 	    // 若欄位驗證有錯，回填 modal

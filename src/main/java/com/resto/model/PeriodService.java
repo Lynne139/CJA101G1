@@ -27,7 +27,7 @@ public class PeriodService {
         return periodRepository.findById(periodId).orElse(null);
     }
 	
-    // 新增入資歷庫
+    // 新增入資料庫
     @Transactional
     public void insert(PeriodVO periodVO) {
     	// sortOrder設為最末碼+1
@@ -38,7 +38,7 @@ public class PeriodService {
     	periodRepository.save(periodVO);
     }
     
-    // 更新入資歷庫
+    // 更新入資料庫
     @Transactional
     public void update(PeriodVO periodVO) {
         periodRepository.save(periodVO);

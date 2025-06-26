@@ -1,13 +1,13 @@
 <div th:fragment="editModalContent">
 
-  <div class="modal fade" id="periodEditModal" tabindex="-1"
+  <div class="modal fade" id="timeslotEditModal" tabindex="-1"
     aria-hidden="true">
     <div class="modal-dialog">
 
       <div class="modal-content">
       
         <div class="modal-header">
-          <h5 class="modal-title">編輯類別</h5>
+          <h5 class="modal-title">編輯時段</h5>
           <button type="button" class="btn-close"
             data-bs-dismiss="modal"></button>
         </div>
@@ -19,44 +19,41 @@
             <i class="fa-solid fa-triangle-exclamation me-2"></i>
             <span th:text="${errorMsg}"></span>
           </div>
-               
         
-          <form id="periodEditForm"
-            th:object="${period}"
-            th:action="@{/admin/resto_timeslot/period/edit}"
+          <form id="timeslotEditForm"
+            th:object="${timeslot}"
+            th:action="@{/admin/resto_timeslot/timeslot/update}"
             method="post">
             
-            
+            <input type="hidden" th:field="*{timeslotId}" />
             <input type="hidden" th:field="*{restoVO.restoId}" />
-            <input type="hidden" th:field="*{periodId}" />
-            <input type="hidden" th:field="*{sortOrder}" />
+            <input type="hidden" th:field="*{periodVO.periodId}" />
+            
             
             <div class="mb-3">
                         
 
-              <label for="periodName" class="form-label">類別名稱 <span
-                class="text-danger">*</span> <small class="text-muted">最多可10字</small></label>
-              <input type="text" th:field="*{periodName}"
-                id="periodName" class="form-control" required
-                maxlength="10">
+              <label for="timeslotName" class="form-label">時段時間 
+                <span class="text-danger">*</span>
+                <small class="text-muted">請選擇 24 小時制時間（HH:MM）</small>
+              </label>
+              <input type="text" th:field="*{timeslotName}"
+                id="timeslotName" class="form-control" required>
 
               <!-- 錯誤提示 -->
               <div class="text-danger"
-                th:if="${#fields.hasErrors('periodName')}">
-                <i
-                  class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
-                <span th:each="err : ${#fields.errors('periodName')}"
-                  th:text="${err}"></span>
+                th:if="${#fields.hasErrors('timeslotName')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('timeslotName')}" th:text="${err}"></span>
               </div>
 
             </div>
-
           </form>
         </div>
         
         <div class="modal-footer">
           <button type="button" class="btn btn_secondary" data-bs-dismiss="modal">取消</button>
-          <button type="submit" form="periodEditForm" id="btnSubmitEditSave" class="btn btn_accent">儲存</button>
+          <button type="submit" form="timeslotEditForm" id="btnSubmitEditSave" class="btn btn_accent ">儲存</button>
         </div>
         
       </div>

@@ -1,15 +1,28 @@
 package com.resto.model;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.resto.entity.TimeslotVO;
 
 public interface TimeslotRepository  extends JpaRepository<TimeslotVO, Integer>{
 	
-	List<TimeslotVO> findByRestoVO_RestoId(Integer restoId);
+	// 取未刪除時段，順便抓period
+	@Query("SELECT t FROM TimeslotVO t JOIN FETCH t.periodVO WHERE t.restoVO.restoId = :restoId AND  t.isDeleted = false ORDER BY t.timeslotName ASC")
+	List<TimeslotVO> findActiveWithPeriodByResto(@Param("restoId") Integer restoId);
+	
+	// 餐廳下所有未刪除時段，依名稱排序
+    List<TimeslotVO> findByRestoVO_RestoIdAndIsDeletedFalseOrderByTimeslotNameAsc(Integer restoId);
 
+    // 重名檢查(未刪除)
+    List<TimeslotVO> findByRestoVO_RestoIdAndTimeslotNameAndIsDeletedFalse(Integer restoId, String timeslotName);
+
+    // 檢查是否有已刪除同名（復原）
+    Optional<TimeslotVO> findByRestoVO_RestoIdAndTimeslotNameAndIsDeletedTrue(Integer restoId, String timeslotName);
 
 
 }
