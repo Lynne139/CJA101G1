@@ -91,7 +91,7 @@
                 <!-- 分隔線 -->
                 <hr class="my-3">
     
-                <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+                <div class="timeslot_group d-flex flex-wrap align-items-center gap-2 mt-2" th:attr="data-id=${period.periodId}">
                 
                     <!-- 若區段無時段內容提示 -->
                     <div class="text-center" th:if="${ !#lists.isEmpty(periodList) and #lists.isEmpty(timeslotList)}">尚無設置時段，新增時段 →</div>

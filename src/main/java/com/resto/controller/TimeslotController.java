@@ -1,5 +1,8 @@
 package com.resto.controller;
 
+import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,8 +12,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.resto.entity.PeriodVO;
 import com.resto.entity.TimeslotVO;
 import com.resto.model.PeriodService;
 import com.resto.model.RestoService;
@@ -45,10 +50,6 @@ public class TimeslotController {
         
         redirectAttributes.addAttribute("restoId", restoId);
         return "redirect:/admin/resto_timeslot";
-        
-//        model.addAttribute("periodList", periodService.getPeriodsByRestoId(restoId));
-//        model.addAttribute("timeslotList", timeslotService.getTimeslotsByRestoId(restoId));
-//        return "forward:/admin/resto_timeslot?restoId=" + restoId;
     }
     
 	
@@ -94,11 +95,6 @@ public class TimeslotController {
         
 	    redirectAttributes.addAttribute("restoId", timeslot.getRestoVO().getRestoId());
 	    return "redirect:/admin/resto_timeslot";
- 
-//        Integer restoId = timeslot.getRestoVO().getRestoId();
-//        model.addAttribute("periodList", periodService.getPeriodsByRestoId(restoId));
-//        model.addAttribute("timeslotList", timeslotService.getTimeslotsByRestoId(restoId));
-//        return "forward:/admin/resto_timeslot?restoId=" + restoId;
 	}
 	
 	
@@ -132,7 +128,7 @@ public class TimeslotController {
 
 	    // 驗證名稱重複
 	    if (timeslotService.existsDuplicateName(timeslot)) {
-	        result.rejectValue("timeslotName", null, "該時段名稱已存在，請重新輸入！");
+	        result.rejectValue("timeslotName", null, "該時段已存在，請重新輸入！");
             hasAnyError = true;
 	    }
 
@@ -147,12 +143,32 @@ public class TimeslotController {
 
 	    redirectAttributes.addAttribute("restoId", restoId);
 	    return "redirect:/admin/resto_timeslot";
-	    
-	    
-//        model.addAttribute("periodList", periodService.getPeriodsByRestoId(restoId));
-//        model.addAttribute("timeslotList", timeslotService.getTimeslotsByRestoId(restoId));
-//        return "forward:/admin/resto_timeslot?restoId=" + restoId;
 	}
+	
+	//拖動改periodId
+	@PostMapping("/resto_timeslot/timeslot/transfer")
+	@ResponseBody
+	public Map<String, Object>
+	transferTimeslot(@RequestParam Integer timeslotId,
+	                 @RequestParam Integer newPeriodId) {
+
+	    TimeslotVO ts = timeslotService.getById(timeslotId);
+	    PeriodVO newPeriod = periodService.getById(newPeriodId);
+
+	    // 檢查同餐廳才能搬
+	    if (!Objects.equals(ts.getRestoVO().getRestoId(),
+	                        newPeriod.getRestoVO().getRestoId())) {
+	        return Map.of("msg", "error",
+	                      "message", "不支援跨餐廳移動，若需新增請直接於該餐廳頁面添加");
+	    }
+
+	    ts.setPeriodVO(newPeriod);   // 更新關聯 (JPA 自動改 period_id)
+	    timeslotService.update(ts);
+
+	    return Map.of("msg", "transfer success");
+	}
+	
+	
 		
 
 

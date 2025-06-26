@@ -18,3 +18,29 @@
 	padding: 0.25rem 0.75rem;
 	font-weight:var(--fw-medium);
 }
+
+/* timeslot排序 */
+/* 讓 + 排在最後，flex-shrink: 0 避免按鈕變形 */
+.timeslot_group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.timeslot_wrapper {
+  order: 0;
+}
+
+.btn_add_timeslot {
+  order: 999;
+  flex-shrink: 0;
+}
+
+/* 拖曳有cursor效果 */
+.timeslot_block {
+  cursor: grab;
+}
+
+.timeslot_block:active {
+  cursor: grabbing;
+}

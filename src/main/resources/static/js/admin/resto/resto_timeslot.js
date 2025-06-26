@@ -402,6 +402,39 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+  
+  
+  // ===== 組時段格式HH:MM =====  
+  function bindTimeSelectListeners() {
+    const hourSelect = document.getElementById("hourSelect");
+    const minuteSelect = document.getElementById("minuteSelect");
+    const hiddenInput = document.getElementById("timeslotHiddenInput");
+
+    function updateTime() {
+      const h = hourSelect.value;
+      const m = minuteSelect.value;
+      if (h && m) {
+        hiddenInput.value = `${h}:${m}`;
+      } else {
+        hiddenInput.value = "";
+      }
+    }
+
+    hourSelect.addEventListener("change", updateTime);
+    minuteSelect.addEventListener("change", updateTime);
+  }
+  
+  // ===== 編輯modal打開要填入資料庫存的值 =====
+  function prefillTimeSelect(modalEl) {
+	const timeslotName = modalEl.querySelector('input[name="timeslotName"]')?.value ?? "";
+
+    if (!modalEl) return;
+
+    const [hour, minute] = timeslotName.split(":");
+	modalEl.querySelector("#hourSelect").value = hour;
+	modalEl.querySelector("#minuteSelect").value = minute;
+  }
+  
 
 
   // ===== 新增時段 =====
@@ -445,10 +478,11 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.show();
 
         modalEl.addEventListener("shown.bs.modal", async () => {
-
           await new Promise(resolve => setTimeout(resolve, 300)); // 等Bootstrap完成動畫
-          bindFormSubmitAddTimeslot();
+		  bindTimeSelectListeners();
+		  bindFormSubmitAddTimeslot();
         })
+
       })
       .catch(err => {
         alert("載入表單失敗：" + err.message);
@@ -519,6 +553,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 模擬動畫結束後再初始化TinyMCE（因為modal沒重新開不能用shown.bs.modal來監聽）
         setTimeout(() => {
+		  bindTimeSelectListeners();
           bindFormSubmitAddTimeslot();
         }, 300); // 與動畫一致延遲時間
 
@@ -579,8 +614,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
           modalEl.addEventListener("shown.bs.modal", async () => {
             await new Promise(resolve => setTimeout(resolve, 300)); // 等Bootstrap完成動畫
-            bindFormSubmitEditTimeslot();
-
+			bindTimeSelectListeners();
+			prefillTimeSelect(modalEl);
+			bindFormSubmitEditTimeslot();
           });
 
         })
@@ -648,6 +684,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         setTimeout(() => {
+		  bindTimeSelectListeners();
+		  prefillTimeSelect(modalEl);
           bindFormSubmitEditTimeslot();
         }, 300); // 與動畫一致延遲時間
 
@@ -660,6 +698,74 @@ document.addEventListener("DOMContentLoaded", () => {
         removeBtnOverlay(submitBtn);
       });
   }
+  
+  
+  // ===== 拖曳時段改變所屬區段 =====
+  function initTimeslotDnD() {
+
+    // 把每個 period 裡的 .timeslot_group 都變成 Sortable 清單
+    document.querySelectorAll('.timeslot_group').forEach(groupEl => {
+
+      new Sortable(groupEl, {
+        group:         'timeslot',          // 允許跨清單
+        animation:     150,
+        draggable:     '.timeslot_wrapper', // 只有 wrapper 可以拖
+		handle: '.timeslot_block',
+        filter:        '.btn_add_timeslot', // 「＋」鈕不可拖
+		ghostClass: 'sortable-ghost', // 「＋」鈕永遠不會被插入/覆蓋
+		fallbackTolerance: 3,
+        onEnd(evt) {
+          const elWrapper = evt.item;                       // 被拖動的 wrapper
+          const fromId    = evt.from.dataset.id;            // 原 periodId
+          const toId      = evt.to.dataset.id;              // 目標 periodId
+          if (fromId === toId) return;                      // 沒搬家
+
+          const timeslotId = elWrapper.dataset.id;          // wrapper 的 data-id = timeslotId
+          moveTimeslot(timeslotId, toId, elWrapper);        // 更新後端
+        }
+      });
+
+    });
+  }
+
+
+  // 呼叫後端同步 periodId
+  function moveTimeslot(timeslotId, newPeriodId, elWrapper) {
+
+    const panel = document.querySelector('.panel_periodntimeslot');
+    showPanelOverlay(panel);
+
+    fetch('/admin/resto_timeslot/timeslot/transfer', {
+      method : 'POST',
+      headers: { 'X-Requested-With': 'Fetch',
+                 'Content-Type':      'application/x-www-form-urlencoded' },
+      body   : new URLSearchParams({ timeslotId, newPeriodId })
+    })
+    .then(r => r.json())
+    .then(j => {
+        if (j.msg === 'transfer success') {
+            // 成功就改掉 wrapper 自己的 periodId（給未來用）
+            elWrapper.dataset.periodId = newPeriodId;
+            refreshMoveButtons(); //借用區段的函式
+            showToast('移動成功！');
+        } else {
+            throw new Error(j.message || '未知錯誤');
+        }
+    })
+    .catch(err => {
+        // 失敗就把元素搬回原清單
+        document
+          .querySelector(`.timeslot_group[data-id="${fromId}"]`)
+          .appendChild(elWrapper);
+        alert('移動失敗：' + err.message);
+    })
+    .finally(() => removePanelOverlay(panel));
+  }
+
+
+  // 第一次與每次重新插入 fragment 後都要重新啟動
+  initTimeslotDnD();
+ 
 
 
 
