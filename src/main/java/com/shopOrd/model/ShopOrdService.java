@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.coupon.entity.Coupon;
-import com.coupon.entity.CouponRepository;
+import com.coupon.repository.CouponRepository;
 import com.member.model.MemberVO;
 import com.prod.model.ProdRepository;
 import com.prod.model.ProdVO;

@@ -1,5 +1,6 @@
 package com.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.member.model.MemberVO;
 import com.coupon.entity.Coupon;
-import com.coupon.entity.CouponService;
+import com.coupon.service.CouponService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.member.model.MemberService;
 import com.prod.model.ProdService;
@@ -457,8 +458,29 @@ public class AdminIndexController {
     	List<com.shopOrd.model.ShopOrdVO> list = shopOrdSvc.getAll();
     	model.addAttribute("shopOrdListData", list);
     	model.addAttribute("memberVO", new MemberVO());
-    	List<Coupon> list2 = couponSvc.getAll();
-    	model.addAttribute("couponListData", list2);
+    	
+    	// 從session獲取當前登入的會員資訊
+    	MemberVO memberVO = (MemberVO) request.getSession().getAttribute("memberVO");
+    	if (memberVO != null) {
+    		Integer memberId = memberVO.getMemberId();
+    		int memberPoints = memberVO.getMemberPoints() != null ? memberVO.getMemberPoints() : 0;
+    		
+    		// 查詢商城專用和通用優惠券
+    		List<Coupon> prodOnlyCoupons = couponSvc.getClaimableCouponsForMember(
+    			com.coupon.enums.OrderType.PROD_ONLY, memberId, memberPoints);
+    		List<Coupon> roomAndProdCoupons = couponSvc.getClaimableCouponsForMember(
+    			com.coupon.enums.OrderType.ROOM_AND_PROD, memberId, memberPoints);
+    		
+    		// 合併兩種類型的優惠券
+    		List<Coupon> allCoupons = new ArrayList<>();
+    		allCoupons.addAll(prodOnlyCoupons);
+    		allCoupons.addAll(roomAndProdCoupons);
+    		
+    		model.addAttribute("couponListData", allCoupons);
+    	} else {
+    		// 如果沒有登入會員，返回空列表
+    		model.addAttribute("couponListData", new ArrayList<>());
+    	}
     	
     	// 檢查是否有錯誤訊息（來自 ProductIdController）
     	String errorMessage = request.getParameter("errorMessage");

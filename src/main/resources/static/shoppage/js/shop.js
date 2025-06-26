@@ -506,4 +506,49 @@ if (!document.getElementById('notification-styles')) {
   styleSheet.id = 'notification-styles';
   styleSheet.textContent = notificationStyles;
   document.head.appendChild(styleSheet);
-} 
+}
+
+// 取代本地 cart，從後端載入會員購物車
+function loadCartFromBackend() {
+  $.get("/prodCart/api/member-cart", function(cartItems) {
+    // cartItems 是後端回傳的購物車陣列
+    let html = "";
+    let total = 0;
+    let itemCount = 0;
+    if (cartItems.length === 0) {
+      html = `<div class="cart-empty">
+        <i class="fas fa-shopping-cart"></i>
+        <p>購物車是空的</p>
+      </div>`;
+    } else {
+      html = cartItems.map(item => {
+        itemCount += item.quantity;
+        total += item.quantity * item.prodVO.productPrice;
+        return `<div class="cart-item">
+          <div class="cart-item-image">
+            <img src="/front-end/shop/product-image/${item.prodVO.productId}" alt="${item.prodVO.productName}" onerror="this.src='/shoppage/image/icon/bag.svg'">
+          </div>
+          <div class="cart-item-info">
+            <div class="cart-item-title">${item.prodVO.productName}</div>
+            <div class="cart-item-price">NT$ ${item.prodVO.productPrice}</div>
+            <div class="cart-item-quantity">
+              <span>${item.quantity}</span>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    $("#cartItems").html(html);
+    $("#cartTotal").text("NT$ " + total.toLocaleString());
+    const cartIcon = document.querySelector('.cart-icon');
+    if (cartIcon) {
+      cartIcon.setAttribute('data-count', itemCount);
+      cartIcon.classList.toggle('has-items', itemCount > 0);
+    }
+  });
+}
+
+// 頁面載入時自動載入購物車
+$(function() {
+  loadCartFromBackend();
+}); 

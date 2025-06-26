@@ -1,29 +1,31 @@
+$(function() {
+  $(".slider").slick({
+    arrow:true, // 是否顯示左右箭頭
+    dots:true, // 是否顯示圓點導航
+    centerMode:true, // 是否居中顯示
+    centerPadding:"60px", // 居中顯示時的邊距
+    autoplay:true, // 是否自動播放
+    autoplaySpeed:2000, // 自動播放的速度
+    speed:500, // 切換圖片的速度
+    fade:true, // 是否淡入淡出切換
+    slidesToShow: 1,            
+    responsive:[
+        {
+            breakpoint: 768, // 當視窗寬度小於768px時
+            settings: {
+                slidesToShow: 1, // 顯示1個圖片
+                centerMode:false, // 不居中顯示
+                centerPadding:"0px" // 無邊距
+            }
+        }
+    ]   
+  });
+});
+
 function goHome() {
     window.location.href = './homepage.html';
   }
 
-  $(".slider").slick({
-            arrow:true, // 是否顯示左右箭頭
-            dots:true, // 是否顯示圓點導航
-            centerMode:true, // 是否居中顯示
-            centerPadding:"60px", // 居中顯示時的邊距
-            autoplay:true, // 是否自動播放
-            autoplaySpeed:2000, // 自動播放的速度
-            speed:500, // 切換圖片的速度
-            fade:true, // 是否淡入淡出切換
-            slidesToShow: 1,            
-            responsive:[
-                {
-                    breakpoint: 768, // 當視窗寬度小於768px時
-                    settings: {
-                        slidesToShow: 1, // 顯示1個圖片
-                        centerMode:false, // 不居中顯示
-                        centerPadding:"0px" // 無邊距
-                    }
-                }
-            ]   
-        });
-  
   // let banners = [
   //   "./image/roomtype_1.png",
   // "./image/roomtype_2.png",
