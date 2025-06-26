@@ -21,13 +21,12 @@ document.addEventListener("DOMContentLoaded", function() {
 			order: [[0, 'asc']],
 			autoWidth: false,
 			columnDefs: [
-				{ targets: [0], width: "10%" },
-				{ targets: [1], width: "15%", orderable: false },
+				{ targets: [0], width: "15%" },
+				{ targets: [1], width: "20%", orderable: false },
 				{ targets: [2], width: "15%" },
 				{ targets: [3], width: "15%" },
 				{ targets: [4], width: "15%" },
-				{ targets: [5], width: "20%" },
-				{ targets: [6], width: "10%", orderable: false }
+				{ targets: [5], width: "20%" }
 			],
 			searching: false,
 			ordering: true,

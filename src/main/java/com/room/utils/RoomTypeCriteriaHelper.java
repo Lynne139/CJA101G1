@@ -30,10 +30,11 @@ public class RoomTypeCriteriaHelper {
 			return cb.ge(root.get("roomTypePrice"), Integer.valueOf(value));// greater than or equal
 		case "maxPrice":
 			return cb.le(root.get("roomTypePrice"), Integer.valueOf(value));// less than or equal
-		case "minAmount":
-			return cb.ge(root.get("roomTypeAmount"), Integer.valueOf(value));
-		case "maxAmount":
-			return cb.le(root.get("roomTypeAmount"), Integer.valueOf(value));
+			// 補充：因為 roomTypeAmount 是動態屬性（@Transient），無法用 Criteria 查詢，只能在 Controller 做過濾
+//		case "minAmount":
+//			return cb.ge(root.get("roomTypeAmount"), Integer.valueOf(value));
+//		case "maxAmount":
+//			return cb.le(root.get("roomTypeAmount"), Integer.valueOf(value));
 		case "roomTypeContent":
 			String pattern = "%" + value + "%";
 			Predicate nameLike = cb.like(root.get("roomTypeContent"), pattern);
