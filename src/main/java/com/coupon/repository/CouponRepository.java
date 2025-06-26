@@ -25,7 +25,7 @@ public interface CouponRepository extends JpaRepository<Coupon, String> {
     	    value = """
     	        SELECT * FROM coupon
     	        WHERE order_type = :orderType
-    	          AND discount_value <= :memberPoints // 因為一點可抵一元
+    	          AND discount_value <= :memberPoints -- 因為一點可抵一元
     	          AND claim_start_date <= :today
     	          AND claim_end_date >= :today
     	          AND coupon_code NOT IN (

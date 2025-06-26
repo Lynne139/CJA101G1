@@ -29,7 +29,8 @@ import com.prodCate.model.ProdCateService;
 import com.prodCate.model.ProdCateVO;
 import com.shopOrd.model.ShopOrdService;
 import com.shopOrd.model.ShopOrdVO;
-import com.coupon.entity.CouponService;
+import com.coupon.entity.Coupon;
+import com.coupon.service.CouponService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -143,9 +144,30 @@ public class ShopOrdController {
 	 * 用於管理員手動建立訂單
 	 */
 	@GetMapping("addShopOrd")
-	public String addShopOrd(Model model) {
+	public String addShopOrd(Model model, HttpServletRequest request) {
 		model.addAttribute("shopOrdVO", new ShopOrdVO());
-		model.addAttribute("couponListData", couponService.getAll());
+		// 從session獲取當前登入的會員資訊
+		MemberVO memberVO = (MemberVO) request.getSession().getAttribute("memberVO");
+		if (memberVO != null) {
+			Integer memberId = memberVO.getMemberId();
+			int memberPoints = memberVO.getMemberPoints() != null ? memberVO.getMemberPoints() : 0;
+			
+			// 查詢商城專用和通用優惠券
+			List<Coupon> prodOnlyCoupons = couponService.getClaimableCouponsForMember(
+				com.coupon.enums.OrderType.PROD_ONLY, memberId, memberPoints);
+			List<Coupon> roomAndProdCoupons = couponService.getClaimableCouponsForMember(
+				com.coupon.enums.OrderType.ROOM_AND_PROD, memberId, memberPoints);
+			
+			// 合併兩種類型的優惠券
+			List<Coupon> allCoupons = new ArrayList<>();
+			allCoupons.addAll(prodOnlyCoupons);
+			allCoupons.addAll(roomAndProdCoupons);
+			
+			model.addAttribute("couponListData", allCoupons);
+		} else {
+			// 如果沒有登入會員，返回空列表
+			model.addAttribute("couponListData", new ArrayList<>());
+		}
 		return "admin/fragments/shop/shopOrd/addShopOrd";
 	}
 
