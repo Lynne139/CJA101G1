@@ -28,14 +28,16 @@ public class MemberCouponController {
         return ResponseEntity.ok(coupons);
     }
 
-    // 2. 查詢會員可用於指定訂單類型的折價券（未使用、未過期）
-    @GetMapping("/{memberId}/usable")
-    public ResponseEntity<List<Coupon>> getAvailableCouponsByOrderType(
-            @PathVariable Integer memberId,
-            @RequestParam OrderType orderType) {
-        List<Coupon> coupons = memberCouponService.getAvailableCouponsByOrderType(memberId, orderType);
-        return ResponseEntity.ok(coupons);
-    }
+	 // 2. 查詢會員可用於指定訂單類型的折價券（未使用、未過期）
+	 // 支援 ROOM_ONLY 回傳 ROOM_ONLY + ROOM_AND_PROD
+	 // 支援 PROD_ONLY 回傳 PROD_ONLY + ROOM_AND_PROD
+	 @GetMapping("/{memberId}/usable")
+	 public ResponseEntity<List<Coupon>> getAvailableCouponsByOrderTypes(
+	         @PathVariable Integer memberId,
+	         @RequestParam OrderType orderType) {
+	     List<Coupon> coupons = memberCouponService.getAvailableCouponsByOrderTypes(memberId, orderType);
+	     return ResponseEntity.ok(coupons);
+	 }
 
     // 3. 查詢會員可用於訂房的折價券
     @GetMapping("/{memberId}/room-order-usable")

@@ -13,7 +13,7 @@
 	    <div class="card">
 	        <div class="card-header d-flex justify-content-between align-items-center">
 	            <h4 class="mb-0">新增折價券</h4>
-	            <a href="/coupon/select" class="btn btn-outline-secondary btn-sm">返回查詢頁</a>
+	            <a href="/admin/coupon/select" class="btn btn-outline-secondary btn-sm">返回查詢頁</a>
 	        </div>
 	        <div class="card-body">
 	            <form id="couponForm" novalidate>
@@ -198,7 +198,7 @@
                     })
                     .then(() => {
                         alert("新增成功！");
-                        window.location.href = "/coupon/select";
+                        window.location.href = "/admin/coupon/select";
                     })
                     .catch(error => {
                         alert("新增失敗：" + error.message);

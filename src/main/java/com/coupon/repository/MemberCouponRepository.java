@@ -18,21 +18,23 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Memb
             JOIN coupon c ON mc.coupon_code = c.coupon_code
             WHERE mc.member_id = :memberId
               AND mc.is_used = true
+            ORDER BY c.discount_value DESC
             """, nativeQuery = true)
     List<Coupon> findUsedCouponsByMemberId(@Param("memberId") Integer memberId);
 
-    // 2. 讓會員查詢未使用、指定 orderType、未過期的 coupon
+    // 2. 讓會員查詢指定orderTypes、未使用、未過期的 coupon
     @Query(value = """
             SELECT c.* FROM member_coupon mc
             JOIN coupon c ON mc.coupon_code = c.coupon_code
             WHERE mc.member_id = :memberId
               AND mc.is_used = false
-              AND c.order_type = :orderType
+              AND c.order_type IN :orderTypes
               AND c.expiry_date >= :currentDate
+            ORDER BY c.discount_value DESC
             """, nativeQuery = true)
-    List<Coupon> findAvailableCouponsByMemberIdAndOrderType(
+    List<Coupon> findAvailableCouponsByMemberIdAndOrderTypes(
             @Param("memberId") Integer memberId,
-            @Param("orderType") int orderType,
+            @Param("orderTypes") List<Integer> orderTypes,
             @Param("currentDate") LocalDate currentDate);
 
     // 3. 查詢某會員所持有，且可用於某筆訂房訂單的折價券
@@ -44,6 +46,7 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Memb
               AND (c.order_type = 1 OR c.order_type = 3) -- 可用於訂房
               AND c.expiry_date >= :currentDate -- 未過期
               AND c.min_purchase <= :priceBeforeUsingCoupon -- 符合低消門檻
+            ORDER BY c.discount_value DESC
             """, nativeQuery = true)
     List<Coupon> findRoomOnlyOrAllCoupons(
             @Param("memberId") Integer memberId,
@@ -59,6 +62,7 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Memb
               AND (c.order_type = 2 OR c.order_type = 3) -- 可用於商城
               AND c.expiry_date >= :currentDate -- 未過期
               AND c.min_purchase <= :priceBeforeUsingCoupon -- 符合低消門檻
+            ORDER BY c.discount_value DESC
             """, nativeQuery = true)
     List<Coupon> findProdOnlyOrAllCoupons(
             @Param("memberId") Integer memberId,

@@ -524,7 +524,7 @@ public class AdminIndexController {
     @GetMapping("/coupon/select")
     public String couponSelectPage(HttpServletRequest request,Model model) {
 
-    	String mainFragment = "admin/fragments/coupon/coupon-select-page";
+    	String mainFragment = "admin/fragments/coupon/admin-select-coupon";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 
