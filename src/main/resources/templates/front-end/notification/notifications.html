@@ -14,17 +14,18 @@
       width: 90%;
     }
 
-    /* 我的通知標題左對齊通知列表左緣 */
+    /* 我的通知標題左對齊通知列表左緣，調大字體並用咖啡色 */
     section.container > h2 {
       max-width: 700px;
       width: 90%;
       margin-left: auto;
       margin-right: auto;
       margin-bottom: 1rem;
-      /* 取消 Bootstrap 的置中效果 */
       text-align: left;
+      font-size: 1.75rem;
+      color: #6c4d3c;
     }
-
+    
     .notification-item {
       border-bottom: 1px solid #ddd;
       padding: 15px;
@@ -34,7 +35,13 @@
       justify-content: space-between;
       align-items: center;
     }
-
+    
+	.notification-title {
+	  font-size: 1.1rem;
+	  color: #6c4d3c;
+	  margin-bottom: 4px;
+	}
+	
     .notification-content {
       flex: 1;
       padding-right: 15px;
@@ -120,7 +127,7 @@
                class="notification-item ${n.isRead ? 'read' : 'unread'}"
                onclick="markAsRead(${n.notificationId})">
             <div class="notification-content">
-              <div><strong>${n.title}</strong></div>
+              <div class="notification-title">${n.title}</div>
               <div>${n.content}</div>
             </div>
             <div class="notification-time">${formattedTime}</div>

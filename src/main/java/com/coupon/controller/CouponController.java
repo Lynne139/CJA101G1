@@ -72,7 +72,7 @@ public class CouponController {
         }
     }
 
-    // 6. 查詢可領且尚未領取過的優惠券
+    // 6. 讓會員查詢可領且尚未領取過的優惠券
     @GetMapping("/claimable")
     public ResponseEntity<List<Coupon>> getClaimableCouponsForMember(
             @RequestParam OrderType orderType,

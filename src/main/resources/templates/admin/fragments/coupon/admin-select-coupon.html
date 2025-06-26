@@ -138,11 +138,11 @@
                     tbody.appendChild(tr);
                 });
 
-                // 綁定修改按鈕事件，點擊就會跳轉到 /coupon/update/{couponCode}。
+                // 綁定修改按鈕事件，點擊就會跳轉到 /admin/coupon/update/{couponCode}。
                 document.querySelectorAll('.btn-edit').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const code = btn.getAttribute('data-code');
-                        window.location.href = `/coupon/update/${code}`;
+                        window.location.href = `/admin/coupon/update/${code}`;
                     });
                 });
 
@@ -180,8 +180,7 @@
 
             // 新增折價券按鈕事件
             document.getElementById('btnAddCoupon').addEventListener('click', () => {
-                // 假設新增頁面路徑為 /coupon/add
-                window.location.href = '/coupon/add';
+                window.location.href = '/admin/coupon/add';
             });
         });
     </script>
