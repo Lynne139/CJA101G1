@@ -19,7 +19,7 @@ import jakarta.validation.Valid;
 @Controller
 @RequestMapping("/memberLevelType")
 public class MemberLevelTypeController {
-	
+	 
 	@Autowired
     private MemberLevelTypeService memberLevelTypeService;
 

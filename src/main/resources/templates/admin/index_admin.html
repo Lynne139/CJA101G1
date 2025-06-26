@@ -51,6 +51,8 @@
 							th:classappend="${currentURI.startsWith('/admin/member')} ? 'show'">
 			        		<a th:href="@{/admin/member1}" th:classappend="${currentURI == '/admin/member1'} ? '-active'" class="sidebar_sub_link">會員子頁1</a>
 			        		<a th:href="@{/admin/listAllMember}" th:classappend="${currentURI == '/admin//admin/listAllMember'} ? '-active'" class="sidebar_sub_link">會員列表</a>
+			      			<a th:href="@{/admin/addMember}" th:classappend="${currentURI == '/admin//admin/addMember'} ? '-active'" class="sidebar_sub_link">會員新增</a>
+			      		 
 			      		</div>
 			    	</div>
 			
@@ -112,8 +114,8 @@
 			        		<a th:href="@{/admin/prodCart/select_page}"   th:classappend="${currentURI == '/admin/prodCart/select_page'} ? '-active'"   class="sidebar_sub_link">購物車項目</a>
 			        		<a th:href="@{/admin/prodCate/select_page}"   th:classappend="${currentURI == '/admin/prodCate/select_page'} ? '-active'"   class="sidebar_sub_link">商品類別管理</a>
 			        		<a th:href="@{/admin/prodPhoto/select_page}"   th:classappend="${currentURI == '/admin/prodPhoto/select_page'} ? '-active'"  class="sidebar_sub_link">商品圖片管理</a>
-			        		<a th:href="@{/admin/shopOrd}"   th:classappend="${currentURI == '/admin/shopOrd'} ? '-active'"    class="sidebar_sub_link">商城訂單</a>
-			        		<a th:href="@{/admin/shopOrdDet}"   th:classappend="${currentURI == '/admin/shopOrdDet'} ? '-active'" class="sidebar_sub_link">商品訂單明細</a>
+			        		<a th:href="@{/admin/shopOrd/select_page}"   th:classappend="${currentURI == '/admin/shopOrd/select_page'} ? '-active'"    class="sidebar_sub_link">商城訂單</a>
+			        		<a th:href="@{/admin/shopOrdDet/select_page}"   th:classappend="${currentURI == '/admin/shopOrdDet/select_page'} ? '-active'" class="sidebar_sub_link">商品訂單明細</a>
 			      		</div>
 			    	</div>
 			

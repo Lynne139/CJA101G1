@@ -12,7 +12,7 @@ import jakarta.validation.constraints.Pattern;
 @Entity
 @Table(name = "member_level_type")
 public class MemberLevelType {
-	
+	 
 	private String memberLevel;
 	private Integer memberRank;
 	
