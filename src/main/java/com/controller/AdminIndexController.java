@@ -112,10 +112,7 @@ public class AdminIndexController {
 
     } 
 
-<<<<<<< Faith
-     
-=======
->>>>>>> master
+
 
 	//===住宿訂單管理===
 	@GetMapping("/roomo_info")
