@@ -9,6 +9,7 @@ import com.member.model.MemberVO;
 public class MemberCoupon {
 
     @EmbeddedId
+
     private MemberCouponId id; // 複合主鍵id
 
     @Column(name = "is_used", nullable = false)
@@ -21,15 +22,20 @@ public class MemberCoupon {
     @Column(name = "used_time")
     private LocalDateTime usedTime; // 使用時間
 
+
     @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("couponCode")
     @JoinColumn(name = "coupon_code", referencedColumnName = "coupon_code")
+
     private Coupon coupon; // 折價券
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("memberId")
     @JoinColumn(name = "member_id", referencedColumnName = "member_id")
+
     private MemberVO member; // 會員
+
 
     // Getters & Setters
 

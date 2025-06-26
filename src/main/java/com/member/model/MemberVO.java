@@ -3,6 +3,7 @@ package com.member.model;
 import java.sql.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -19,7 +21,7 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-
+  
 
 @Entity
 @Table(name = "member")
@@ -39,6 +41,7 @@ public class MemberVO implements java.io.Serializable {
 	private Integer memberPoints;
 	private Integer memberAccumulativeConsumption;
 	
+	private MultipartFile uploadPic;
 	
 	public MemberVO() {//必需有一個不傳參數建構子
 		
@@ -47,10 +50,11 @@ public class MemberVO implements java.io.Serializable {
 	@Id //@Id代表這個屬性是這個Entity的唯一識別屬性，並且對映到Table的主鍵
 	@Column(name = "member_id")  //@Column指這個屬性是對應到資料庫Table的哪一個欄位   //【非必要，但當欄位名稱與屬性名稱不同時則一定要用】
 	@GeneratedValue(strategy = GenerationType.IDENTITY) //@GeneratedValue的generator屬性指定要用哪個generator //【strategy的GenerationType, 有四種值: AUTO, IDENTITY, SEQUENCE, TABLE】 
+//	@OneToMany(mappedBy = "roomTypeVO", cascade = CascadeType.ALL)
 	public Integer getMemberId() {
 		return memberId;
 	}
-	
+
 	public void setMemberId(Integer memberId) {
 		this.memberId = memberId;
 	}
@@ -178,5 +182,12 @@ public class MemberVO implements java.io.Serializable {
 		this.memberAccumulativeConsumption = memberAccumulativeConsumption;
 	}
 	
-	
+	@Transient
+	public MultipartFile getUploadPic() {
+		return uploadPic;
+	}
+
+	public void setUploadPic(MultipartFile uploadPic) {
+		this.uploadPic = uploadPic;
+	}
 }

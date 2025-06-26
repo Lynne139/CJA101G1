@@ -1,5 +1,130 @@
 <div th:fragment="content">
-	<div class="main_news1">
-		<p>消息管理頁1</p>
+	<div class="main_news1 container mt-4">
+		<h3>最新消息管理</h3>
+		<!-- 新增按鈕 -->
+		<button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addModal">新增消息</button>
+		<!-- 資料表格 -->
+		<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th>編號</th>
+					<th>標題</th>
+					<th>內容</th>
+					<th>建立日期</th>
+					<th>顯示</th>
+					<th>圖片</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="news : ${hotNewsList}">
+					<td th:text="${news.hotNewsNo}"></td>
+					<td th:text="${news.title}"></td>
+					<td th:text="${news.content}"></td>
+					<td th:text="${news.createdDate}"></td>
+					<td>
+						<span th:text="${news.isDisplay} ? '是' : '否'"></span>
+					</td>
+					<td>
+						<img th:if="${news.newsPhoto != null}" th:src="@{'/admin/news/image/' + ${news.hotNewsNo}}" style="max-width: 80px; max-height: 60px;"/>
+						<span th:if="${news.newsPhoto == null}">無</span>
+					</td>
+					<td>
+						<!-- 編輯按鈕 -->
+						<button class="btn btn-sm btn-warning" data-bs-toggle="modal" th:attr="data-bs-target='#editModal' + ${news.hotNewsNo}">編輯</button>
+						<!-- 刪除表單 -->
+						<form th:action="@{'/admin/news/delete/' + ${news.hotNewsNo}}" method="post" style="display:inline-block;" onsubmit="return confirm('確定要刪除嗎？');">
+							<button type="submit" class="btn btn-sm btn-danger">刪除</button>
+						</form>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<!-- 新增Modal -->
+		<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<form th:action="@{/admin/news/add}" method="post" enctype="multipart/form-data">
+						<div class="modal-header">
+							<h5 class="modal-title" id="addModalLabel">新增最新消息</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<div class="mb-3">
+								<label class="form-label">標題</label>
+								<input type="text" class="form-control" name="title" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">內容</label>
+								<textarea class="form-control" name="content" rows="3" required></textarea>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">圖片</label>
+								<input type="file" class="form-control" name="photo" accept="image/*">
+							</div>
+							<div class="mb-3">
+								<label class="form-label">是否顯示</label>
+								<select class="form-select" name="isDisplay">
+									<option value="true">是</option>
+									<option value="false">否</option>
+								</select>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+							<button type="submit" class="btn btn-primary">新增</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- 編輯Modal（每筆資料一個） -->
+		<div th:each="news : ${hotNewsList}">
+			<div class="modal fade" th:id="${'editModal' + news.hotNewsNo}" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<form th:action="@{/admin/news/edit}" method="post" enctype="multipart/form-data">
+							<input type="hidden" name="hotNewsNo" th:value="${news.hotNewsNo}" />
+							<div class="modal-header">
+								<h5 class="modal-title" id="editModalLabel">編輯最新消息</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<div class="mb-3">
+									<label class="form-label">標題</label>
+									<input type="text" class="form-control" name="title" th:value="${news.title}" required>
+								</div>
+								<div class="mb-3">
+									<label class="form-label">內容</label>
+									<textarea class="form-control" name="content" rows="3" th:text="${news.content}" required></textarea>
+								</div>
+								<div class="mb-3">
+									<label class="form-label">目前圖片</label><br>
+									<img th:if="${news.newsPhoto != null}" th:src="@{'/admin/news/image/' + ${news.hotNewsNo}}" style="max-width: 80px; max-height: 60px;"/>
+									<span th:if="${news.newsPhoto == null}">無</span>
+								</div>
+								<div class="mb-3">
+									<label class="form-label">更換圖片</label>
+									<input type="file" class="form-control" name="photo" accept="image/*">
+								</div>
+								<div class="mb-3">
+									<label class="form-label">是否顯示</label>
+									<select class="form-select" name="isDisplay">
+										<option th:selected="${news.isDisplay}" value="true">是</option>
+										<option th:selected="${!news.isDisplay}" value="false">否</option>
+									</select>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+								<button type="submit" class="btn btn-primary">儲存</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>

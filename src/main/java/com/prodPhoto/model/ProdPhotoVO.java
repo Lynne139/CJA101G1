@@ -31,7 +31,7 @@ public class ProdPhotoVO implements java.io.Serializable{
 	@JoinColumn(name = "PRODUCT_ID")   // 指定用來join table的column
 	private ProdVO prodVO;
 	
-	@Column(name = "PRODUCT_PHOTO")
+	@Column(name = "PRODUCT_PHOTO", columnDefinition = "MEDIUMBLOB")
 	private byte[] prodPhoto;
 
 	public ProdPhotoVO() {

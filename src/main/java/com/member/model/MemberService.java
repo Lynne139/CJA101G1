@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service("memberService")
 public class MemberService {
-	
+	 
 	@Autowired
 	MemberRepository repository;
 	

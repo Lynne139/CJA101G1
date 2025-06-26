@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商城訂單資料修改 - update_shopOrd_input.html</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- Admin CSS -->
+    <link rel="stylesheet" th:href="@{/css/all_admin.css}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 主內容 -->
+            <main class="col-12 p-4">
+                <div class="w-100 mx-auto">
+                    <!-- 修改商品表單 -->
+                    <div class="panel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="panel-title">商品資料</h2>
+                            <span class="text-muted">所有欄位皆為必填</span>
+                        </div>
+                        <form th:action="@{/prod/update}" method="post" th:object="${prodVO}" enctype="multipart/form-data" id="editProdForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">商城訂單編號</label>
+                                    <input type="text" th:field="*{prodOrdId}" class="form-control" readonly />
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">會員編號</label>
+                                    <input type="text" th:field="*{memberVO.memberId}" class="form-control" readonly />
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">付款方式</label>
+                                    <select th:field="*{payMethod}" class="form-select">
+                                        <option th:value="true">現金</option>
+                                        <option th:value="false">信用卡</option>
+                                    </select>
+                                    <span th:if="${#fields.hasErrors('payMethod')}" th:errors="*{payMethod}" class="text-danger small" id="payMethod.errors"></span>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">訂單狀態</label>
+                                     <select th:field="*{ordStat}" class="form-select">
+                                        <option th:value="0">已付款</option>
+                                        <option th:value="1">完成</option>
+                                        <option th:value="2">取消</option>
+                                    </select>
+                                    <span th:if="${#fields.hasErrors('ordStat')}" th:errors="*{ordStat}" class="text-danger small" id="ordStat.errors"></span>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">折價卷編號</label>
+                                    <select th:field="*{couponVO.couponCode}" class="form-select">
+                                        <option th:each="couponVO : ${couponVO.couponCode}" th:value="${couponVO.couponCode}" th:text="${couponVO.couponCode + ' - ' + couponVO.couponName}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-end pt-4 border-top mt-4">
+                                <button type="submit" id="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save me-2"></i>
+                                    送出修改
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    
+    <script type="text/javascript">
+    //清除提示信息
+    function hideContent(d) {
+         var el = document.getElementById(d);
+         if(el) el.style.display = "none";
+    }
+    
+    // 處理 Modal 中的表單提交
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('editProdForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(form);
+                
+                fetch('/prod/update', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // 檢查是否有錯誤訊息
+                    if (html.includes('text-danger') || html.includes('has-error')) {
+                        // 有錯誤，更新 Modal 內容
+                        const modalBody = document.getElementById('editProdModalBody');
+                        modalBody.innerHTML = html;
+                    } else {
+                        // 成功，關閉 Modal 並重新載入頁面
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('editProdModal'));
+                        modal.hide();
+                        
+                        // 重新載入頁面以顯示更新後的資料
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('提交失敗:', error);
+                    alert('提交失敗，請重新嘗試');
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>

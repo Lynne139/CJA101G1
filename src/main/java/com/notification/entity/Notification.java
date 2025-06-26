@@ -2,7 +2,6 @@ package com.notification.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import com.member.model.MemberVO;
 
 @Entity
 @Table(name = "notification")
@@ -13,9 +12,8 @@ public class Notification {
     @Column(name = "notification_id")
     private Integer notificationId; // 通知流水號
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "member_id", nullable = false)
-    private MemberVO member; // 會員
+    @Column(name = "member_id", nullable = false)
+    private Integer memberId; // 會員
 
     @Column(name = "title", nullable = false, length = 50)
     private String title; // 通知標題
@@ -40,12 +38,12 @@ public class Notification {
         this.notificationId = notificationId;
     }
 
-    public MemberVO getMember() {
-        return member;
+    public Integer getMemberId() {
+        return memberId;
     }
 
-    public void setMember(MemberVO member) {
-        this.member = member;
+    public void setMemberId(Integer memberId) {
+        this.memberId = memberId;
     }
 
     public String getTitle() {

@@ -1,0 +1,161 @@
+<div th:fragment="listOneShopOrdDet-div">
+    <div class="panel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="panel-title">訂單明細詳細資訊</h2>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary" 
+                        data-bs-toggle="modal" data-bs-target="#editShopOrdDetModal"
+                        th:data-prod-ord-id="${shopOrdDetVO.shopOrdVO.prodOrdId}"
+                        th:data-product-id="${shopOrdDetVO.prodVO.productId}"
+                        onclick="loadEditShopOrdDetModal(this)">
+                    <i class="fas fa-edit me-2"></i>
+                    修改
+                </button>
+                <button type="button" class="btn btn-outline-danger"
+                        th:onclick="'deleteShopOrdDet(' + ${shopOrdDetVO.shopOrdVO.prodOrdId} + ', ' + ${shopOrdDetVO.prodVO.productId} + ')'">
+                    <i class="fas fa-trash me-2"></i>
+                    刪除
+                </button>
+                <a href="/admin/shopOrdDet/select_page" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    返回列表
+                </a>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            訂單資訊
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">訂單編號：</div>
+                            <div class="col-8" th:text="${shopOrdDetVO.shopOrdVO.prodOrdId}"></div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">訂單日期：</div>
+                            <div class="col-8" th:text="${#temporals.format(shopOrdDetVO.shopOrdVO.prodOrdDate, 'yyyy-MM-dd HH:mm')}"></div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">會員：</div>
+                            <div class="col-8" th:text="${shopOrdDetVO.shopOrdVO.memberVO.memberName}"></div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">付款方式：</div>
+                            <div class="col-8">
+                                <span th:if="${shopOrdDetVO.shopOrdVO.payMethod}" class="badge bg-success">現金</span>
+                                <span th:unless="${shopOrdDetVO.shopOrdVO.payMethod}" class="badge bg-info">信用卡</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">訂單狀態：</div>
+                            <div class="col-8">
+                                <span th:if="${shopOrdDetVO.shopOrdVO.ordStat == 0}" class="badge bg-primary">已付款</span>
+                                <span th:if="${shopOrdDetVO.shopOrdVO.ordStat == 1}" class="badge bg-success">完成</span>
+                                <span th:if="${shopOrdDetVO.shopOrdVO.ordStat == 2}" class="badge bg-danger">取消</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-box me-2"></i>
+                            商品資訊
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">商品編號：</div>
+                            <div class="col-8" th:text="${shopOrdDetVO.prodVO.productId}"></div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">商品名稱：</div>
+                            <div class="col-8" th:text="${shopOrdDetVO.prodVO.productName}"></div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">商品分類：</div>
+                            <div class="col-8" th:text="${shopOrdDetVO.prodVO.prodCateVO.prodCateName}"></div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 fw-bold">原價：</div>
+                            <div class="col-8" th:text="${'$' + shopOrdDetVO.prodVO.productPrice}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-receipt me-2"></i>
+                    購買明細
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <div class="h4 text-primary" th:text="${'$' + shopOrdDetVO.purchasePrice}"></div>
+                            <div class="text-muted">購買價格</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <div class="h4 text-success" th:text="${shopOrdDetVO.prodQuantity}"></div>
+                            <div class="text-muted">購買數量</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <div class="h4 text-danger" th:text="${'$' + (shopOrdDetVO.purchasePrice * shopOrdDetVO.prodQuantity)}"></div>
+                            <div class="text-muted">小計金額</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <div class="h4 text-warning" th:text="${'$' + shopOrdDetVO.shopOrdVO.discountAmount}"></div>
+                            <div class="text-muted">折價金額</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 刪除訂單明細
+function deleteShopOrdDet(prodOrdId, productId) {
+    if (confirm('確定要刪除這筆訂單明細嗎？')) {
+        // 建立表單並提交
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/admin/shopOrdDet/delete';
+        
+        const prodOrdIdInput = document.createElement('input');
+        prodOrdIdInput.type = 'hidden';
+        prodOrdIdInput.name = 'prodOrdId';
+        prodOrdIdInput.value = prodOrdId;
+        
+        const productIdInput = document.createElement('input');
+        productIdInput.type = 'hidden';
+        productIdInput.name = 'productId';
+        productIdInput.value = productId;
+        
+        form.appendChild(prodOrdIdInput);
+        form.appendChild(productIdInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script> 

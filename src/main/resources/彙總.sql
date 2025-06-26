@@ -130,23 +130,43 @@ Is_active boolean not null default true
 INSERT INTO ROLE_LIST (ROLE_NAME, REMARK)
 VALUES 
 ('系統管理員', '擁有全站存取權限'),
-('客服專員', '可回覆顧客留言與查詢訂單');
+('客服部', '可回覆顧客留言與查詢訂單');
+
+-- 職稱表 
+create table job_title (
+job_title_id int auto_increment primary key not null,
+job_title_name Varchar(50) not null,
+description Varchar(200),
+is_active boolean not null default true
+);
+
+INSERT INTO JOB_TITLE (JOB_TITLE_NAME, DESCRIPTION)
+VALUES 
+('總經理', '負責公司整體營運管理'),
+('副總經理', '協助總經理管理公司業務'),
+('部門經理', '負責部門日常營運管理'),
+('資深專員', '具備豐富經驗的專業人員'),
+('專員', '一般業務處理人員'),
+('助理', '協助各項業務處理');
 
 -- 員工 
 Create table employee (
 Employee_id int auto_increment primary key not null,
 Role_id int not null,
+job_title_id int,
 Name Varchar(50) not null,
 Status boolean default true not null,
 Created_date date not null,
 Password Varchar(50) not null,
-foreign key (Role_id) references Role_list (Role_id)
+employee_photo LONGBLOB,
+foreign key (Role_id) references Role_list (Role_id),
+foreign key (job_title_id) references job_title (job_title_id)
 );
 
-INSERT INTO EMPLOYEE (ROLE_ID, NAME, CREATED_DATE, PASSWORD)
+INSERT INTO EMPLOYEE (ROLE_ID, JOB_TITLE_ID, NAME, CREATED_DATE, PASSWORD)
 VALUES 
-(1, '吳永志', '2025-01-01', '1234'),
-(2, '吳冠宏', '2025-02-15', '1234');
+(1, 1, '吳永志', '2025-01-01', '1234'),
+(2, 5, '吳冠宏', '2025-02-15', '1234');
 
 
 -- 客服留言 
@@ -228,7 +248,6 @@ create table prod_cart_item(
   PRODUCT_ID INT NOT NULL,
   PRIMARY KEY(MEMBER_ID, PRODUCT_ID),
   
-  PRODUCT_NAME VARCHAR(30) NOT NULL,
   QUANTITY INT NOT NULL,
   
   foreign key (MEMBER_ID) references MEMBER(MEMBER_ID),
@@ -240,9 +259,9 @@ create table prod_cart_item(
 -- 商城訂單 
 create table shop_order(
 
-  PRODUCT_ORDER_ID INT PRIMARY KEY NOT NULL,
+  PRODUCT_ORDER_ID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   MEMBER_ID INT NOT NULL,
-  PRODUCT_ORDER_DATE DATE NOT NULL,
+  PRODUCT_ORDER_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRODUCT_AMOUNT INT NOT NULL,
   PAYMENT_METHOD Boolean,
   ORDER_STATUS TinyInt NOT NULL,
@@ -275,9 +294,9 @@ create table shop_order_detail(
 -- 商品圖片 
 create table product_photo(
 
-  PRODUCT_PHOTO_ID INT PRIMARY KEY NOT NULL,
+  PRODUCT_PHOTO_ID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   PRODUCT_ID INT NOT NULL,
-  PRODUCT_PHOTO BLOB,
+  PRODUCT_PHOTO MEDIUMBLOB,
   
   foreign key (PRODUCT_ID) references PRODUCT(PRODUCT_ID)
 );
@@ -298,31 +317,31 @@ VALUES
   (3, 30000, 'MacBook Air M2', TRUE);
 
 
-INSERT INTO PROD_CART_ITEM (MEMBER_ID, PRODUCT_ID, PRODUCT_NAME, QUANTITY)
+INSERT INTO PROD_CART_ITEM (MEMBER_ID, PRODUCT_ID,QUANTITY)
 VALUES
-  (1, 1, 'Dyson 吸塵器', 1),
-  (1, 2, 'Java 程式設計入門', 2),
-  (2, 3, 'MacBook Air M2', 1);
+  (1, 1, 1),
+  (1, 2, 2),
+  (2, 3, 1);
 
 INSERT INTO SHOP_ORDER (
-  PRODUCT_ORDER_ID, MEMBER_ID, PRODUCT_ORDER_DATE, PRODUCT_AMOUNT,
-  PAYMENT_METHOD, ORDER_STATUS, DISCOUNT_AMOUNT, ACTUAL_PAYMENT_AMOUNT
+   MEMBER_ID, PRODUCT_AMOUNT,
+  PAYMENT_METHOD, ORDER_STATUS, DISCOUNT_AMOUNT, ACTUAL_PAYMENT_AMOUNT,COUPON_CODE
 )
 VALUES
-  (1001, 1, '2025-05-15', 12450, TRUE, 1, 450, 12000),
-  (1002, 2, '2025-05-16', 30000, FALSE, 0, 0, 30000);
+  ( 1, 12450, TRUE, 1, 150, 12300,'A2505AAA'),
+  ( 2, 30000, FALSE, 0, 0, 30000,null);
 
 INSERT INTO SHOP_ORDER_DETAIL (PRODUCT_ORDER_ID, PRODUCT_ID, PURCHASE_PRICE, PRODUCT_QUANTITY)
 VALUES
-  (1001, 1, 12000, 1),
-  (1001, 2, 450, 1),
-  (1002, 3, 30000, 1);
+  (1, 1, 12000, 1),
+  (2, 2, 450, 1),
+  (2, 3, 30000, 1);
 
-INSERT INTO PRODUCT_PHOTO (PRODUCT_PHOTO_ID, PRODUCT_ID, PRODUCT_PHOTO)
+INSERT INTO PRODUCT_PHOTO (PRODUCT_ID, PRODUCT_PHOTO)
 VALUES 
-  (1, 1, NULL),
-  (2, 2, NULL),
-  (3, 3, NULL);
+  ( 1, NULL),
+  ( 2, NULL),
+  ( 3, NULL);
   
 -- 新聞報導 
 create table news_list (
@@ -331,9 +350,9 @@ Title varchar(100) not null,
 Content Varchar(1000) not null,
 Published_date date not null,
 Is_display boolean default true not null,
-Promo_photo longblob);
+News_photo longblob);
 
-INSERT INTO NEWS_LIST (TITLE, CONTENT, PUBLISHED_DATE, IS_DISPLAY, PROMO_PHOTO)
+INSERT INTO NEWS_LIST (TITLE, CONTENT, PUBLISHED_DATE, IS_DISPLAY, NEWS_PHOTO)
 VALUES 
 (
   '嶼蔻飯店榮獲2025年度最佳設計旅宿獎',
@@ -358,9 +377,9 @@ Title Varchar(100) not null,
 Content Varchar(1000) not null,
 Created_date date not null,
 Is_display boolean default true not null,
-News_photo longblob);
+Hotnews_photo longblob);
 
-INSERT INTO HOT_NEWS_LIST (TITLE, CONTENT, CREATED_DATE, IS_DISPLAY, NEWS_PHOTO)
+INSERT INTO HOT_NEWS_LIST (TITLE, CONTENT, CREATED_DATE, IS_DISPLAY, HOTNEWS_PHOTO)
 VALUES 
 (
   '嶼蔻飯店全新開幕，打造奢華海島體驗',

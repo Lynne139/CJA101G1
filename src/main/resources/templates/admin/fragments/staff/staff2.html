@@ -1,5 +1,197 @@
 <div th:fragment="content">
-	<div class="main_staff2">
-		<p>查詢</p>
+	<div class="container py-4">
+		<h4 class="mb-4">員工管理查詢</h4>
+		
+		<!-- 員工查詢區域 -->
+		<div class="card mb-4">
+			<div class="card-header">
+				<h5 class="mb-0">員工查詢</h5>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-md-8 mb-2">
+						<input type="text" class="form-control" id="employeeSearchInput" placeholder="搜尋員工姓名..." onkeyup="searchEmployees()">
+					</div>
+					<div class="col-md-4 mb-2">
+						<button type="button" class="btn btn-primary btn-lg w-100" onclick="loadEmployees()">
+							<i class="fas fa-users me-2"></i>查詢員工
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 部門查詢區域 -->
+		<div class="card mb-4">
+			<div class="card-header">
+				<h5 class="mb-0">部門查詢</h5>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-md-8 mb-2">
+						<input type="text" class="form-control" id="roleSearchInput" placeholder="搜尋部門名稱..." onkeyup="searchRoles()">
+					</div>
+					<div class="col-md-4 mb-2">
+						<button type="button" class="btn btn-success btn-lg w-100" onclick="loadRoles()">
+							<i class="fas fa-building me-2"></i>查詢部門
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 職稱查詢區域 -->
+		<div class="card mb-4">
+			<div class="card-header">
+				<h5 class="mb-0">職稱查詢</h5>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-md-8 mb-2">
+						<input type="text" class="form-control" id="jobTitleSearchInput" placeholder="搜尋職稱名稱..." onkeyup="searchJobTitles()">
+					</div>
+					<div class="col-md-4 mb-2">
+						<button type="button" class="btn btn-info btn-lg w-100" onclick="loadJobTitles()">
+							<i class="fas fa-id-badge me-2"></i>查詢職稱
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 查詢結果區域 -->
+		<div id="queryResults" class="mt-4"></div>
+	</div>
+
+	<!-- 編輯員工的 Modal -->
+	<div class="modal fade" id="editEmployeeModal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">編輯員工</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<form id="editEmployeeForm">
+						<input type="hidden" id="editEmployeeId" name="employeeId">
+						<div class="mb-3">
+							<label class="form-label">姓名</label>
+							<input type="text" class="form-control" id="editEmployeeName" name="name" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">部門</label>
+							<select class="form-select" id="editEmployeeRoleId" name="roleId">
+								<option value="">請選擇部門</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">職稱</label>
+							<select class="form-select" id="editEmployeeJobTitleId" name="jobTitleId" required>
+								<option value="">請選擇職稱</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">狀態</label>
+							<select class="form-select" id="editEmployeeStatus" name="status">
+								<option value="true">啟用</option>
+								<option value="false">停用</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">員工照片</label>
+							<div class="mb-2">
+								<img id="editEmployeePhotoPreview" src="/images/admin/no_img.svg" alt="員工照片" 
+									 class="img-thumbnail" style="max-width: 150px; max-height: 150px; cursor: pointer;" 
+									 onclick="previewEmployeePhoto(this.src)">
+							</div>
+							<input type="file" class="form-control" id="editEmployeePhoto" name="employeePhoto" 
+								   accept="image/*" onchange="previewEditEmployeePhoto(this)">
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary" onclick="saveEmployeeEdit()">儲存</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 編輯部門的 Modal -->
+	<div class="modal fade" id="editRoleModal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">編輯部門</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<form id="editRoleForm">
+						<input type="hidden" id="editRoleId" name="roleId">
+						<div class="mb-3">
+							<label class="form-label">部門名稱</label>
+							<input type="text" class="form-control" id="editRoleName" name="roleName" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">備註</label>
+							<input type="text" class="form-control" id="editRoleRemark" name="remark">
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary" onclick="saveRoleEdit()">儲存</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 編輯職稱的 Modal -->
+	<div class="modal fade" id="editJobTitleModal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">編輯職稱</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<form id="editJobTitleForm">
+						<input type="hidden" id="editJobTitleId" name="jobTitleId">
+						<div class="mb-3">
+							<label class="form-label">職稱名稱</label>
+							<input type="text" class="form-control" id="editJobTitleName" name="jobTitleName" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">職稱說明</label>
+							<input type="text" class="form-control" id="editJobTitleDescription" name="description">
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary" onclick="saveJobTitleEdit()">儲存</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="/js/admin/staff/staff_read.js"></script>
+
+	<!-- 照片預覽 Modal -->
+	<div class="modal fade" id="photoPreviewModal" tabindex="-1">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">員工照片</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body text-center">
+					<img id="photoPreviewImage" src="" alt="員工照片" class="img-fluid" style="max-height: 70vh;">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>

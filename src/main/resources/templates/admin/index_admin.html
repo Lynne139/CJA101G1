@@ -50,6 +50,9 @@
 			      		<div class="submenu_block ps-4" 
 							th:classappend="${currentURI.startsWith('/admin/member')} ? 'show'">
 			        		<a th:href="@{/admin/member1}" th:classappend="${currentURI == '/admin/member1'} ? '-active'" class="sidebar_sub_link">會員子頁1</a>
+			        		<a th:href="@{/admin/listAllMember}" th:classappend="${currentURI == '/admin//admin/listAllMember'} ? '-active'" class="sidebar_sub_link">會員列表</a>
+			      			<a th:href="@{/admin/addMember}" th:classappend="${currentURI == '/admin//admin/addMember'} ? '-active'" class="sidebar_sub_link">會員新增</a>
+			      		 
 			      		</div>
 			    	</div>
 			
@@ -77,7 +80,6 @@
                 
 				      	<div class="submenu_block ps-4"
 							th:classappend="${currentURI.startsWith('/admin/room')} ? 'show'">
-				        	<a th:href="@{/admin/room1}" th:classappend="${currentURI == '/admin/room1'} ? '-active'" class="sidebar_sub_link">房型子頁1</a>
 				        	<a th:href="@{/admin/listAllRoomType}" th:classappend="${currentURI == '/admin/listAllRoomType'} ? '-active'" class="sidebar_sub_link">房型資訊</a>
 				        	<a th:href="@{/admin/listAllRoomTypeSchedule}" th:classappend="${currentURI == '/admin/listAllRoomTypeSchedule'} ? '-active'" class="sidebar_sub_link">房型預定表資訊</a>
 				        	<a th:href="@{/admin/listAllRoom}" th:classappend="${currentURI == '/admin/listAllRoom'} ? '-active'" class="sidebar_sub_link">房間資訊</a>
@@ -109,11 +111,11 @@
 			      		<div class="submenu_block ps-4"
 			      			th:classappend="${currentURI.startsWith('/admin/shop')} ? 'show'">
 			        		<a th:href="@{/admin/prod/select_page}"   th:classappend="${currentURI == '/admin/prod/select_page'} ? '-active'"       class="sidebar_sub_link">商品管理</a>
-			        		<a th:href="@{/admin/prodCart}"   th:classappend="${currentURI == '/admin/prodCart'} ? '-active'"   class="sidebar_sub_link">購物車項目</a>
+			        		<a th:href="@{/admin/prodCart/select_page}"   th:classappend="${currentURI == '/admin/prodCart/select_page'} ? '-active'"   class="sidebar_sub_link">購物車項目</a>
 			        		<a th:href="@{/admin/prodCate/select_page}"   th:classappend="${currentURI == '/admin/prodCate/select_page'} ? '-active'"   class="sidebar_sub_link">商品類別管理</a>
 			        		<a th:href="@{/admin/prodPhoto/select_page}"   th:classappend="${currentURI == '/admin/prodPhoto/select_page'} ? '-active'"  class="sidebar_sub_link">商品圖片管理</a>
-			        		<a th:href="@{/admin/shopOrd}"   th:classappend="${currentURI == '/admin/shopOrd'} ? '-active'"    class="sidebar_sub_link">商城訂單</a>
-			        		<a th:href="@{/admin/shopOrdDet}"   th:classappend="${currentURI == '/admin/shopOrdDet'} ? '-active'" class="sidebar_sub_link">商品訂單明細</a>
+			        		<a th:href="@{/admin/shopOrd/select_page}"   th:classappend="${currentURI == '/admin/shopOrd/select_page'} ? '-active'"    class="sidebar_sub_link">商城訂單</a>
+			        		<a th:href="@{/admin/shopOrdDet/select_page}"   th:classappend="${currentURI == '/admin/shopOrdDet/select_page'} ? '-active'" class="sidebar_sub_link">商品訂單明細</a>
 			      		</div>
 			    	</div>
 			
@@ -152,7 +154,9 @@
                   
 		          		<div class="submenu_block ps-4"
 		          			th:classappend="${currentURI.startsWith('/admin/news')} ? 'show'">
-		            		<a th:href="@{/admin/news1}" th:classappend="${currentURI == '/admin/news1'} ? '-active'" class="sidebar_sub_link">消息子頁1</a>
+		            		<a th:href="@{/admin/news1}" th:classappend="${currentURI == '/admin/news1'} ? '-active'" class="sidebar_sub_link">最新消息</a>
+							<a th:href="@{/admin/news2}" th:classappend="${currentURI == '/admin/news2'} ? '-active'" class="sidebar_sub_link">活動消息</a>
+							<a th:href="@{/admin/news3}" th:classappend="${currentURI == '/admin/news3'} ? '-active'" class="sidebar_sub_link">媒體消息</a>	          		
 		          		</div>
 		        	</div>
 		  		</nav>		
