@@ -3,18 +3,16 @@ package com.roomtype.model;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.room.utils.RoomTypeCriteriaHelper;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceContext;
 
 @Service("roomTypeService")
@@ -47,7 +45,7 @@ public class RoomTypeService {
 	}
 
 	// 用於新增時（單一參數）
-	public boolean isDuplicateName(String name) {
+	public boolean existsDuplicateName(String name) {
 		return roomTypeRepository.findByRoomTypeName(name).isPresent();
 	}
 
@@ -101,12 +99,12 @@ public class RoomTypeService {
 	}
 
 	// 這是處理圖片轉換為 Base64 字串的邏輯
-	public String convertImageToBase64(byte[] imageBytes) {
-		if (imageBytes != null) {
-			return Base64.getEncoder().encodeToString(imageBytes);
-		}
-		return ""; // 如果圖片為 null，返回空字串
-	}
+//	public String convertImageToBase64(byte[] imageBytes) {
+//		if (imageBytes != null) {
+//			return Base64.getEncoder().encodeToString(imageBytes);
+//		}
+//		return ""; // 如果圖片為 null，返回空字串
+//	}
 	
 //	public List<RoomTypeVO> getAll() {
 //        List<RoomTypeVO> roomTypeVOList = roomTypeRepository.findAll();  // 假設從資料庫取得所有資料
@@ -127,5 +125,10 @@ public class RoomTypeService {
 //
 //        return roomTypeVOList;
 //    }
+	
+	// 複合查詢（Criteria 結構）
+    public List<RoomTypeVO> compositeQuery(Map<String, String[]> map) {
+        return RoomTypeCriteriaHelper.getRoomTypeCriteria(map, em);
+    }
 }	
 	

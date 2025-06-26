@@ -107,39 +107,7 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
     } 
-    @GetMapping("/listAllRoomType")
-    public String listAllRoomType(HttpServletRequest request,HttpServletResponse response,Model model) {
-    	
-    	String mainFragment = "admin/fragments/room/listAllRoomType";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-    	List<RoomTypeVO> roomTypeVOList = roomTypeService.getAll();
-    	model.addAttribute("roomTypeVOList",roomTypeVOList);
-    	
-    	return "admin/index_admin";
-    } 
-    @GetMapping("/listAllRoomTypeSchedule")
-    public String listAllRoomTypeSchedule(HttpServletRequest request,HttpServletResponse response,Model model) {
-    	
-    	String mainFragment = "admin/fragments/room/listAllRoomTypeSchedule";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-    	List<RoomTypeScheduleVO> roomTypeScheduleVOList = roomTypeScheduleService.getAll();
-    	model.addAttribute("roomTypeScheduleVOList",roomTypeScheduleVOList);
-    	
-    	return "admin/index_admin";
-    } 
-    @GetMapping("/listAllRoom")
-    public String listAllRoom(HttpServletRequest request,HttpServletResponse response,Model model) {
-    	
-    	String mainFragment = "admin/fragments/room/listAllRoom";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-    	List<RoomVO> roomVOList = roomService.getAll();
-    	model.addAttribute("roomVOList",roomVOList);
-    	
-    	return "admin/index_admin";
-    } 
+     
     
     // === 餐廳管理 ===
     @GetMapping("/resto_info")

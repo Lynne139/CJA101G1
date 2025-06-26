@@ -17,7 +17,7 @@
         <div class="modal-body">
 
           <form id="restoAddForm" data-parsley-validate
-            th:object="${roomTypeVO}" th:action="@{/admin//roomType_info/insert}"
+            th:object="${roomTypeVO}" th:action="@{/admin/listAllRoomType/insert}"
             method="post" enctype="multipart/form-data"
             onsubmit="this.querySelector('button[type=submit]').disabled=true">
 
@@ -35,7 +35,7 @@
 
             <div class="mb-3">
               <label for="roomTypeAmount" class="form-label">房型數量 <span class="text-danger">*</span> <small class="text-muted">上限1000</small></label>
-              <input type="text" th:field="*{roomTypeAmount}" id="roomTypeAmount" class="form-control" required min="1">
+              <input type="text" inputmode="numeric" pattern="\d*" th:field="*{roomTypeAmount}" id="roomTypeAmount" class="form-control" required min="1">
               
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('roomTypeAmount')}">
@@ -81,16 +81,14 @@
             </div>
             
             <div class="mb-3">
-              <label for="roomTypePic" class="form-label">房型圖片 <small class="text-muted">檔案上限16MB</small></label>
-              <input type="file" name="roomTypePic" id="roomTypePic" class="form-control" accept="image/*">
+              <label for="roomTypePic" class="form-label">房型圖片 <small class="text-muted">只接受 PNG/JPEG/GIF 格式，檔案上限16MB</small></label>
+              <input type="file" name="uploadImg" id="uploadImg" class="form-control" accept="image/png,image/jpeg,image/gif">
               <img id="imgPreview"
-                 th:src="${roomTypeVO.roomTypePic != null} ?
-                         @{/admin/roomType_info/img/{id}(id=${roomTypeVO.roomTypeId})} :
-                         @{/images/admin/no_img.svg}"
+                 th:src="@{/images/admin/no_img.svg}"
                  class="img-fluid mt-2 rounded mx-auto d-block"
                  style="max-height: 200px;" />        
                  
-                 <div class="d-flex justify-content-center">
+                 <div id="btnClearImageContainer" class="d-flex justify-content-center">
                     <button type="button" id="btnClearImage" class="btn btn-outline-danger btn-sm mt-2 d-none">
                       <i class="fa-solid fa-trash-can me-1 mt-2"></i> 清除圖片
                     </button>
