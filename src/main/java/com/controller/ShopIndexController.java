@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.prod.model.ProdService;
 import com.prod.model.ProdVO;
@@ -60,7 +61,9 @@ public class ShopIndexController {
      * 商城首頁（本地測試用，含假登入）
      */
     @GetMapping("/shop")
-    public String shopIndex(HttpSession session, Model model) {
+    public String shopIndex(HttpSession session, Model model, 
+                           @RequestParam(required = false) String payment,
+                           @RequestParam(required = false) String orderId) {
         // 假登入：本地測試用，直接查詢會員編號1號的資料
         if (session.getAttribute("memberVO") == null) {
             MemberVO member = memberService.getOneMember(1);
@@ -68,6 +71,18 @@ public class ShopIndexController {
                 session.setAttribute("memberVO", member);
             }
         }
+        
+        // 處理付款狀態參數
+        if (payment != null) {
+            if ("success".equals(payment)) {
+                model.addAttribute("paymentMessage", "付款成功！");
+                model.addAttribute("paymentStatus", "success");
+            } else if ("failed".equals(payment)) {
+                model.addAttribute("paymentMessage", "付款失敗，請稍後再試。");
+                model.addAttribute("paymentStatus", "failed");
+            }
+        }
+        
         // 獲取所有商品
         List<ProdVO> products = prodService.getAll();
         model.addAttribute("products", products);

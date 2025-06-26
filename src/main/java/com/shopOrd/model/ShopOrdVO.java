@@ -43,7 +43,7 @@ public class ShopOrdVO implements java.io.Serializable{
     @Column(name = "PRODUCT_ORDER_DATE", nullable = false, updatable = false, insertable = false)
 	private LocalDateTime prodOrdDate;
 	
-    @Column(name = "PRODUCT_AMOUNT" , nullable = false, updatable = false, insertable = false)
+    @Column(name = "PRODUCT_AMOUNT" , nullable = false)
     private  Integer prodAmount;
     
     @Column(name = "PAYMENT_METHOD")

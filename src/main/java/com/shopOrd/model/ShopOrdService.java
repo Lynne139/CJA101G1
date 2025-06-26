@@ -3,6 +3,9 @@ package com.shopOrd.model;
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.coupon.entity.Coupon;
+import com.coupon.entity.MemberCoupon;
+import com.coupon.entity.MemberCouponId;
+import com.coupon.repository.MemberCouponRepository;
 import com.coupon.repository.CouponRepository;
 import com.member.model.MemberVO;
 import com.prod.model.ProdRepository;
@@ -19,7 +25,6 @@ import com.prodCart.model.ProdCartVO;
 import com.shopOrdDet.model.ShopOrdDetIdVO;
 import com.shopOrdDet.model.ShopOrdDetRepository;
 import com.shopOrdDet.model.ShopOrdDetVO;
-import java.time.LocalDateTime;
 
 @Service("shopOrdService")
 public class ShopOrdService {
@@ -29,6 +34,9 @@ public class ShopOrdService {
 	
 	@Autowired
 	ShopOrdDetRepository shopOrdDetRepository;
+	
+	@Autowired
+    MemberCouponRepository memberCouponRepository;
 	
 	@Autowired
     CouponRepository couponRepository;
@@ -73,17 +81,6 @@ public class ShopOrdService {
 		order.setPayMethod(paymentMethod);
 		order.setOrdStat(0); // 已付款
 
-		// 折價券處理
-		int discount = 0;
-		if (couponCode != null && !couponCode.trim().isEmpty()) {
-			Optional<Coupon> couponOpt = couponRepository.findById(couponCode);
-			if (couponOpt.isPresent()) {
-				Coupon coupon = couponOpt.get();
-				discount = coupon.getDiscountValue();
-				order.setCoupon(coupon);
-			}
-		}
-
 		// 3. 建立明細，計算總金額
 		List<ShopOrdDetVO> detailList = new ArrayList<>();
 		int total = 0;
@@ -102,19 +99,75 @@ public class ShopOrdService {
 			detailList.add(detail);
 		}
 
+		// 4. 折價券處理和驗證
+		int discount = 0;
+		if (couponCode != null && !couponCode.trim().isEmpty()) {
+			// 先檢查折價券是否存在
+			Optional<Coupon> couponOpt = couponRepository.findById(couponCode);
+			if (couponOpt.isPresent()) {
+				Coupon coupon = couponOpt.get();
+				
+				// 檢查會員是否擁有這張折價券且未使用
+				MemberCouponId memberCouponId = new MemberCouponId(couponCode, memberId);
+				Optional<MemberCoupon> memberCouponOpt = memberCouponRepository.findById(memberCouponId);
+				
+				if (!memberCouponOpt.isPresent()) {
+					throw new RuntimeException("您尚未領取此折價券");
+				}
+				
+				MemberCoupon memberCoupon = memberCouponOpt.get();
+				if (Boolean.TRUE.equals(memberCoupon.getIsUsed())) {
+					throw new RuntimeException("此折價券已使用過");
+				}
+				
+				// 驗證折價券
+				validateCoupon(coupon, total, memberId);
+				
+				// 計算折扣金額（不能超過總金額）
+				discount = Math.min(coupon.getDiscountValue(), total);
+				order.setCoupon(coupon);
+				
+				// 標記折價券為已使用
+				memberCoupon.setIsUsed(true);
+				memberCoupon.setUsedTime(LocalDateTime.now());
+				memberCouponRepository.save(memberCoupon);
+			} else {
+				throw new RuntimeException("折價券不存在");
+			}
+		}
+
 		order.setProdAmount(total);
 		order.setDiscountAmount(discount);
 		order.setActualPaymentAmount(total - discount);
 
-		// 4. 儲存主檔與明細
+		// 5. 儲存主檔與明細
 		ShopOrdVO savedOrder = repository.save(order);
 		for (ShopOrdDetVO detail : detailList) {
 			detail.getPpid().setProdOrdId(savedOrder.getProdOrdId());
 			shopOrdDetRepository.save(detail);
 		}
 
-		// 5. 刪除購物車項目
+		// 6. 刪除購物車項目
 		prodCartRepository.deleteAll(cartItems);
+	}
+
+	/**
+	 * 驗證折價券是否可用
+	 */
+	private void validateCoupon(Coupon coupon, int orderTotal, Integer memberId) {
+		// 檢查最低消費
+		if (coupon.getMinPurchase() > 0 && orderTotal < coupon.getMinPurchase()) {
+			throw new RuntimeException("訂單金額未達折價券最低消費 NT$ " + coupon.getMinPurchase());
+		}
+		
+		// 檢查到期日
+		LocalDate today = LocalDate.now();
+		if (today.isAfter(coupon.getExpiryDate())) {
+			throw new RuntimeException("折價券已過期");
+		}
+		
+		// 注意：不檢查 claim_start_date 和 claim_end_date
+		// 因為這些是領取期間，會員已經領取了折價券，只需要檢查是否過期即可
 	}
 
 	/**
@@ -196,6 +249,103 @@ public class ShopOrdService {
 
 		// 4. 儲存訂單主檔
 		repository.save(shopOrdVO);
+	}
+
+	/**
+	 * 根據 LINE Pay 訂單資料建立商城訂單
+	 * 用於 LINE Pay 付款成功後建立訂單
+	 */
+	@Transactional
+	public void createShopOrderFromLinePay(Map<String, Object> linepayOrder) {
+		Integer memberId = (Integer) linepayOrder.get("memberId");
+		String couponCode = (String) linepayOrder.get("couponCode");
+		Boolean paymentMethod = (Boolean) linepayOrder.get("paymentMethod");
+		String orderId = (String) linepayOrder.get("orderId");
+		Integer amount = (Integer) linepayOrder.get("amount");
+		
+		// 1. 取得購物車中所有商品
+		List<ProdCartVO> cartItems = prodCartRepository.findByMemberVO_MemberId(memberId);
+		if (cartItems.isEmpty()) {
+			throw new RuntimeException("購物車為空");
+		}
+
+		// 2. 建立訂單主檔
+		ShopOrdVO order = new ShopOrdVO();
+		MemberVO member = new MemberVO();
+		member.setMemberId(memberId);
+		order.setMemberVO(member);
+		order.setProdOrdDate(LocalDateTime.now());
+		order.setPayMethod(paymentMethod);
+		order.setOrdStat(1); // 已付款（LINE Pay 付款成功）
+
+		// 3. 建立明細，計算總金額
+		List<ShopOrdDetVO> detailList = new ArrayList<>();
+		int total = 0;
+		for (ProdCartVO cartItem : cartItems) {
+			ProdVO product = cartItem.getProdVO();
+
+			ShopOrdDetVO detail = new ShopOrdDetVO();
+			ShopOrdDetIdVO detailId = new ShopOrdDetIdVO(null, product.getProductId()); // 先留 null，儲存後再補
+			detail.setPpid(detailId);
+			detail.setProdVO(product);
+			detail.setPurchasePrice(product.getProductPrice());
+			detail.setProdQuantity(cartItem.getQuantity());
+			detail.setShopOrdVO(order);
+
+			total += product.getProductPrice() * cartItem.getQuantity();
+			detailList.add(detail);
+		}
+
+		// 4. 折價券處理和驗證
+		int discount = 0;
+		if (couponCode != null && !couponCode.trim().isEmpty()) {
+			// 先檢查折價券是否存在
+			Optional<Coupon> couponOpt = couponRepository.findById(couponCode);
+			if (couponOpt.isPresent()) {
+				Coupon coupon = couponOpt.get();
+				
+				// 檢查會員是否擁有這張折價券且未使用
+				MemberCouponId memberCouponId = new MemberCouponId(couponCode, memberId);
+				Optional<MemberCoupon> memberCouponOpt = memberCouponRepository.findById(memberCouponId);
+				
+				if (!memberCouponOpt.isPresent()) {
+					throw new RuntimeException("您尚未領取此折價券");
+				}
+				
+				MemberCoupon memberCoupon = memberCouponOpt.get();
+				if (Boolean.TRUE.equals(memberCoupon.getIsUsed())) {
+					throw new RuntimeException("此折價券已使用過");
+				}
+				
+				// 驗證折價券
+				validateCoupon(coupon, total, memberId);
+				
+				// 計算折扣金額（不能超過總金額）
+				discount = Math.min(coupon.getDiscountValue(), total);
+				order.setCoupon(coupon);
+				
+				// 標記折價券為已使用
+				memberCoupon.setIsUsed(true);
+				memberCoupon.setUsedTime(LocalDateTime.now());
+				memberCouponRepository.save(memberCoupon);
+			} else {
+				throw new RuntimeException("折價券不存在");
+			}
+		}
+
+		order.setProdAmount(total);
+		order.setDiscountAmount(discount);
+		order.setActualPaymentAmount(total - discount);
+
+		// 5. 儲存主檔與明細
+		ShopOrdVO savedOrder = repository.save(order);
+		for (ShopOrdDetVO detail : detailList) {
+			detail.getPpid().setProdOrdId(savedOrder.getProdOrdId());
+			shopOrdDetRepository.save(detail);
+		}
+
+		// 6. 刪除購物車項目
+		prodCartRepository.deleteAll(cartItems);
 	}
 
 }

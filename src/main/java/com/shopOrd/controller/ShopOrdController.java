@@ -1,8 +1,11 @@
 package com.shopOrd.controller;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,8 +21,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.member.model.MemberService;
 import com.member.model.MemberVO;
@@ -31,6 +36,7 @@ import com.shopOrd.model.ShopOrdService;
 import com.shopOrd.model.ShopOrdVO;
 import com.coupon.entity.Coupon;
 import com.coupon.service.CouponService;
+import com.coupon.service.MemberCouponService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -50,6 +56,9 @@ public class ShopOrdController {
 	
 	@Autowired
 	CouponService couponService;
+	
+	@Autowired
+	MemberCouponService memberCouponService;
 	
 	@GetMapping("/admin/shopOrd/select_page")
 	public String selectPage(Model model) {
@@ -123,19 +132,80 @@ public class ShopOrdController {
 	 * 這是主要的訂單建立方式，符合電商流程
 	 */
 	@PostMapping("checkout")
-	public String checkout(@RequestParam("memberId") Integer memberId,
-						  @RequestParam(value = "couponCode", required = false) String couponCode,
-						  @RequestParam("paymentMethod") Boolean paymentMethod,
-						  ModelMap model) {
+	@ResponseBody
+	public Map<String, Object> checkout(@RequestBody(required = false) Map<String, Object> requestData,
+						  @RequestParam(value = "memberId", required = false) Integer memberIdParam,
+						  @RequestParam(value = "couponCode", required = false) String couponCodeParam,
+						  @RequestParam(value = "paymentMethod", required = false) Boolean paymentMethodParam,
+						  HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		
 		try {
+			Integer memberId;
+			String couponCode;
+			Boolean paymentMethod;
+			
+			// 處理JSON請求或表單請求
+			if (requestData != null) {
+				// JSON請求 - 安全地處理類型轉換
+				Object memberIdObj = requestData.get("memberId");
+				if (memberIdObj instanceof Integer) {
+					memberId = (Integer) memberIdObj;
+				} else if (memberIdObj instanceof String) {
+					try {
+						memberId = Integer.valueOf((String) memberIdObj);
+					} catch (NumberFormatException e) {
+						memberId = null;
+					}
+				} else {
+					memberId = null;
+				}
+				
+				Object couponCodeObj = requestData.get("couponCode");
+				couponCode = couponCodeObj instanceof String ? (String) couponCodeObj : null;
+				
+				Object paymentMethodObj = requestData.get("paymentMethod");
+				if (paymentMethodObj instanceof Boolean) {
+					paymentMethod = (Boolean) paymentMethodObj;
+				} else if (paymentMethodObj instanceof String) {
+					paymentMethod = Boolean.valueOf((String) paymentMethodObj);
+				} else {
+					paymentMethod = true; // 預設值
+				}
+			} else {
+				// 表單請求
+				memberId = memberIdParam;
+				couponCode = couponCodeParam;
+				paymentMethod = paymentMethodParam;
+			}
+			
+			// 如果沒有提供會員ID，從session獲取
+			if (memberId == null) {
+				MemberVO memberVO = (MemberVO) request.getSession().getAttribute("memberVO");
+				if (memberVO != null) {
+					memberId = memberVO.getMemberId();
+				} else {
+					response.put("success", false);
+					response.put("message", "請先登入會員");
+					return response;
+				}
+			}
+			
 			// 呼叫服務層的結帳方法
 			shopOrdSvc.createOrderFromCart(memberId, couponCode, paymentMethod);
 			
-			// 結帳成功，重定向到訂單列表頁面
-			return "redirect:/admin/shopOrd/select_page?success=true&message=訂單建立成功";
+			response.put("success", true);
+			response.put("message", "訂單建立成功");
+			return response;
+			
 		} catch (RuntimeException e) {
-			// 結帳失敗，返回錯誤訊息
-			return "redirect:/admin/prodCart/select_page?errorMessage=" + e.getMessage();
+			response.put("success", false);
+			response.put("message", e.getMessage());
+			return response;
+		} catch (Exception e) {
+			response.put("success", false);
+			response.put("message", "系統錯誤，請稍後再試");
+			return response;
 		}
 	}
 
@@ -175,7 +245,7 @@ public class ShopOrdController {
 	 * 手動新增訂單（管理員功能）
 	 * 用於管理員手動建立訂單
 	 */
-	@PostMapping("addShopOrd")
+	@PostMapping("shoprOrd/addShopOrd")
 	public String addShopOrd(@Valid ShopOrdVO shopOrdVO, BindingResult result, ModelMap model) {
 		if (result.hasErrors()) {
 			return "admin/fragments/shop/shopOrd/addShopOrd";
@@ -234,7 +304,7 @@ public class ShopOrdController {
 	@GetMapping("getOne_For_Display")
 	public String getOne_For_Display(@RequestParam(value = "prodOrdId", required = false) String prodOrdId) {
 	    if (prodOrdId == null || prodOrdId.trim().isEmpty()) {
-	        return "redirect:/admin/ShopOrd/select_page?errorMessage=訂單編號請勿空白";
+	        return "redirect:/admin/shopOrd/select_page?errorMessage=訂單編號請勿空白";
 	    }
 
 	   
@@ -257,6 +327,55 @@ public class ShopOrdController {
 		}
 		String message = strBuilder.toString();
 		return "redirect:/admin/shopOrd/select_page?errorMessage=" + java.net.URLEncoder.encode(message, java.nio.charset.StandardCharsets.UTF_8);
+	}
+
+	/**
+	 * 獲取會員可用的折價券列表（前台API）
+	 */
+	@GetMapping("api/available-coupons")
+	@ResponseBody
+	public Map<String, Object> getAvailableCoupons(
+			@RequestParam(defaultValue = "0") Integer cartTotal,
+			HttpServletRequest request) {
+		Map<String, Object> response = new HashMap<>();
+		
+		try {
+			System.out.println("=== 開始獲取可用折價券 ===");
+			System.out.println("購物車總金額: " + cartTotal);
+			
+			// 從session獲取當前登入的會員資訊
+			MemberVO memberVO = (MemberVO) request.getSession().getAttribute("memberVO");
+			if (memberVO == null) {
+				System.out.println("會員未登入");
+				response.put("success", false);
+				response.put("message", "請先登入會員");
+				return response;
+			}
+			
+			Integer memberId = memberVO.getMemberId();
+			System.out.println("會員ID: " + memberId);
+			
+			// 使用MemberCouponService查詢會員可用於商城訂單的折價券
+			List<Coupon> availableCoupons = memberCouponService.getProductOrderApplicableCoupons(
+				memberId, cartTotal);
+			
+			System.out.println("可用折價券數量: " + availableCoupons.size());
+			for (Coupon coupon : availableCoupons) {
+				System.out.println("折價券: " + coupon.getCouponCode() + " - " + coupon.getCouponName());
+			}
+			System.out.println("=== 獲取折價券完成 ===");
+			
+			response.put("success", true);
+			response.put("coupons", availableCoupons);
+			return response;
+			
+		} catch (Exception e) {
+			System.out.println("獲取折價券時發生錯誤: " + e.getMessage());
+			e.printStackTrace();
+			response.put("success", false);
+			response.put("message", "獲取折價券失敗: " + e.getMessage());
+			return response;
+		}
 	}
 
 }

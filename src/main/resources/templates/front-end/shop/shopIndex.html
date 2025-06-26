@@ -23,6 +23,17 @@
     </div>
   </header>
 
+  <!-- 付款狀態顯示區域 -->
+  <div th:if="${paymentStatus}" class="payment-status-alert" th:classappend="${paymentStatus == 'success' ? 'alert-success' : 'alert-danger'}">
+    <div class="container">
+      <div class="alert" role="alert">
+        <i th:class="${paymentStatus == 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'}"></i>
+        <span th:text="${paymentMessage}">付款狀態訊息</span>
+        <button type="button" class="btn-close" style="font-size:1.5rem;line-height:1;" onclick="this.parentElement.parentElement.parentElement.style.display='none'">×</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 子選單 Navbar -->
   <nav class="sub-navbar d-flex justify-content-center align-items-center">
     <ul class="nav">
@@ -206,10 +217,43 @@
       <!-- 購物車項目會在這裡動態添加 -->
     </div>
     <div class="cart-footer">
-      <div class="cart-total">
-        <span>總計：</span>
-        <span id="cartTotal">NT$ 0</span>
+      <!-- 折價券選擇區域 -->
+      <div class="coupon-section">
+        <label for="couponSelect" class="coupon-label">選擇折價券：</label>
+        <select id="couponSelect" class="coupon-select">
+          <option value="">不使用折價券</option>
+          <!-- 折價券選項會在這裡動態添加 -->
+        </select>
+        <div id="couponInfo" class="coupon-info" style="display: none;">
+          <small class="text-success">已選擇折價券</small>
+        </div>
       </div>
+      
+      <!-- 付款方式選擇區域 -->
+      <div class="payment-section">
+        <label for="paymentMethod" class="payment-label">付款方式：</label>
+        <select id="paymentMethod" class="payment-select">
+          <option value="true">信用卡</option>
+          <option value="false">現金</option>
+        </select>
+      </div>
+      
+      <!-- 金額計算區域 -->
+      <div class="price-breakdown">
+        <div class="price-row">
+          <span>商品總計：</span>
+          <span id="subtotal">NT$ 0</span>
+        </div>
+        <div class="price-row" id="discountRow" style="display: none;">
+          <span>折價券折扣：</span>
+          <span id="discountAmount" class="text-success">-NT$ 0</span>
+        </div>
+        <div class="price-row total-row">
+          <span>應付金額：</span>
+          <span id="cartTotal">NT$ 0</span>
+        </div>
+      </div>
+      
       <button class="checkout-btn" id="checkoutBtn">結帳</button>
     </div>
   </div>

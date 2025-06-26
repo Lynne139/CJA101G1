@@ -79,7 +79,7 @@ public class ProdCartService {
     }
     
     // 查詢會員購物車所有商品==listAllByMemberId
-    public List<ProdCartVO> getCartByMemberId(Integer memberId) {
+    public List<ProdCartVO> getProdCartByMemberId(Integer memberId) {
         return prodCartRepository.findByMemberVO_MemberId(memberId);
     }
     
