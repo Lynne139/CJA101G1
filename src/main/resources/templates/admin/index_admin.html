@@ -80,6 +80,7 @@
                 
 				      	<div class="submenu_block ps-4"
 							th:classappend="${currentURI.startsWith('/admin/room')} ? 'show'">
+							<a th:href="@{/admin/roomo_info}" th:classappend="${currentURI == '/admin/roomo_info'} ? '-active'" class="sidebar_sub_link">訂單資訊</a>
 				        	<a th:href="@{/admin/listAllRoomType}" th:classappend="${currentURI == '/admin/listAllRoomType'} ? '-active'" class="sidebar_sub_link">房型資訊</a>
 				        	<a th:href="@{/admin/listAllRoomTypeSchedule}" th:classappend="${currentURI == '/admin/listAllRoomTypeSchedule'} ? '-active'" class="sidebar_sub_link">房型預定表資訊</a>
 				        	<a th:href="@{/admin/listAllRoom}" th:classappend="${currentURI == '/admin/listAllRoom'} ? '-active'" class="sidebar_sub_link">房間資訊</a>
@@ -203,7 +204,13 @@
         th:src="@{/js/admin/room/listAllRoomType.js}"></script>
         <script th:if="${mainFragment == 'admin/fragments/room/listAllRoomTypeSchedule'}"
         th:src="@{/js/admin/room/listAllRoomTypeSchedule.js}"></script>
-		
+
+		<!-- 住宿訂單 -->
+		<script th:if="${mainFragment == 'admin/fragments/roomo/roomoInfo'}"
+        src="https://cdn.tiny.cloud/1/5ydxgx8itt1g2ztd9z0kgct3fry3wndyy5h3mgq55cfw1xxx/tinymce/6/tinymce.min.js"
+        referrerpolicy="origin"></script> 
+		<script th:if="${mainFragment == 'admin/fragments/roomo/roomoInfo'}"
+        th:src="@{/js/admin/roomo/roomo_info.js}"></script>
 		
 
 	</body>

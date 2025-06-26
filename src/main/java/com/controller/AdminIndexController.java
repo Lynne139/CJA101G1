@@ -185,7 +185,6 @@ public class AdminIndexController {
     	return "admin/index_admin";
 
     } 
-     
 
 
 	//===住宿訂單管理===
