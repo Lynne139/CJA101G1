@@ -8,7 +8,7 @@
         </div>
         <div class="modal-body">
           <form id="roomOrderAddForm" data-parsley-validate th:object="${roomOrder}"
-            th:action="@{/admin/roomorder/insert}" method="post" enctype="multipart/form-data"
+            th:action="@{/admin/roomo_info/insert}" method="post" enctype="multipart/form-data"
             onsubmit="this.querySelector('button[type=submit]').disabled=true">
 
             <!-- 會員編號 -->
@@ -22,15 +22,8 @@
               <input type="text" id="memberName" class="form-control" readonly>
             </div>
 
-            <!-- 訂單狀態 -->
-            <!-- <div class="mb-3">
-              <label class="form-label">訂單狀態 <span class="text-danger">*</span></label>
-              <select th:field="*{orderStatus}" class="form-select" required>
-                <option value="1">成立</option>
-                <option value="2">完成</option>
-                <option value="0">取消</option>
-              </select>
-            </div>  -->
+            <!-- 訂單狀態 0:取消1:成立2:完成 -->
+            <input type="hidden" name="orderStatus" value="1">
 
             <!-- 入住日期 -->
             <div class="mb-3">
@@ -64,7 +57,10 @@
                       </option>
                       </option>
                     </select>
+                    <!-- 訂單明細狀態 0:已取消 1:已成立 -->
+                    <input type="hidden" name="orderDetails[0].listStatus" value="1">
                   </div>
+                  
                   <div class="col-md-2">
                     <label class="form-label">房間數量 <span class="text-danger">*</span></label>
                     <input type="number" name="orderDetails[0].roomAmount" class="form-control roomAmountInput" min="1"
@@ -86,6 +82,7 @@
                     <input type="number" name="orderDetails[0].numberOfPeople" class="form-control" min="1"
                       style="width:100px" required>
                   </div>
+                  
                 </div>
                 <div class="row mt-2">
                   <div class="col">
@@ -107,7 +104,6 @@
             <div class="mb-3">
               <label for="coupon" class="form-label">折價券</label>
               <select th:field="*{coupon}" id="coupon" class="form-select">
-                <option value="">無</option>
                 <option th:each="c : ${couponList}" th:value="${c.couponCode}" th:text="${c.couponCode}"></option>
               </select>
             </div>
@@ -115,16 +111,7 @@
             <!-- 折扣金額 -->
             <div class="mb-3">
               <label for="discountAmount" class="form-label">折扣金額</label>
-              <input type="number" th:field="*{discountAmount}" id="discountAmount" class="form-control" min="0">
-            </div>
-
-            <!-- 實際支付金額 -->
-            <div class="mb-3">
-              <label for="actualAmount" class="form-label">實際支付金額 <span class="text-danger">*</span></label>
-              <input type="number" th:field="*{actualAmount}" id="actualAmount" class="form-control" min="0" required>
-              <div class="text-danger" th:if="${#fields.hasErrors('actualAmount')}">
-                <span th:each="err : ${#fields.errors('actualAmount')}" th:text="${err}"></span>
-              </div>
+              <input type="number" th:field="*{discountAmount}" id="discountAmount" class="form-control" default="0" readonly>
             </div>
 
             <!-- 是否加購專案 -->
@@ -136,15 +123,54 @@
               </select>
             </div>
 
+            <!-- 付款狀態 -->
+            <div class="mb-3">
+              <label for="payStatus" class="form-label">付款狀態</label>
+              <select th:field="*{payStatus}" id="payStatus" class="form-select">
+                <option value="0">未付款</option>
+                <option value="1">已付款</option>
+              </select>
+            </div>
+
+            <!-- 付款方式 0:現金 1:信用卡 -->
+            <div class="mb-3">
+              <label for="payMethod" class="form-label">付款方式</label>
+              <select th:field="*{payMethod}" id="payMethod" class="form-select">
+                <option value="0">現金</option>
+                <option value="1">信用卡</option>
+              </select>
+            </div>
+
+            <!-- 房間總數量 -->
+            <div class="mb-3">
+              <label for="totalRoomCount" class="form-label">房間總數量</label>
+              <input type="number" id="roomCount" name="roomCount" class="form-control" readonly required>
+            </div>
+
+            <!-- 訂單總金額 -->
+            <div class="mb-3">
+              <label for="totalRoomPrice" class="form-label">訂單總金額</label>
+              <input type="number" id="totalRoomPrice" name="roomAmount" class="form-control" default="0" readonly required>
+            </div>
+
+            <!-- 實際支付金額 -->
+            <div class="mb-3">
+              <label for="actualAmount" class="form-label">實際支付金額</label>
+              <input type="number" id="actualAmount" name="actualAmount" class="form-control" readonly required>
+            </div>
+            
             <!-- 最後更新人 -->
             <div class="mb-3">
               <label for="employee" class="form-label">最後更新人</label>
               <select th:field="*{employee}" id="employee" class="form-select">
+                <option value="1">SYSTEM</option>
                 <option th:each="emp : ${employeeList}" th:value="${emp.employeeId}" th:text="${emp.employeeName}">
                 </option>
               </select>
             </div>
+
             <div class="modal-footer">
+
               <button type="button" class="btn btn_secondary" data-bs-dismiss="modal">取消</button>
               <button type="submit" id="btnSubmitAdd" class="btn btn_accent">新增</button>
             </div>

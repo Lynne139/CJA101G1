@@ -1,8 +1,12 @@
 package com.roomOrder.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.coupon.entity.Coupon;
 import com.employee.entity.Employee;
 import com.member.model.MemberVO;
+import com.roomOList.model.RoomOList;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -31,6 +35,9 @@ public class RoomOrder {
     @Column(name = "ROOM_AMOUNT")
     private Integer roomAmount;
 
+    @Column(name="ROOM_COUNT")
+    private Integer roomCount;
+
     @NotNull(message = "入住日期不可為空")
     @Column(name = "CHECK_IN_DATE")
     private String checkInDate;
@@ -40,7 +47,6 @@ public class RoomOrder {
     private String checkOutDate;
 
     @ManyToOne
-    @Size(min=8,max=8,message = "折價券號碼為8碼")
     @JoinColumn(name = "COUPON_CODE",referencedColumnName = "coupon_code")
     private Coupon coupon;
 
@@ -60,6 +66,15 @@ public class RoomOrder {
     @ManyToOne
     @JoinColumn(name = "UPDATE_EMP", referencedColumnName = "Employee_id")
     private Employee employee;
+
+    @Column(name="PAY_METHOD")
+    private String payMethod;
+
+    @Column(name="PAY_STATUS")
+    private String payStatus;
+
+    @Transient
+    private List<RoomOList> orderDetails;
 
     public Integer getRoomOrderId() {
         return roomOrderId;
@@ -164,5 +179,39 @@ public class RoomOrder {
     public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
     }
+
+    public Integer getRoomCount() {
+        return roomCount;
+    }
+
+    public void setRoomCount(Integer roomCount) {
+        this.roomCount = roomCount;
+    }
+
+    public List<RoomOList> getOrderDetails() {
+        // 保證永遠不會回傳 null
+        return orderDetails == null ? new ArrayList<>() : orderDetails;
+    }
+    public void setOrderDetails(List<RoomOList> orderDetails) {
+        this.orderDetails = orderDetails;
+    }
+
+    public String getPayMethod() {
+        return payMethod;
+    }
+
+    public void setPayMethod(String payMethod) {
+        this.payMethod = payMethod;
+    }
+
+    public String getPayStatus() {
+        return payStatus;
+    }
+
+    public void setPayStatus(String payStatus) {
+        this.payStatus = payStatus;
+    }
+    
+
 
 }

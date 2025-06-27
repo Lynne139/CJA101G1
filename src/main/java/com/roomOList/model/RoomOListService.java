@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.roomOList.model.RoomOList;
 import com.roomOList.model.RoomOListRepository;
@@ -25,6 +26,7 @@ public class RoomOListService {
     }
 
     // 刪除訂單明細
+    @Transactional
     public void deleteByRoomOrderListId(Integer roomOrderListId) {  
         repository.deleteByRoomOrderListId(roomOrderListId);
     }
@@ -32,6 +34,11 @@ public class RoomOListService {
     // 查詢所有訂單明細
     public List<RoomOList> findAll() {
         return repository.findAll();
+    }
+
+    // 根據訂單ID查詢所有訂單明細
+    public List<RoomOList> findByRoomOrderId(Integer roomOrderId) {
+        return repository.findByRoomOrder_RoomOrderId(roomOrderId);
     }
 
 }
