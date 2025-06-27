@@ -74,7 +74,7 @@ public class PeriodController {
 		
 		// 驗證名稱重複
 	    if (periodService.existsDuplicateName(period)) {
-	        result.rejectValue("periodName", null, "類別名稱已存在，請重新輸入！");
+	        result.rejectValue("periodName", null, "該類別已存在，請重新輸入！");
 	        hasAnyError = true;
 	    }
 		
@@ -121,7 +121,7 @@ public class PeriodController {
 
 	    // 驗證名稱重複
 	    if (periodService.existsDuplicateName(period)) {
-	        result.rejectValue("periodName", null, "該類別名稱已存在，請重新輸入！");
+	        result.rejectValue("periodName", null, "該類別已存在，請重新輸入！");
             hasAnyError = true;
 	    }
 

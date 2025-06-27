@@ -238,7 +238,7 @@ public class RestoController {
 
 	    // 驗證名稱重複
 	    if (restoService.existsDuplicateName(resto)) {
-	        result.rejectValue("restoName", null, "餐廳名稱已存在，請重新輸入！");
+	        result.rejectValue("restoName", null, "該餐廳名稱已存在，請重新輸入！");
 	    }
 
 	    // 若欄位驗證有錯，或圖片錯誤，回填 modal

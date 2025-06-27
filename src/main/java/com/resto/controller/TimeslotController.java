@@ -81,7 +81,7 @@ public class TimeslotController {
 	
 		// 驗證名稱重複
 		if (timeslotService.existsDuplicateName(timeslot)) {
-            result.rejectValue("timeslotName", null, "該時段名稱已存在，請重新輸入！");
+            result.rejectValue("timeslotName", null, "該時段已存在，請重新輸入！");
             hasAnyError = true;
         }
 
