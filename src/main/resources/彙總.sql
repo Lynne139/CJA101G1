@@ -583,13 +583,11 @@ VALUES
 	('嶼間餐館', 'Islespace Bistro', 200, '餐廳簡介B', '精緻套餐', '餐廳文案B', '091234567 #456', '1F 大廳左側', NULL);
 
 
--- 區段(只用在UI方便)
+-- 區段(只用在UI方便，不需軟刪)
 CREATE TABLE resto_period (
   period_id INT AUTO_INCREMENT NOT NULL, -- PK用流水號
   resto_id INT NOT NULL,
   period_name VARCHAR(10) NOT NULL,
-  is_deleted BOOLEAN NOT NULL DEFAULT FALSE,  -- 軟刪除使用
-
   
   sort_order INT NOT NULL DEFAULT 0,
 
@@ -610,15 +608,15 @@ VALUES
  CREATE TABLE resto_timeslot (
   timeslot_id INT AUTO_INCREMENT NOT NULL, -- PK用流水號
   resto_id INT NOT NULL,
-  period_id INT NOT NULL,
+  period_id INT,
   
   timeslot_name VARCHAR(5) NOT NULL,
   is_deleted BOOLEAN NOT NULL DEFAULT FALSE,  -- 軟刪除使用
   
   CONSTRAINT resto_timeslot_pk PRIMARY KEY (timeslot_id),
   CONSTRAINT resto_timeslot_resto_fk FOREIGN KEY (resto_id) REFERENCES resto (resto_id),
-  CONSTRAINT resto_timeslot_period_fk FOREIGN KEY (period_id) REFERENCES resto_period(period_id) -- 方便前端依區段渲染
-);
+  CONSTRAINT resto_timeslot_period_fk FOREIGN KEY (period_id) REFERENCES resto_period(period_id) ON DELETE SET NULL -- 方便前端依區段渲染  
+  );
 -- PK編號從1開始
 ALTER TABLE resto_timeslot AUTO_INCREMENT = 1;
 
