@@ -70,11 +70,13 @@ import com.resto.entity.TimeslotVO;
 	        // 若名稱改變，檢查是否已有軟刪版
 	        Optional<TimeslotVO> softDeleted = timeslotRepository
 	            .findByRestoVO_RestoIdAndTimeslotNameAndIsDeletedTrue(updated.getRestoVO().getRestoId(),
-	                                              updated.getTimeslotName());
+	            													  updated.getTimeslotName());
 	        // 有同名軟刪便救回資料
 	        if (softDeleted.isPresent()) {
 	            TimeslotVO toRestore = softDeleted.get();
+	            
 	            toRestore.setIsDeleted(false);
+	            toRestore.setPeriodVO(original.getPeriodVO()); // 更新Period
 	            timeslotRepository.save(toRestore);
 
 	            // 將原本的資料軟刪

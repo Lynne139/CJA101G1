@@ -41,7 +41,7 @@
         <div class="d-flex flex-column gap-5">
         
             
-            <div th:if="${periodList != null}" th:each="period,iter : ${periodList}" th:class="'period_block'">
+            <div th:if="${periodList != null}" th:each="period,iter : ${periodList}" th:class="'period_block'" th:attr="data-id=${period.periodId}">
                 <div class="d-flex justify-content-between align-items-center">
                 
                     <!-- 標題 -->
@@ -70,20 +70,14 @@
                         <button class="btn_icon btn_edit btn_period_edit me-1" title="編輯類別" th:data-id="${period.periodId}">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <!-- 若可刪除 -->
-                        <button class="btn_icon btn_delete btn_period_del me-1"
-                                th:if="${deletableMap[period.periodId]}"
-                                title="刪除類別"
-                                th:data-id="${period.periodId}">
-                            <i class="fas fa-trash"></i>
-                        </button>
                         
-                        <!-- 若不可刪除 -->
-                        <button class="btn_icon btn_delete me-1"
-                                th:unless="${deletableMap[period.periodId]}"
-                                disabled
-                                title="仍有時段綁定此類別，無法刪除">
-                            <i class="fas fa-trash"></i>
+                        <button class="btn_icon btn_delete btn_period_del me-1"
+                                th:data-id="${period.periodId}"
+                                th:disabled="${!deletableMap[period.periodId]}"
+                                th:title="${deletableMap[period.periodId] ?
+                                          '刪除類別' :
+                                          '仍有時段綁定此類別，無法刪除'}">
+                          <i class="fas fa-trash"></i>
                         </button>
 
                     </div>

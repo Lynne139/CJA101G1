@@ -42,7 +42,7 @@ public class PeriodController {
 								   RedirectAttributes redirectAttributes
 		) {
 			
-			periodService.deleteById(periodId);
+			periodService.softDelete(periodId);
 		    redirectAttributes.addAttribute("restoId", restoId);
 		    return "redirect:/admin/resto_timeslot";
 		}

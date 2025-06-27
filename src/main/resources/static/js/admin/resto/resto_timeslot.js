@@ -351,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 
-  // 讓頂/底元素的箭頭切換disabled狀態
+  // 讓頂、底元素的箭頭切換disabled狀態
   function refreshMoveButtons() {
     const allPeriods = document.querySelectorAll(".period_block");
     allPeriods.forEach(p => {
@@ -366,6 +366,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // timeslot拖曳變動時都要再次更新period的刪除disable
+  function refreshPeriodDeleteButtons() {
+	document.querySelectorAll('.period_block').forEach(block => {
+
+	    /* 只算真正的時段 wrapper（排除 + 按鈕）*/
+	    const hasTimeslot = block.querySelector('.timeslot_wrapper') !== null;
+
+	    const delBtn = block.querySelector('.btn_period_del');
+	    if (!delBtn) return;
+
+	    if (hasTimeslot) {
+	      delBtn.disabled = true;
+	      delBtn.title = '仍有時段綁定此類別，無法刪除';
+	    } else {
+	      delBtn.disabled = false;
+	      delBtn.title = '刪除類別';
+	    }
+	  });
+	}
 
 
 
@@ -701,8 +720,8 @@ document.addEventListener("DOMContentLoaded", () => {
   
   
   // ===== 拖曳時段改變所屬區段 =====
+  
   function initTimeslotDnD() {
-
     // 把每個 period 裡的 .timeslot_group 都變成 Sortable 清單
     document.querySelectorAll('.timeslot_group').forEach(groupEl => {
 
@@ -721,7 +740,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (fromId === toId) return;                      // 沒搬家
 
           const timeslotId = elWrapper.dataset.id;          // wrapper 的 data-id = timeslotId
-          moveTimeslot(timeslotId, toId, elWrapper);        // 更新後端
+          moveTimeslot(timeslotId, toId, fromId, elWrapper);        // 更新後端
         }
       });
 
@@ -730,7 +749,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // 呼叫後端同步 periodId
-  function moveTimeslot(timeslotId, newPeriodId, elWrapper) {
+  function moveTimeslot(timeslotId, newPeriodId, fromPeriodId, elWrapper) {
 
     const panel = document.querySelector('.panel_periodntimeslot');
     showPanelOverlay(panel);
@@ -746,7 +765,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (j.msg === 'transfer success') {
             // 成功就改掉 wrapper 自己的 periodId（給未來用）
             elWrapper.dataset.periodId = newPeriodId;
-            refreshMoveButtons(); //借用區段的函式
+			
+			//刷新period排序與可刪按鈕的狀態
+            refreshMoveButtons();
+			refreshPeriodDeleteButtons();
             showToast('移動成功！');
         } else {
             throw new Error(j.message || '未知錯誤');
@@ -755,16 +777,20 @@ document.addEventListener("DOMContentLoaded", () => {
     .catch(err => {
         // 失敗就把元素搬回原清單
         document
-          .querySelector(`.timeslot_group[data-id="${fromId}"]`)
+          .querySelector(`.timeslot_group[data-id="${fromPeriodId}"]`)
           .appendChild(elWrapper);
+		  refreshPeriodDeleteButtons();       // 失敗也要重算
         alert('移動失敗：' + err.message);
     })
-    .finally(() => removePanelOverlay(panel));
+    .finally(() => {
+		removePanelOverlay(panel);	
+	});
   }
 
 
   // 第一次與每次重新插入 fragment 後都要重新啟動
   initTimeslotDnD();
+  refreshPeriodDeleteButtons();
  
 
 

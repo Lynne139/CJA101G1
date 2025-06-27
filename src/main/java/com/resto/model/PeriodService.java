@@ -18,7 +18,7 @@ public class PeriodService {
 	// 餐廳拿多筆
 	@Transactional(readOnly = true)
     public List<PeriodVO> getPeriodsByRestoId(Integer restoId) {
-        return periodRepository.findByRestoVO_RestoIdOrderBySort(restoId);
+        return periodRepository.findActiveByRestoId(restoId);
     }
 	
 	// id拿單筆
@@ -49,7 +49,7 @@ public class PeriodService {
     	Integer restoId    = periodVO.getRestoVO().getRestoId();
         String  periodName = periodVO.getPeriodName();
     	
-        List<PeriodVO> matches = periodRepository.findAllByRestoVO_RestoIdAndPeriodName(restoId, periodName);
+        List<PeriodVO> matches = periodRepository.findAllByRestoVO_RestoIdAndPeriodNameAndIsDeletedFalse(restoId, periodName);
    
         if (periodVO.getPeriodId() == null) {
         	// 新增
@@ -62,10 +62,11 @@ public class PeriodService {
     
     // 刪除
     @Transactional
-    public void deleteById(Integer periodId) {
-        periodRepository.findById(periodId).ifPresent(periodVO -> {
-            periodRepository.delete(periodVO); // 用 delete(entity) 而不是 deleteById
-        });
+    public void softDelete(Integer periodId) {
+    	PeriodVO p = periodRepository.findById(periodId)
+                .orElseThrow(() -> new RuntimeException("找不到 Period"));
+		p.setIsDeleted(true);
+		periodRepository.save(p);
     }
 
     
@@ -80,9 +81,11 @@ public class PeriodService {
         
         // 上/下個物件
         Optional<PeriodVO> optTarget =
-              "up".equals(dir)
-                ? periodRepository.findTopByRestoVO_RestoIdAndSortOrderLessThanOrderBySortOrderDesc(restoId, self.getSortOrder())
-                : periodRepository.findTopByRestoVO_RestoIdAndSortOrderGreaterThanOrderBySortOrderAsc(restoId, self.getSortOrder());
+        	    "up".equals(dir)
+        	        ? periodRepository
+        	            .findTopByRestoVO_RestoIdAndSortOrderLessThanAndIsDeletedFalseOrderBySortOrderDesc(restoId, selfOrder)
+        	        : periodRepository
+        	            .findTopByRestoVO_RestoIdAndSortOrderGreaterThanAndIsDeletedFalseOrderBySortOrderAsc(restoId, selfOrder);
 
         // 若已經在頂/底，target為empty
         if (optTarget.isEmpty()) return;

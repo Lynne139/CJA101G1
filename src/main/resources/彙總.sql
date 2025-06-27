@@ -570,11 +570,13 @@ VALUES
 	('嶼間餐館', 'Islespace Bistro', 200, '餐廳簡介B', '精緻套餐', '餐廳文案B', '091234567 #456', '1F 大廳左側', NULL);
 
 
--- 區段(只用在UI方便，不需軟刪)
+-- 區段(只用在UI方便)
 CREATE TABLE resto_period (
   period_id INT AUTO_INCREMENT NOT NULL, -- PK用流水號
   resto_id INT NOT NULL,
   period_name VARCHAR(10) NOT NULL,
+  is_deleted BOOLEAN NOT NULL DEFAULT FALSE,  -- 軟刪除使用
+
   
   sort_order INT NOT NULL DEFAULT 0,
 
