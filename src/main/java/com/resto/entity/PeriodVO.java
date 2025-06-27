@@ -1,6 +1,7 @@
-package com.resto.model;
+package com.resto.entity;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -28,18 +29,24 @@ public class PeriodVO{
 	@Column(name = "period_id", updatable = false)
 	private Integer periodId;
 	
-	@NotBlank(message = "區段設置不得為空")
-	@Size(max = 10, message = "區段設置請勿超過10字")
+	@NotBlank
+	@Size(max = 10, message = "類別名稱請勿超過10字")
 	@Column(name = "period_name")
 	private String periodName;
+	
+	@Column(name = "sort_order")
+	private Integer sortOrder;
+	
+	@Column(name = "is_deleted") //軟刪除
+	private Boolean isDeleted = false;
 
 	@ManyToOne
 	@JoinColumn(name="resto_id")
 	private RestoVO restoVO;
 	
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="timeslotId")
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="periodVO", orphanRemoval = true)
 	@OrderBy("timeslot_id asc")
-	private Set<TimeslotVO> timeslots = new HashSet<TimeslotVO>();
+	private List<TimeslotVO> timeslots = new ArrayList<>();
 
 	public Integer getPeriodId() {
 		return periodId;
@@ -56,11 +63,44 @@ public class PeriodVO{
 	public void setPeriodName(String periodName) {
 		this.periodName = periodName;
 	}
+	
+	public Integer getSortOrder() {
+		return sortOrder;
+	}
+
+	public void setSortOrder(Integer sortOrder) {
+		this.sortOrder = sortOrder;
+	}
+
+	public Boolean getIsDeleted() {
+		return isDeleted;
+	}
+
+	public void setIsDeleted(Boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
+	public List<TimeslotVO> getTimeslots() {
+		return timeslots;
+	}
+
+	public void setTimeslots(List<TimeslotVO> timeslots) {
+		this.timeslots = timeslots;
+	}
+
+	public RestoVO getRestoVO() {
+		return restoVO;
+	}
+
+	public void setRestoVO(RestoVO restoVO) {
+		this.restoVO = restoVO;
+	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(periodId, periodName);
+		return Objects.hash(periodId);
 	}
+	
 
 	@Override
 	public boolean equals(Object obj) {
@@ -71,13 +111,18 @@ public class PeriodVO{
 		if (getClass() != obj.getClass())
 			return false;
 		PeriodVO other = (PeriodVO) obj;
-		return Objects.equals(periodId, other.periodId) && Objects.equals(periodName, other.periodName);
+		return Objects.equals(periodId, other.periodId);
 	}
 
 	@Override
 	public String toString() {
-		return "PeriodVO [periodId=" + periodId + ", periodName=" + periodName + "]";
+		return "PeriodVO [periodId=" + periodId + ", periodName=" + periodName + ", sortOrder=" + sortOrder
+				+ ", isDeleted=" + isDeleted + ", restoVO=" + restoVO + ", timeslots=" + timeslots + "]";
 	}
+
+	
+
+	
 	
 	
 }

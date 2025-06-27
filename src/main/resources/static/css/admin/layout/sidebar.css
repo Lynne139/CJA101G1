@@ -81,7 +81,7 @@ aside>nav.sidebar_nav .sidebar_link {
 
 
 .sidebar_sub_link {
-  color: var(--color-primary);
+  color: var(--color-secondary);
   padding: 8px 24px;
   display: flex;
   justify-content:center;
@@ -90,7 +90,7 @@ aside>nav.sidebar_nav .sidebar_link {
   text-decoration: none;
   
   &:hover {
-  color: var(--color-primary);
+  color: var(--color-secondary);
   opacity:var(--hover-opacity);
   }
 }

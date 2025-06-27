@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.resto.model.RestoVO;
+import com.resto.entity.RestoVO;
 
 public interface RoomTypeRepository extends JpaRepository<RoomTypeVO, Integer>{
 	
