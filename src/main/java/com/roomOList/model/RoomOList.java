@@ -57,6 +57,9 @@ public class RoomOList {
     @Column(name="LIST_STATUS")
     private String listStatus;
 
+    @Transient
+    private Integer roomTypeId;
+
     public Integer getRoomOrderListId() {
         return roomOrderListId;
     }
@@ -143,5 +146,13 @@ public class RoomOList {
 
     public void setListStatus(String listStatus) {
         this.listStatus = listStatus;
+    }
+
+    public Integer getRoomTypeId() {
+        return roomTypeId;
+    }
+
+    public void setRoomTypeId(Integer roomTypeId) {
+        this.roomTypeId = roomTypeId;
     }
 }

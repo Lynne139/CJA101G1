@@ -47,6 +47,11 @@ public class RoomOrderService {
         return repository.findByRoomOrderId(roomOrderId);
     }
 
+    // 更新訂單資料
+    public RoomOrder updateOrder(RoomOrder order) {
+        return repository.save(order);
+    }
+
     
 
 }

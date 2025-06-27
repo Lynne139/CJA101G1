@@ -12,25 +12,25 @@
 
                 <!-- Modal內容 -->
                   <div class="modal-body">
-                      <h6 class="modal_sub_title d-flex justify-content-start align-items-center gap-2">
-                        明細編號
-                          <span th:text="'#' + ${roomOList.roomOrderListId}"></span>
-                      </h6>
-                    
-                    <div class="modal_section">
-                     
-                     <div class="modal_detail d-flex flex-column align-items-start">
-                        <p><strong>訂單編號：</strong> <span th:text="${roomOList.roomOrder.roomOrderId}"></span></p>
-                        <p><strong>房型名稱：</strong> <span th:text="${roomOList.roomType.roomTypeName}"></span></p>
-                        <p><strong>房間編號：</strong> <span th:text="${roomOList.room.roomId}"></span></p>
-                        <p><strong>入住人數：</strong> <span th:text="${roomOList.numberOfPeople}"></span></p>
-                        <p><strong>房間價格：</strong> <span th:text="${roomOList.roomPrice}"></span></p>
-                        <p><strong>房間數量：</strong> <span th:text="${roomOList.roomAmount}"></span></p>
-                        <p><strong>入住人姓名：</strong> <span th:text="${roomOList.roomGuestName}"></span></p>
-                        <p><strong>特殊需求：</strong> <span th:text="${roomOList.specialReq}"></span></p>
-                        <p><strong>建立日期：</strong> <span th:text="${roomOList.createDate}"></span></p>
-                        <p><strong>明細狀態：</strong> <span th:text="${roomOList.listStatus}"></span></p>
-                     </div>
+                    <div th:each="roomOList : ${roomOLists}">
+                        <h6 class="modal_sub_title d-flex justify-content-start align-items-center gap-2">
+                            明細編號 <span th:text="'#' + ${roomOList.roomOrderListId}"></span>
+                        </h6>
+                        <div class="modal_section">
+                            <div class="modal_detail d-flex flex-column align-items-start">
+                                <p><strong>訂單編號：</strong> <span th:text="${roomOList.roomOrder.roomOrderId}"></span></p>
+                                <p><strong>房型名稱：</strong> <span th:text="${roomOList.roomType.roomTypeName}"></span></p>
+                                <p><strong>房間編號：</strong> <span th:text="${roomOList.room != null ? roomOList.room.roomId : '-'}"></span></p>
+                                <p><strong>入住人數：</strong> <span th:text="${roomOList.numberOfPeople}"></span></p>
+                                <p><strong>房間價格：</strong> <span th:text="${roomOList.roomPrice}"></span></p>
+                                <p><strong>房間數量：</strong> <span th:text="${roomOList.roomAmount}"></span></p>
+                                <p><strong>入住人姓名：</strong> <span th:text="${roomOList.roomGuestName}"></span></p>
+                                <p><strong>特殊需求：</strong> <span th:text="${roomOList.specialReq}"></span></p>
+                                <p><strong>建立日期：</strong> <span th:text="${roomOList.createDate}"></span></p>
+                                <p><strong>明細狀態：</strong> <span th:text="${roomOList.listStatus}"></span></p>
+                            </div>
+                        </div>
+                        <hr/>
                     </div>
                   </div>
             </div>
