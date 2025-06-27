@@ -18,8 +18,8 @@ public class PeriodService {
 	// 餐廳拿多筆
 	@Transactional(readOnly = true)
     public List<PeriodVO> getPeriodsByRestoId(Integer restoId) {
-        return periodRepository.findActiveByRestoId(restoId);
-    }
+		return periodRepository.findByRestoVO_RestoIdOrderBySort(restoId);
+		}
 	
 	// id拿單筆
     @Transactional(readOnly = true)
@@ -49,24 +49,27 @@ public class PeriodService {
     	Integer restoId    = periodVO.getRestoVO().getRestoId();
         String  periodName = periodVO.getPeriodName();
     	
-        List<PeriodVO> matches = periodRepository.findAllByRestoVO_RestoIdAndPeriodNameAndIsDeletedFalse(restoId, periodName);
-   
+        List<PeriodVO> matches = periodRepository.findAllByRestoVO_RestoIdAndPeriodName(restoId, periodName);
+        
+        // 名稱沒變，少一次DBround-trip
+        if (periodVO.getPeriodId() != null &&
+        	    periodName.equals(periodRepository.getById(periodVO.getPeriodId()).getPeriodName())) {
+        	    return false;
+        	}
+        
         if (periodVO.getPeriodId() == null) {
         	// 新增
             return !matches.isEmpty();
         } else {
         	// 編輯
-            return matches.stream().anyMatch(r -> !r.getPeriodId().equals(periodVO.getPeriodId()));
+            return matches.stream().anyMatch(p -> !p.getPeriodId().equals(periodVO.getPeriodId()));
         }
     }
     
     // 刪除
     @Transactional
-    public void softDelete(Integer periodId) {
-    	PeriodVO p = periodRepository.findById(periodId)
-                .orElseThrow(() -> new RuntimeException("找不到 Period"));
-		p.setIsDeleted(true);
-		periodRepository.save(p);
+    public void deleteById(Integer periodId) {
+    	periodRepository.deleteById(periodId);
     }
 
     
@@ -81,11 +84,9 @@ public class PeriodService {
         
         // 上/下個物件
         Optional<PeriodVO> optTarget =
-        	    "up".equals(dir)
-        	        ? periodRepository
-        	            .findTopByRestoVO_RestoIdAndSortOrderLessThanAndIsDeletedFalseOrderBySortOrderDesc(restoId, selfOrder)
-        	        : periodRepository
-        	            .findTopByRestoVO_RestoIdAndSortOrderGreaterThanAndIsDeletedFalseOrderBySortOrderAsc(restoId, selfOrder);
+        		"up".equals(dir)
+                ? periodRepository.findTopByRestoVO_RestoIdAndSortOrderLessThanOrderBySortOrderDesc(restoId, self.getSortOrder())
+                : periodRepository.findTopByRestoVO_RestoIdAndSortOrderGreaterThanOrderBySortOrderAsc(restoId, self.getSortOrder());
 
         // 若已經在頂/底，target為empty
         if (optTarget.isEmpty()) return;
