@@ -6,6 +6,7 @@ import com.coupon.entity.MemberCouponId;
 import com.coupon.enums.OrderType;
 import com.coupon.repository.MemberCouponRepository;
 import com.coupon.repository.CouponRepository;
+import com.member.model.MemberRepository;
 import com.member.model.MemberVO;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,18 +15,22 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MemberCouponService {
 
     private final MemberCouponRepository memberCouponRepository;
     private final CouponRepository couponRepository;
+    private final MemberRepository memberRepository;
 
     @Autowired
     public MemberCouponService(MemberCouponRepository memberCouponRepository,
-                               CouponRepository couponRepository) {
+                               CouponRepository couponRepository,
+                               MemberRepository memberRepository) {
         this.memberCouponRepository = memberCouponRepository;
         this.couponRepository = couponRepository;
+        this.memberRepository = memberRepository;
     }
 
     // 1. 查詢會員已使用的折價券
@@ -71,25 +76,28 @@ public class MemberCouponService {
         );
     }
 
-    // 5. 新增一筆 MemberCoupon（給會員領取折價券時使用）
+    // 5. 新增一筆 MemberCoupon 並扣會員點數（給會員領取折價券時使用）
     public MemberCoupon addMemberCoupon(Integer memberId, String couponCode) {
         // 檢查該 coupon 是否存在
         Coupon coupon = couponRepository.findById(couponCode)
                 .orElseThrow(() -> new IllegalArgumentException("查無此折價券: " + couponCode));
-
+        
         // 檢查是否已領取過（避免重複領券）
         MemberCouponId id = new MemberCouponId(couponCode, memberId);
         if (memberCouponRepository.existsById(id)) {
             throw new IllegalStateException("此折價券已領取");
         }
+        
+        // 取得會員完整資料（包含點數）
+         Optional<MemberVO> optMember = memberRepository.findById(memberId);
+         MemberVO member = optMember.orElseThrow(() -> new IllegalArgumentException("查無此會員"));
 
-        // 建立 MemberVO 實例，只需設定主鍵
-        // (因為JPA 知道我設定的是 @ManyToOne，只要我設定了主鍵，
-        // 它就能處理好關聯欄位（member_id）。)
-        MemberVO member = new MemberVO();
-        member.setMemberId(memberId);
+        // 扣點數
+        int discountValue = coupon.getDiscountValue();
+        member.setMemberPoints(member.getMemberPoints() - discountValue);
+        memberRepository.save(member);
 
-        // 建立 MemberCoupon 並設定基本欄位
+        // 建立並儲存 MemberCoupon
         MemberCoupon mc = new MemberCoupon();
         mc.setId(id);
         mc.setMember(member);
