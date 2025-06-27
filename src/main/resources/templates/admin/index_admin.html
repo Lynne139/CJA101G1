@@ -203,8 +203,13 @@
         <!-- 房間 -->
         <script th:if="${mainFragment == 'admin/fragments/room/listAllRoom'}"
         th:src="@{/js/admin/room/listAllRoom.js}"></script>
+        
+        <script th:if="${mainFragment == 'admin/fragments/room/listAllRoomType'}"
+        src="https://cdn.tiny.cloud/1/5ydxgx8itt1g2ztd9z0kgct3fry3wndyy5h3mgq55cfw1xxx/tinymce/6/tinymce.min.js"
+        referrerpolicy="origin"></script>
         <script th:if="${mainFragment == 'admin/fragments/room/listAllRoomType'}"
         th:src="@{/js/admin/room/listAllRoomType.js}"></script>
+        
         <script th:if="${mainFragment == 'admin/fragments/room/listAllRoomTypeSchedule'}"
         th:src="@{/js/admin/room/listAllRoomTypeSchedule.js}"></script>
 

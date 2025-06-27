@@ -1,0 +1,41 @@
+<div th:fragment="viewRoomTypeModalContent">
+
+	<div class="modal fade" id="roomTypeViewModal" tabindex="-1" aria-hidden="true">
+  		<div class="modal-dialog modal-dialog-scrollable">
+    		<div class="modal-content rounded-4 p-4" style="background-color: var(--color-background);">
+     			
+				<!-- Modal標題與關閉按鈕 -->
+     			<div class="modal-header d-flex justify-content-between align-items-center mb-2 mt-2 px-3">
+        			<h5 class="modal-title">房型資訊</h5>
+        			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      			</div>
+
+				<!-- Modal內容 -->
+      			<div class="modal-body">
+      				<h6 class="modal_sub_title d-flex justify-content-start align-items-center gap-2">房型編號
+      					<span th:text="'#' + ${roomTypeVO.roomTypeId}"></span>
+      				</h6>
+					
+					<div class="modal_section">
+					
+					<div>
+						<img th:src="@{/admin/listAllRoomType/img/{id}(id=${roomTypeVO.roomTypeId})}"
+	    						alt="房型圖片" class="roomType_img img-fluid mb-4 d-block mx-auto"
+						     onerror="this.src='/images/admin/no_img.svg';">
+					</div>
+	    				<div class="modal_detail d-flex flex-column align-items-start">
+					        <p><strong>房型名稱：</strong> <span th:text="${roomTypeVO.roomTypeName}"></span></p>
+					        <p><strong>房型數量：</strong> <span th:text="${roomTypeVO.roomTypeAmount}"></span></p>
+					        <p><strong>房型價格：</strong> <span th:text="${roomTypeVO.roomTypePrice}"></span> </p>
+					        <p><strong>上下架狀態：</strong> <span th:text="${roomTypeVO.roomSaleStatus == 1}? '上架' : '下架'"></span></p>
+					        <p><strong>房型介紹：</strong> <div th:utext="${roomTypeVO.roomTypeContent}"></div></p>
+	    				</div>
+					</div>
+      			</div>
+    		</div>
+  		</div>
+	</div>
+</div>
+
+
+
