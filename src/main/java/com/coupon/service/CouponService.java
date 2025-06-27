@@ -54,7 +54,7 @@ public class CouponService {
     }
 
     // 6. 會員依 orderType 查詢他可領且尚未領取過的優惠券（使用 native SQL）
-    public List<Coupon> getClaimableCouponsForMember(OrderType orderType, Integer memberId, int memberPoints) {
+    public List<Coupon> getClaimableCouponsForMember(OrderType orderType, Integer memberId, Integer memberPoints) {
         return couponRepository.findClaimableCouponsNotClaimedByMember(
                 orderType.getValue(),
                 memberPoints,

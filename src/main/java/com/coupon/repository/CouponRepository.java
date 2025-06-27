@@ -36,7 +36,7 @@ public interface CouponRepository extends JpaRepository<Coupon, String> {
     	)
 	List<Coupon> findClaimableCouponsNotClaimedByMember(
 	    @Param("orderType") int orderType,
-	    @Param("memberPoints") int memberPoints,
+	    @Param("memberPoints") Integer memberPoints,
 	    @Param("today") LocalDate today,
 	    @Param("memberId") Integer memberId
 	);

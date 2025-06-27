@@ -1,210 +1,684 @@
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>會員折價券查詢｜Maison d'Yuko</title>
-
+  <title>我的折價券 - Maison d'Yuko</title>
   <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
   <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
   <style>
-    .card-header h5 {
-      font-weight: bold;
-      margin-bottom: 0;
+    .coupon-section {
+      padding: 60px 0;
+      background-color: #fdf6ef;
+      min-height: 80vh;
     }
-    .table th, .table td {
-      vertical-align: middle;
+    
+    .coupon-header {
+      text-align: center;
+      margin-bottom: 40px;
     }
-    .pagination {
+    
+    .coupon-title {
+      font-size: 2.5rem;
+      color: #6d4c41;
+      margin-bottom: 10px;
+    }
+    
+    .coupon-subtitle {
+      color: #8d6e63;
+      font-size: 1.1rem;
+    }
+    
+    .search-form {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    
+    .search-row {
       display: flex;
-      justify-content: center;
-      margin-top: 1rem;
-      flex-wrap: wrap;
+      gap: 20px;
+      align-items: end;
     }
-    .pagination button {
-      margin: 4px;
-      padding: 6px 12px;
-      border: none;
-      background-color: #ccc;
-      cursor: pointer;
+    
+    .form-group {
+      flex: 1;
     }
-    .pagination button.active {
-      background-color: #6c4d3c;
+    
+    .form-label {
+      font-weight: 600;
+      color: #6d4c41;
+      margin-bottom: 8px;
+      display: block;
+    }
+    
+    .form-select {
+      border: 2px solid #d7ccc8;
+      border-radius: 8px;
+      padding: 12px 15px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    
+    .form-select:focus {
+      border-color: #8d6e63;
+      box-shadow: 0 0 0 0.2rem rgba(141, 110, 99, 0.25);
+    }
+    
+    .form-select:disabled {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+    }
+    
+    .search-btn {
+      background: linear-gradient(135deg, #8d6e63, #6d4c41);
       color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .search-btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .search-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .results-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .results-header {
+      background: #8d6e63;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .results-title {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    .coupon-table {
+      width: 100%;
+      margin: 0;
+    }
+    
+    .coupon-table th {
+      background: #f5f5f5;
+      color: #6d4c41;
+      font-weight: 600;
+      padding: 15px 12px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition: background-color 0.2s;
+    }
+    
+    .coupon-table th:hover {
+      background: #eeeeee;
+    }
+    
+    .coupon-table th::after {
+      content: '⇅';
+      position: absolute;
+      right: 8px;
+      opacity: 0.5;
+      font-size: 12px;
+    }
+    
+    .coupon-table th.sort-asc::after {
+      content: '↑';
+      opacity: 1;
+      color: #8d6e63;
+    }
+    
+    .coupon-table th.sort-desc::after {
+      content: '↓';
+      opacity: 1;
+      color: #8d6e63;
+    }
+    
+    .coupon-table td {
+      padding: 15px 12px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .coupon-table tbody tr:hover {
+      background-color: #fafafa;
+    }
+    
+    .coupon-code {
+      font-family: 'Courier New', monospace;
+      background: #e8f5e8;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    
+    .order-type-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    
+    .order-type-room {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+    
+    .order-type-prod {
+      background: #f3e5f5;
+      color: #7b1fa2;
+    }
+    
+    .order-type-both {
+      background: #fff3e0;
+      color: #ef6c00;
+    }
+    
+    .discount-amount {
+      font-weight: bold;
+      color: #d32f2f;
+    }
+    
+    .no-data {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    
+    .no-data-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      opacity: 0.3;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #8d6e63;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #8d6e63;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 768px) {
+      .search-row {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .coupon-table th,
+      .coupon-table td {
+        padding: 10px 8px;
+        font-size: 14px;
+      }
+      
+      .coupon-title {
+        font-size: 2rem;
+      }
     }
   </style>
 </head>
+
 <body>
+  <!-- Header -->
+  <div th:replace="~{fragments/header :: header}"></div>
 
-<!-- Header -->
-<div th:replace="~{fragments/header :: header}"></div>
+  <!-- 子選單 Navbar -->
+  <nav class="sub-navbar d-flex justify-content-center align-items-center">
+    <ul class="nav">
+      <li class="nav-item"><a class="nav-link" href="#">關於嶼蔻</a></li>
+      <li class="nav-item"><a class="nav-link" href="#">最新消息</a></li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" tabindex="0">探索嶼蔻</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">珍饈美饌</a></li>
+          <li><a class="dropdown-item" href="#">多元設施</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a class="nav-link" href="#rooms">精緻客房</a></li>
+      <li class="nav-item"><a class="nav-link" href="#faq">交通資訊</a></li>
+      <li class="nav-item"><a class="nav-link" href="#footer">聯絡我們</a></li>
+      <li class="nav-item"><a class="nav-link" href="#faq">常見問題</a></li>
+    </ul>
+  </nav>
 
-<section class="section" style="background-color: #fdf6ef;">
-  <div class="container py-5" style="margin-bottom: 100px;">
-    <h2 class="text-center mb-5 fw-bold">查詢您的折價券</h2>
+  <!-- Sticky 右側按鈕 -->
+  <div class="sticky-icons d-none d-lg-block">
+    <a href="#"><img th:src="@{/images/icon/bed.svg}" alt="bed" class="icon"/><br>線上訂房</a>
+    <a th:href="@{/front-end/shop}"><img th:src="@{/images/icon/bag.svg}" alt="bag" class="icon"/><br>帳號選物</a>
+    <a href="#"><img th:src="@{/images/icon/dish.svg}" alt="dish" class="icon"/><br>餐廳訂位</a>
+  </div>
 
-    <input type="hidden" id="memberId" th:value="${memberId}" />
-
-    <!-- 查詢條件 -->
-    <div class="card shadow-sm mb-5">
-      <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">查詢條件</h5>
+  <!-- Main Content -->
+  <section class="coupon-section">
+    <div class="container">
+      <!-- 標題區 -->
+      <div class="coupon-header">
+        <h1 class="coupon-title">會員折價券</h1>
+        <p class="coupon-subtitle">查詢您的折價券</p>
       </div>
-      <div class="card-body">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-4">
-            <label for="queryType" class="form-label">使用狀態</label>
-            <select class="form-select" id="queryType" onchange="toggleOrderTypeSelect()">
+
+      <!-- 搜尋表單 -->
+      <div class="search-form">
+        <div class="search-row">
+          <div class="form-group">
+            <label class="form-label" for="queryType">折價券使用狀態</label>
+            <select class="form-select" id="queryType">
+              <option value="">-- 請選擇 --</option>
               <option value="usable">可供使用</option>
               <option value="used">您已使用</option>
             </select>
           </div>
-          <div class="col-md-4">
-            <label for="orderType" class="form-label">適用訂單類型</label>
-            <select class="form-select" id="orderType">
+          
+          <div class="form-group">
+            <label class="form-label" for="orderType">適用訂單類型</label>
+            <select class="form-select" id="orderType" disabled>
+              <option value="">-- 請選擇 --</option>
               <option value="ROOM_ONLY">訂房訂單</option>
               <option value="PROD_ONLY">商城訂單</option>
             </select>
           </div>
-          <div class="col-md-2">
-            <button class="btn btn-outline-primary w-100" onclick="queryCoupons()">送出查詢</button>
+          
+          <div class="form-group">
+            <button type="button" class="search-btn" id="searchBtn" disabled>送出查詢</button>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 查詢結果 -->
-    <div class="card shadow-sm" id="resultCard">
-      <div class="card-header bg-secondary text-white">
-        <h5 class="mb-0">查詢結果</h5>
-      </div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-bordered table-hover align-middle mb-0" id="couponResultTable">
-            <thead class="table-light text-center">
+      <!-- 結果區域 -->
+      <div class="results-container" id="resultsContainer" style="display: none;">
+        <div class="results-header">
+          <h3 class="results-title" id="resultsTitle">查詢結果</h3>
+        </div>
+        
+        <!-- 載入中 -->
+        <div class="loading" id="loadingDiv" style="display: none;">
+          <div class="loading-spinner"></div>
+          <div>查詢中，請稍候...</div>
+        </div>
+        
+        <!-- 無資料 -->
+        <div class="no-data" id="noDataDiv" style="display: none;">
+          <div class="no-data-icon">📄</div>
+          <h4>查無符合資料</h4>
+          <p>沒有找到符合條件的折價券</p>
+        </div>
+        
+        <!-- 資料表格 -->
+        <div class="table-container" id="tableContainer" style="display: none;">
+          <table class="coupon-table table">
+            <thead>
               <tr>
-                <th>折價券代碼</th>
-                <th>折價券名稱</th>
-                <th>折扣金額</th>
-                <th>到期日</th>
+                <th data-sort="couponCode">折價券編號</th>
+                <th data-sort="couponName">折價券名稱</th>
+                <th data-sort="orderType">適用訂單種類</th>
+                <th data-sort="discountValue">折價金額</th>
+                <th data-sort="minPurchase">使用低銷</th>
+                <th data-sort="expiryDate">到期日</th>
               </tr>
             </thead>
-            <tbody id="couponResultBody">
-              <tr>
-                <td colspan="4" class="text-center text-muted" style="height: 120px;">
-                  請選擇查詢條件並按下查詢
-                </td>
-              </tr>
+            <tbody id="couponTableBody">
             </tbody>
           </table>
         </div>
-        <div class="pagination" id="couponPagination"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Overlay Full Menu -->
+  <div class="overlay-menu" id="overlayMenu">
+    <div class="overlay-menu-header d-flex justify-content-between align-items-start">
+      <div class="overlay-mobile-menu d-flex justify-content-between align-items-center p-3">
+        <div class="mb-menu-header">Maison d'Yuko</div>
+      </div>
+      <div class="overlay-logo-contact mb-5">
+        <img th:src="@{/images/logo/logo_hp.png}" alt="logo" class="overlay-logo mb-3" />
+        <div class="overlay-title">嶼蔻渡假村 Maison d'Yuko</div>
+        <div class="overlay-contact">
+          <div>+886-7-123-4567</div>
+          <div>service@maisondyuko.com</div>
+        </div>
+      </div>
+      <div class="close-btn" id="menuClose">&times;</div>
+    </div>
+    <div class="overlay-center">
+      <div class="overlay-menu-member px-5 mb-5 d-flex justify-content-center">
+        <img th:src="@{/images/icon/member.svg}" alt="member" class="text-center" style="padding:0 5px" />
+        <a href="#" class="text-center">會員登入</a>
+      </div>
+      <div class="px-5 mb-5 d-flex justify-content-between">
+        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_bed.svg}" alt="bed" class="menu-icon"/><br>線上訂房</a>
+        <a th:href="@{/front-end/shop}" class="text-center"><img th:src="@{/images/icon/menu_bag.svg}" alt="bag" class="menu-icon"/><br>帳號選物</a>
+        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_dish.svg}" alt="dish" class="menu-icon"/><br>餐廳訂位</a>
+      </div>
+      <div class="overlay-menu-row d-flex justify-content-center">
+        <div class="overlay-menu-col">
+          <h5>關於嶼蔻</h5>
+          <a href="#">品牌故事</a>
+          <a href="#">環境簡介</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>最新消息</h5>
+          <a th:href="@{/news/notice}">最新公告</a>
+          <a th:href="@{/news/promotion}">活動通知</a>
+          <a th:href="@{/news/news}">媒體報導</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>探索嶼蔻</h5>
+          <a href="#">珍饌美饌</a>
+          <a href="#">豐富設施</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>精緻客房</h5>
+          <a href="#">蔻香居</a>
+          <a href="#">海音居</a>
+          <a href="#">晨曦之庭</a>
+          <a href="#">月影行館</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>其他</h5>
+          <a href="#">交通資訊</a>
+          <a href="#">聯絡我們</a>
+          <a href="#">常見問題</a>
+        </div>
       </div>
     </div>
   </div>
-</section>
 
-<!-- Footer -->
-<div th:replace="~{fragments/footer :: footer}"></div>
+  <!-- Footer -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-  let coupons = [];
-  let pageSize = 10;
-  let currentPage = 1;
-
-  function toggleOrderTypeSelect() {
-    const queryType = document.getElementById('queryType').value;
-    const orderTypeSelect = document.getElementById('orderType');
-
-    if (queryType === 'used') {
-      orderTypeSelect.innerHTML = '<option value="ALL">全部</option>';
-      orderTypeSelect.disabled = true;
-    } else {
-      orderTypeSelect.innerHTML = 
-        <option value="ROOM_ONLY">訂房訂單</option>
-        <option value="PROD_ONLY">商城訂單</option>
-      ;
-      orderTypeSelect.disabled = false;
-    }
-  }
-
-  function queryCoupons() {
-    const memberId = document.getElementById('memberId').value;
-    const queryType = document.getElementById('queryType').value;
-    const orderType = document.getElementById('orderType').value;
-
-    let url = "";
-    if (queryType === 'used') {
-      url = /api/member-coupons/${memberId}/used;
-    } else {
-      url = /api/member-coupons/${memberId}/usable?orderType=${orderType};
-    }
-
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        coupons = Array.isArray(data) ? data : [];
-        renderCouponPage(1);
-      })
-      .catch(err => {
-        console.error("查詢失敗", err);
-        coupons = [];
-        renderCouponPage(1);
-      });
-  }
-
-  function renderCouponPage(page) {
-    currentPage = page;
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize;
-    const pageData = coupons.slice(start, end);
-
-    const tbody = document.getElementById("couponResultBody");
-    tbody.innerHTML = "";
-
-    if (pageData.length === 0) {
-      tbody.innerHTML = 
-        <tr>
-          <td colspan="4" class="text-center text-dark" style="height: 120px;">
-            查無符合的折價券
-          </td>
-        </tr>;
-      document.getElementById("couponPagination").innerHTML = "";
-      return;
-    }
-
-    pageData.forEach(coupon => {
-      const row = 
-        <tr>
-          <td>${coupon.couponCode || ''}</td>
-          <td>${coupon.couponName || ''}</td>
-          <td>${coupon.discountValue || 0}</td>
-          <td>${coupon.expiryDate || ''}</td>
-        </tr>
-      ;
-      tbody.innerHTML += row;
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script th:inline="javascript">
+    // 從 Thymeleaf 取得 memberId
+    const memberId = /*[[${memberId}]]*/ null;
+    
+    // 當前查詢的資料
+    let currentData = [];
+    let currentSort = { field: null, direction: 'asc' };
+    
+    $(document).ready(function() {
+      // 初始化事件監聽器
+      initializeEventHandlers();
     });
-
-    renderCouponPagination();
-  }
-
-  function renderCouponPagination() {
-    const totalPages = Math.ceil(coupons.length / pageSize);
-    const pagination = document.getElementById("couponPagination");
-    pagination.innerHTML = "";
-
-    for (let i = 1; i <= totalPages; i++) {
-      const btn = document.createElement("button");
-      btn.textContent = i;
-      btn.className = (i === currentPage) ? "active" : "";
-      btn.onclick = () => renderCouponPage(i);
-      pagination.appendChild(btn);
+    
+    function initializeEventHandlers() {
+      // 查詢類型改變
+      $('#queryType').on('change', function() {
+        const queryType = $(this).val();
+        const orderTypeSelect = $('#orderType');
+        const searchBtn = $('#searchBtn');
+        
+        if (queryType === 'usable') {
+          // 可供使用：啟用訂單類型選擇
+          orderTypeSelect.prop('disabled', false);
+          orderTypeSelect.empty().append('<option value="">-- 請選擇 --</option>')
+                                 .append('<option value="ROOM_ONLY">訂房訂單</option>')
+                                 .append('<option value="PROD_ONLY">商城訂單</option>');
+          searchBtn.prop('disabled', true);
+        } else if (queryType === 'used') {
+          // 已使用折價券：鎖定為全部
+          orderTypeSelect.prop('disabled', true);
+          orderTypeSelect.empty().append('<option value="all">查詢全部</option>');
+          orderTypeSelect.val('all');
+          searchBtn.prop('disabled', false);
+        } else {
+          // 未選擇：重置
+          orderTypeSelect.prop('disabled', true);
+          orderTypeSelect.empty().append('<option value="">-- 請選擇 --</option>');
+          searchBtn.prop('disabled', true);
+        }
+        
+        // 隱藏結果區域
+        $('#resultsContainer').hide();
+      });
+      
+      // 訂單類型改變（只有可供使用時才會觸發）
+      $('#orderType').on('change', function() {
+        const orderType = $(this).val();
+        const queryType = $('#queryType').val();
+        
+        if (queryType === 'usable' && orderType) {
+          $('#searchBtn').prop('disabled', false);
+        } else {
+          $('#searchBtn').prop('disabled', true);
+        }
+      });
+      
+      // 查詢按鈕點擊
+      $('#searchBtn').on('click', function() {
+        performSearch();
+      });
+      
+      // 表格排序
+      $(document).on('click', '.coupon-table th[data-sort]', function() {
+        const field = $(this).data('sort');
+        sortTable(field);
+      });
+      
+      // 選單功能
+      $('#menuToggle, #menu-Toggle').on('click', function() {
+        $('#overlayMenu').addClass('active');
+      });
+      
+      $('#menuClose').on('click', function() {
+        $('#overlayMenu').removeClass('active');
+      });
     }
-  }
-</script>
-
+    
+    function performSearch() {
+      const queryType = $('#queryType').val();
+      const orderType = $('#orderType').val();
+      
+      if (!queryType) {
+        alert('請選擇查詢類型');
+        return;
+      }
+      
+      // 顯示結果區域和載入狀態
+      $('#resultsContainer').show();
+      $('#loadingDiv').show();
+      $('#noDataDiv').hide();
+      $('#tableContainer').hide();
+      
+      // 設定 API URL
+      let apiUrl;
+      if (queryType === 'used') {
+        apiUrl = `/api/member-coupons/${memberId}/used`;
+        $('#resultsTitle').text('已使用折價券');
+      } else {
+        if (!orderType) {
+          alert('請選擇訂單類型');
+          return;
+        }
+        apiUrl = `/api/member-coupons/${memberId}/usable?orderType=${orderType}`;
+        $('#resultsTitle').text('可用折價券');
+      }
+      
+      // 發送 AJAX 請求
+      $.ajax({
+        url: apiUrl,
+        method: 'GET',
+        success: function(data) {
+          handleSearchSuccess(data);
+        },
+        error: function(xhr, status, error) {
+          handleSearchError(xhr, status, error);
+        },
+        complete: function() {
+          $('#loadingDiv').hide();
+        }
+      });
+    }
+    
+    function handleSearchSuccess(data) {
+      currentData = data || [];
+      
+      if (currentData.length === 0) {
+        $('#noDataDiv').show();
+        $('#tableContainer').hide();
+      } else {
+        $('#noDataDiv').hide();
+        $('#tableContainer').show();
+        renderTable(currentData);
+      }
+    }
+    
+    function handleSearchError(xhr, status, error) {
+      console.error('查詢錯誤:', error);
+      alert('查詢失敗，請稍後重試');
+      $('#resultsContainer').hide();
+    }
+    
+    function renderTable(data) {
+      const tbody = $('#couponTableBody');
+      tbody.empty();
+      
+      data.forEach(function(coupon) {
+        const row = $('<tr></tr>');
+        
+        // 折價券編號
+        row.append(`<td><span class="coupon-code">${coupon.couponCode}</span></td>`);
+        
+        // 折價券名稱
+        row.append(`<td>${coupon.couponName}</td>`);
+        
+        // 適用訂單種類
+        const orderTypeHtml = getOrderTypeBadge(coupon.orderType);
+        row.append(`<td>${orderTypeHtml}</td>`);
+        
+        // 折價金額
+        row.append(`<td><span class="discount-amount">$${coupon.discountValue.toLocaleString()}</span></td>`);
+        
+        // 使用低銷
+        row.append(`<td>$${coupon.minPurchase.toLocaleString()}</td>`);
+        
+        // 到期日
+        row.append(`<td>${formatDate(coupon.expiryDate)}</td>`);
+        
+        tbody.append(row);
+      });
+    }
+    
+    function getOrderTypeBadge(orderType) {
+      const typeMap = {
+        'ROOM_ONLY': { label: '限訂房', class: 'order-type-room' },
+        'PROD_ONLY': { label: '限商城', class: 'order-type-prod' },
+        'ROOM_AND_PROD': { label: '訂房和商城', class: 'order-type-both' }
+      };
+      
+      const type = typeMap[orderType] || { label: orderType, class: 'order-type-room' };
+      return `<span class="order-type-badge ${type.class}">${type.label}</span>`;
+    }
+    
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('zh-TW', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    }
+    
+    function sortTable(field) {
+      // 更新排序狀態
+      if (currentSort.field === field) {
+        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSort.field = field;
+        currentSort.direction = 'asc';
+      }
+      
+      // 更新表頭樣式
+      $('.coupon-table th').removeClass('sort-asc sort-desc');
+      $(`.coupon-table th[data-sort="${field}"]`).addClass(`sort-${currentSort.direction}`);
+      
+      // 排序資料
+      currentData.sort(function(a, b) {
+        let aVal, bVal;
+        
+        switch (field) {
+          case 'couponCode':
+            aVal = a.couponCode;
+            bVal = b.couponCode;
+            break;
+          case 'couponName':
+            aVal = a.couponName;
+            bVal = b.couponName;
+            break;
+          case 'orderType':
+            aVal = a.orderType;
+            bVal = b.orderType;
+            break;
+          case 'discountValue':
+            aVal = a.discountValue;
+            bVal = b.discountValue;
+            break;
+          case 'minPurchase':
+            aVal = a.minPurchase;
+            bVal = b.minPurchase;
+            break;
+          case 'expiryDate':
+            aVal = new Date(a.expiryDate);
+            bVal = new Date(b.expiryDate);
+            break;
+          default:
+            return 0;
+        }
+        
+        if (typeof aVal === 'string') {
+          aVal = aVal.toLowerCase();
+          bVal = bVal.toLowerCase();
+        }
+        
+        let result = 0;
+        if (aVal < bVal) result = -1;
+        else if (aVal > bVal) result = 1;
+        
+        return currentSort.direction === 'desc' ? -result : result;
+      });
+      
+      // 重新渲染表格
+      renderTable(currentData);
+    }
+  </script>
 </body>
+
 </html>
