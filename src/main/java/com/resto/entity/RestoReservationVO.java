@@ -33,7 +33,7 @@ public class RestoReservationVO {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reserve_timeslot_id")
-    private TimeslotVO timeslotVO;
+    private TimeslotVO reserveTimeslotVO;
 
     @NotNull
     @Column(name = "resto_seats_total")
@@ -88,13 +88,13 @@ public class RestoReservationVO {
 
 
 	public TimeslotVO getTimeslotVO() {
-		return timeslotVO;
+		return reserveTimeslotVO;
 	}
 
 
 
 	public void setTimeslotVO(TimeslotVO timeslotVO) {
-		this.timeslotVO = timeslotVO;
+		this.reserveTimeslotVO = reserveTimeslotVO;
 	}
 
 
