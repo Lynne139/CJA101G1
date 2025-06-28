@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.member.model.MemberVO;
@@ -98,7 +99,8 @@ public class RestoOrderVO{
 	private String orderGuestName;
 	
 	@NotBlank(groups = ValidationGroups.First.class)
-    @Pattern(regexp = "^09\\d{8}$", message = "手機號碼格式錯誤",groups = ValidationGroups.Second.class)
+	// ^09\\d{8}$
+    @Pattern(regexp = "^\\d{6,12}$", message = "手機號碼格式錯誤",groups = ValidationGroups.Second.class)
 	@Column(name = "order_guest_phone")
 	private String orderGuestPhone;
 	
@@ -134,12 +136,6 @@ public class RestoOrderVO{
 	
 	
 	
-	public RestoOrderVO() {
-
-	}
-
-	
-	
 //	// Hibernate在儲存或更新前自動填入快照欄位(EntityManager.persist/merge()前觸發)
 //	@PrePersist
 //	@PreUpdate
@@ -154,6 +150,22 @@ public class RestoOrderVO{
 //	    }
 //	}
 //	
+	
+	
+	
+	
+	
+	@Transient
+	public LocalDateTime getReserveStartTime() {
+	    if (regiDate == null || timeslotVO == null) return null;
+	    return LocalDateTime.of(regiDate, timeslotVO.getLocalTime());
+	}
+
+
+
+	public RestoOrderVO() {
+		super();
+	}
 
 
 

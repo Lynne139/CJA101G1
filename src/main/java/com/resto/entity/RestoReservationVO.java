@@ -30,7 +30,6 @@ public class RestoReservationVO {
     @JoinColumn(name = "resto_id", nullable = false)
     private RestoVO restoVO;
 
-    @NotNull
     @Column(name = "reserve_date")
     private LocalDate reserveDate;
 
@@ -46,10 +45,12 @@ public class RestoReservationVO {
     @Column(name = "reserve_seats_total")
     private Integer reserveSeatsTotal = 0;
 
+
     
     
+
 	public RestoReservationVO() {
-		
+		super();
 	}
 
 
