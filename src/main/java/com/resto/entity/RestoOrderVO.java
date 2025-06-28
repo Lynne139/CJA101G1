@@ -155,12 +155,12 @@ public class RestoOrderVO{
 	
 	
 	
-	@Transient
-	public LocalDateTime getReserveStartTime() {
-	    if (regiDate == null || timeslotVO == null) return null;
-	    return LocalDateTime.of(regiDate, timeslotVO.getLocalTime());
-	}
-
+//	@Transient
+//	public LocalDateTime getReserveStartTime() {
+//	    if (regiDate == null || timeslotVO == null) return null;
+//	    return LocalDateTime.of(regiDate, timeslotVO.getLocalTime());
+//	}
+//
 
 
 	public RestoOrderVO() {
