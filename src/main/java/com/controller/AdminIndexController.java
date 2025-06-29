@@ -13,9 +13,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,9 +25,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.coupon.entity.Coupon;
 import com.coupon.service.CouponService;
+import com.employee.entity.Employee;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.member.model.MemberService;
 import com.member.model.MemberVO;
+import com.news.service.HotNewsService;
+import com.news.service.NewsService;
+import com.news.service.PromotionNewsService;
 import com.prod.model.ProdService;
 import com.prodCart.model.ProdCartService;
 import com.prodCart.model.ProdCartVO;
@@ -52,14 +55,11 @@ import com.roomOrder.model.RoomOrderService;
 import com.shopOrd.model.ShopOrdService;
 import com.shopOrd.model.ShopOrdVO;
 import com.shopOrdDet.model.ShopOrdDetService;
-import com.news.service.HotNewsService;
-import com.news.service.PromotionNewsService;
-import com.news.service.NewsService;
-import com.employee.entity.Employee;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 
 @Controller
@@ -353,13 +353,18 @@ public class AdminIndexController {
     								@RequestParam(value = "restoId", required = false) Integer restoId,
     								Model model
     	) {
-    		
+
 		// 把所有餐廳都傳給下拉選單使用
         List<RestoVO> restoList = restoService.getAll();
         model.addAttribute("restoList", restoList);
 
         // 若選定某餐廳，才撈出該餐廳的區段與時段
         if (restoId != null) {
+        	
+            RestoVO Urlresto = restoService.getById(restoId);
+        	boolean readonly = Urlresto.getIsDeleted();  // 軟刪除的餐廳只讀
+            model.addAttribute("readonly", readonly);
+        	
         	// 把選到的餐廳的詳細資訊放進 model 以顯示餐廳名稱
             RestoVO selectedResto = restoService.getById(restoId);
             model.addAttribute("selectedResto", selectedResto);
@@ -384,6 +389,7 @@ public class AdminIndexController {
             model.addAttribute("selectedResto", null);
             model.addAttribute("periodList", new ArrayList<>());
             model.addAttribute("timeslotList", new ArrayList<>());
+            model.addAttribute("readonly", false);
         }
         
         String mainFragment = "admin/fragments/resto/restoTimeslot";
