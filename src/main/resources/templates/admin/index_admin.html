@@ -80,6 +80,7 @@
                 
 				      	<div class="submenu_block ps-4"
 							th:classappend="${currentURI.startsWith('/admin/room')} ? 'show'">
+							<a th:href="@{/admin/roomo_info}" th:classappend="${currentURI == '/admin/roomo_info'} ? '-active'" class="sidebar_sub_link">訂單資訊</a>
 				        	<a th:href="@{/admin/listAllRoomType}" th:classappend="${currentURI == '/admin/listAllRoomType'} ? '-active'" class="sidebar_sub_link">房型資訊</a>
 				        	<a th:href="@{/admin/listAllRoomTypeSchedule}" th:classappend="${currentURI == '/admin/listAllRoomTypeSchedule'} ? '-active'" class="sidebar_sub_link">房型預定表資訊</a>
 				        	<a th:href="@{/admin/listAllRoom}" th:classappend="${currentURI == '/admin/listAllRoom'} ? '-active'" class="sidebar_sub_link">房間資訊</a>
@@ -165,7 +166,9 @@
 			
 			<!-- Main Content -->
 			<main class="main_content" th:insert="~{${mainFragment}}"></main>				
-			
+			  
+      
+      
 	  </div>
 	
 	
@@ -174,11 +177,9 @@
 		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 		<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <script th:src="@{/js/admin/zh-HANT.js}"></script>
-        <script th:src="@{/js/admin/btn_loading_overlay.js}"></script>
-    
-        <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
-        
+        <script th:src="@{/js/admin/loading_overlay.js}"></script>
+        <script th:src="@{/js/admin/toast.js}"></script>
+            
 		
 		
 		
@@ -193,6 +194,9 @@
 
 		<script th:if="${mainFragment == 'admin/fragments/resto/restoTimeslot'}"
         th:src="@{/js/admin/resto/resto_timeslot.js}"></script>
+        <script th:if="${mainFragment == 'admin/fragments/resto/restoTimeslot'}"
+        src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+        
 
 		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrder'}"
         th:src="@{/js/admin/resto/resto_order.js}"></script>
@@ -208,7 +212,13 @@
         
         <script th:if="${mainFragment == 'admin/fragments/room/listAllRoomTypeSchedule'}"
         th:src="@{/js/admin/room/listAllRoomTypeSchedule.js}"></script>
-		
+
+		<!-- 住宿訂單 -->
+		<script th:if="${mainFragment == 'admin/fragments/roomo/roomoInfo'}"
+        src="https://cdn.tiny.cloud/1/5ydxgx8itt1g2ztd9z0kgct3fry3wndyy5h3mgq55cfw1xxx/tinymce/6/tinymce.min.js"
+        referrerpolicy="origin"></script> 
+		<script th:if="${mainFragment == 'admin/fragments/roomo/roomoInfo'}"
+        th:src="@{/js/admin/roomo/roomo_info.js}"></script>
 		
 
 	</body>

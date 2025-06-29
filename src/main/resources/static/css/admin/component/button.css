@@ -70,6 +70,7 @@
 .btn_icon {
   border: none;
   background-color: transparent;
+  color:var(--color-primary);
 
   &:hover {
     color: var(--color-accent);
@@ -93,19 +94,24 @@
 }
 
 
-
-
-
-.btn-overlay {
+.btn_overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.6); /* 半透 */
+  background-color: rgba(0, 0, 0, 0.1); /* 半透 */
   display: flex;
   justify-content: center;
   align-items: center;
   pointer-events: none; /* 不擋內部事件 */
   border-radius: inherit;
+}
+
+
+button:disabled,
+button[disabled] {
+  opacity: 0.5;                 /* 半透明 */
+  cursor: not-allowed !important; /* 滑鼠變禁止符號 */
+  filter: grayscale(100%);      /* 可選，變成灰階 */
 }

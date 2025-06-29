@@ -1,0 +1,71 @@
+<div th:fragment="editModalContent">
+
+  <div class="modal fade" id="periodEditModal" tabindex="-1"
+    aria-hidden="true">
+    <div class="modal-dialog">
+
+      <div class="modal-content">
+      
+        <div class="modal-header">
+          <h5 class="modal-title">編輯類別</h5>
+          <button type="button" class="btn-close"
+            data-bs-dismiss="modal"></button>
+        </div>
+        
+        <div class="modal-body">
+        
+          <!-- 若有不隸屬欄位而須統一顯示的錯誤提示 -->
+          <div th:if="${errorMsg}" class="alert alert-danger">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+            <span th:text="${errorMsg}"></span>
+          </div>
+               
+        
+          <form id="periodEditForm"
+            th:object="${period}"
+            th:action="@{/admin/resto_timeslot/period/edit}"
+            method="post">
+            
+            
+            <input type="hidden" th:field="*{restoVO.restoId}" />
+            <input type="hidden" th:field="*{periodId}" />
+            <input type="hidden" th:field="*{sortOrder}" />
+            
+            <div class="mb-3">
+                        
+
+              <label for="periodName" class="form-label">類別名稱 <span
+                class="text-danger">*</span> <small class="text-muted">最多可10字</small></label>
+              <input type="text" th:field="*{periodName}"
+                id="periodName" class="form-control" required
+                maxlength="10">
+
+              <!-- 錯誤提示 -->
+              <div class="text-danger"
+                th:if="${#fields.hasErrors('periodName')}">
+                <i
+                  class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('periodName')}"
+                  th:text="${err}"></span>
+              </div>
+
+            </div>
+
+          </form>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn_secondary" data-bs-dismiss="modal">取消</button>
+          <button type="submit" form="periodEditForm" id="btnSubmitEditSave" class="btn btn_accent">儲存</button>
+        </div>
+        
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+</div>

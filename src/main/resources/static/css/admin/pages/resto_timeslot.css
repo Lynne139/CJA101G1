@@ -1,0 +1,46 @@
+.main_resto_timeslot .timeslot_name {
+	color:var(--color-black);
+}
+
+.main_resto_timeslot .timeslot_block{
+	background-color:var(--color-white);
+	border-radius:24px;
+	padding: 0 0.75rem;
+}
+
+.main_resto_timeslot .timeslot_name{
+	font-weight:var(--fw-medium);
+}
+
+.main_resto_timeslot .btn_add_timeslot{
+	color:var(--color-white);
+	border-radius:24px;
+	padding: 0.25rem 0.75rem;
+	font-weight:var(--fw-medium);
+}
+
+/* timeslot排序 */
+/* 讓 + 排在最後，flex-shrink: 0 避免按鈕變形 */
+.timeslot_group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.timeslot_wrapper {
+  order: 0;
+}
+
+.btn_add_timeslot {
+  order: 999;
+  flex-shrink: 0;
+}
+
+/* 拖曳有cursor效果 */
+.timeslot_block {
+  cursor: grab;
+}
+
+.timeslot_block:active {
+  cursor: grabbing;
+}

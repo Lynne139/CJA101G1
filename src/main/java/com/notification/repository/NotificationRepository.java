@@ -1,6 +1,9 @@
 package com.notification.repository;
 
 import com.notification.entity.Notification;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,8 +12,8 @@ import java.util.List;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Integer> {
 
-    // 根據會員編號查詢該會員的所有通知
-    List<Notification> findByMemberId(Integer memberId);
+    // 根據會員編號查詢該會員的所有通知，新的排在前面
+    List<Notification> findByMemberIdOrderByCreatedAtDesc(Integer memberId);
     
     // 根據 memberId 查詢未讀通知
 //    List<Notification> findByMemberIdAndIsReadFalse(Integer memberId);

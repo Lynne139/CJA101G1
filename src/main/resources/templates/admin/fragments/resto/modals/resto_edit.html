@@ -16,27 +16,24 @@
 
         <div class="modal-body">
         
+        <!-- 若有不隸屬欄位而須統一顯示的錯誤提示 -->
         <div th:if="${errorMsg}" class="alert alert-danger">
           <i class="fa-solid fa-triangle-exclamation me-2"></i>
           <span th:text="${errorMsg}"></span>
         </div>
         
 
-          <form id="restoEditForm" data-parsley-validate
+          <form id="restoEditForm"
             th:object="${resto}" th:action="@{/admin/resto_info/update}"
-            method="post" enctype="multipart/form-data"
-            onsubmit="this.querySelector('button[type=submit]').disabled=true">
+            method="post" enctype="multipart/form-data">
 
             <input type="hidden" th:field="*{version}" />
             
 
             <div class="mb-3">
               <label class="form-label">餐廳編號</label>
-              <!-- 顯示編號 -->
               <input type="text" class="form-control"
-                th:value="*{restoId}" readonly>
-              <!-- 實際送出編號 -->
-              <input type="hidden" th:field="*{restoId}">
+                th:field="*{restoId}" readonly>
             </div>
 
             <div class="mb-3">
@@ -166,17 +163,19 @@
               </div>
             </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn_secondary "
-            data-bs-dismiss="modal">取消</button>
-          <button type="submit" id="btnSubmitEditSave"
-            class="btn btn_accent ">儲存</button>
           </form>
 
         </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn_secondary "
+            data-bs-dismiss="modal">取消</button>
+          <button type="submit" form="restoEditForm" id="btnSubmitEditSave"
+            class="btn btn_accent ">儲存</button>
 
-
-      </div>
+        </div>
+      
+      
     </div>
   </div>
 </div>

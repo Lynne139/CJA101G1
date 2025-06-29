@@ -1,4 +1,4 @@
-package com.resto.model;
+package com.resto.entity;
 
 import java.util.Objects;
 
@@ -23,7 +23,7 @@ public class TimeslotVO{
 	@Column(name = "timeslot_id", updatable = false)
 	private Integer timeslotId;
 
-	@NotBlank(message = "時段設置不得為空")
+	@NotBlank
 	@Pattern(regexp = "^([01]\\d|2[0-3]):[0-5]\\d$", message = "請輸入有效的時間格式（HH:mm）")
 	@Column(name = "timeslot_name")
 	private String timeslotName;
@@ -37,7 +37,6 @@ public class TimeslotVO{
 	private RestoVO restoVO;
 	
 	@ManyToOne
-	@NotNull
 	@JoinColumn(name="period_id")
 	private PeriodVO periodVO;
 	

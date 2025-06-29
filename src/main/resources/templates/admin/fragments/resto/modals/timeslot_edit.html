@@ -1,0 +1,87 @@
+<div th:fragment="editModalContent">
+
+  <div class="modal fade" id="timeslotEditModal" tabindex="-1"
+    aria-hidden="true">
+    <div class="modal-dialog">
+
+      <div class="modal-content">
+      
+        <div class="modal-header">
+          <h5 class="modal-title">編輯時段</h5>
+          <button type="button" class="btn-close"
+            data-bs-dismiss="modal"></button>
+        </div>
+        
+        <div class="modal-body">
+        
+          <!-- 若有不隸屬欄位而須統一顯示的錯誤提示 -->
+          <div th:if="${errorMsg}" class="alert alert-danger">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+            <span th:text="${errorMsg}"></span>
+          </div>
+        
+          <form id="timeslotEditForm"
+            th:object="${timeslot}"
+            th:action="@{/admin/resto_timeslot/timeslot/update}"
+            method="post">
+            
+            <input type="hidden" th:field="*{timeslotId}" />
+            <input type="hidden" th:field="*{restoVO.restoId}" />
+            <input type="hidden" th:field="*{periodVO.periodId}" />
+            
+            
+            <div class="mb-3">
+                        
+
+              <label for="timeslotName" class="form-label">時段時間 
+                <span class="text-danger">*</span>
+                <small class="text-muted">請選擇 24 小時制時間（HH:MM）</small>
+              </label>
+              
+              <div class="d-flex gap-2 align-items-center">
+                <select class="form-select" id="hourSelect" name="hour">
+                  <option disabled selected>時</option>
+                  <th:block th:each="i : ${#numbers.sequence(0, 23)}">
+                    <option th:value="${i < 10 ? '0' + i : i}" th:text="${i < 10 ? '0' + i : i}"></option>
+                  </th:block>
+                </select>
+              
+                <span>:</span>
+              
+                <select class="form-select" id="minuteSelect" name="minute">
+                  <option disabled selected>分</option>
+                  <th:block th:each="i : ${#numbers.sequence(0, 59)}">
+                    <option th:value="${i < 10 ? '0' + i : i}" th:text="${i < 10 ? '0' + i : i}"></option>
+                  </th:block>
+                </select>
+              </div>
+              
+              <!-- 實際用來送出的欄位（隱藏） -->
+              <input type="hidden" th:field="*{timeslotName}" id="timeslotHiddenInput">
+
+              <!-- 錯誤提示 -->
+              <div class="text-danger"
+                th:if="${#fields.hasErrors('timeslotName')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:text="${#fields.errors('timeslotName')[0]}"></span>
+              </div>
+
+            </div>
+          </form>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn_secondary" data-bs-dismiss="modal">取消</button>
+          <button type="submit" form="timeslotEditForm" id="btnSubmitEditSave" class="btn btn_accent ">儲存</button>
+        </div>
+        
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+</div>
