@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
+@Entity
 @Table(name = "resto_reservation")
 public class RestoReservationVO {
 	
@@ -146,7 +148,7 @@ public class RestoReservationVO {
 	@Override
 	public String toString() {
 		return "RestoReservationVO [restoReserveId=" + restoReserveId + ", restoVO=" + restoVO + ", reserveDate="
-				+ reserveDate + ", timeslotVO=" + timeslotVO + ", restoSeatsTotal=" + restoSeatsTotal
+				+ reserveDate + ", timeslotVO=" + reserveTimeslotVO + ", restoSeatsTotal=" + restoSeatsTotal
 				+ ", reserveSeatsTotal=" + reserveSeatsTotal + "]";
 	}
 
