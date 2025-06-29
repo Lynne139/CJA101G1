@@ -1,0 +1,38 @@
+.btn-outline-brown {
+  border: 2px solid #7E4E24;
+  color: #7E4E24;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-brown:hover {
+  background-color: #7E4E24;
+  color: #fff !important;  /* 強制白字 */
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
+.hover-zoom {
+  transition: transform 0.4s ease;
+}
+
+.hover-zoom:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+.card.roomtype-card {
+  background-color: #F9F6F0;
+  color: #7E4E24;
+  border: none;
+}
+
+.card.roomtype-card h4,
+.card.roomtype-card p,
+.card.roomtype-card strong {
+  color: #7E4E24;
+}
+.card.roomtype-card:hover {
+  background-color: #F9F6F0;
+}

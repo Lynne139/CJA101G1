@@ -49,6 +49,9 @@ public class RoomTypeService {
 	public List<RoomTypeVO> getAll() {
 		return roomTypeRepository.findAll();
 	}
+	public List<RoomTypeVO> getAllAvailableRoomTypes() {
+		return roomTypeRepository.findByRoomSaleStatus((byte) 1);
+	}
 
 	// 用於新增時（單一參數）
 	public boolean existsDuplicateName(String name) {

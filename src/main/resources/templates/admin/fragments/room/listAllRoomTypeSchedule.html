@@ -12,15 +12,6 @@
 
 
 
-				<div class="col-md-4">
-					<label for="qRoomType" class="form-label">房型</label> <select
-						id="qRoomType" name="roomTypeId" class="form-select">
-						<option value="">--- 所有房型 ---</option>
-						<option th:each="rt : ${roomTypeVOList}"
-							th:value="${rt.roomTypeId}" th:text="${rt.roomTypeName}"
-							th:selected="${roomTypeId} == ${rt.roomTypeId}"></option>
-					</select>
-				</div>
 
 				<div class="col-md-4">
 					<label for="minDate" class="form-label">日期（起）</label> <input
@@ -31,6 +22,15 @@
 					<label for="maxDate" class="form-label">日期（迄）</label> <input
 						type="date" class="form-control" id="maxDate" name="maxDate"
 						th:value="${maxDate}">
+				</div>
+				<div class="col-md-4">
+					<label for="qRoomType" class="form-label">房型</label> <select
+						id="qRoomType" name="roomTypeId" class="form-select">
+						<option value="">--- 所有房型 ---</option>
+						<option th:each="rt : ${roomTypeVOList}"
+							th:value="${rt.roomTypeId}" th:text="${rt.roomTypeName}"
+							th:selected="${roomTypeId} == ${rt.roomTypeId}"></option>
+					</select>
 				</div>
 				
 				<div class="col-md-4">
@@ -62,30 +62,34 @@
 		<div class="table panel p-4">
 			<div class="table_header d-flex justify-content-between align-items-end mb-4">
 		    	<h4 class="table_title">房型預定表列表</h4>
-		    	<!-- 新增房間 -->
+		    	<!-- 新增房型預定表 -->
 <!-- 				<button class="btn btn_accent btn_add" id="btnAddRoomTypeSchedule">新增房型預定表</button> -->
+				<button class="btn btn-danger" id="btnInitAllSchedules">批次產生所有房型排程</button>
+				<div id="loadingSpinner" style="display:none;">
+    				<div class="spinner"></div>
+				</div>
 		  	</div>
 		  	<div class="table-responsive">
 		    	<table id="roomTypeScheduleTable" class="table table-bordered align-top">
 		      		<thead class="table_head align-top">
 		        		<tr>
-					        <th class="text-center">編號</th>
+<!-- 					        <th class="text-center">編號</th> -->
+					        <th class="text-center">日期</th>
 		          			<th class="text-center">房型</th>
 					        <th class="text-center">房間數量</th>
 					        <th class="text-center">已訂間數</th>
 					        <th class="text-center">剩餘間數</th>
-					        <th class="text-center">日期</th>
 <!-- 					        <th class="text-center">操作</th> -->
 		        		</tr>
 		      		</thead>
 		      		<tbody>
 		        		<tr th:each="roomTypeScheduleVO : ${roomTypeScheduleVOList}">
-						    <td class="text-center" th:text="${roomTypeScheduleVO.roomTypeScheduleId}"></td>
+<!-- 						    <td class="text-center" th:text="${roomTypeScheduleVO.roomTypeScheduleId}"></td> -->
+						    <td class="text-center" th:text="${roomTypeScheduleVO.roomOrderDate}"></td>
 						    <td class="text-center" th:text="${roomTypeScheduleVO.roomTypeVO.roomTypeName}"></td>
 						    <td class="text-center" th:text="${roomTypeScheduleVO.roomAmount}"></td>
 						    <td class="text-center" th:text="${roomTypeScheduleVO.roomRSVBooked}"></td>
 						    <td class="text-center" th:text="${roomTypeScheduleVO.roomAmount - roomTypeScheduleVO.roomRSVBooked}"></td>
-						    <td class="text-center" th:text="${roomTypeScheduleVO.roomOrderDate}"></td>
 <!-- 						    <td> -->
 <!-- 						        <div class="table_row_actions d-flex justify-content-center align-items-start"> -->
 <!-- 									<button class="btn_icon btn_view" th:data-id="${roomTypeScheduleVO.roomTypeScheduleId}"><i class="fas fa-eye"></i></button> -->

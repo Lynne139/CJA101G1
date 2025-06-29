@@ -74,4 +74,7 @@ public class RoomTypeScheduleVO {
 	public void setRoomOrderDate(Date roomOrderDate) {
 		this.roomOrderDate = roomOrderDate;
 	}
+	public RoomTypeScheduleVO() {
+//		this.roomRSVBooked = 0;
+	}
 }
