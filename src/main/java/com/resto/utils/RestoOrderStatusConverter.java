@@ -3,17 +3,15 @@ package com.resto.utils;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-@Converter(autoApply = true) // autoApply=所有RestoOrderStatus都套用
+@Converter(autoApply = false)
 public class RestoOrderStatusConverter implements AttributeConverter<RestoOrderStatus, Integer> {
-
-	@Override
+    @Override
     public Integer convertToDatabaseColumn(RestoOrderStatus status) {
-        return status == null ? null : status.getCode();
+        return status != null ? status.getValue() : null;
     }
 
     @Override
     public RestoOrderStatus convertToEntityAttribute(Integer dbData) {
-        return dbData == null ? null : RestoOrderStatus.fromCode(dbData);
+        return dbData != null ? RestoOrderStatus.fromValue(dbData) : null;
     }
-    
 }

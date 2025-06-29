@@ -1,1 +1,10 @@
 /* === bootstrap 樣式覆蓋 ==== */
+.bg-yuko-primary{
+	background-color:var(--color-primary);
+}
+.bg-yuko-secondary{
+	background-color:var(--color-secondary);
+}
+.bg-yuko-accent{
+	background-color:var(--color-accent);
+}

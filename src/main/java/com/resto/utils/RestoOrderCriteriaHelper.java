@@ -15,7 +15,6 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-/** 依照 paramMap 自動組裝複合查詢並回傳 DTO 清單 */
 public class RestoOrderCriteriaHelper {
 
     private static Predicate buildPredicate(CriteriaBuilder cb, Root<RestoOrderVO> root,
@@ -35,24 +34,31 @@ public class RestoOrderCriteriaHelper {
             case "orderSource": // select
             	return cb.equal(root.get(column), RestoOrderSource.valueOf(value));
             	
-            case "regiDateFrom":
-                return cb.greaterThanOrEqualTo(root.get("regiDate"), LocalDate.parse(value));
-            case "regiDateTo":
-                return cb.lessThanOrEqualTo(root.get("regiDate"), LocalDate.parse(value));
+            case "regiDateRange": // pick
+                String[] parts = value.split(" to ");
+                if (parts.length == 2) {
+                    Predicate from = cb.greaterThanOrEqualTo(root.get("regiDate"), LocalDate.parse(parts[0]));
+                    Predicate to = cb.lessThanOrEqualTo(root.get("regiDate"), LocalDate.parse(parts[1]));
+                    return cb.and(from, to);
+                }
+                return null;
+                
+            case "orderTimeRange":
+                String[] timeParts = value.split(" to ");
+                if (timeParts.length == 2) {
+                    Predicate from = cb.greaterThanOrEqualTo(root.get("orderTime"), LocalDateTime.parse(timeParts[0]));
+                    Predicate to = cb.lessThanOrEqualTo(root.get("orderTime"), LocalDateTime.parse(timeParts[1]));
+                    return cb.and(from, to);
+                }
+                return null;
 
-            case "orderTimeFrom":           // 建議全部小寫，和表單欄位一致
-                return cb.greaterThanOrEqualTo(root.get("orderTime"), LocalDateTime.parse(value));
-            case "orderTimeTo":
-                return cb.lessThanOrEqualTo(root.get("orderTime"), LocalDateTime.parse(value));
 
-
-
-            case "hasAdminNote":
+            case "hasAdminNote":  // checkbox
                 return Boolean.parseBoolean(value)
                     ? cb.and(cb.isNotNull(root.get("adminNote")),
                              cb.notEqual(root.get("adminNote"), ""))
                     : null;
-            case "hasRegiReq":
+            case "hasRegiReq":  // checkbox
                 return Boolean.parseBoolean(value)
                     ? cb.and(cb.isNotNull(root.get("regiReq")),
                              cb.notEqual(root.get("regiReq"), ""))
@@ -68,8 +74,7 @@ public class RestoOrderCriteriaHelper {
 	            String pattern = "%" + value + "%";
 	            Predicate guestNameLike = cb.like(root.get("orderGuestName"), pattern);
 	            Predicate guestEmailLike = cb.like(root.get("orderGuestEmail"), pattern);
-	            Predicate guestPhoneLike = cb.like(root.get("orderGuestPhone"), pattern);
-	            return cb.or(guestNameLike, guestEmailLike, guestPhoneLike);
+	            return cb.or(guestNameLike, guestEmailLike);
             default:
             	return null;   // 未涵蓋欄位忽略
         }

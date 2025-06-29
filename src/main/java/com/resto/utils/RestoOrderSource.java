@@ -1,47 +1,36 @@
 package com.resto.utils;
 
 public enum RestoOrderSource {
-	MEMBER(0),   // 會員登入預約
-    ROOM(1),    // 住房訂單
-    ADMIN(2);       // 管理員建置
-    
-	
-	// 實際存進資料庫的代碼
-    private final int code;
+    MEMBER(0, "會員", "yuko-accent"),
+    ROOM(1, "住房", "warning"),
+    ADMIN(2, "後台", "yuko-secondary");
 
-    RestoOrderSource(int code) {
+    private final int code;
+    private final String label;
+    private final String css;
+
+    RestoOrderSource(int code, String label, String css) {
         this.code = code;
+        this.label = label;
+        this.css = css;
     }
 
     public int getCode() {
         return code;
     }
 
-    // 方便從 int 反查 enum
+    public String getLabel() {
+        return label;
+    }
+
+    public String getCssClass() {
+        return css;
+    }
+
     public static RestoOrderSource fromCode(int code) {
         for (RestoOrderSource s : values()) {
             if (s.code == code) return s;
         }
-        throw new IllegalArgumentException("Unknown code: " + code);
+        throw new IllegalArgumentException("Unknown RestoOrderSource code: " + code);
     }
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
-
-

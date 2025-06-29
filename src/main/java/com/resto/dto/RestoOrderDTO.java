@@ -17,7 +17,6 @@ public class RestoOrderDTO {
 	private Integer roomOrderId;
 	private String orderGuestName;
 	private String orderGuestEmail;
-	private String orderGuestPhone;
 	private LocalDate regiDate;
 	private String snapshotPeriodName;
 	private String snapshotTimeslotName;
@@ -44,7 +43,6 @@ public class RestoOrderDTO {
 		this.roomOrderId = roomOrderId;
 		this.orderGuestName = orderGuestName;
 		this.orderGuestEmail = orderGuestEmail;
-		this.orderGuestPhone = orderGuestPhone;
 		this.regiDate = regiDate;
 		this.snapshotPeriodName = snapshotPeriodName;
 		this.snapshotTimeslotName = snapshotTimeslotName;
@@ -127,16 +125,6 @@ public class RestoOrderDTO {
 	}
 
 
-	public String getOrderGuestPhone() {
-		return orderGuestPhone;
-	}
-
-
-	public void setOrderGuestPhone(String orderGuestPhone) {
-		this.orderGuestPhone = orderGuestPhone;
-	}
-
-
 	public LocalDate getRegiDate() {
 		return regiDate;
 	}
@@ -201,7 +189,7 @@ public class RestoOrderDTO {
 	public String toString() {
 		return "RestoOrderDTO [restoOrderId=" + restoOrderId + ", restoName=" + snapshotRestoName + ", orderSource="
 				+ orderSource + ", memberId=" + memberId + ", roomOrderId=" + roomOrderId + ", orderGuestName="
-				+ orderGuestName + ", orderGuestEmail=" + orderGuestEmail + ", orderGuestPhone=" + orderGuestPhone
+				+ orderGuestName + ", orderGuestEmail=" + orderGuestEmail + ", orderGuestPhone="
 				+ ", regiDate=" + regiDate + ", periodName=" + snapshotPeriodName + ", timeslotName=" + snapshotTimeslotName
 				+ ", regiSeats=" + regiSeats + ", orderTime=" + orderTime + ", orderStatus=" + orderStatus + "]";
 	}
