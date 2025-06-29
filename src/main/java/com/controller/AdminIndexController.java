@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.coupon.entity.Coupon;
@@ -27,12 +26,16 @@ import com.prodCate.model.ProdCateVO;
 import com.prodPhoto.model.ProdPhotoService;
 import com.prodPhoto.model.ProdPhotoVO;
 import com.resto.dto.RestoDTO;
+import com.resto.dto.RestoOrderDTO;
 import com.resto.entity.PeriodVO;
 import com.resto.entity.RestoVO;
 import com.resto.entity.TimeslotVO;
 import com.resto.model.PeriodService;
+import com.resto.model.RestoOrderService;
 import com.resto.model.RestoService;
 import com.resto.model.TimeslotService;
+import com.resto.utils.RestoOrderSource;
+import com.resto.utils.RestoOrderStatus;
 import com.roomOrder.model.RoomOrder;
 import com.roomOrder.model.RoomOrderService;
 import com.shopOrd.model.ShopOrdService;
@@ -52,6 +55,8 @@ public class AdminIndexController {
 	PeriodService periodService;
 	@Autowired
 	TimeslotService timeslotService;
+	@Autowired
+	RestoOrderService restoOrderService;
 	
 	@Autowired
 	ProdService prodSvc;
@@ -228,6 +233,21 @@ public class AdminIndexController {
     	String mainFragment = "admin/fragments/resto/restoOrder";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	// 複合查詢 + Datatables
+    	Map<String, String[]> paramMap = request.getParameterMap();
+        List<RestoOrderDTO> orderList = restoOrderService.compositeQueryAsDTO(paramMap);
+        model.addAttribute("orderList", orderList);
+        
+    	// 給下拉選單用
+        model.addAttribute("orderSourceOpts", List.of(RestoOrderSource.values()));
+        model.addAttribute("orderStatusOpts", List.of(RestoOrderStatus.values()));
+
+    	
+    	// 讓複合查詢欄位保持原值（用於 th:selected / th:value）
+        for (String key : paramMap.keySet()) {
+            model.addAttribute(key, paramMap.get(key)[0]);
+        }
 
     	return "admin/index_admin";
     } 

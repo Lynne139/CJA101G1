@@ -20,8 +20,8 @@ public class RestoCriteriaHelper {
 	    if (value == null || value.trim().isEmpty()) return null;
 
 	    switch (column) {
-	        case "restoSeatsTotal":
-	            return cb.equal(root.get(column), Integer.valueOf(value));
+//	        case "restoSeatsTotal":
+//	            return cb.equal(root.get(column), Integer.valueOf(value));
 	        case "isEnabled":
 	            return cb.equal(root.get(column), Boolean.valueOf(value));
 	        case "keyword":
@@ -74,8 +74,9 @@ public class RestoCriteriaHelper {
 
         // 處理前端傳來的 map 條件
         for (String column : map.keySet()) {
-//            if ("action".equals(column)) continue; // 忽略表單多餘欄位
-            String value = map.get(column)[0];
+        	String[] values = map.get(column);
+            String value = (values != null && values.length > 0) ? values[0] : null;
+            
             Predicate p = buildPredicate(cb, root, column, value);
             if (p != null) {
                 predicateList.add(p);
@@ -96,7 +97,9 @@ public class RestoCriteriaHelper {
         ));
 
         // 組裝查詢條件，都設進where
-        cq.where(predicateList.toArray(new Predicate[0]));
+        if (!predicateList.isEmpty()) {
+            cq.where(predicateList.toArray(new Predicate[0]));
+        }
         cq.orderBy(cb.asc(root.get("restoId"))); // 可以改為其他欄位排序
 
         return em.createQuery(cq).getResultList();
