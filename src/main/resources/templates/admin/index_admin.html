@@ -196,6 +196,10 @@
         th:src="@{/js/admin/resto/resto_timeslot.js}"></script>
         <script th:if="${mainFragment == 'admin/fragments/resto/restoTimeslot'}"
         src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+        <script th:if="${mainFragment == 'admin/fragments/resto/restoTimeslot'}"
+                th:inline="javascript">
+        window.readonly =  /*[[${readonly}]]*/ false;
+		</script>
         
 		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrder'}"
         th:src="@{/js/admin/resto/resto_order.js}"></script>
@@ -203,7 +207,6 @@
         src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrder'}"
         src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh.js"></script>
-		
         
         
         <!-- 房間 -->
