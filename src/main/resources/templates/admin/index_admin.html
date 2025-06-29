@@ -10,7 +10,10 @@
 	  	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 	  	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 	  	<link rel="stylesheet" th:href="@{/css/all_admin.css}">
-	  	
+	    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    	<link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.3.0/css/fixedColumns.dataTables.min.css">
+      
+      
 	</head>
 
 	<body>
@@ -190,9 +193,16 @@
         <script th:if="${mainFragment == 'admin/fragments/resto/restoTimeslot'}"
         src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
         
-
 		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrder'}"
         th:src="@{/js/admin/resto/resto_order.js}"></script>
+		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrder'}"
+        src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrder'}"
+        src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh.js"></script>
+		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrder'}"
+        src="https://cdn.datatables.net/fixedcolumns/4.3.0/js/dataTables.fixedColumns.min.js"></script>
+        
+        
         <!-- 房間 -->
         <script th:if="${mainFragment == 'admin/fragments/room/listAllRoom'}"
         th:src="@{/js/admin/room/listAllRoom.js}"></script>

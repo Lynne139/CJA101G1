@@ -1,48 +1,38 @@
 package com.resto.utils;
 
 public enum RestoOrderStatus {
-	CANCELED(0),   // 已取消
-    CREATED(1),    // 已建立 / 未付款
-    DONE(2),       // 已完成
-    WITHHOLD(3),   // 保留（例如刷卡預授權）
-    NOSHOW(4);     // 未到
-	
-	// 實際存進資料庫的代碼
-    private final int code;
+    CANCELED(0, "已取消", "secondary"),
+    CREATED(1, "已成立", "yuko-accent"),
+    DONE(2, "已完成", "success"),
+    WITHHOLD(3, "保留", "warning"),
+    NOSHOW(4, "未到", "danger");
 
-    RestoOrderStatus(int code) {
-        this.code = code;
+    private final int value;
+    private final String label;
+    private final String css;
+
+    RestoOrderStatus(int value, String label, String css) {
+        this.value = value;
+        this.label = label;
+        this.css = css;
     }
 
-    public int getCode() {
-        return code;
+    public int getValue() {
+        return value;
     }
 
-    // 方便從 int 反查 enum
-    public static RestoOrderStatus fromCode(int code) {
-        for (RestoOrderStatus s : values()) {
-            if (s.code == code) return s;
+    public String getLabel() {
+        return label;
+    }
+
+    public String getCssClass() {
+        return css;
+    }
+
+    public static RestoOrderStatus fromValue(int value) {
+        for (RestoOrderStatus status : values()) {
+            if (status.value == value) return status;
         }
-        throw new IllegalArgumentException("Unknown code: " + code);
+        throw new IllegalArgumentException("Unknown value: " + value);
     }
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
-
-

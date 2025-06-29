@@ -25,16 +25,10 @@ public class RestoOrderService {
         this.restoOrderRepository = restoOrderRepository;
     }
 
-    // Datatable 預設載入
+    // Datatable顯示複合查詢結果
     @Transactional(readOnly = true)
-    public List<RestoOrderDTO> findAllDTO() {
-        return restoOrderRepository.findAllDTO();
-    }
-
-    // 複合查詢，把paramMap丟給CriteriaHelper
-    @Transactional(readOnly = true)
-    public List<RestoOrderDTO> compositeQueryAsDTO(Map<String,String[]> paramMap) {
-        return RestoOrderCriteriaHelper.getAllDTO(paramMap, em);
+    public List<RestoOrderDTO> compositeQueryAsDTO(Map<String,String[]> param) {
+        return RestoOrderCriteriaHelper.getAllDTO(param, em);
     }
     
     

@@ -5,6 +5,7 @@
 @import url(./admin/base/base.css);
 
 /* === utilities === */
+@import url(./admin/helpers/utilities.css);
 
 /* === component === */
 @import url(./admin/component/button.css);
@@ -24,6 +25,7 @@
 @import url(./admin/pages/index.css);
 @import url(./admin/pages/resto_info.css);
 @import url(./admin/pages/resto_timeslot.css);
+@import url(./admin/pages/resto_order.css);
 
 /* === room === */
 @import url(./admin/room/roomTypeSchedule.css);

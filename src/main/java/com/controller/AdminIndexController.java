@@ -6,12 +6,14 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -416,14 +418,32 @@ public class AdminIndexController {
         model.addAttribute("orderList", orderList);
         
     	// 給下拉選單用
-        model.addAttribute("orderSourceOpts", List.of(RestoOrderSource.values()));
-        model.addAttribute("orderStatusOpts", List.of(RestoOrderStatus.values()));
-
-    	
-    	// 讓複合查詢欄位保持原值（用於 th:selected / th:value）
-        for (String key : paramMap.keySet()) {
-            model.addAttribute(key, paramMap.get(key)[0]);
+        model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
+        model.addAttribute("orderStatusOptions", List.of(RestoOrderStatus.values()));
+        
+        // 下拉選單保持原值(因為param取得的字串與enum物件無法比較會抓不到select)
+        String srcParam = request.getParameter("orderSource");
+        if (StringUtils.hasText(srcParam)) {
+            model.addAttribute("orderSource", RestoOrderSource.valueOf(srcParam));
         }
+        String stParam  = request.getParameter("orderStatus");
+        if (StringUtils.hasText(stParam)) {
+            model.addAttribute("orderStatus", RestoOrderStatus.valueOf(stParam));
+        }
+        
+    	// 讓複合查詢欄位保持原值（th:value）
+        Set<String> enumKeys = Set.of("orderSource", "orderStatus");
+        for (String key : paramMap.keySet()) {
+            if (enumKeys.contains(key)) continue;
+
+            String[] values = paramMap.get(key);
+            if (values != null && values.length > 0 && StringUtils.hasText(values[0])) {
+                model.addAttribute(key, values[0]);
+            }
+        }
+    	
+   
+        
 
     	return "admin/index_admin";
     } 

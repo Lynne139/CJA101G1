@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function initRestoTable() {
     const table = $('#restoTable');
 
-    if ($.fn.DataTable.isDataTable(table)) {
+    if ($.fn.dataTable.isDataTable(table)) {
       table.DataTable().clear().destroy(); // 清除舊實例
     }
 
@@ -42,12 +42,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const form = document.querySelector(".filter");
 
   clearBtn.addEventListener("click", () => {
-    // 清空欄位值
-    form.querySelector("select[name='isEnabled']").value = "";
-    form.querySelector("input[name='keyword']").value = "";
-
-    // 自動提交清空後的查詢表單
-    form.submit();
+    // 直接回到基礎路徑(清空欄位值)
+    location.href = location.pathname;
   });
 
 
