@@ -5,14 +5,14 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="panel-title">商城訂單篩選</h2>
                 <div>
-                    <button type="button" class="btn btn_accent me-2" data-bs-toggle="modal" data-bs-target="#addShopOrdModal">
-                        <i class="fas fa-plus me-2"></i>
-                        新增訂單
-                    </button>
-                    <a href="/admin/prodCart/select_page" class="btn btn_accent">
-                        <i class="fas fa-shopping-cart me-2"></i>
-                        前往購物車結帳
-                    </a>
+<!--                     <button type="button" class="btn btn_accent me-2" data-bs-toggle="modal" data-bs-target="#addShopOrdModal"> -->
+<!--                         <i class="fas fa-plus me-2"></i> -->
+<!--                         新增訂單 -->
+<!--                     </button> -->
+<!--                     <a href="/admin/prodCart/select_page" class="btn btn_accent"> -->
+<!--                         <i class="fas fa-shopping-cart me-2"></i> -->
+<!--                         前往購物車結帳 -->
+<!--                     </a> -->
                 </div>
             </div>
             
@@ -127,7 +127,7 @@
 </div>
 
 <!-- 修改商品 Modal -->
-<div class="modal fade" id="editShopOrdModal" tabindex="-1" aria-labelledby="editShopOrdModalLabel" aria-hidden="true">
+<div class="modal fade" id="editProdModal" tabindex="-1" aria-labelledby="editShopOrdModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -219,7 +219,7 @@ function loadEditProdModal(button) {
   `;
   
   // 用 AJAX 載入修改訂單頁面內容
-  fetch('/admin/shopOrd/getOne_For_Update', {
+  fetch('/shopOrd/getOne_For_Update', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -345,6 +345,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }, 100);
 });
+
+function cancelOrder(prodOrdId) {
+  if (!confirm('確定要取消這筆訂單嗎？')) return;
+  fetch('/shopOrd/admin/shopOrd/cancel?prodOrdId=' + prodOrdId, {
+    method: 'POST'
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('訂單已取消');
+      window.location.reload();
+    } else {
+      alert('取消失敗：' + data.message);
+    }
+  })
+  .catch(err => {
+    alert('系統錯誤，請稍後再試');
+  });
+}
 </script>
 
 
