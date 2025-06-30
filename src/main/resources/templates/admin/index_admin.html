@@ -49,9 +49,8 @@
                 
 			      		<div class="submenu_block ps-4" 
 							th:classappend="${currentURI.startsWith('/admin/member')} ? 'show'">
-			        		<a th:href="@{/admin/member1}" th:classappend="${currentURI == '/admin/member1'} ? '-active'" class="sidebar_sub_link">會員子頁1</a>
-			        		<a th:href="@{/admin/listAllMember}" th:classappend="${currentURI == '/admin//admin/listAllMember'} ? '-active'" class="sidebar_sub_link">會員列表</a>
-			      			<a th:href="@{/admin/addMember}" th:classappend="${currentURI == '/admin//admin/addMember'} ? '-active'" class="sidebar_sub_link">會員新增</a>
+			        		<a th:href="@{/admin/select_page}" th:classappend="${currentURI == '/admin/select_page'} ? '-active'" class="sidebar_sub_link">會員查詢</a>
+			        		<a th:href="@{/admin/listAllMember}" th:classappend="${currentURI == '/admin/listAllMember'} ? '-active'" class="sidebar_sub_link">會員列表</a>			      			
 			      		 
 			      		</div>
 			    	</div>

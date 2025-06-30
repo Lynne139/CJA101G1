@@ -93,13 +93,28 @@ public class AdminIndexController {
     } 
 	
     
-    // === 會員管理 ===
-    @GetMapping("/member1")
-    public String member1(HttpServletRequest request,Model model) {
-    	String mainFragment = "admin/fragments/member/member1";
+ // === 會員查詢 ===
+    @GetMapping("/select_page")
+    public String showSelectPage(HttpServletRequest request,Model model) {
+    	String mainFragment = "admin/fragments/member/select_page";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
     	
+    	List<MemberVO> list = memberSvc.getAll();
+        model.addAttribute("memberListData", list);
+        
+    	return "admin/index_admin";
+    } 
+    // === 會員列表 ===
+    @GetMapping("/listAllMember")
+    public String listAllMember(HttpServletRequest request,Model model) {
+    	String mainFragment = "admin/fragments/member/listAllMember";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	List<MemberVO> list = memberSvc.getAll();
+        model.addAttribute("memberListData", list);
+        
     	return "admin/index_admin";
     } 
     

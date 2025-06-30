@@ -44,4 +44,13 @@ public class MemberService {
 //		return HibernateUtil_CompositeQuery_yuko.getAllC(map,sessionFactory.openSession());
 //	}
 	
+	public MemberVO findByEmail(String email) {
+	    return repository.findByMemberEmail(email);
+	}
+
+	public List<MemberVO> findByNameLike(String memberName) {
+		
+		return repository.findByMemberName(memberName);
+	}
+	
 }
