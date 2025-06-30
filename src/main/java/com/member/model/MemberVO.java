@@ -94,7 +94,7 @@ public class MemberVO implements java.io.Serializable {
 	@Column(name = "member_birthday")
 	@NotNull(message="生日日期: 請勿空白")	
 	@Past(message="日期必須是在今日(含)之前")
-	@DateTimeFormat(pattern="yyyy-MM-dd")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	public Date getMemberBirthday() {
 		return memberBirthday;
 	}
