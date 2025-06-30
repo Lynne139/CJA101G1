@@ -6,7 +6,7 @@
 }
 
 .btn-outline-brown:hover {
-  background-color: #7E4E24;
+  background-color: #7E4E24 !important;
   color: #fff !important;  /* 強制白字 */
 }
 .card:hover {

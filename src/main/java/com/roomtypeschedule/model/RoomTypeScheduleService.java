@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.room.model.RoomRepository;
 import com.room.utils.RoomTypeScheduleCriteriaHelper;
+import com.roomOList.model.RoomOList;
 import com.roomtype.model.RoomTypeVO;
 
 import jakarta.persistence.EntityManager;
@@ -64,6 +65,11 @@ public class RoomTypeScheduleService {
 //        Date end = Date.valueOf(month.atEndOfMonth());
 //        return roomTypeScheduleRepository.findMonthlySchedules(roomTypeId, start, end);
 //    }
+	
+	//訂房
+	public List<RoomTypeScheduleVO> findSchedules(RoomTypeVO roomTypeVO, java.sql.Date start, java.sql.Date end) {
+        return roomTypeScheduleRepository.findByRoomTypeVOAndRoomOrderDateBetween(roomTypeVO, start, end);
+    }
 	
 	// 複合查詢（Criteria 結構）
     public List<RoomTypeScheduleVO> compositeQuery(Map<String, String[]> map) {
@@ -128,7 +134,7 @@ public class RoomTypeScheduleService {
 //			roomTypeScheduleRepository.save(schedule);
 //		}
 //	}
-    
+//    
 //    @Transactional
 //    public void cancelReservation(RoomOList roomOList) {
 //        RoomTypeVO roomType = roomOList.getRoomType();
@@ -152,7 +158,7 @@ public class RoomTypeScheduleService {
 //            roomTypeScheduleRepository.save(schedule);
 //        }
 //    }
-    
+//    
 //    @Transactional
 //    public void updateReservation(RoomOList oldRoomOList, RoomOList newRoomOList) {
 //        RoomTypeVO roomType = oldRoomOList.getRoomType();
