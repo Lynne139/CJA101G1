@@ -4,30 +4,23 @@ import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.resto.entity.RestoReservationVO;
 import com.resto.entity.TimeslotVO;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.RequiredArgsConstructor;
 
 @Service
-//@RequiredArgsConstructor
 public class ReservationService {
 
     @PersistenceContext
     private EntityManager em;
-
-    private final ReservationRepository reservationRepository;
-    private final RestoRepository restoRepository;
-
-
-    public ReservationService(ReservationRepository reservationRepository,RestoRepository restoRepository) {
-        this.reservationRepository = reservationRepository;
-        this.restoRepository = restoRepository;
-    }
+    
+    @Autowired
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private RestoRepository restoRepository;
 
     
     //取出、建立當天預約vo
@@ -45,6 +38,7 @@ public class ReservationService {
                 vo.setTimeslotVO(new TimeslotVO(timeslotId)); // 只需 idproxy
                 vo.setReserveDate(date);
                 vo.setRestoSeatsTotal(vo.getRestoVO().getRestoSeatsTotal());
+                // reserveSeatsTotal已在vo預設0
                 
                 return reservationRepository.save(vo);
             });
@@ -57,37 +51,23 @@ public class ReservationService {
                      - entry.getReserveSeatsTotal(), 0);
     }
 
-    // 更新預約狀況，防呆預約人數若超額丟 IllegalStateException
-    @Transactional
-    public void reserve(Integer restoId, Integer timeslotId,
-                        LocalDate date, int seats){
-
-        var entry  = getEntry(restoId,timeslotId,date);
-        int remain = entry.getRestoSeatsTotal() - entry.getReserveSeatsTotal();
-        if (seats > remain) {
-            throw new IllegalStateException("剩餘 " + remain + " 位，名額不足");
-        }
-        entry.setReserveSeatsTotal(entry.getReserveSeatsTotal() + seats);
-        // JPA 內部自動 flush
-    }
-    
     
     // 更新(釋放/占用)每時段實際預約人數
-    @Transactional
-    public void adjust(Integer restoId,Integer timeslotId,
-                       LocalDate date,int deltaSeats){
-
-        var entry = getEntry(restoId,timeslotId,date);
-        int newTotal = entry.getReserveSeatsTotal() + deltaSeats;
-
-        if (newTotal < 0)
-            throw new IllegalStateException("reserveSeatsTotal < 0 ?!");
-
-        if (newTotal > entry.getRestoSeatsTotal())
-            throw new IllegalStateException("剩餘名額不足");
-
-        entry.setReserveSeatsTotal(newTotal);
-    }
+    public void adjustSeats(Integer restoId, Integer timeslotId,
+            LocalDate date, int diff) {
+		
+    	if (diff == 0) return;
+		
+		RestoReservationVO entry = getEntry(restoId, timeslotId, date);
+		// 正diff 代表占位，負diff 代表釋放
+		int newTotal = entry.getReserveSeatsTotal() + diff;
+		
+		// 保底 0、保頂 restoSeatsTotal
+		newTotal = Math.max(0, Math.min(entry.getRestoSeatsTotal(), newTotal));
+		entry.setReserveSeatsTotal(newTotal);
+		
+		// reservationRepo.save(entry);可省略，Entity 已託管
+	}
 
     
     
