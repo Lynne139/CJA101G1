@@ -4,131 +4,296 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>會員通知 - Maison d'Yuko</title>
+
+  <!-- ✅ global CSS -->
   <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
   <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
+    integrity="sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- ✅ main CSS -->
   <style>
-    /* 讓通知列表置中且寬度較寬 */
-    .notification-list {
-      margin: 30px auto;
-      max-width: 700px;
-      width: 90%;
-    }
-
-    /* 我的通知標題左對齊通知列表左緣，調大字體並用咖啡色 */
-    section.container > h2 {
-      max-width: 700px;
-      width: 90%;
-      margin-left: auto;
-      margin-right: auto;
-      margin-bottom: 1rem;
-      text-align: left;
-      font-size: 1.75rem;
-      color: #6c4d3c;
-    }
+    /* 通知頁面專用樣式 */
+    .notifications-section { padding: 60px 0; background: #fdf6ef; min-height: 80vh; }
+    .notifications-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    .notifications-header { text-align: center; margin-bottom: 40px; }
+    .notifications-title { font-size: 2.5rem; color: #8B4513; margin-bottom: 10px; }
+    .notifications-subtitle { font-size: 1.1rem; color: #666; margin-bottom: 30px; }
     
+    /* 通知列表容器 */
+    .notification-list-wrapper { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); min-height: 400px; }
+    .notification-list { margin: 0; }
+    
+    /* 通知項目樣式 */
     .notification-item {
-      border-bottom: 1px solid #ddd;
-      padding: 15px;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 20px 0;
       cursor: pointer;
-
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
+      transition: all 0.3s ease;
     }
     
-	.notification-title {
-	  font-size: 1.1rem;
-	  color: #6c4d3c;
-	  margin-bottom: 4px;
-	}
-	
-    .notification-content {
-      flex: 1;
-      padding-right: 15px;
-    }
-
-    .notification-item.unread {
-      font-weight: bold;
-      background-color: #f9f1e9;
-    }
-    .notification-item.read {
-      color: #999;
-    }
-
-    /* 分頁按鈕置中 */
-    .pagination {
-      display: flex;
-      justify-content: center;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-    .pagination button {
-      margin: 5px;
-      padding: 6px 12px;
-      border: none;
-      background-color: #ccc;
-      cursor: pointer;
-    }
-    .pagination button.active {
-      background-color: #6c4d3c;
-      color: white;
-    }
+    .notification-item:last-child { border-bottom: none; }
+    .notification-item:hover { background-color: #f9f9f9; padding-left: 15px; padding-right: 15px; border-radius: 8px; }
+    .notification-content { flex: 1; padding-right: 20px; }
+    .notification-title { font-size: 1.2rem; color: #8B4513; margin-bottom: 8px; font-weight: 600; }
+    .notification-message { font-size: 1rem; color: #555; line-height: 1.5; margin-bottom: 5px; }
+    .notification-item.unread { background-color: #f9f1e9; border-left: 4px solid #d4a574; padding-left: 16px; }
+    .notification-item.unread .notification-title { font-weight: bold; color: #6c4d3c; }
+    .notification-item.read { opacity: 0.7; }
+    .notification-item.read .notification-title { color: #999; }
+    .notification-item.read .notification-message { color: #999; }
     .notification-time {
-      font-size: 0.85em;
+      font-size: 0.9rem;
       color: #777;
       white-space: nowrap;
       flex-shrink: 0;
+      margin-top: 2px;
+    }
+    
+    /* 未讀標記 */
+    .unread-badge {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background-color: #d4a574;
+      border-radius: 50%;
+      margin-left: 10px;
+    }
+
+    /* 分頁樣式 */
+    .pagination-wrapper { display: flex; justify-content: center; align-items: center; margin-top: 30px; gap: 10px; }
+    .pagination-btn { background: white; border: 1px solid #d4a574; color: #8B4513; padding: 8px 12px; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; min-width: 40px; text-align: center; }
+    .pagination-btn:hover:not(:disabled) { background: #d4a574; color: white; }
+    .pagination-btn.active { background: #8B4513; color: white; border-color: #8B4513; }
+    .pagination-btn:disabled { background: #f5f5f5; color: #ccc; border-color: #e0e0e0; cursor: not-allowed; }
+    .pagination-info { color: #666; font-size: 0.9rem; }
+
+    /* 無資料訊息 */
+    .no-data-message { text-align: center; padding: 60px 20px; color: #666; font-size: 1.1rem; }
+    .no-data-icon { font-size: 3rem; color: #ddd; margin-bottom: 20px; }
+
+    /* 載入動畫 */
+    .loading { text-align: center; padding: 40px; color: #666; }
+    .loading-spinner { border: 3px solid #f3f3f3; border-top: 3px solid #8B4513; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+    
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .notifications-title { font-size: 2rem; }
+      .notification-item { flex-direction: column; align-items: flex-start; }
+      .notification-content { padding-right: 0; margin-bottom: 10px; }
+      .notification-time { align-self: flex-end; }
+    }
+
+    @media (min-width: 992px) {
+      .notifications-container { margin-left: 90px; margin-right: 90px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- 匯入 header -->
+  <!-- ✅ header -->
   <div th:replace="~{fragments/header :: header}"></div>
 
-  <!-- 通知內容 -->
-  <section class="section container">
-    <h2 class="mt-5 mb-4">我的通知</h2>
-    <div id="notificationList" class="notification-list"></div>
-    <div class="pagination" id="pagination"></div>
+  <!-- ✅ 子選單 Navbar -->
+  <nav class="sub-navbar d-flex justify-content-center align-items-center">
+    <ul class="nav">
+      <li class="nav-item"><a class="nav-link" href="#">關於嶼蔻</a></li>
+      <li class="nav-item"><a class="nav-link" href="#">最新消息</a></li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" tabindex="0">探索嶼蔻</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">珍饈美饌</a></li>
+          <li><a class="dropdown-item" href="#">多元設施</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a class="nav-link" href="#rooms">精緻客房</a></li>
+      <li class="nav-item"><a class="nav-link" href="#faq">交通資訊</a></li>
+      <li class="nav-item"><a class="nav-link" href="#footer">聯絡我們</a></li>
+      <li class="nav-item"><a class="nav-link" href="#faq">常見問題</a></li>
+    </ul>
+  </nav>
+
+  <!-- ✅ Sticky 右側按鈕 -->
+  <div class="sticky-icons d-none d-lg-block">
+    <a href="#"><img th:src="@{/images/icon/bed.svg}" alt="bed" class="icon"/><br>線上訂房</a>
+    <a th:href="@{/front-end/shop}"><img th:src="@{/images/icon/bag.svg}" alt="bag" class="icon"/><br>帳號選物</a>
+    <a href="#"><img th:src="@{/images/icon/dish.svg}" alt="dish" class="icon"/><br>餐廳訂位</a>
+  </div>
+
+  <!-- ✅ Main Content -->
+  <section class="notifications-section">
+    <div class="notifications-container">
+      
+      <!-- 頁面標題 -->
+      <div class="notifications-header">
+        <h1 class="notifications-title">我的通知</h1>
+        <p class="notifications-subtitle">查看您的所有通知訊息</p>
+      </div>
+
+      <!-- 通知列表 -->
+      <div class="notification-list-wrapper">
+        <div id="loadingContainer" class="loading" style="display: none;">
+          <div class="loading-spinner"></div>
+          <div>正在載入通知...</div>
+        </div>
+        
+        <div id="notificationList" class="notification-list">
+          <!-- 通知項目將由JavaScript動態載入 -->
+        </div>
+        
+        <div id="paginationContainer" class="pagination-wrapper" style="display: none;"></div>
+      </div>
+
+    </div>
   </section>
 
-  <!-- 匯入 footer -->
+  <!-- ✅ Overlay Full Menu -->
+  <div class="overlay-menu" id="overlayMenu">
+    <div class="overlay-menu-header d-flex justify-content-between align-items-start">
+      <div class="overlay-mobile-menu d-flex justify-content-between align-items-center p-3">
+        <div class="mb-menu-header">Maison d'Yuko</div>
+      </div>
+      <div class="overlay-logo-contact mb-5">
+        <img th:src="@{/images/logo/logo_hp.png}" alt="logo" class="overlay-logo mb-3" />
+        <div class="overlay-title">嶼蔻渡假村 Maison d'Yuko</div>
+        <div class="overlay-contact">
+          <div>+886-7-123-4567</div>
+          <div>service@maisondyuko.com</div>
+        </div>
+      </div>
+      <div class="close-btn" id="menuClose">&times;</div>
+    </div>
+    <div class="overlay-center">
+      <div class="overlay-menu-member px-5 mb-5 d-flex justify-content-center">
+        <img th:src="@{/images/icon/member.svg}" alt="member" class="text-center" style="padding:0 5px"/>
+        <a href="#" class="text-center">會員登入</a>
+      </div>
+      <div class="px-5 mb-5 d-flex justify-content-between">
+        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_bed.svg}" alt="bed" class="menu-icon"/><br>線上訂房</a>
+        <a th:href="@{/front-end/shop}" class="text-center"><img th:src="@{/images/icon/menu_bag.svg}" alt="bag" class="menu-icon"/><br>帳號選物</a>
+        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_dish.svg}" alt="dish" class="menu-icon"/><br>餐廳訂位</a>
+      </div>
+      <div class="overlay-menu-row d-flex justify-content-center">
+        <div class="overlay-menu-col">
+          <h5>關於嶼蔻</h5>
+          <a href="#">品牌故事</a>
+          <a href="#">環境簡介</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>最新消息</h5>
+          <a th:href="@{/news/notice}">最新公告</a>
+          <a th:href="@{/news/promotion}">活動通知</a>
+          <a th:href="@{/news/news}">媒體報導</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>探索嶼蔻</h5>
+          <a href="#">珍饈美饌</a>
+          <a href="#">豐富設施</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>精緻客房</h5>
+          <a href="#">蔻香居</a>
+          <a href="#">海音居</a>
+          <a href="#">晨曦之庭</a>
+          <a href="#">月影行館</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>其他</h5>
+          <a href="#">交通資訊</a>
+          <a href="#">聯絡我們</a>
+          <a href="#">常見問題</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ footer -->
   <div th:replace="~{fragments/footer :: footer}"></div>
 
-  <!-- Scripts -->
+  <!-- ✅ global JS -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- ✅ Main JS -->
   <script th:inline="javascript">
-    const memberId = '[[${memberId}]]';
+    // 從 Thymeleaf 獲取資料
+    const memberId = /*[[${memberId}]]*/ '0';
     let notifications = [];
     let pageSize = 10;
     let currentPage = 1;
 
-    function fetchNotifications() {
-      $.get(`/api/notifications/member/${memberId}`, function (data) {
-        notifications = data;
-        renderPage(1);
+    // 初始化
+    $(document).ready(function() {
+      initializeEventHandlers();
+      fetchNotifications();
+    });
+
+    // 初始化事件處理器
+    function initializeEventHandlers() {
+      // Menu 收合功能
+      $('#menuToggle').on('click', function () {
+        $('#overlayMenu').addClass('active');
+      });
+      $('#menu-Toggle').on('click', function () {
+        $('#overlayMenu').addClass('active');
+      });
+      $('#menuClose').on('click', function () {
+        $('#overlayMenu').removeClass('active');
       });
     }
 
+    // 獲取通知資料
+    function fetchNotifications() {
+      showLoading();
+      
+      $.get(`/api/notifications/member/${memberId}`)
+        .done(function (data) {
+          hideLoading();
+          notifications = data || [];
+          renderPage(1);
+        })
+        .fail(function(xhr, status, error) {
+          hideLoading();
+          console.error('獲取通知失敗:', error);
+          showNoDataMessage('獲取通知失敗，請稍後再試', '❌');
+        });
+    }
+
+    // 渲染頁面
     function renderPage(page) {
       currentPage = page;
       const start = (page - 1) * pageSize;
       const end = start + pageSize;
       const pageData = notifications.slice(start, end);
 
+      if (pageData.length === 0) {
+        showNoDataMessage('目前沒有通知', '📭');
+        $('#paginationContainer').hide();
+        return;
+      }
+
       let html = "";
       pageData.forEach(n => {
         const createdAt = new Date(n.createdAt);
         const formattedTime = createdAt.toLocaleString("zh-TW");
+        const unreadBadge = !n.isRead ? '<span class="unread-badge"></span>' : '';
 
         html += `
           <div id="notification-${n.notificationId}" 
                class="notification-item ${n.isRead ? 'read' : 'unread'}"
                onclick="markAsRead(${n.notificationId})">
             <div class="notification-content">
-              <div class="notification-title">${n.title}</div>
-              <div>${n.content}</div>
+              <div class="notification-title">
+                ${n.title}${unreadBadge}
+              </div>
+              <div class="notification-message">${n.content}</div>
             </div>
             <div class="notification-time">${formattedTime}</div>
           </div>
@@ -139,35 +304,102 @@
       renderPagination();
     }
 
+    // 渲染分頁
     function renderPagination() {
       const totalPages = Math.ceil(notifications.length / pageSize);
-      let html = "";
-
-      for (let i = 1; i <= totalPages; i++) {
-        html += `<button class="${i === currentPage ? 'active' : ''}" onclick="renderPage(${i})">${i}</button>`;
+      const container = $('#paginationContainer');
+      
+      if (totalPages <= 1) {
+        container.hide();
+        return;
       }
-
-      $("#pagination").html(html);
+      
+      let html = `
+        <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''}>
+          ‹ 上一頁
+        </button>
+      `;
+      
+      // 頁碼按鈕
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage || i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+          html += `
+            <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+              ${i}
+            </button>
+          `;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+          html += '<span class="pagination-info">...</span>';
+        }
+      }
+      
+      html += `
+        <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>
+          下一頁 ›
+        </button>
+      `;
+      
+      container.html(html).show();
     }
 
+    // 換頁
+    function changePage(page) {
+      const totalPages = Math.ceil(notifications.length / pageSize);
+      if (page < 1 || page > totalPages) return;
+      
+      renderPage(page);
+      
+      // 滾動到頂部
+      $('html, body').animate({
+        scrollTop: $('.notifications-section').offset().top - 100
+      }, 500);
+    }
+
+    // 標記為已讀
     function markAsRead(notificationId) {
       const notificationDiv = $(`#notification-${notificationId}`);
       if (notificationDiv.hasClass("read")) return;
 
-      $.post(`/api/notifications/${memberId}/${notificationId}/read`, function (response) {
-        if (response === "success") {
-          notificationDiv.removeClass("unread").addClass("read");
-          const target = notifications.find(n => n.notificationId === notificationId);
-          if (target) target.isRead = true;
-        } else {
-          alert("設為已讀失敗");
-        }
-      });
+      $.post(`/api/notifications/${memberId}/${notificationId}/read`)
+        .done(function (response) {
+          if (response === "success") {
+            notificationDiv.removeClass("unread").addClass("read");
+            notificationDiv.find('.unread-badge').remove();
+            const target = notifications.find(n => n.notificationId === notificationId);
+            if (target) target.isRead = true;
+          } else {
+            alert("設為已讀失敗");
+          }
+        })
+        .fail(function(xhr, status, error) {
+          console.error('標記已讀失敗:', error);
+          alert("設為已讀失敗，請稍後再試");
+        });
     }
 
-    $(document).ready(function () {
-      fetchNotifications();
-    });
+    // 顯示載入動畫
+    function showLoading() {
+      $('#loadingContainer').show();
+      $('#notificationList').hide();
+      $('#paginationContainer').hide();
+    }
+
+    // 隱藏載入動畫
+    function hideLoading() {
+      $('#loadingContainer').hide();
+      $('#notificationList').show();
+    }
+
+    // 顯示無資料訊息
+    function showNoDataMessage(message, icon = '📭') {
+      const html = `
+        <div class="no-data-message">
+          <div class="no-data-icon">${icon}</div>
+          <div>${message}</div>
+        </div>
+      `;
+      $('#notificationList').html(html);
+    }
   </script>
 </body>
 </html>

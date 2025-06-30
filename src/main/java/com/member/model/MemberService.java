@@ -44,4 +44,9 @@ public class MemberService {
 //		return HibernateUtil_CompositeQuery_yuko.getAllC(map,sessionFactory.openSession());
 //	}
 	
+	public Integer getMemberPointsById(Integer memberId) {
+	    Optional<MemberVO> optional = repository.findById(memberId);
+	    return optional.map(MemberVO::getMemberPoints).orElse(null);
+	}
+
 }
