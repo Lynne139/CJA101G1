@@ -43,24 +43,24 @@
             <!-- 錯誤訊息顯示 -->
             <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-            <form th:action="@{/member/memberLogin}" method="post" th:object="${memberVO}">
-                <div class="mb-3">
-                    <label for="memberEmail" class="form-label">電子信箱</label>
-                    <input type="text" th:field="*{memberEmail}" class="form-control" id="memberEmail" required>
-                    <div class="text-danger" th:errors="*{memberEmail}"></div>
-                </div>
+           <form id="loginForm">
+			    <div class="mb-3">
+			        <label for="memberEmail" class="form-label">電子信箱</label>
+			        <input type="email" class="form-control" id="memberEmail" name="memberEmail" required>
+			    </div>
+			
+			    <div class="mb-3">
+			        <label for="memberPassword" class="form-label">密碼</label>
+			        <input type="password" class="form-control" id="memberPassword" name="memberPassword" required>
+			    </div>
+			
+			    <div id="loginError" class="text-danger mb-2"></div>
+			
+			    <div class="d-grid">
+			        <button type="submit" class="btn btn-primary">登入</button>
+			    </div>
+			</form>
 
-                <div class="mb-3">
-                    <label for="memberPassword" class="form-label">密碼</label>
-                    <input type="password" th:field="*{memberPassword}" class="form-control" id="memberPassword" required>
-                    <div class="text-danger" th:errors="*{memberPassword}"></div>
-                </div>
-
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">登入</button>
-                </div>
-                               
-            </form>
 
         </div>
       </div>
@@ -71,6 +71,39 @@
 
       </div>
     </div>
+    <script>
+		document.addEventListener('DOMContentLoaded', function () {
+		    const form = document.getElementById('loginForm');
+		    const errorDiv = document.getElementById('loginError');
+		
+		    form.addEventListener('submit', function (e) {
+		        e.preventDefault();
+		
+		        const formData = new FormData(form);
+		
+		        fetch('/member/ajaxLogin', {
+		            method: 'POST',
+		            body: formData,
+		        })
+		        .then(response => response.json())
+		        .then(data => {
+		            if (data.success) {
+		                // 關閉 modal
+		                const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+		                modal.hide();
+		
+		                // 重新整理或更新頁面
+		                window.location.reload();
+		            } else {
+		                errorDiv.textContent = data.message || "登入失敗";
+		            }
+		        })
+		        .catch(err => {
+		            errorDiv.textContent = "伺服器錯誤，請稍後再試。";
+		        });
+		    });
+		});
+	</script>
     
     
 </header>

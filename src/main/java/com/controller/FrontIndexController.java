@@ -1,12 +1,16 @@
 package com.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.member.model.MemberService;
 import com.member.model.MemberVO;
@@ -49,21 +53,27 @@ public class FrontIndexController {
     }
 
     
-    @PostMapping("/member/memberLogin")
-    public String login(@ModelAttribute("memberVO") MemberVO memberVO,
-                        Model model,
-                        HttpSession session) {
+    
+    
+    // Ajax 版登入
+    @PostMapping("/member/ajaxLogin")
+    @ResponseBody
+    public Map<String, Object> ajaxLogin(@RequestParam String memberEmail,
+                                         @RequestParam String memberPassword,
+                                         HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
 
-        MemberVO dbMember = memberSvc.findByEmail(memberVO.getMemberEmail());
+        MemberVO dbMember = memberSvc.findByEmail(memberEmail);
 
-        if (dbMember == null || !dbMember.getMemberPassword().equals(memberVO.getMemberPassword())) {
-            model.addAttribute("error", "帳號或密碼錯誤");
-            model.addAttribute("memberVO", new MemberVO());
-            return "index";
+        if (dbMember == null || !dbMember.getMemberPassword().equals(memberPassword)) {
+            result.put("success", false);
+            result.put("message", "帳號或密碼錯誤");
+        } else {
+            session.setAttribute("loggedInMember", dbMember);
+            result.put("success", true);
         }
-        
-        session.setAttribute("loggedInMember", dbMember);
-        return "redirect:/home";
+
+        return result;
     }
     
     @GetMapping("/member/logout")
