@@ -1,0 +1,75 @@
+<div th:fragment="viewModalContent">
+
+	<div class="modal fade" id="restoOrderViewModal" tabindex="-1" aria-hidden="true">
+  		<div class="modal-dialog modal-dialog-scrollable">
+    		<div class="modal-content rounded-4 p-4" style="background-color: var(--color-background);">
+     			
+				<!-- Modal標題與關閉按鈕 -->
+     			<div class="modal-header d-flex justify-content-between align-items-center mb-2 mt-2 px-3">
+        			<h5 class="modal-title">訂單資訊</h5>
+        			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      			</div>
+
+				<!-- Modal內容 -->
+      			<div class="modal-body">
+      				<h6 class="modal_sub_title d-flex justify-content-start align-items-center gap-2">訂單編號
+      					<span th:text="'#' + ${restoOrder.restoOrderId}"></span>
+      				</h6>
+					
+					<div class="modal_section">
+         				<div class="modal_detail d-flex flex-column align-items-start">
+                            <p><strong>訂單來源：</strong> 
+                                       <span th:text="${restoOrder.orderSource.label}"
+                                             th:class="'text-center badge bg-' + ${restoOrder.orderSource.cssClass}">來源</span>
+                            </p>
+                            <p><strong>訂單狀態：</strong> 
+                                       <span th:text="${restoOrder.orderStatus.label}"
+                                             th:class="'text-center badge bg-' + ${restoOrder.orderStatus.cssClass}">狀態</span>
+                            </p>
+    	     				<p><strong>餐廳：</strong> <span th:text="${restoOrder.snapshotRestoName}"></span></p>
+    				        <p><strong>預定日期：</strong> <span th:text="${restoOrder.regiDate}"></span></p>
+    				        <p><strong>區段：</strong> <span th:text="${restoOrder.snapshotPeriodName}"></span></p>
+    				        <p><strong>時段：</strong> <span th:text="${restoOrder.snapshotTimeslotName}"></span></p>
+    				        <p><strong>人數：</strong> <span th:text="${restoOrder.regiSeats}"></span></p>
+    				        <p><strong>下定時間：</strong> <div th:text="${#temporals.format(restoOrder.orderTime,'yyyy-MM-dd HH:mm:ss')}"></div> </p>
+         				</div>
+                    </div>
+
+					<div class="modal_section d-flex flex-column gap-2">
+                        <p class="view_sec_title"><strong>需求備註</strong></p>
+          
+         				<div class="modal_detail d-flex flex-column align-items-start gap-0">
+    	     				<p><strong>兒童座椅數：</strong> <span th:text="${restoOrder.highChairs}"></span></p>
+    				        <p><strong>其他需求：</strong> <span th:text="${restoOrder.regiReq}"></span></p>
+         				</div>
+                    </div>
+
+					<div class="modal_section d-flex flex-column gap-2">
+                        <p class="view_sec_title"><strong>訂位者資訊</strong></p>
+          
+         				<div class="modal_detail d-flex flex-column align-items-start">
+    	     				<p><strong>會員ID：</strong> <span th:text="${restoOrder.memberVO?.memberId}"></span></p>
+    				        <p><strong>住宿ID：</strong> <span th:text="${restoOrder.roomOrder?.roomOrderId}"></span></p>
+    				        <p><strong>姓名：</strong> <span th:text="${restoOrder.orderGuestName}"></span></p>
+    				        <p><strong>電話：</strong> <span th:text="${restoOrder.orderGuestPhone}"></span></p>
+    				        <p><strong>信箱：</strong> <span th:text="${restoOrder.orderGuestEmail}"></span></p>
+         				</div>
+                    </div>
+                
+              
+				        
+                
+				        	
+
+			        
+      			</div>
+      			
+      			
+    		</div>
+  		</div>
+	</div>
+
+</div>
+
+
+

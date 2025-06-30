@@ -136,10 +136,8 @@
 				<button class="btn btn_accent btn_add" id="btnAddRestoOrder">新增訂單</button>
 			</div>
       
-            <div class="table-responsive-wrapper position-relative">
             
-            
-			<div class="table-responsive" style="width:100%; overflow-x:auto;">
+			<div class="table-responsive" >
 				<table id="restoOrderTable" class="table table-bordered">
 					<thead class="table_head align-top">
 						<tr>
@@ -186,8 +184,8 @@
 								<div class="table_row_actions d-flex justify-content-center align-items-start">
 									<button class="btn_icon btn_view" th:data-id="${order.restoOrderId}"><i class="fas fa-eye"></i></button>
 									<button class="btn_icon btn_edit" th:data-id="${order.restoOrderId}"><i class="fas fa-edit"></i></button>
-									<button class="btn_icon btn_delete" th:data-id="${order.restoOrderId}"><i
-											class="fas fa-trash"></i></button>
+<!-- 									<button class="btn_icon btn_delete" th:data-id="${order.restoOrderId}"><i -->
+<!-- 											class="fas fa-trash"></i></button> -->
 								</div>
 							</td>
 						</tr>
@@ -196,7 +194,6 @@
 			</div>
       
 
-            </div>
 
 
 			<!-- Modal -->

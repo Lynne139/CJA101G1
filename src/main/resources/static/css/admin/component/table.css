@@ -1,6 +1,10 @@
 /* === Table === */
 .table {
   --bs-table-bg: transparent;
+  min-width: 100%;
+  
+  word-break: break-word;
+  white-space: normal;
 }
 
 .table.table-bordered {
@@ -11,9 +15,15 @@
 .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  /* iOS 更流暢 */
+/*   iOS 更流暢 */
   scrollbar-color: var(--scrollbar) transparent;
+  
 }
+
+div.dataTables_scrollBody{
+  scrollbar-color: var(--scrollbar) transparent;	
+}
+
 
 .table thead.table_head>tr>th {
   /* 讓所有內容單行顯示，不會換行 */
@@ -34,7 +44,7 @@
 /* 表格本體	 */
 div.dataTables_wrapper table.dataTable{
 	border:1px solid var(--color-primary);
-	  border-collapse: collapse;
+	border-collapse: collapse;
 	
 }
 div.dataTables_wrapper table.dataTable thead th,
@@ -97,6 +107,28 @@ div.dataTables_wrapper div.dataTables_paginate .paginate_button:hover {
   opacity:var(--hover-opacity);
 }
 
+
+/* FixedColumn */
+.dtfc-fixed-right {
+  background-color: #FCF7EF !important; 
+  position: relative;
+}
+
+
+/* 左邊界 */
+.dtfc-fixed-right::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -1px;
+  width: 1px;
+  height: 100%;
+  background-color: #d6c1ab;
+}
+
+.dtfc-right-top-blocker {
+  display: none !important;
+}
 
 
 

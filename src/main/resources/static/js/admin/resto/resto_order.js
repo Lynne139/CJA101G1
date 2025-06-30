@@ -10,11 +10,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function initRestoOrderTable() {
     const table = $('#restoOrderTable');
 
-	// 強制移除殘留的clone表格
-	$('.dtfc-fixed-left').remove();   // 左邊固定欄
-	$('.dtfc-fixed-right').remove();  // 右邊固定欄（可保留，視情況）
 	
-    if ($.fn.dataTable.isDataTable(table)) {
+    if ($.fn.DataTable.isDataTable(table)) {
       table.DataTable().clear().destroy(); // 清除舊實例
     }
 
@@ -38,9 +35,10 @@ document.addEventListener("DOMContentLoaded", function () {
         { targets: [9], width: "5%"},
         { targets: [10], width: "4%"},
         { targets: [11], width: "10%"},
-        { targets: [12], width: "6%", orderable: false},
-        { targets: [13], width: "10%", orderable: false}
+        { targets: [12], width: "9%", orderable: false},
+        { targets: [13], width: "7%", orderable: false}
       ],
+	  scrollX:true,
 	  fixedColumns: {
 	      rightColumns: 1,   // 固定最右邊 1 欄
 		  leftColumns: 0
@@ -48,7 +46,6 @@ document.addEventListener("DOMContentLoaded", function () {
       searching: false,
       ordering: true,
       info: true,
-	  destroy: true
     });
 	
   }
@@ -85,6 +82,35 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("orderTimeTo").value = to || "";
     }
   });
+  
+  
+  // ===== Modal - View =====
+    document.addEventListener("click", function (e) {
+      if (e.target.closest(".btn_view")) {
+        const btn = e.target.closest(".btn_view");
+        const restoOrderId = btn.getAttribute("data-id");
+
+        if (!container) return;
+
+        fetch(`/admin/resto_order/view?restoOrderId=${restoOrderId}`)
+          .then(res => res.text())
+          .then(html => {
+
+            container.innerHTML = html;
+
+            const modalEl = document.getElementById("restoOrderViewModal");
+            if (!modalEl) {
+              alert("無法載入 modal 結構");
+              return;
+            }
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+          })
+          .catch(err => {
+            alert("載入資料失敗：" + err.message);
+          });
+      }
+    });
 
   
   

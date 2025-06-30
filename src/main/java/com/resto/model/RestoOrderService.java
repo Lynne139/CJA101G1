@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.resto.dto.RestoOrderDTO;
+import com.resto.entity.PeriodVO;
+import com.resto.entity.RestoOrderVO;
 import com.resto.entity.RestoVO;
 import com.resto.utils.RestoOrderCriteriaHelper;
 
@@ -31,6 +33,11 @@ public class RestoOrderService {
         return RestoOrderCriteriaHelper.getAllDTO(param, em);
     }
     
+	// id拿單筆
+    @Transactional(readOnly = true)
+    public RestoOrderVO getById(Integer restoOrderId) {
+        return restoOrderRepository.findById(restoOrderId).orElse(null);
+    }
     
     
     

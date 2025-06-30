@@ -10,8 +10,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===== DataTables =====
   function initRestoTable() {
     const table = $('#restoTable');
-
-    if ($.fn.dataTable.isDataTable(table)) {
+	
+    if ($.fn.DataTable.isDataTable(table)) {
       table.DataTable().clear().destroy(); // 清除舊實例
     }
 
@@ -30,9 +30,15 @@ document.addEventListener("DOMContentLoaded", function () {
         { targets: [4], width: "5%", orderable: false },
         { targets: [5], width: "15%", orderable: false }
       ],
+	  scrollX:true,
+	  fixedColumns:true,
+	  fixedColumns: {
+	  	      rightColumns: 1,   // 固定最右邊 1 欄
+	  		  leftColumns: 0
+	  	    },
       searching: false,
       ordering: true,
-      info: true
+      info: true,
     });
   }
 

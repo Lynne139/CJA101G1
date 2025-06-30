@@ -1,43 +1,20 @@
+/* ===== data table ===== */
 #restoOrderTable {
-  min-width: 1200px; /* 根據你的欄位總寬度估算 */
-  table-layout: fixed;
+  min-width: 1200px;
 }
 
 #restoOrderTable td {
-  white-space: normal;
   word-break: break-word;
+  white-space: normal;
+  
 }
 
-
-.dtfc-fixed-right {
-  background-color: #FCF7EF !important; /* 固定欄背景與主表格一致 */
-  box-shadow: -12px 0 8px -4px rgba(0, 0, 0, 0.3); /* 模擬右側陰影邊框 */
-  z-index: 10;
+/* ===== view modal ===== */
+#restoOrderViewModal .modal_section{
+	margin-bottom:1rem;
 }
-
-/* 左邊界 */
-.dtfc-fixed-right::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -1px;
-  width: 1px;
-  height: 100%;
-  background-color: var(--color-secondary); /* 模擬邊框色 */
+#restoOrderViewModal .view_sec_title{
+	padding:0.5rem 0;
+	border-bottom:1px solid var(--color-primary);
+	color:var(--color-primary);
 }
-
-/* 讓 pagination/info 固定在表格下方，不跟著 scrollX 移動 */
- div.dataTables_info {
-  position: sticky;
-  left: 0;
-  padding-right: 1rem;
-}
-
-div.dataTables_paginate {
-  position: sticky;
-  right: 0;  
-}
-
-
-
-
