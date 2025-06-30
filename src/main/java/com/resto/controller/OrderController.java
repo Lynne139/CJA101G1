@@ -56,6 +56,17 @@ public class OrderController {
 	    model.addAttribute("restoOrder", restoOrder);
 	    return "admin/fragments/resto/modals/order_resto_view :: viewModalContent";
 	}
+	
+	
+	// ===== 刪除 =====
+	@PostMapping("/resto_order/delete")
+	public String deleteRestoOrder(@RequestParam("restoOrderId") Integer restoOrderId,
+							   RedirectAttributes redirectAttributes
+	) {
+		
+		restoOrderService.deleteById(restoOrderId);
+	    return "redirect:/admin/resto_order";
+	}
 		
 	
 	// ===== 新增 =====
