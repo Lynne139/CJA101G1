@@ -25,4 +25,8 @@ public interface TimeslotRepository  extends JpaRepository<TimeslotVO, Integer>{
     Optional<TimeslotVO> findByRestoVO_RestoIdAndTimeslotNameAndIsDeletedTrue(Integer restoId, String timeslotName);
 
 
+    //拿未刪多筆(給order add modal用)
+    @Query("SELECT t FROM TimeslotVO t JOIN FETCH t.periodVO WHERE t.isDeleted = false")
+    List<TimeslotVO> findActiveWithPeriod();
+    
 }

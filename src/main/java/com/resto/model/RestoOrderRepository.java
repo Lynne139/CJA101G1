@@ -1,15 +1,36 @@
 package com.resto.model;
 
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.resto.entity.RestoOrderVO;
+import com.resto.utils.RestoOrderStatus;
 
 public interface RestoOrderRepository extends JpaRepository<RestoOrderVO, Integer>  {
 
-	
+	@Query("""
+		    SELECT ro.regiDate, SUM(ro.regiSeats)
+		    FROM RestoOrderVO ro
+		    WHERE ro.restoVO.restoId = :restoId AND ro.orderStatus != 0
+		    GROUP BY ro.regiDate
+		""")
+		List<Object[]> findBookedSeatsPerDate(@Param("restoId") Integer restoId);
 
 
+		 /** 回傳 [regiDate, totalSeats] */
+	    @Query("""
+	        SELECT ro.regiDate, SUM(ro.regiSeats)
+	        FROM RestoOrderVO ro
+	        WHERE ro.restoVO.restoId = :restoId
+	          AND ro.orderStatus <> :canceled
+	        GROUP BY ro.regiDate
+	    """)
+	    List<Object[]> findBookedSeatsPerDate(@Param("restoId") Integer restoId,
+	                                          @Param("cancelled") RestoOrderStatus cancelled);
 	
 	
 	

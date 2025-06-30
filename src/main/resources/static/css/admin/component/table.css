@@ -112,6 +112,8 @@ div.dataTables_wrapper div.dataTables_paginate .paginate_button:hover {
 .dtfc-fixed-right {
   background-color: #FCF7EF !important; 
   position: relative;
+  z-index: 2 !important; /* 小於 Bootstrap 的 modal (1050) 和 toast (1080~) */
+  
 }
 
 

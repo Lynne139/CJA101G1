@@ -11,6 +11,7 @@ import com.resto.utils.RestoOrderSource;
 import com.resto.utils.RestoOrderSourceConverter;
 import com.resto.utils.RestoOrderStatus;
 import com.resto.utils.RestoOrderStatusConverter;
+import com.resto.utils.ValidationGroups;
 import com.roomOrder.model.RoomOrder;
 
 import jakarta.persistence.Column;
@@ -70,7 +71,7 @@ public class RestoOrderVO{
 	@Column(name = "regi_seats")
 	private Integer regiSeats;
 	
-    @Min(value = 0)
+    @Min(value = 0, message = "數值不可小於0")
 	@Column(name = "high_chairs")
 	private Integer highChairs;
 	
@@ -79,19 +80,19 @@ public class RestoOrderVO{
 	private String regiReq;
 	
 	// 歷史訂單快照
-	@NotBlank
-	@Column(name = "snapshot_resto_name", length = 40)
+//	@NotBlank
+//	@Column(name = "snapshot_resto_name", length = 40)
 	private String snapshotRestoName;
 
-	@Column(name = "snapshot_resto_name_en", length = 40)
+//	@Column(name = "snapshot_resto_name_en", length = 40)
 	private String snapshotRestoNameEn;
 
-	@NotBlank
-	@Column(name = "snapshot_period_name", length = 10)
+//	@NotBlank
+//	@Column(name = "snapshot_period_name", length = 10)
 	private String snapshotPeriodName;
 
-	@NotBlank
-	@Column(name = "snapshot_timeslot_name", length = 5)
+//	@NotBlank
+//	@Column(name = "snapshot_timeslot_name", length = 5)
 	private String snapshotTimeslotName;
 	
 	// 訂單客戶資料
@@ -100,8 +101,8 @@ public class RestoOrderVO{
 	@Column(name = "order_guest_name")
 	private String orderGuestName;
 	
-	@NotBlank
-    @Pattern(regexp = "^09\\d{8}$", message = "手機號碼格式錯誤")
+	@NotBlank(groups = ValidationGroups.First.class)
+    @Pattern(regexp = "^09\\d{8}$", message = "手機號碼格式錯誤",groups = ValidationGroups.Second.class)
 	@Column(name = "order_guest_phone")
 	private String orderGuestPhone;
 	
@@ -111,7 +112,7 @@ public class RestoOrderVO{
 	@Column(name = "order_guest_email")
 	private String orderGuestEmail;
 	
-	@NotNull
+//	@NotNull
 	@CreationTimestamp
 	@Column(name = "order_time", updatable = false)
 	private LocalDateTime orderTime;
@@ -132,7 +133,7 @@ public class RestoOrderVO{
 	@Column(name = "order_status")
 	private RestoOrderStatus orderStatus = RestoOrderStatus.CREATED;
 	
-	@NotNull
+//	@NotNull
 	@Column(name = "reserve_expire_time")
 	private LocalDateTime reserveExpireTime;
 
