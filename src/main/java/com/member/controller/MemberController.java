@@ -118,6 +118,8 @@ public class MemberController {
                          ModelMap model, HttpServletRequest request) {
 
         if (result.hasErrors()) {
+        	System.out.println("error");
+        	result.getAllErrors().forEach(err -> System.out.println(err.toString()));
             model.addAttribute("memberVO", memberVO);
             model.addAttribute("currentURI", request.getRequestURI());
             model.addAttribute("mainFragment", "admin/fragments/member/update_member_input");
@@ -194,4 +196,7 @@ public class MemberController {
         model.addAttribute("mainFragment", "admin/fragments/member/listAllMember");
         return "admin/index_admin";
     }
+    
+    
+    
 }

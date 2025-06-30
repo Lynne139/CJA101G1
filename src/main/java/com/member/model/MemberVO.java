@@ -1,6 +1,7 @@
 package com.member.model;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,7 +33,7 @@ public class MemberVO implements java.io.Serializable {
 	private String memberLevel;
 	private String memberPassword;
 	private String memberName;
-	private Date memberBirthday;
+	private LocalDate memberBirthday;
 	private String memberPhone;
 	private String memberAddress;
 	private byte[] memberPic;
@@ -95,11 +96,11 @@ public class MemberVO implements java.io.Serializable {
 	@NotNull(message="生日日期: 請勿空白")	
 	@Past(message="日期必須是在今日(含)之前")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	public Date getMemberBirthday() {
-		return memberBirthday;
-	}
+	public LocalDate getMemberBirthday() { 
+		return memberBirthday; 
+	} 
 	
-	public void setMemberBirthday(Date memberBirthday) {
+	public void setMemberBirthday(LocalDate memberBirthday) {
 		this.memberBirthday = memberBirthday;
 	}
 	

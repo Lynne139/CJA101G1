@@ -4,11 +4,73 @@
       <a href="#" id="menuToggle" class="ml-3"><img th:src="@{/images/icon/menu.svg}" alt="menu" class="menu-img" /></a>
     </div>
     <div class="d-flex">
-      <div class="d-none d-lg-block">
+      <div class="d-flex align-items-center gap-3">
         <a href="#" id="menu-Toggle" class="ml-lg-3">☰ MENU</a>
         <span class="mx-3"></span>
         <img th:src="@{/images/icon/member.svg}" alt="member" class="logo-header" />
-        <a href="#">會員登入</a>
+
+<!-- 登入/登出切換區 -->
+<div th:if="${loggedInMember == null}">
+    <button type="button" class="btn btn-link p-0 m-0 text-dark text-decoration-none" data-bs-toggle="modal" data-bs-target="#loginModal">
+        會員登入
+    </button>
+</div>
+
+<div th:if="${loggedInMember != null}">
+    <span th:text="'歡迎，' + ${loggedInMember.memberName} + '！'" class="me-2"></span>
+    <a th:href="@{/member/logout}" class="btn btn-link p-0 m-0 text-dark text-decoration-none">
+        會員登出
+    </a>
+</div>
+
+<!-- 登入Modal區塊 -->
+<div th:class="'modal fade' + (${error} != null ? ' show d-block' : '')"
+     id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel"
+     th:attr="style=${error} != null ? 'display:block;' : 'display:none;'">
+
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">會員登入</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- 登入表單 -->
+        <div class="container">
+            
+            <!-- 錯誤訊息顯示 -->
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+            <form th:action="@{/member/memberLogin}" method="post" th:object="${memberVO}">
+                <div class="mb-3">
+                    <label for="memberEmail" class="form-label">電子信箱</label>
+                    <input type="text" th:field="*{memberEmail}" class="form-control" id="memberEmail" required>
+                    <div class="text-danger" th:errors="*{memberEmail}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="memberPassword" class="form-label">密碼</label>
+                    <input type="password" th:field="*{memberPassword}" class="form-control" id="memberPassword" required>
+                    <div class="text-danger" th:errors="*{memberPassword}"></div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">登入</button>
+                </div>
+                               
+            </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
       </div>
     </div>
+    
+    
 </header>
