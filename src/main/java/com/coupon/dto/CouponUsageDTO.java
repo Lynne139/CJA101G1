@@ -27,7 +27,7 @@ public class CouponUsageDTO {
     }
 
     public String getCouponName() {
-        return couponName;
+        return couponName; 
     }
 
     public OrderType getOrderType() {
