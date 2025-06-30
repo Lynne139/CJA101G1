@@ -37,9 +37,6 @@ public class PeriodVO{
 	@Column(name = "sort_order")
 	private Integer sortOrder;
 	
-	@Column(name = "is_deleted") //軟刪除
-	private Boolean isDeleted = false;
-
 	@ManyToOne
 	@JoinColumn(name="resto_id")
 	private RestoVO restoVO;
@@ -70,14 +67,6 @@ public class PeriodVO{
 
 	public void setSortOrder(Integer sortOrder) {
 		this.sortOrder = sortOrder;
-	}
-
-	public Boolean getIsDeleted() {
-		return isDeleted;
-	}
-
-	public void setIsDeleted(Boolean isDeleted) {
-		this.isDeleted = isDeleted;
 	}
 
 	public List<TimeslotVO> getTimeslots() {
@@ -117,7 +106,7 @@ public class PeriodVO{
 	@Override
 	public String toString() {
 		return "PeriodVO [periodId=" + periodId + ", periodName=" + periodName + ", sortOrder=" + sortOrder
-				+ ", isDeleted=" + isDeleted + ", restoVO=" + restoVO + ", timeslots=" + timeslots + "]";
+				+ ", restoVO=" + restoVO + ", timeslots=" + timeslots + "]";
 	}
 
 	

@@ -37,7 +37,6 @@ public class TimeslotVO{
 	private RestoVO restoVO;
 	
 	@ManyToOne
-	@NotNull
 	@JoinColumn(name="period_id")
 	private PeriodVO periodVO;
 	

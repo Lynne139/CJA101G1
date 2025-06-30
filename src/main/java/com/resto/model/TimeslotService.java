@@ -28,7 +28,7 @@ import com.resto.entity.TimeslotVO;
 	    // id拿單筆
 	    @Transactional(readOnly = true)
 	    public TimeslotVO getById(Integer id) {
-	        return timeslotRepository.findById(id).orElse(null);
+	        return timeslotRepository.findById(id).orElseThrow();
 	    }
 
 	    
@@ -47,8 +47,7 @@ import com.resto.entity.TimeslotVO;
 	        if (softDeleted.isPresent()) {
 	            TimeslotVO restore = softDeleted.get();
 	            restore.setIsDeleted(false);
-	            // 放到新選的period
-	            restore.setPeriodVO(timeslotVO.getPeriodVO());
+	            restore.setPeriodVO(timeslotVO.getPeriodVO()); // 重綁現在的period
 	            timeslotRepository.save(restore);
 	            return; 
 	        }
@@ -62,9 +61,11 @@ import com.resto.entity.TimeslotVO;
 	    public void update(TimeslotVO updated) {
 	    	TimeslotVO original = timeslotRepository.findById(updated.getTimeslotId()).orElseThrow();
 
-	        // 若名稱沒變，不更新
+	        // 若名稱沒變，不更新名稱，但拖曳也共用方法所以要更新periodId
 	        if (original.getTimeslotName().equals(updated.getTimeslotName())) {
-	            return;
+	        	original.setPeriodVO(updated.getPeriodVO()); // 把拖曳的新 period 套進去
+	            timeslotRepository.save(original);
+	        	return;
 	        }
 
 	        // 若名稱改變，檢查是否已有軟刪版
@@ -76,16 +77,18 @@ import com.resto.entity.TimeslotVO;
 	            TimeslotVO toRestore = softDeleted.get();
 	            
 	            toRestore.setIsDeleted(false);
-	            toRestore.setPeriodVO(original.getPeriodVO()); // 更新Period
+	            toRestore.setPeriodVO(updated.getPeriodVO()); // 更新Period
 	            timeslotRepository.save(toRestore);
 
 	            // 將原本的資料軟刪
 	            original.setIsDeleted(true);
+	            original.setPeriodVO(null); // 解除原period關聯
 	            timeslotRepository.save(original);
 
 	        } else {
 	            // 沒有同名軟刪，正常更新
 	            original.setTimeslotName(updated.getTimeslotName());
+	            original.setPeriodVO(updated.getPeriodVO());    // 同步 period
 	            timeslotRepository.save(original);
 	        }
 	    }
@@ -93,10 +96,11 @@ import com.resto.entity.TimeslotVO;
 	    // 軟刪除
 	    @Transactional
 	    public void softDelete(Integer timeslotId) {
-	        timeslotRepository.findById(timeslotId).ifPresent(ts -> {
+	        	//設period為null
+	        	TimeslotVO ts = timeslotRepository.findById(timeslotId).orElseThrow();
 	            ts.setIsDeleted(true);
-	            timeslotRepository.save(ts);
-	        });
+	            ts.setPeriodVO(null); // 解除跟period的關聯
+	            timeslotRepository.save(ts);	        	
 	    }
 
 	    

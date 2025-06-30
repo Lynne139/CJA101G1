@@ -77,7 +77,7 @@ public class CouponController {
     public ResponseEntity<List<Coupon>> getClaimableCouponsForMember(
             @RequestParam OrderType orderType,
             @RequestParam Integer memberId,
-            @RequestParam int memberPoints) {
+            @RequestParam Integer memberPoints) {
         List<Coupon> coupons = couponService.getClaimableCouponsForMember(orderType, memberId, memberPoints);
         return ResponseEntity.ok(coupons);
     }

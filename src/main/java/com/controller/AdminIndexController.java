@@ -174,8 +174,7 @@ public class AdminIndexController {
     	return "admin/index_admin";
     	} 
     
-//    	@RequestMapping(value = "/resto_timeslot",
-//            method = {RequestMethod.GET, RequestMethod.POST})
+
     	@GetMapping("/resto_timeslot")
     	public String restoTimeslot(HttpServletRequest request,
     								@RequestParam(value = "restoId", required = false) Integer restoId,
@@ -213,26 +212,11 @@ public class AdminIndexController {
             model.addAttribute("periodList", new ArrayList<>());
             model.addAttribute("timeslotList", new ArrayList<>());
         }
-    	
-//    	// 判斷是否是 fetch 請求（自訂header）
-//        boolean isAjax =
-//        	      "Fetch".equals(request.getHeader("X-Requested-With"))
-//        	   || "POST".equalsIgnoreCase(request.getMethod());        
-//        
-//        if (isAjax) {
-//            return "admin/fragments/resto/restoTimeslot"; // 只回panel（右側）
-//        } else {
-//        	String mainFragment = "admin/fragments/resto/restoTimeslot";
-//        	model.addAttribute("mainFragment", mainFragment);
-//        	model.addAttribute("currentURI", request.getRequestURI());
-//            return "admin/index_admin"; // 回整頁layout
-//        }
         
         String mainFragment = "admin/fragments/resto/restoTimeslot";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
         return "admin/index_admin";
-        
         
     } 
     	

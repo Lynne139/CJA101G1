@@ -370,7 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function refreshPeriodDeleteButtons() {
 	document.querySelectorAll('.period_block').forEach(block => {
 
-	    /* 只算真正的時段 wrapper（排除 + 按鈕）*/
+	    // 只算真正的時段 wrapper（排除 + 按鈕
 	    const hasTimeslot = block.querySelector('.timeslot_wrapper') !== null;
 
 	    const delBtn = block.querySelector('.btn_period_del');
