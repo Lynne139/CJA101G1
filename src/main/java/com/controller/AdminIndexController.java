@@ -89,6 +89,7 @@ public class AdminIndexController {
 	RoomOrderService roomOrderService;
 	
 <<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
+<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
 
     @Autowired
     private HotNewsService hotNewsService;
@@ -114,8 +115,25 @@ public class AdminIndexController {
 
     @Autowired
     private EmployeeService employeeService;
+=======
+	@Autowired
+	HotNewsService hotNewsSvc;
+>>>>>>> 299fac7 fix_AdminIndexController
 	
+<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
 >>>>>>> ddc24ac fix_AdminIndexController
+=======
+	@Autowired
+	PromotionNewsService promotionNewsSvc;
+	
+	@Autowired
+	NewsService newsSvc;
+	
+	@Autowired
+	EmployeeService employeeSvc;
+	
+		
+>>>>>>> 299fac7 fix_AdminIndexController
 	// === 後台首頁 ===
     @GetMapping("")
     public String index(HttpServletRequest request,Model model) {
@@ -640,7 +658,7 @@ public class AdminIndexController {
         model.addAttribute("mainFragment", mainFragment);
         model.addAttribute("currentURI", request.getRequestURI());
         // 查詢資料庫
-        List<HotNews> hotNewsList = hotNewsService.findAll();
+        List<HotNews> hotNewsList = hotNewsSvc.findAll();
         model.addAttribute("hotNewsList", hotNewsList);
         return "admin/index_admin";
     }
@@ -651,7 +669,7 @@ public class AdminIndexController {
         model.addAttribute("mainFragment", mainFragment);
         model.addAttribute("currentURI", request.getRequestURI());
         // 查詢資料庫
-        List<PromotionNews> promotionNewsList = promotionNewsService.findAll();
+        List<PromotionNews> promotionNewsList = promotionNewsSvc.findAll();
         model.addAttribute("promotionNewsList", promotionNewsList);
         return "admin/index_admin";
     }
@@ -693,10 +711,14 @@ public class AdminIndexController {
         model.addAttribute("mainFragment", mainFragment);
         model.addAttribute("currentURI", request.getRequestURI());
         // 查詢資料庫
-        List<News> newsList = newsService.findAll();
+        List<News> newsList = newsSvc.findAll();
         model.addAttribute("newsList", newsList);
         return "admin/index_admin";
+<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
     }
 >>>>>>> ddc24ac fix_AdminIndexController
+=======
+    } 
+>>>>>>> 299fac7 fix_AdminIndexController
 	
 }
