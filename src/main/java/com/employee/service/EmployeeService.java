@@ -4,16 +4,22 @@ import com.employee.entity.Employee;
 import com.employee.entity.EmployeeDTO;
 import com.employee.entity.Role;
 import com.employee.entity.JobTitle;
+import com.employee.entity.EmployeeFunctionAccessRight;
+import com.employee.entity.FunctionAccessRight;
 import com.employee.repository.EmployeeRepository;
 import com.employee.repository.RoleRepository;
 import com.employee.repository.JobTitleRepository;
+import com.employee.repository.EmployeeFunctionAccessRightRepository;
+import com.employee.repository.FunctionAccessRightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
@@ -26,6 +32,12 @@ public class EmployeeService {
     
     @Autowired
     private JobTitleRepository jobTitleRepository;
+    
+    @Autowired
+    private EmployeeFunctionAccessRightRepository employeeFunctionAccessRightRepository;
+    
+    @Autowired
+    private FunctionAccessRightRepository functionAccessRightRepository;
 
     // 取得所有員工（包含部門名稱和職稱名稱）
     public List<EmployeeDTO> getAllEmployeesWithDetails() {
@@ -146,5 +158,46 @@ public class EmployeeService {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found with ID: " + employeeId));
         return employee.getEmployeePhoto();
+    }
+
+    // 根據員工ID和日期取得權限列表
+    public List<String> getEmployeePermissions(Integer employeeId, LocalDate checkDate) {
+        List<EmployeeFunctionAccessRight> accessRights = employeeFunctionAccessRightRepository
+                .findByEmployeeIdAndDateRange(employeeId, checkDate);
+        
+        return accessRights.stream()
+                .filter(access -> access.getEnabled())
+                .map(access -> access.getFunctionAccessRight().getAccessName())
+                .collect(Collectors.toList());
+    }
+    
+    // 檢查員工是否有特定權限
+    public boolean hasPermission(Integer employeeId, String permissionName, LocalDate checkDate) {
+        List<String> permissions = getEmployeePermissions(employeeId, checkDate);
+        return permissions.contains(permissionName);
+    }
+    
+    // 員工登入驗證（使用 "maison" + employeeId 格式）
+    public Employee login(String username, String password) {
+        if (!username.startsWith("maison")) {
+            return null;
+        }
+        
+        try {
+            String employeeIdStr = username.substring(6); // 移除 "maison" 前綴
+            Integer employeeId = Integer.parseInt(employeeIdStr);
+            
+            Optional<Employee> employeeOpt = employeeRepository.findById(employeeId);
+            if (employeeOpt.isPresent()) {
+                Employee employee = employeeOpt.get();
+                if (employee.getPassword().equals(password) && employee.getStatus()) {
+                    return employee;
+                }
+            }
+        } catch (NumberFormatException e) {
+            // 員工ID格式錯誤
+        }
+        
+        return null;
     }
 } 
