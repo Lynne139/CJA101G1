@@ -52,5 +52,9 @@ public class MemberService {
 		
 		return repository.findByMemberName(memberName);
 	}
-	
+  
+	public Integer getMemberPointsById(Integer memberId) {
+	    Optional<MemberVO> optional = repository.findById(memberId);
+	    return optional.map(MemberVO::getMemberPoints).orElse(null);
+	}
 }

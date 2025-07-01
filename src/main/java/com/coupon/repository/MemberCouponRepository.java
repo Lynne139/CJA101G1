@@ -1,5 +1,6 @@
 package com.coupon.repository;
 
+import com.coupon.dto.CouponUsageDTO;
 import com.coupon.entity.Coupon;
 import com.coupon.entity.MemberCoupon;
 import com.coupon.entity.MemberCouponId;
@@ -12,15 +13,18 @@ import java.util.List;
 
 public interface MemberCouponRepository extends JpaRepository<MemberCoupon, MemberCouponId> {
 
-    // 1. 讓會員查詢已使用的 coupon
-    @Query(value = """
-            SELECT c.* FROM member_coupon mc
-            JOIN coupon c ON mc.coupon_code = c.coupon_code
-            WHERE mc.member_id = :memberId
-              AND mc.is_used = true
-            ORDER BY c.discount_value DESC
-            """, nativeQuery = true)
-    List<Coupon> findUsedCouponsByMemberId(@Param("memberId") Integer memberId);
+    // 1. 讓會員查詢已使用的 coupon (包含使用時間) (JPQL 查詢)
+    @Query("""
+    	    SELECT new com.coupon.dto.CouponUsageDTO(
+    	        c.couponCode, c.couponName, c.orderType, c.discountValue, mc.usedTime
+    	    )
+    	    FROM MemberCoupon mc
+    	    JOIN mc.coupon c
+    	    WHERE mc.member.id = :memberId
+    	      AND mc.isUsed = true
+    	    ORDER BY mc.usedTime DESC
+    	""")
+    	List<CouponUsageDTO> findUsedCouponUsagesByMemberId(@Param("memberId") Integer memberId);
 
     // 2. 讓會員查詢指定orderTypes、未使用、未過期的 coupon
     @Query(value = """

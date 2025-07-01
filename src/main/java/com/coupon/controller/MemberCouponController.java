@@ -1,5 +1,6 @@
 package com.coupon.controller;
 
+import com.coupon.dto.CouponUsageDTO;
 import com.coupon.entity.Coupon;
 import com.coupon.entity.MemberCoupon;
 import com.coupon.enums.OrderType;
@@ -23,9 +24,9 @@ public class MemberCouponController {
 
     // 1. 查詢會員已使用的折價券
     @GetMapping("/{memberId}/used")
-    public ResponseEntity<List<Coupon>> getUsedCoupons(@PathVariable Integer memberId) {
-        List<Coupon> coupons = memberCouponService.getUsedCouponsByMember(memberId);
-        return ResponseEntity.ok(coupons);
+    public ResponseEntity<List<CouponUsageDTO>> getUsedCoupons(@PathVariable Integer memberId) {
+        List<CouponUsageDTO> dtos = memberCouponService.getUsedCouponUsagesByMember(memberId);
+        return ResponseEntity.ok(dtos);
     }
 
 	 // 2. 查詢會員可用於指定訂單類型的折價券（未使用、未過期）
