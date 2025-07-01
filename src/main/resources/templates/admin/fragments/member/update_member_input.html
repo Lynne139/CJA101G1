@@ -11,7 +11,7 @@
 <div class="container mt-5" th:fragment="update_member_input">
   <h3>修改會員資料</h3>
 
-  <form th:action="@{/admin/member/update}" method="post" enctype="multipart/form-data" th:object="${memberVO}">
+  <form th:action="@{/admin/update}" method="post" enctype="multipart/form-data" th:object="${memberVO}">
 
     <input type="hidden" th:field="*{memberId}" />
 
@@ -79,7 +79,7 @@
     </div>
 
     <button type="submit" class="btn btn-primary">送出修改</button>
-    <a th:href="@{/admin/member/listAllMember}" class="btn btn-secondary">取消</a>
+    <a th:href="@{/admin/listAllMember}" class="btn btn-secondary">取消</a>
 
   </form>
 </div>

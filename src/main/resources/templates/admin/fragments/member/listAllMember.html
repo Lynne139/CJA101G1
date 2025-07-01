@@ -20,12 +20,6 @@ body {
 <body>
 	<h2>所有會員資料:</h2>
 	
-	<!-- 新增會員按鈕 -->
-	<a th:href="@{/admin/member/addMember}" 
-	   style="padding: 8px 12px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px; margin-bottom: 15px; display: inline-block;">
-	   新增會員
-	</a>
-	
 	<table id="listAllMember" class="display" style="width: 1800px">
 		<thead>
 			<tr style="background-color: #F4EDE1">
@@ -63,15 +57,16 @@ body {
 			<td th:text="${memberVO.memberAccumulativeConsumption}"></td>
 			<!-- 修改按鈕 -->
 		  	<td>
-			    <a th:href="@{'/admin/member/updateMember/' + ${memberVO.memberId}}"
+			    <a th:href="@{'/admin/updateMember/' + ${memberVO.memberId}}"
 			       class="btn btn-primary btn-sm">修改</a>
 		 	</td>
 		  	<!-- 刪除按鈕 -->
 		 	<td>
-		    	<form th:action="@{'/admin/member/deleteMember/' + ${memberVO.memberId}}" method="post"
-		          onsubmit="return confirm('確定要刪除此會員嗎？');">
-		      <button type="submit" class="btn btn-danger btn-sm">刪除</button>
-			    </form>
+		    	<form th:action="@{/admin/delete}" method="post"
+				      onsubmit="return confirm('確定要刪除此會員嗎？');">
+				    <input type="hidden" name="memberId" th:value="${memberVO.memberId}" />
+				    <button type="submit" class="btn btn-danger btn-sm">刪除</button>
+				</form>
 			</td>
 			</tr>
 			</th:block>
