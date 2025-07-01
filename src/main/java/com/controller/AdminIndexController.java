@@ -18,8 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.member.model.MemberVO;
 import com.member.model.MemberService;
 import com.resto.model.RestoService;
-import com.resto.model.RestoVO;
-
 import com.coupon.entity.Coupon;
 import com.coupon.service.CouponService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -104,10 +102,6 @@ public class AdminIndexController {
 	@Autowired
 	RoomOrderService roomOrderService;
 	
-
-    @Autowired
-    private RoomOrderService roomOrderService;
-
     @Autowired
     private HotNewsService hotNewsService;
 
@@ -723,8 +717,7 @@ public class AdminIndexController {
             model.addAttribute("adminPermissions", new ArrayList<>());
         }
         */
-    }
-    	return "admin/index_admin";
+    
     } 
 	
 }
