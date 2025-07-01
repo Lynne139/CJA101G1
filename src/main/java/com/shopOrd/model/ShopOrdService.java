@@ -326,7 +326,7 @@ public class ShopOrdService {
 		order.setMemberVO(member);
 		order.setProdOrdDate(LocalDateTime.now());
 		order.setPayMethod(paymentMethod);
-		order.setOrdStat(1); // 已付款（LINE Pay 付款成功）
+		order.setOrdStat(0); // 已付款
 
 		// 3. 建立明細，計算總金額
 		List<ShopOrdDetVO> detailList = new ArrayList<>();
