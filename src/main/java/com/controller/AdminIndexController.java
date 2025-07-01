@@ -37,9 +37,18 @@ import com.roomOrder.model.RoomOrderService;
 import com.shopOrd.model.ShopOrdService;
 import com.shopOrd.model.ShopOrdVO;
 import com.shopOrdDet.model.ShopOrdDetService;
+import com.news.service.HotNewsService;
+import com.news.service.PromotionNewsService;
+import com.news.service.NewsService;
+import com.news.entity.HotNews;
+import com.news.entity.News;
+import com.news.entity.PromotionNews;
+import com.employee.service.EmployeeService;
+import com.employee.entity.Employee;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/admin")
@@ -79,6 +88,7 @@ public class AdminIndexController {
 	@Autowired
 	RoomOrderService roomOrderService;
 	
+<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
 
     @Autowired
     private HotNewsService hotNewsService;
@@ -92,6 +102,20 @@ public class AdminIndexController {
     @Autowired
     private EmployeeService employeeService;
 
+=======
+    @Autowired
+    private HotNewsService hotNewsService;
+
+    @Autowired
+    private PromotionNewsService promotionNewsService;
+
+    @Autowired
+    private NewsService newsService;
+
+    @Autowired
+    private EmployeeService employeeService;
+	
+>>>>>>> ddc24ac fix_AdminIndexController
 	// === 後台首頁 ===
     @GetMapping("")
     public String index(HttpServletRequest request,Model model) {
@@ -134,6 +158,26 @@ public class AdminIndexController {
     public String staff1(HttpServletRequest request,Model model) {
 
     	String mainFragment = "admin/fragments/staff/staff1";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    } 
+    
+    @GetMapping("/staff2")
+    public String staff2(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/staff/staff2";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    } 
+    
+    @GetMapping("/staff3")
+    public String staff3(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/staff/staff3";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 
@@ -592,11 +636,27 @@ public class AdminIndexController {
     // === 消息管理 ===
     @GetMapping("/news1")
     public String news1(HttpServletRequest request,Model model) {
+        String mainFragment = "admin/fragments/news/news1";
+        model.addAttribute("mainFragment", mainFragment);
+        model.addAttribute("currentURI", request.getRequestURI());
+        // 查詢資料庫
+        List<HotNews> hotNewsList = hotNewsService.findAll();
+        model.addAttribute("hotNewsList", hotNewsList);
+        return "admin/index_admin";
+    }
 
-    	String mainFragment = "admin/fragments/news/news1";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
+    @GetMapping("/news2")
+    public String news2(HttpServletRequest request,Model model) {
+        String mainFragment = "admin/fragments/news/news2";
+        model.addAttribute("mainFragment", mainFragment);
+        model.addAttribute("currentURI", request.getRequestURI());
+        // 查詢資料庫
+        List<PromotionNews> promotionNewsList = promotionNewsService.findAll();
+        model.addAttribute("promotionNewsList", promotionNewsList);
+        return "admin/index_admin";
+    }
 
+<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
     // 添加權限資訊到model的輔助方法
     private void addPermissionInfo(HttpServletRequest request, Model model) {
         // 暫時給所有權限，方便開發測試
@@ -626,5 +686,17 @@ public class AdminIndexController {
     	return "admin/index_admin";
 
     } 
+=======
+    @GetMapping("/news3")
+    public String news3(HttpServletRequest request,Model model) {
+        String mainFragment = "admin/fragments/news/news3";
+        model.addAttribute("mainFragment", mainFragment);
+        model.addAttribute("currentURI", request.getRequestURI());
+        // 查詢資料庫
+        List<News> newsList = newsService.findAll();
+        model.addAttribute("newsList", newsList);
+        return "admin/index_admin";
+    }
+>>>>>>> ddc24ac fix_AdminIndexController
 	
 }
