@@ -129,7 +129,7 @@ Is_active boolean not null default true
 
 INSERT INTO ROLE_LIST (ROLE_NAME, REMARK)
 VALUES 
-('系統管理員', '擁有全站存取權限'),
+('總經理', '擁有全站存取權限'),
 ('客服部', '可回覆顧客留言與查詢訂單');
 
 -- 職稱表 
@@ -219,7 +219,7 @@ INSERT INTO FUNCTION_ACCESS_RIGHT (ACCESS_NAME) VALUES
 );
 
 INSERT INTO Role_access_right (Role_id, Access_id) VALUES
-(1, 1), (1, 2), (1, 3);
+(1, 1), (1, 2), (1, 3), (1 ,4), (1 ,5), (1 ,6), (1, 7), (1, 8), (2, 7);
 
 
 -- 商品類別 
