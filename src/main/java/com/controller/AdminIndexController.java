@@ -41,9 +41,10 @@ import com.shopOrdDet.model.ShopOrdDetService;
 import com.news.service.HotNewsService;
 import com.news.service.PromotionNewsService;
 import com.news.service.NewsService;
-
+import com.employee.entity.Employee;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/admin")
@@ -96,12 +97,18 @@ public class AdminIndexController {
 	// === 後台首頁 ===
     @GetMapping("")
     public String index(HttpServletRequest request,Model model) {
-
-    	String mainFragment = "admin/fragments/default";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-
-    	return "admin/index_admin";
+        // 開發測試用：強制給所有權限
+        HttpSession session = request.getSession();
+        session.setAttribute("employeePermissions", java.util.List.of(
+            "會員管理權限", "員工管理權限", "住宿管理權限", "餐廳管理權限",
+            "商店管理權限", "優惠管理權限", "客服管理權限", "消息管理權限"
+        ));
+        session.setAttribute("employeeJobTitle", "管理員");
+        session.setAttribute("currentEmployee", new Employee());
+        String mainFragment = "admin/fragments/default";
+        model.addAttribute("mainFragment", mainFragment);
+        model.addAttribute("currentURI", request.getRequestURI());
+        return "admin/index_admin";
     } 
 	
     
@@ -145,16 +152,6 @@ public class AdminIndexController {
     public String staff2(HttpServletRequest request,Model model) {
 
     	String mainFragment = "admin/fragments/staff/staff2";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-
-    	return "admin/index_admin";
-    } 
-    
-    @GetMapping("/staff3")
-    public String staff3(HttpServletRequest request,Model model) {
-
-    	String mainFragment = "admin/fragments/staff/staff3";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 

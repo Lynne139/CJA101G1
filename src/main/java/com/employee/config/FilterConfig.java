@@ -8,12 +8,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FilterConfig {
 
-    @Bean
-    public FilterRegistrationBean<AdminPermissionFilter> adminPermissionFilterRegistration(AdminPermissionFilter filter) {
-        FilterRegistrationBean<AdminPermissionFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(filter);
-        registration.addUrlPatterns("/admin/*", "/employees/*");
-        registration.setOrder(1);
-        return registration;
-    }
+//    @Bean
+//    public FilterRegistrationBean<AdminPermissionFilter> adminPermissionFilterRegistration(AdminPermissionFilter filter) {
+//        FilterRegistrationBean<AdminPermissionFilter> registration = new FilterRegistrationBean<>();
+//        registration.setFilter(filter);
+//        registration.addUrlPatterns("/admin/*", "/employees/*");
+//        registration.setOrder(1);
+//        return registration;
+//    }
 } 

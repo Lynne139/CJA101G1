@@ -8,12 +8,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
 
-@Component
+// @Component
 public class AdminPermissionFilter implements Filter {
 
     @Autowired
@@ -22,13 +21,11 @@ public class AdminPermissionFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        
+        /*
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         HttpSession session = httpRequest.getSession();
-        
         String requestURI = httpRequest.getRequestURI();
-        
         // 排除登入相關的 URL 和靜態資源
         if (requestURI.equals("/admin/login") || 
             requestURI.equals("/admin/doLogin") || 
@@ -43,20 +40,16 @@ public class AdminPermissionFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
-        
         // 檢查是否為後台 URL（/admin 或 /admin/* 或 /employees/*）
         boolean isAdminUrl = requestURI.equals("/admin") || 
                            requestURI.startsWith("/admin/") || 
                            requestURI.startsWith("/employees/");
-        
         if (!isAdminUrl) {
             chain.doFilter(request, response);
             return;
         }
-        
         // 第一層權限檢查：是否已登入
         Employee currentEmployee = (Employee) session.getAttribute("currentEmployee");
-        
         if (currentEmployee == null) {
             // 如果是 AJAX 請求，返回 401 狀態碼
             String xRequestedWith = httpRequest.getHeader("X-Requested-With");
@@ -68,14 +61,12 @@ public class AdminPermissionFilter implements Filter {
             httpResponse.sendRedirect("/admin/login");
             return;
         }
-        
         // 檢查員工狀態是否啟用
         if (!currentEmployee.getStatus()) {
             session.invalidate();
             httpResponse.sendRedirect("/admin/login?error=account_disabled");
             return;
         }
-        
         // 查詢員工職稱
         String jobTitleName = "未知職稱";
         if (currentEmployee.getJobTitleId() != null) {
@@ -89,7 +80,6 @@ public class AdminPermissionFilter implements Filter {
             }
         }
         session.setAttribute("employeeJobTitle", jobTitleName);
-        
         // 根據員工 ID 給不同的權限
         List<String> employeePermissions;
         if (currentEmployee.getEmployeeId() == 1 || currentEmployee.getEmployeeId() == 2) {
@@ -110,9 +100,8 @@ public class AdminPermissionFilter implements Filter {
                 "客服管理權限"
             );
         }
-        
         session.setAttribute("employeePermissions", employeePermissions);
-        
-        chain.doFilter(request, response);
+        */
+        chain.doFilter(request, response); // 直接放行
     }
 } 
