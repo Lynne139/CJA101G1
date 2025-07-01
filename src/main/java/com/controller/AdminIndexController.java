@@ -37,9 +37,18 @@ import com.roomOrder.model.RoomOrderService;
 import com.shopOrd.model.ShopOrdService;
 import com.shopOrd.model.ShopOrdVO;
 import com.shopOrdDet.model.ShopOrdDetService;
+import com.news.service.HotNewsService;
+import com.news.service.PromotionNewsService;
+import com.news.service.NewsService;
+import com.news.entity.HotNews;
+import com.news.entity.News;
+import com.news.entity.PromotionNews;
+import com.employee.service.EmployeeService;
+import com.employee.entity.Employee;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/admin")
@@ -79,19 +88,19 @@ public class AdminIndexController {
 	@Autowired
 	RoomOrderService roomOrderService;
 	
-
-    @Autowired
-    private HotNewsService hotNewsService;
-
-    @Autowired
-    private PromotionNewsService promotionNewsService;
-
-    @Autowired
-    private NewsService newsService;
-
-    @Autowired
-    private EmployeeService employeeService;
-
+	@Autowired
+	HotNewsService hotNewsSvc;
+	
+	@Autowired
+	PromotionNewsService promotionNewsSvc;
+	
+	@Autowired
+	NewsService newsSvc;
+	
+	@Autowired
+	EmployeeService employeeSvc;
+	
+		
 	// === 後台首頁 ===
     @GetMapping("")
     public String index(HttpServletRequest request,Model model) {
@@ -140,6 +149,26 @@ public class AdminIndexController {
     	return "admin/index_admin";
     } 
     
+    @GetMapping("/staff2")
+    public String staff2(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/staff/staff2";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    } 
+    
+    @GetMapping("/staff3")
+    public String staff3(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/staff/staff3";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    } 
+    
     // === 房間管理 ===
     @GetMapping("/room1")
     public String room1(HttpServletRequest request,Model model) {
@@ -150,6 +179,36 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
 
+    } 
+    
+    @GetMapping("/listAllRoomType")
+    public String listAllRoomType(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/room/listAllRoomType";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    } 
+    
+    @GetMapping("/listAllRoomTypeSchedule")
+    public String listAllRoomTypeSchedule(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/room/listAllRoomTypeSchedule";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    } 
+    
+    @GetMapping("/listAllRoom")
+    public String listAllRoom(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/room/listAllRoom";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
     } 
 
 
@@ -592,39 +651,35 @@ public class AdminIndexController {
     // === 消息管理 ===
     @GetMapping("/news1")
     public String news1(HttpServletRequest request,Model model) {
+        String mainFragment = "admin/fragments/news/news1";
+        model.addAttribute("mainFragment", mainFragment);
+        model.addAttribute("currentURI", request.getRequestURI());
+        // 查詢資料庫
+        List<HotNews> hotNewsList = hotNewsSvc.findAll();
+        model.addAttribute("hotNewsList", hotNewsList);
+        return "admin/index_admin";
+    }
 
-    	String mainFragment = "admin/fragments/news/news1";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
+    @GetMapping("/news2")
+    public String news2(HttpServletRequest request,Model model) {
+        String mainFragment = "admin/fragments/news/news2";
+        model.addAttribute("mainFragment", mainFragment);
+        model.addAttribute("currentURI", request.getRequestURI());
+        // 查詢資料庫
+        List<PromotionNews> promotionNewsList = promotionNewsSvc.findAll();
+        model.addAttribute("promotionNewsList", promotionNewsList);
+        return "admin/index_admin";
+    }
 
-    // 添加權限資訊到model的輔助方法
-    private void addPermissionInfo(HttpServletRequest request, Model model) {
-        // 暫時給所有權限，方便開發測試
-        List<String> allPermissions = List.of(
-            "會員管理權限",
-            "員工管理權限", 
-            "住宿管理權限",
-            "餐廳管理權限",
-            "商店管理權限",
-            "優惠管理權限",
-            "客服管理權限",
-            "消息管理權限"
-        );
-        model.addAttribute("adminPermissions", allPermissions);
-        
-        /*
-        HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute("adminEmployee") != null) {
-            Employee employee = (Employee) session.getAttribute("adminEmployee");
-            List<String> permissions = employeeService.getEmployeePermissionNames(employee.getEmployeeId());
-            model.addAttribute("adminPermissions", permissions);
-        } else {
-            model.addAttribute("adminPermissions", new ArrayList<>());
-        }
-        */
-
-    	return "admin/index_admin";
-
+    @GetMapping("/news3")
+    public String news3(HttpServletRequest request,Model model) {
+        String mainFragment = "admin/fragments/news/news3";
+        model.addAttribute("mainFragment", mainFragment);
+        model.addAttribute("currentURI", request.getRequestURI());
+        // 查詢資料庫
+        List<News> newsList = newsSvc.findAll();
+        model.addAttribute("newsList", newsList);
+        return "admin/index_admin";
     } 
 	
 }
