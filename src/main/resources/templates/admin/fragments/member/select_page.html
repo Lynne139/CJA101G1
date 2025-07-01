@@ -15,7 +15,7 @@
     <div th:if="${error}" class="alert alert-danger mt-3" th:text="${error}"></div>
 
     <!-- 查詢會員編號（下拉式選單） -->
-    <form th:action="@{/admin/member/searchById}" method="post">
+    <form th:action="@{/admin/searchById}" method="post">
       <div class="mb-3">
         <label for="selectMemberId" class="form-label">會員編號（下拉）</label>
         <select class="form-select" id="selectMemberId" name="memberId">
@@ -29,7 +29,7 @@
     </form>
 
     <!-- 查詢會員編號（手動輸入） -->
-    <form th:action="@{/admin/member/searchById}" method="post">
+    <form th:action="@{/admin/searchById}" method="post">
       <div class="mb-3">
         <label for="inputMemberId" class="form-label">會員編號（手動輸入）</label>
         <input type="text" class="form-control" id="inputMemberId" name="memberId" placeholder="請輸入會員編號">
@@ -40,7 +40,7 @@
     </form>
 
     <!-- 查詢會員姓名（下拉式選單） -->
-    <form th:action="@{/admin/member/searchByName}" method="post">
+    <form th:action="@{/admin/searchByName}" method="post">
       <div class="mb-3">
         <label for="selectMemberName" class="form-label">會員姓名（下拉）</label>
         <select class="form-select" id="selectMemberName" name="memberName">
@@ -54,7 +54,7 @@
     </form>
 
     <!-- 查詢會員姓名（手動輸入） -->
-    <form th:action="@{/admin/member/searchByName}" method="post">
+    <form th:action="@{/admin/searchByName}" method="post">
       <div class="mb-3">
         <label for="inputMemberName" class="form-label">會員姓名（手動輸入）</label>
         <input type="text" class="form-control" id="inputMemberName" name="memberName" placeholder="請輸入會員姓名">
@@ -66,7 +66,7 @@
 
     <!-- 查看全部會員 -->
     <div class="text-center mt-4">
-      <a th:href="@{/admin/member/listAllMember}" class="btn btn-secondary">查看全部會員</a>
+      <a th:href="@{/admin/listAllMember}" class="btn btn-secondary">查看全部會員</a>
     </div>
   </div>
 </div>
