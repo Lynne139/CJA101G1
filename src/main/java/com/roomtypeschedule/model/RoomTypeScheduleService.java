@@ -109,109 +109,109 @@ public class RoomTypeScheduleService {
     /**
      * 當訂單成立時，更新多天的已預定數量
      */    
-//	@Transactional
-//	public void reserve(RoomOList roomOList) {
-//		RoomTypeVO roomType = roomOList.getRoomType();
-//		LocalDate startDate = roomOList.getRoomOrder().getStartDate().toLocalDate();
-//		LocalDate endDate = roomOList.getRoomOrder().getEndDate().toLocalDate();
-//		int bookedAmount = roomOList.getRoomAmount();
-//
-//		List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository.findByRoomTypeVOAndRoomOrderDateBetween(
-//				roomType, java.sql.Date.valueOf(startDate), java.sql.Date.valueOf(endDate));
-//
-//		// 先檢查所有天庫存
-//		for (RoomTypeScheduleVO schedule : schedules) {
-//			int remaining = schedule.getRoomAmount() - schedule.getRoomRSVBooked();
-//			if (remaining < bookedAmount) {
-//				throw new IllegalArgumentException(
-//						"庫存不足！在 " + schedule.getRoomOrderDate() + " 只剩 " + remaining + " 間房");
-//			}
-//		}
-//
-//		// 再逐天寫入
-//		for (RoomTypeScheduleVO schedule : schedules) {
-//			schedule.setRoomRSVBooked(schedule.getRoomRSVBooked() + bookedAmount);
-//			roomTypeScheduleRepository.save(schedule);
-//		}
-//	}
-//    
-//    @Transactional
-//    public void cancelReservation(RoomOList roomOList) {
-//        RoomTypeVO roomType = roomOList.getRoomType();
-//        LocalDate startDate = roomOList.getRoomOrder().getStartDate().toLocalDate();
-//        LocalDate endDate = roomOList.getRoomOrder().getEndDate().toLocalDate();
-//        int quantity = roomOList.getRoomAmount();
-//
-//        List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository.findByRoomTypeVOAndRoomOrderDateBetween(
-//            roomType,
-//            java.sql.Date.valueOf(startDate),
-//            java.sql.Date.valueOf(endDate)
-//        );
-//
-//        for (RoomTypeScheduleVO schedule : schedules) {
-//            int updatedBooked = schedule.getRoomRSVBooked() - quantity;
-//            if (updatedBooked <= 0) {
-//                schedule.setRoomRSVBooked(0);
-//            } else {
-//                schedule.setRoomRSVBooked(updatedBooked);
-//            }
-//            roomTypeScheduleRepository.save(schedule);
-//        }
-//    }
-//    
-//    @Transactional
-//    public void updateReservation(RoomOList oldRoomOList, RoomOList newRoomOList) {
-//        RoomTypeVO roomType = oldRoomOList.getRoomType();
-//        LocalDate startDate = oldRoomOList.getRoomOrder().getStartDate().toLocalDate();
-//        LocalDate endDate = oldRoomOList.getRoomOrder().getEndDate().toLocalDate();
-//
-//        int oldQty = oldRoomOList.getRoomAmount();
-//        int newQty = newRoomOList.getRoomAmount();
-//        int diff = newQty - oldQty;
-//
-//        if (diff > 0) {
-//            // 要多訂房 ➜ 檢查並預約
-//            List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository
-//                .findByRoomTypeVOAndRoomOrderDateBetween(
-//                    roomType,
-//                    java.sql.Date.valueOf(startDate),
-//                    java.sql.Date.valueOf(endDate)
-//                );
-//
-//            for (RoomTypeScheduleVO schedule : schedules) {
-//                int remaining = schedule.getRoomAmount() - schedule.getRoomRSVBooked();
-//                if (remaining < diff) {
-//                    throw new IllegalArgumentException(
-//                        "庫存不足！在 " + schedule.getRoomOrderDate() +
-//                        " 只剩 " + remaining + " 間房"
-//                    );
-//                }
-//            }
-//
-//            for (RoomTypeScheduleVO schedule : schedules) {
-//                schedule.setRoomRSVBooked(schedule.getRoomRSVBooked() + diff);
-//                roomTypeScheduleRepository.save(schedule);
-//            }
-//
-//        } else if (diff < 0) {
-//            // 減少預約 ➜ 釋放庫存
-//            List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository
-//                .findByRoomTypeVOAndRoomOrderDateBetween(
-//                    roomType,
-//                    java.sql.Date.valueOf(startDate),
-//                    java.sql.Date.valueOf(endDate)
-//                );
-//
-//            for (RoomTypeScheduleVO schedule : schedules) {
-//                int newBooked = schedule.getRoomRSVBooked() + diff; // diff 是負數
-//                schedule.setRoomRSVBooked(Math.max(0, newBooked));
-//                roomTypeScheduleRepository.save(schedule);
-//            }
-//
-//        } else {
-//            // 數量沒變，不動
-//        }
-//    }
+	@Transactional
+	public void reserve(RoomOList roomOList) {
+		RoomTypeVO roomType = roomOList.getRoomType();
+		String startDate = roomOList.getRoomOrder().getCheckInDate();
+		String endDate = roomOList.getRoomOrder().getCheckOutDate();
+		int bookedAmount = roomOList.getRoomAmount();
+
+		List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository.findByRoomTypeVOAndRoomOrderDateBetween(
+				roomType, java.sql.Date.valueOf(startDate), java.sql.Date.valueOf(endDate));
+
+		// 先檢查所有天庫存
+		for (RoomTypeScheduleVO schedule : schedules) {
+			int remaining = schedule.getRoomAmount() - schedule.getRoomRSVBooked();
+			if (remaining < bookedAmount) {
+				throw new IllegalArgumentException(
+						"庫存不足！在 " + schedule.getRoomOrderDate() + " 只剩 " + remaining + " 間房");
+			}
+		}
+
+		// 再逐天寫入
+		for (RoomTypeScheduleVO schedule : schedules) {
+			schedule.setRoomRSVBooked(schedule.getRoomRSVBooked() + bookedAmount);
+			roomTypeScheduleRepository.save(schedule);
+		}
+	}
+    
+    @Transactional
+    public void cancelReservation(RoomOList roomOList) {
+        RoomTypeVO roomType = roomOList.getRoomType();
+        String startDate = roomOList.getRoomOrder().getCheckInDate();
+		String endDate = roomOList.getRoomOrder().getCheckOutDate();
+        int quantity = roomOList.getRoomAmount();
+
+        List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository.findByRoomTypeVOAndRoomOrderDateBetween(
+            roomType,
+            java.sql.Date.valueOf(startDate),
+            java.sql.Date.valueOf(endDate)
+        );
+
+        for (RoomTypeScheduleVO schedule : schedules) {
+            int updatedBooked = schedule.getRoomRSVBooked() - quantity;
+            if (updatedBooked <= 0) {
+                schedule.setRoomRSVBooked(0);
+            } else {
+                schedule.setRoomRSVBooked(updatedBooked);
+            }
+            roomTypeScheduleRepository.save(schedule);
+        }
+    }
+    
+    @Transactional
+    public void updateReservation(RoomOList oldRoomOList, RoomOList newRoomOList) {
+        RoomTypeVO roomType = oldRoomOList.getRoomType();
+        String startDate = oldRoomOList.getRoomOrder().getCheckInDate();
+        String endDate = oldRoomOList.getRoomOrder().getCheckOutDate();
+
+        int oldQty = oldRoomOList.getRoomAmount();
+        int newQty = newRoomOList.getRoomAmount();
+        int diff = newQty - oldQty;
+
+        if (diff > 0) {
+            // 要多訂房 ➜ 檢查並預約
+            List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository
+                .findByRoomTypeVOAndRoomOrderDateBetween(
+                    roomType,
+                    java.sql.Date.valueOf(startDate),
+                    java.sql.Date.valueOf(endDate)
+                );
+
+            for (RoomTypeScheduleVO schedule : schedules) {
+                int remaining = schedule.getRoomAmount() - schedule.getRoomRSVBooked();
+                if (remaining < diff) {
+                    throw new IllegalArgumentException(
+                        "庫存不足！在 " + schedule.getRoomOrderDate() +
+                        " 只剩 " + remaining + " 間房"
+                    );
+                }
+            }
+
+            for (RoomTypeScheduleVO schedule : schedules) {
+                schedule.setRoomRSVBooked(schedule.getRoomRSVBooked() + diff);
+                roomTypeScheduleRepository.save(schedule);
+            }
+
+        } else if (diff < 0) {
+            // 減少預約 ➜ 釋放庫存
+            List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository
+                .findByRoomTypeVOAndRoomOrderDateBetween(
+                    roomType,
+                    java.sql.Date.valueOf(startDate),
+                    java.sql.Date.valueOf(endDate)
+                );
+
+            for (RoomTypeScheduleVO schedule : schedules) {
+                int newBooked = schedule.getRoomRSVBooked() + diff; // diff 是負數
+                schedule.setRoomRSVBooked(Math.max(0, newBooked));
+                roomTypeScheduleRepository.save(schedule);
+            }
+
+        } else {
+            // 數量沒變，不動
+        }
+    }
 
 
 }

@@ -29,11 +29,11 @@ function loadInventoryMap() {
 			//			console.log("取得庫存地圖:", data);
 			inventoryMap = data;
 			// 找出最大日期
-			const dates = Object.keys(inventoryMap).sort();
-			if (dates.length > 0) {
-				const maxDate = new Date(dates[dates.length - 1]);
-				currentDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1); // 把日曆移到最大月份
-			}
+//			const dates = Object.keys(inventoryMap).sort();
+//			if (dates.length > 0) {
+//				const maxDate = new Date(dates[dates.length - 1]);
+//				currentDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1); // 把日曆移到最大月份
+//			}
 			generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
 		})
 		.catch(e => console.error("取庫存失敗", e));
