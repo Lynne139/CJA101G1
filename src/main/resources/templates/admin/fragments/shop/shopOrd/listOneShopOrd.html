@@ -52,7 +52,7 @@
                                             <th>付款方式</th>
                                             <td>
                                                 <span th:classappend="${shopOrdVO.payMethod == true} ? 'badge bg-success' : 'badge bg-danger'" class="badge">
-                                                        <span th:text="${shopOrdVO.payMethod == true} ? '現金' : 'LinePay'"></span>
+                                                        <span th:text="${shopOrdVO.payMethod == true} ? 'LinePay' : '現金'"></span>
                                                 </span>
                                             </td>
                                         </tr>

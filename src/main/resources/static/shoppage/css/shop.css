@@ -449,6 +449,18 @@
   background: #f9f9f9;
 }
 
+.cart-item-remove {
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 10px;
+}
+.cart-item-remove:hover {
+  color: #a71d2a;
+}
+
 /* 折價券選擇區域 */
 .coupon-section {
   margin-bottom: 15px;
