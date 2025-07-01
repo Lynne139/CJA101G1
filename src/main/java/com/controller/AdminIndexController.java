@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import com.coupon.entity.Coupon;
 import com.coupon.service.CouponService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,7 +79,19 @@ public class AdminIndexController {
 	@Autowired
 	RoomOrderService roomOrderService;
 	
-		
+
+    @Autowired
+    private HotNewsService hotNewsService;
+
+    @Autowired
+    private PromotionNewsService promotionNewsService;
+
+    @Autowired
+    private NewsService newsService;
+
+    @Autowired
+    private EmployeeService employeeService;
+
 	// === 後台首頁 ===
     @GetMapping("")
     public String index(HttpServletRequest request,Model model) {
@@ -586,7 +597,34 @@ public class AdminIndexController {
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 
+    // 添加權限資訊到model的輔助方法
+    private void addPermissionInfo(HttpServletRequest request, Model model) {
+        // 暫時給所有權限，方便開發測試
+        List<String> allPermissions = List.of(
+            "會員管理權限",
+            "員工管理權限", 
+            "住宿管理權限",
+            "餐廳管理權限",
+            "商店管理權限",
+            "優惠管理權限",
+            "客服管理權限",
+            "消息管理權限"
+        );
+        model.addAttribute("adminPermissions", allPermissions);
+        
+        /*
+        HttpSession session = request.getSession(false);
+        if (session != null && session.getAttribute("adminEmployee") != null) {
+            Employee employee = (Employee) session.getAttribute("adminEmployee");
+            List<String> permissions = employeeService.getEmployeePermissionNames(employee.getEmployeeId());
+            model.addAttribute("adminPermissions", permissions);
+        } else {
+            model.addAttribute("adminPermissions", new ArrayList<>());
+        }
+        */
+
     	return "admin/index_admin";
+
     } 
 	
 }
