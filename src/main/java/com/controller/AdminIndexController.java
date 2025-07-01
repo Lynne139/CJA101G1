@@ -38,6 +38,9 @@ import com.roomOrder.model.RoomOrderService;
 import com.shopOrd.model.ShopOrdService;
 import com.shopOrd.model.ShopOrdVO;
 import com.shopOrdDet.model.ShopOrdDetService;
+import com.news.service.HotNewsService;
+import com.news.service.PromotionNewsService;
+import com.news.service.NewsService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -79,6 +82,15 @@ public class AdminIndexController {
 	
 	@Autowired
 	RoomOrderService roomOrderService;
+	
+	@Autowired
+	HotNewsService hotNewsSvc;
+	
+	@Autowired
+	PromotionNewsService promotionNewsSvc;
+	
+	@Autowired
+	NewsService newsSvc;
 	
 		
 	// === 後台首頁 ===
@@ -123,6 +135,26 @@ public class AdminIndexController {
     public String staff1(HttpServletRequest request,Model model) {
 
     	String mainFragment = "admin/fragments/staff/staff1";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    } 
+    
+    @GetMapping("/staff2")
+    public String staff2(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/staff/staff2";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    } 
+    
+    @GetMapping("/staff3")
+    public String staff3(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/staff/staff3";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 
@@ -585,6 +617,41 @@ public class AdminIndexController {
     	String mainFragment = "admin/fragments/news/news1";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	// 添加最新消息資料到 model 中
+    	List<com.news.entity.HotNews> hotNewsList = hotNewsSvc.findAll();
+    	model.addAttribute("hotNewsList", hotNewsList);
+    	model.addAttribute("hotNews", new com.news.entity.HotNews());
+
+    	return "admin/index_admin";
+    } 
+    
+    @GetMapping("/news2")
+    public String news2(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/news/news2";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	// 添加活動消息資料到 model 中
+    	List<com.news.entity.PromotionNews> promotionNewsList = promotionNewsSvc.findAll();
+    	model.addAttribute("promotionNewsList", promotionNewsList);
+    	model.addAttribute("promotionNews", new com.news.entity.PromotionNews());
+
+    	return "admin/index_admin";
+    } 
+    
+    @GetMapping("/news3")
+    public String news3(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/news/news3";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	// 添加媒體消息資料到 model 中
+    	List<com.news.entity.News> newsList = newsSvc.findAll();
+    	model.addAttribute("newsList", newsList);
+    	model.addAttribute("news", new com.news.entity.News());
 
     	return "admin/index_admin";
     } 
