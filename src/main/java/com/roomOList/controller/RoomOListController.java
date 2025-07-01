@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,18 +75,7 @@ public class RoomOListController {
         return result;
     }
 
-    // ===== 取消明細 =====
-    @PostMapping("/roomo_info/roomOlist/cancel")
-    @ResponseBody
-    public Map<String, Object> cancelRoomOrderList(@RequestParam("roomOrderListId") Integer roomOrderListId) {
-        RoomOList detail = roomOListService.findByRoomOrderListId(roomOrderListId);
-        if (detail != null) {
-            detail.setListStatus("0"); // 0:取消
-            roomOListService.save(detail);
-            return Map.of("success", true);
-        }
-        return Map.of("success", false, "message", "找不到明細");
-    }
+    
 
 }
 

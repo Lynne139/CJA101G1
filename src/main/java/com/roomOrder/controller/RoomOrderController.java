@@ -55,47 +55,35 @@ public class RoomOrderController {
 		return "admin/fragments/roomo/modals/roomo_add :: addModalContent";
 	}
 
-	@GetMapping("/roomo_info/check_schedule")
+	@GetMapping("/roomo_info/{roomTypeId}/check_schedule")
 	@ResponseBody
-	public Map<String, Object> checkRoomAvailability(@RequestParam("roomTypeId") Integer roomTypeId,
-			@RequestParam("checkInDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date checkInDate,
-			@RequestParam("checkOutDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date checkOutDate) {
+	public Integer getRoomInventoryRange(@PathVariable Integer roomTypeId,
+	                                     @RequestParam String start,
+	                                     @RequestParam String end) {
+	    java.sql.Date startDate = java.sql.Date.valueOf(start);
+	    java.sql.Date endDate = java.sql.Date.valueOf(end);
 
-		Map<String, Object> result = new HashMap<>();
+	    RoomTypeVO roomType = roomTypeService.getOneRoomType(roomTypeId);
+	    List<RoomTypeScheduleVO> schedules = roomScheduleService
+		.findSchedules(roomType, startDate, endDate);
+	    
+	    // 找區間內的最少可訂
+	    int minRemaining = schedules.stream()
+	        .mapToInt(s -> s.getRoomAmount() - s.getRoomRSVBooked())
+	        .min()
+	        .orElse(0);
 
-		RoomTypeVO roomTypeVO = roomTypeService.getOneRoomType(roomTypeId);
-		int totalRooms = roomTypeVO.getRoomTypeAmount();
+	    return minRemaining;
+	}
 
-		List<String> fullyBookedDates = new ArrayList<>();
-
-		LocalDate start = checkInDate.toLocalDate();
-		LocalDate end = checkOutDate.toLocalDate();
-
-		while (!start.isAfter(end.minusDays(1))) {
-			Date currentDate = Date.valueOf(start);
-			Optional<RoomTypeScheduleVO> optional = roomScheduleService
-					.getByRoomTypeVO_RoomTypeIdAndRoomOrderDate(roomTypeId, currentDate);
-
-			int booked = optional.map(RoomTypeScheduleVO::getRoomRSVBooked).orElse(0);
-			int remaining = totalRooms - booked;
-
-			if (remaining <= 0) {
-				fullyBookedDates.add(currentDate.toString());
-			}
-
-			start = start.plusDays(1);
-		}
-
-		if (!fullyBookedDates.isEmpty()) {
-			result.put("available", false);
-			result.put("message", "以下日期已滿房，請重新選擇其他日期");
-			result.put("unavailableDates", fullyBookedDates);
-		} else {
-			result.put("available", true);
-			result.put("message", "選定區間內皆有空房");
-		}
-
-		return result;
+	// ===== 檢視訂單 =====
+	@GetMapping("/roomo_info/view")
+	public String viewRoomOrder(@RequestParam("roomOrderId") Integer roomOrderId, Model model) {
+		RoomOrder order = orderService.getById(roomOrderId);
+		List<RoomOList> details = roomOListService.findByRoomOrderId(roomOrderId);
+		model.addAttribute("roomOrder", order);
+		model.addAttribute("roomOLists", details);
+		return "admin/fragments/roomo/modals/roomo_view :: viewModalContent";
 	}
 
 	// ===== 修改 =====
@@ -276,9 +264,11 @@ public class RoomOrderController {
         RoomOrder order = orderService.getById(roomOrderId);
         if (order != null) {
             order.setOrderStatus(0); // 0:取消
+            // 這裡補查明細
+            List<RoomOList> details = roomOListService.findByRoomOrderId(roomOrderId);
             List<Integer> olistIds = new ArrayList<>();
-            if (order.getOrderDetails() != null) {
-                for (RoomOList detail : order.getOrderDetails()) {
+            if (details != null) {
+                for (RoomOList detail : details) {
                     detail.setListStatus("0"); // 0:取消
                     roomOListService.save(detail);
                     olistIds.add(detail.getRoomOrderListId());
@@ -340,15 +330,7 @@ public class RoomOrderController {
 		return details;
 	}
 
-	// ===== 檢視訂單 =====
-	@GetMapping("/roomo_info/view")
-	public String viewRoomOrder(@RequestParam("roomOrderId") Integer roomOrderId, Model model) {
-		RoomOrder order = orderService.getById(roomOrderId);
-		List<RoomOList> details = roomOListService.findByRoomOrderId(roomOrderId);
-		model.addAttribute("roomOrder", order);
-		model.addAttribute("roomOLists", details);
-		return "admin/fragments/roomo/modals/roomo_view :: viewModalContent";
-	}
+	
 
 	
 }
