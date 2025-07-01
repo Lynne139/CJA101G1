@@ -88,41 +88,9 @@ public class AdminIndexController {
 	@Autowired
 	RoomOrderService roomOrderService;
 	
-<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
-<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
-
-    @Autowired
-    private HotNewsService hotNewsService;
-
-    @Autowired
-    private PromotionNewsService promotionNewsService;
-
-    @Autowired
-    private NewsService newsService;
-
-    @Autowired
-    private EmployeeService employeeService;
-
-=======
-    @Autowired
-    private HotNewsService hotNewsService;
-
-    @Autowired
-    private PromotionNewsService promotionNewsService;
-
-    @Autowired
-    private NewsService newsService;
-
-    @Autowired
-    private EmployeeService employeeService;
-=======
 	@Autowired
 	HotNewsService hotNewsSvc;
->>>>>>> 299fac7 fix_AdminIndexController
 	
-<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
->>>>>>> ddc24ac fix_AdminIndexController
-=======
 	@Autowired
 	PromotionNewsService promotionNewsSvc;
 	
@@ -133,7 +101,6 @@ public class AdminIndexController {
 	EmployeeService employeeSvc;
 	
 		
->>>>>>> 299fac7 fix_AdminIndexController
 	// === 後台首頁 ===
     @GetMapping("")
     public String index(HttpServletRequest request,Model model) {
@@ -212,6 +179,36 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
 
+    } 
+    
+    @GetMapping("/listAllRoomType")
+    public String listAllRoomType(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/room/listAllRoomType";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    } 
+    
+    @GetMapping("/listAllRoomTypeSchedule")
+    public String listAllRoomTypeSchedule(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/room/listAllRoomTypeSchedule";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+    } 
+    
+    @GetMapping("/listAllRoom")
+    public String listAllRoom(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/room/listAllRoom";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
     } 
 
 
@@ -674,37 +671,6 @@ public class AdminIndexController {
         return "admin/index_admin";
     }
 
-<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
-    // 添加權限資訊到model的輔助方法
-    private void addPermissionInfo(HttpServletRequest request, Model model) {
-        // 暫時給所有權限，方便開發測試
-        List<String> allPermissions = List.of(
-            "會員管理權限",
-            "員工管理權限", 
-            "住宿管理權限",
-            "餐廳管理權限",
-            "商店管理權限",
-            "優惠管理權限",
-            "客服管理權限",
-            "消息管理權限"
-        );
-        model.addAttribute("adminPermissions", allPermissions);
-        
-        /*
-        HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute("adminEmployee") != null) {
-            Employee employee = (Employee) session.getAttribute("adminEmployee");
-            List<String> permissions = employeeService.getEmployeePermissionNames(employee.getEmployeeId());
-            model.addAttribute("adminPermissions", permissions);
-        } else {
-            model.addAttribute("adminPermissions", new ArrayList<>());
-        }
-        */
-
-    	return "admin/index_admin";
-
-    } 
-=======
     @GetMapping("/news3")
     public String news3(HttpServletRequest request,Model model) {
         String mainFragment = "admin/fragments/news/news3";
@@ -714,11 +680,6 @@ public class AdminIndexController {
         List<News> newsList = newsSvc.findAll();
         model.addAttribute("newsList", newsList);
         return "admin/index_admin";
-<<<<<<< Upstream, based on branch 'master' of https://github.com/Lynne139/CJA101G1.git
-    }
->>>>>>> ddc24ac fix_AdminIndexController
-=======
     } 
->>>>>>> 299fac7 fix_AdminIndexController
 	
 }
