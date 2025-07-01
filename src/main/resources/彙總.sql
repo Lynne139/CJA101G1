@@ -119,84 +119,46 @@ VALUES (1, '測試通知標題一', '測試通知內容一'),
 	(2, '測試通知標題二', '測試通知內容二'),
 	(3, '測試通知標題三', '測試通知內容三');
 
--- 職稱表 
-create table role_list (
-Role_id int auto_increment primary key not null,
-Role_name Varchar(50) not null,
-Remark Varchar(100),
-Is_active boolean not null default true
+-- 職稱
+CREATE TABLE job_title (
+    job_title_id INT AUTO_INCREMENT PRIMARY KEY,
+    job_title_name VARCHAR(50) NOT NULL,
+    description VARCHAR(200),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-INSERT INTO ROLE_LIST (ROLE_NAME, REMARK)
-VALUES 
-('總經理', '擁有全站存取權限'),
-('客服部', '可回覆顧客留言與查詢訂單');
+INSERT INTO job_title (job_title_id, job_title_name, description, is_active) VALUES
+  (1, '總經理', '負責公司整體營運管理', TRUE),
+  (2, '副總經理', '協助總經理管理公司業務', TRUE),
+  (3, '部門經理', '負責部門日常營運管理', TRUE),
+  (4, '資深專員', '具備豐富經驗的專業人員', TRUE),
+  (5, '專員', '一般業務處理人員', TRUE),
+  (6, '助理', '協助各項業務處理', TRUE),
+  (7, '系統', '自動寫入資料', TRUE);
 
--- 職稱表 
-create table job_title (
-job_title_id int auto_increment primary key not null,
-job_title_name Varchar(50) not null,
-description Varchar(200),
-is_active boolean not null default true
+-- 員工
+create table employee (
+  Employee_id int auto_increment primary key not null,
+  Role_id int not null,
+  job_title_id int,
+  Name varchar(50) not null,
+  Status boolean not null default true,
+  Created_date date not null,
+  Password varchar(50) not null,
+  employee_photo longblob
 );
 
-INSERT INTO JOB_TITLE (JOB_TITLE_NAME, DESCRIPTION)
-VALUES 
-('總經理', '負責公司整體營運管理'),
-('副總經理', '協助總經理管理公司業務'),
-('部門經理', '負責部門日常營運管理'),
-('資深專員', '具備豐富經驗的專業人員'),
-('專員', '一般業務處理人員'),
-    ('助理', '協助各項業務處理'),
-    ('系統', '自動寫入資料');
-
--- 員工 
-Create table employee (
-Employee_id int auto_increment primary key not null,
-Role_id int not null,
-job_title_id int,
-Name Varchar(50) not null,
-Status boolean default true not null,
-Created_date date not null,
-Password Varchar(50) not null,
-employee_photo LONGBLOB,
-foreign key (Role_id) references Role_list (Role_id),
-foreign key (job_title_id) references job_title (job_title_id)
-);
-
-INSERT INTO EMPLOYEE (ROLE_ID, JOB_TITLE_ID, NAME, CREATED_DATE, PASSWORD)
-VALUES 
-
-    (1, 7, 'SYSTEM', '2025-01-01', '1234'), /*系統帳號 ADD BY YCH*/
-(1, 1, '吳永志', '2025-01-01', '1234'),
-(2, 5, '吳冠宏', '2025-02-15', '1234');
+INSERT INTO employee (Employee_id, Role_id, job_title_id, Name, Status, Created_date, Password, employee_photo)
+VALUES
+  (1, 1, 7, 'SYSTEM', TRUE, '2025-01-01', '1234', NULL),
+  (2, 1, 1, '吳永志', TRUE, '2025-01-01', '1234', NULL),
+  (3, 2, 5, '吳冠宏', TRUE, '2025-02-15', '1234', NULL);
 
 
--- 客服留言 
-CREATE TABLE customer_service_message
-(
-	message_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	member_id INT,
-	customer_name VARCHAR(50),
-	email VARCHAR(50) NOT NULL,
-	submitted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	message VARCHAR(1500) NOT NULL,
-	processing_status INT NOT NULL DEFAULT 0,
-	employee_id INT,
-	responsed_at DATETIME,
-    FOREIGN KEY (member_id) REFERENCES member(member_id),
-    FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
-);
-
-INSERT INTO customer_service_message (member_id, customer_name, email, message)
-VALUES(1, '林冠宇', 'guanyu.lin@example.com', '訂房有哪些優惠?'),
-	(2, NULL, 'shuhan.chang@example.com', '早上幾點check out?'),
-	(NULL, '杜宥瑄', 'yousyuan.tu@example.com', '住宿有公共洗衣機嗎?');
-    
--- 功能權限
+-- 權限
 create table function_access_right (
-Access_id int  auto_increment primary key,
-Access_name Varchar(50) not null
+  Access_id int  auto_increment primary key,
+  Access_name Varchar(50) not null
 );
 
 INSERT INTO FUNCTION_ACCESS_RIGHT (ACCESS_NAME) VALUES
@@ -208,19 +170,54 @@ INSERT INTO FUNCTION_ACCESS_RIGHT (ACCESS_NAME) VALUES
 ('優惠管理權限'),
 ('客服管理權限'),
 ('消息管理權限');
-    
--- 角色權限
- CREATE TABLE role_access_right (
-    Role_id INT NOT NULL,
-    Access_id INT NOT NULL,
-    PRIMARY KEY (Role_id, Access_id),
-    FOREIGN KEY (Role_id) REFERENCES Role_list (Role_id),
-    FOREIGN KEY (Access_id) REFERENCES Function_access_right (Access_id)
+
+-- 員工個別權限
+CREATE TABLE employee_function_access_right (
+    employee_id INT NOT NULL,
+    function_access_right_id INT NOT NULL,
+    start_date DATE,
+    end_date DATE,
+    enabled BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (employee_id, function_access_right_id),
+    FOREIGN KEY (employee_id) REFERENCES employee(Employee_id),
+    FOREIGN KEY (function_access_right_id) REFERENCES function_access_right(Access_id)
 );
 
-INSERT INTO Role_access_right (Role_id, Access_id) VALUES
-(1, 1), (1, 2), (1, 3), (1 ,4), (1 ,5), (1 ,6), (1, 7), (1, 8), (2, 7);
+INSERT INTO employee_function_access_right (employee_id, function_access_right_id, start_date, end_date, enabled) VALUES
+(1, 1, NULL, NULL, TRUE), -- SYSTEM 擁有會員管理權限
+(1, 2, NULL, NULL, TRUE), -- SYSTEM 擁有員工管理權限
+(1, 3, NULL, NULL, TRUE), -- SYSTEM 擁有住宿管理權限
+(1, 4, NULL, NULL, TRUE), -- SYSTEM 擁有餐廳管理權限
+(1, 5, NULL, NULL, TRUE), -- SYSTEM 擁有商店管理權限
+(1, 6, NULL, NULL, TRUE), -- SYSTEM 擁有優惠管理權限
+(1, 7, NULL, NULL, TRUE), -- SYSTEM 擁有客服管理權限
+(1, 8, NULL, NULL, TRUE), -- SYSTEM 擁有消息管理權限
+(2, 2, NULL, NULL, TRUE), -- 吳永志 員工管理權限
+(2, 3, NULL, NULL, TRUE), -- 吳永志 住宿管理權限
+(2, 4, NULL, NULL, TRUE), -- 吳永志 餐廳管理權限
+(3, 7, NULL, NULL, TRUE); -- 吳冠宏 客服管理權限
 
+-- 客服留言 
+CREATE TABLE customer_service_message
+(
+    message_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    member_id INT,
+    customer_name VARCHAR(50),
+    email VARCHAR(50) NOT NULL,
+    submitted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    message VARCHAR(1500) NOT NULL,
+    processing_status INT NOT NULL DEFAULT 0,
+    employee_id INT,
+    responsed_at DATETIME,
+    FOREIGN KEY (member_id) REFERENCES member(member_id),
+    FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
+);
+
+INSERT INTO customer_service_message (member_id, customer_name, email, message)
+VALUES
+    (1, '林冠宇', 'guanyu.lin@example.com', '訂房有哪些優惠?'),
+    (2, NULL, 'shuhan.chang@example.com', '早上幾點check out?'),
+    (NULL, '杜宥瑄', 'yousyuan.tu@example.com', '住宿有公共洗衣機嗎?');
 
 -- 商品類別 
 create table product_category(
@@ -723,3 +720,15 @@ VALUES
 	(1,'2025-06-06',6,250,6),
 	(1,'2025-06-07',2,250,6),
 	(2,'2025-06-10',11,200,3);
+
+CREATE TABLE role_list (
+  Role_id int auto_increment primary key not null,
+  Role_name Varchar(50) not null,
+  Remark Varchar(100),
+  Is_active boolean not null default true
+);
+
+INSERT INTO role_list (Role_id, Role_name, Remark, Is_active) VALUES
+  (1, '總經理室', '最高管理部門', TRUE),
+  (2, '客服部', '處理顧客問題', TRUE);
+
