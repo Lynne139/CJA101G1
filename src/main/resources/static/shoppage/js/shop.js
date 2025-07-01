@@ -1,7 +1,13 @@
 // 商城 JavaScript 功能
 
-// 購物車數據
+// 全局變數
 let cart = JSON.parse(localStorage.getItem('shopCart')) || [];
+let currentMemberId = null; // 當前會員ID
+let availableCoupons = []; // 可用的折價券列表
+let selectedCoupon = null; // 選擇的折價券
+let productPhotos = {}; // 儲存每個商品的照片資訊
+
+// 購物車數據
 let products = [
   {
     id: 1,
@@ -60,14 +66,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 初始化商城功能
 function initializeShop() {
+  // 初始化會員ID
+  initializeMemberId();
+  
   // 初始化購物車
   updateCartDisplay();
+  
+  // 初始化商品照片切換功能
+  initializeProductPhotos();
   
   // 綁定事件監聽器
   bindEventListeners();
   
   // 初始化篩選功能
   initializeFilters();
+}
+
+// 初始化會員ID
+function initializeMemberId() {
+  const memberIdElement = document.querySelector('input[name="memberId"]');
+  if (memberIdElement && memberIdElement.value) {
+    currentMemberId = memberIdElement.value;
+  }
 }
 
 // 綁定事件監聽器
@@ -131,6 +151,14 @@ function bindEventListeners() {
   if (checkoutBtn) {
     checkoutBtn.addEventListener('click', function() {
       checkout();
+    });
+  }
+  
+  // 折價券選擇
+  const couponSelect = document.getElementById('couponSelect');
+  if (couponSelect) {
+    couponSelect.addEventListener('change', function() {
+      handleCouponSelection();
     });
   }
   
@@ -346,78 +374,281 @@ function removeFromCart(productId) {
   showNotification('商品已從購物車移除', 'info');
 }
 
-// 顯示商品詳情 Modal
+// 快速查看商品詳情 Modal
 function showProductModal(productId) {
-  // 從頁面中獲取商品資訊
-  const productCard = document.querySelector(`[data-product-id="${productId}"]`);
-  
-  if (productCard) {
-    const productName = productCard.querySelector('.product-title').textContent;
-    const productDescription = productCard.querySelector('.product-description').textContent;
-    const productPrice = productCard.querySelector('.product-price').textContent;
-    const productImage = productCard.querySelector('.product-image img').src;
-    
-    const modalTitle = document.getElementById('productModalTitle');
-    const modalBody = document.getElementById('productModalBody');
-    
-    if (modalTitle) {
-      modalTitle.textContent = productName;
+  // 取得商品資料（可根據實際需求擴充）
+  const product = products.find(p => p.id == productId);
+  if (!product) return;
+
+  // 載入商品所有照片
+  $.ajax({
+    url: `/front-end/shop/product-photos/${productId}`,
+    type: 'GET',
+    success: function(photos) {
+      renderProductModal(product, photos);
+      $('#productModal').modal('show');
+    },
+    error: function() {
+      renderProductModal(product, []);
+      $('#productModal').modal('show');
     }
-    
-    if (modalBody) {
-      modalBody.innerHTML = `
-        <div class="row">
-          <div class="col-md-6">
-            <img src="${productImage}" alt="${productName}" class="img-fluid rounded" onerror="this.src='/images/admin/no_img.svg'">
-          </div>
-          <div class="col-md-6">
-            <h4 class="text-brown">${productName}</h4>
-            <p class="text-muted">${productDescription}</p>
-            <div class="h3 text-brown mb-3">${productPrice}</div>
-            <button class="btn btn-primary add-to-cart-btn" 
-                    data-product-id="${productId}" 
-                    data-product-name="${productName}" 
-                    data-product-price="${productCard.dataset.price}">
-              <i class="fas fa-shopping-cart"></i> 加入購物車
-            </button>
-          </div>
-        </div>
-      `;
-    }
-    
-    // 顯示 Modal
-    const modal = new bootstrap.Modal(document.getElementById('productModal'));
-    modal.show();
+  });
+}
+
+function renderProductModal(product, photos) {
+  // 主圖
+  const mainPhotoUrl = (photos && photos.length > 0) ? photos[0].imageUrl : '/shoppage/image/icon/bag.svg';
+  const modalBody = document.getElementById('productModalBody');
+  if (!modalBody) return;
+
+  // 設定主圖
+  const mainPhoto = modalBody.querySelector('.modal-main-photo');
+  if (mainPhoto) mainPhoto.src = mainPhotoUrl;
+
+  // 箭頭
+  const prevBtn = modalBody.querySelector('.modal-photo-prev');
+  const nextBtn = modalBody.querySelector('.modal-photo-next');
+  if (photos && photos.length > 1) {
+    prevBtn.style.display = 'flex';
+    nextBtn.style.display = 'flex';
   } else {
-    showNotification('找不到商品資訊', 'error');
+    prevBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
   }
+
+  // 指示器
+  const indicators = modalBody.querySelector('.modal-photo-indicators');
+  indicators.innerHTML = '';
+  if (photos && photos.length > 1) {
+    photos.forEach((photo, idx) => {
+      const dot = document.createElement('div');
+      dot.className = 'modal-photo-indicator' + (idx === 0 ? ' active' : '');
+      dot.style.width = '10px';
+      dot.style.height = '10px';
+      dot.style.borderRadius = '50%';
+      dot.style.background = '#ccc';
+      dot.style.cursor = 'pointer';
+      dot.onclick = () => showModalPhoto(idx, photos);
+      indicators.appendChild(dot);
+    });
+    indicators.style.display = 'flex';
+  } else {
+    indicators.style.display = 'none';
+  }
+
+  // 綁定箭頭事件
+  prevBtn.onclick = () => changeModalPhoto(-1, photos);
+  nextBtn.onclick = () => changeModalPhoto(1, photos);
+
+  // 記錄目前索引
+  modalBody.dataset.currentModalPhotoIndex = '0';
+  modalBody.dataset.modalPhotoCount = photos.length;
+  window._modalPhotos = photos;
+
+  // 商品資訊
+  const infoDiv = modalBody.querySelector('.modal-product-info');
+  if (infoDiv) {
+    infoDiv.innerHTML = `
+      <h4>${product.name || product.productName}</h4>
+      <div class="mb-2">${product.description || ''}</div>
+      <div class="mb-2">價格：NT$ ${product.price || product.productPrice}</div>
+    `;
+  }
+}
+
+function showModalPhoto(idx, photos) {
+  const modalBody = document.getElementById('productModalBody');
+  if (!modalBody || !photos || idx < 0 || idx >= photos.length) return;
+  const mainPhoto = modalBody.querySelector('.modal-main-photo');
+  if (mainPhoto) mainPhoto.src = photos[idx].imageUrl;
+  // 更新指示器
+  const indicators = modalBody.querySelectorAll('.modal-photo-indicator');
+  indicators.forEach((dot, i) => dot.classList.toggle('active', i === idx));
+  // 更新索引
+  modalBody.dataset.currentModalPhotoIndex = idx;
+}
+
+function changeModalPhoto(direction, photos) {
+  const modalBody = document.getElementById('productModalBody');
+  if (!modalBody || !photos || photos.length === 0) return;
+  let idx = parseInt(modalBody.dataset.currentModalPhotoIndex) || 0;
+  idx += direction;
+  if (idx < 0) idx = photos.length - 1;
+  if (idx >= photos.length) idx = 0;
+  showModalPhoto(idx, photos);
 }
 
 // 結帳功能
 function checkout() {
-  if (cart.length === 0) {
+  // 檢查會員是否登入
+  const memberId = getMemberIdFromSession();
+  if (!memberId) {
+    showNotification('請先登入會員', 'error');
+    return;
+  }
+  
+  // 檢查購物車是否有商品
+  const cartItems = document.querySelectorAll('#cartItems .cart-item');
+  if (cartItems.length === 0) {
     showNotification('購物車是空的', 'warning');
     return;
   }
   
-  // 這裡可以導向結帳頁面或顯示結帳表單
-  showNotification('即將導向結帳頁面...', 'info');
-  
-  // 模擬結帳流程
-  setTimeout(() => {
-    // 清空購物車
-    cart = [];
-    localStorage.removeItem('shopCart');
-    updateCartDisplay();
+  // 檢查折價券使用條件
+  if (selectedCoupon) {
+    const subtotalElement = document.getElementById('subtotal');
+    const subtotalText = subtotalElement.textContent;
+    const subtotal = parseInt(subtotalText.replace(/[^0-9]/g, '')) || 0;
     
-    // 關閉購物車側邊欄
-    const cartSidebar = document.getElementById('cartSidebar');
-    if (cartSidebar) {
-      cartSidebar.classList.remove('active');
+    if (selectedCoupon.minPurchase > 0 && subtotal < selectedCoupon.minPurchase) {
+      showNotification(`訂單金額未達折價券最低消費 NT$ ${selectedCoupon.minPurchase}`, 'error');
+      return;
     }
-    
-    showNotification('訂單已成功提交！', 'success');
-  }, 2000);
+  }
+  
+  // 獲取付款方式
+  const paymentMethod = document.getElementById('paymentMethod').value === 'true';
+  
+  // 顯示結帳確認對話框
+  const paymentText = paymentMethod ? 'LINE Pay' : '現金';
+  const confirmCheckout = confirm(`確定要使用${paymentText}結帳嗎？`);
+  if (!confirmCheckout) {
+    return;
+  }
+  
+  if (paymentMethod) {
+    // 使用 LINE Pay 結帳
+    checkoutWithLinePay(memberId);
+  } else {
+    // 使用現金結帳（原本的流程）
+    checkoutWithCash(memberId);
+  }
+}
+
+// LINE Pay 結帳
+function checkoutWithLinePay(memberId) {
+  // 準備 LINE Pay 結帳數據
+  const cartTotalElement = document.getElementById('cartTotal');
+  const cartTotalText = cartTotalElement.textContent;
+  const amount = parseInt(cartTotalText.replace(/[^0-9]/g, '')) || 0;
+  
+  // 生成訂單編號
+  const orderId = 'SHOP_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  
+  const linePayData = {
+    linepayBody: {
+      amount: amount,
+      currency: "TWD",
+      orderId: orderId,
+      packages: [
+        {
+          id: "package-1",
+          amount: amount,
+          products: [
+            {
+              name: "嶼蔻商城商品",
+              quantity: 1,
+              price: amount
+            }
+          ]
+        }
+      ],
+      redirectUrls: {
+        confirmUrl: "http://localhost:8080/api/confirmpayment/" + orderId + "/false",
+        cancelUrl: "http://localhost:8080/front-end/shop"
+      }
+    },
+    linepayOrder: {
+      memberId: parseInt(memberId),
+      couponCode: selectedCoupon ? selectedCoupon.couponCode : null,
+      paymentMethod: true,
+      orderId: orderId,
+      amount: amount
+    }
+  };
+  
+  // 發送到 LINE Pay API
+  $.ajax({
+    url: '/api/linepay/false',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(linePayData),
+    success: function(response) {
+      if (response.status === 'success' && response.data) {
+        // 跳轉到 LINE Pay 付款頁面
+        window.location.href = response.data;
+      } else {
+        showNotification('LINE Pay 付款初始化失敗', 'error');
+      }
+    },
+    error: function(xhr, status, error) {
+      console.error('LINE Pay 結帳錯誤:', error);
+      showNotification('LINE Pay 結帳失敗，請稍後再試', 'error');
+    }
+  });
+}
+
+// 現金結帳（原本的流程）
+function checkoutWithCash(memberId) {
+  // 準備結帳數據
+  const checkoutData = {
+    memberId: parseInt(memberId), // 確保發送為數字類型
+    paymentMethod: false, // 現金付款
+    couponCode: selectedCoupon ? selectedCoupon.couponCode : null // 包含選擇的折價券
+  };
+  
+  // 發送到後端建立訂單
+  $.ajax({
+    url: '/shopOrd/checkout',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(checkoutData),
+    success: function(response) {
+      if (response.success) {
+        showNotification('訂單建立成功！', 'success');
+        
+        // 重新載入購物車（清空）
+        loadCartFromBackend();
+        
+        // 關閉購物車側邊欄
+        const cartSidebar = document.getElementById('cartSidebar');
+        if (cartSidebar) {
+          cartSidebar.classList.remove('active');
+        }
+        
+        // 可以選擇跳轉到訂單確認頁面或留在當前頁面
+        setTimeout(() => {
+          if (confirm('訂單建立成功！是否要查看訂單詳情？')) {
+            window.location.href = '/admin/shopOrd/select_page';
+          }
+        }, 2000);
+      } else {
+        showNotification(response.message || '訂單建立失敗', 'error');
+      }
+    },
+    error: function(xhr, status, error) {
+      console.error('結帳錯誤:', error);
+      showNotification('結帳失敗，請稍後再試', 'error');
+    }
+  });
+}
+
+// 從session獲取會員ID的輔助函數
+function getMemberIdFromSession() {
+  // 使用全局會員ID變數
+  if (currentMemberId) {
+    return currentMemberId;
+  }
+  
+  // 如果全局變數沒有，嘗試從頁面元素獲取
+  const memberIdElement = document.querySelector('input[name="memberId"]');
+  if (memberIdElement && memberIdElement.value) {
+    currentMemberId = memberIdElement.value;
+    return currentMemberId;
+  }
+  
+  // 如果都沒有找到，返回null表示需要登入
+  return null;
 }
 
 // 顯示通知訊息
@@ -539,16 +770,277 @@ function loadCartFromBackend() {
       }).join('');
     }
     $("#cartItems").html(html);
-    $("#cartTotal").text("NT$ " + total.toLocaleString());
+    
+    // 更新商品總計
+    const subtotalElement = document.getElementById('subtotal');
+    if (subtotalElement) {
+      subtotalElement.textContent = `NT$ ${total.toLocaleString()}`;
+    }
+    
+    // 更新應付金額（考慮折價券）
+    updatePriceBreakdown();
+    
     const cartIcon = document.querySelector('.cart-icon');
     if (cartIcon) {
       cartIcon.setAttribute('data-count', itemCount);
       cartIcon.classList.toggle('has-items', itemCount > 0);
     }
+    
+    // 購物車載入完成後，載入折價券
+    loadAvailableCoupons(total);
   });
 }
 
 // 頁面載入時自動載入購物車
 $(function() {
   loadCartFromBackend();
-}); 
+});
+
+// 載入可用的折價券
+function loadAvailableCoupons(cartTotal = 0) {
+  console.log('開始載入折價券...');
+  console.log('購物車總金額:', cartTotal);
+  
+  $.ajax({
+    url: '/shopOrd/api/available-coupons',
+    type: 'GET',
+    data: { cartTotal: cartTotal },
+    success: function(response) {
+      console.log('折價券API響應:', response);
+      
+      if (response.success) {
+        availableCoupons = response.coupons || [];
+        console.log('可用折價券數量:', availableCoupons.length);
+        console.log('折價券列表:', availableCoupons);
+        populateCouponSelect();
+      } else {
+        console.log('載入折價券失敗:', response.message);
+        showNotification('載入折價券失敗: ' + response.message, 'error');
+      }
+    },
+    error: function(xhr, status, error) {
+      console.error('載入折價券錯誤:', error);
+      console.error('HTTP狀態:', xhr.status);
+      console.error('響應文本:', xhr.responseText);
+      showNotification('載入折價券失敗，請檢查網路連線', 'error');
+    }
+  });
+}
+
+// 填充折價券下拉選單
+function populateCouponSelect() {
+  const couponSelect = document.getElementById('couponSelect');
+  if (!couponSelect) return;
+  
+  // 清空現有選項（保留第一個"不使用折價券"選項）
+  couponSelect.innerHTML = '<option value="">不使用折價券</option>';
+  
+  // 添加可用的折價券
+  availableCoupons.forEach(coupon => {
+    const option = document.createElement('option');
+    option.value = coupon.couponCode;
+    
+    // 顯示詳細的折價券信息
+    let couponText = `${coupon.couponName} - 折抵 NT$ ${coupon.discountValue}`;
+    if (coupon.minPurchase > 0) {
+      couponText += ` (最低消費 NT$ ${coupon.minPurchase})`;
+    }
+    
+    option.textContent = couponText;
+    option.dataset.coupon = JSON.stringify(coupon);
+    couponSelect.appendChild(option);
+  });
+}
+
+// 處理折價券選擇
+function handleCouponSelection() {
+  const couponSelect = document.getElementById('couponSelect');
+  const couponInfo = document.getElementById('couponInfo');
+  
+  if (!couponSelect || !couponInfo) return;
+  
+  const selectedValue = couponSelect.value;
+  
+  if (selectedValue === '') {
+    // 沒有選擇折價券
+    selectedCoupon = null;
+    couponInfo.style.display = 'none';
+  } else {
+    // 選擇了折價券
+    const selectedOption = couponSelect.options[couponSelect.selectedIndex];
+    selectedCoupon = JSON.parse(selectedOption.dataset.coupon);
+    
+    // 檢查最低消費
+    const subtotalElement = document.getElementById('subtotal');
+    const subtotalText = subtotalElement.textContent;
+    const subtotal = parseInt(subtotalText.replace(/[^0-9]/g, '')) || 0;
+    
+    if (selectedCoupon.minPurchase > 0 && subtotal < selectedCoupon.minPurchase) {
+      // 未達最低消費
+      couponInfo.innerHTML = `<small class="text-danger">未達最低消費 NT$ ${selectedCoupon.minPurchase}</small>`;
+      couponInfo.style.display = 'block';
+      selectedCoupon = null; // 不允許使用此折價券
+    } else {
+      // 可以使用折價券
+      couponInfo.innerHTML = `<small class="text-success">已選擇折價券</small>`;
+      couponInfo.style.display = 'block';
+    }
+  }
+  
+  // 重新計算價格
+  updatePriceBreakdown();
+}
+
+// 更新價格明細
+function updatePriceBreakdown() {
+  const subtotalElement = document.getElementById('subtotal');
+  const discountRow = document.getElementById('discountRow');
+  const discountAmount = document.getElementById('discountAmount');
+  const cartTotal = document.getElementById('cartTotal');
+  
+  if (!subtotalElement || !discountRow || !discountAmount || !cartTotal) return;
+  
+  // 獲取商品總計
+  const subtotalText = subtotalElement.textContent;
+  const subtotal = parseInt(subtotalText.replace(/[^0-9]/g, '')) || 0;
+  
+  // 計算折扣
+  let discount = 0;
+  if (selectedCoupon) {
+    discount = Math.min(selectedCoupon.discountValue, subtotal); // 折扣不能超過總金額
+  }
+  
+  // 計算應付金額
+  const total = Math.max(0, subtotal - discount);
+  
+  // 更新顯示
+  subtotalElement.textContent = `NT$ ${subtotal.toLocaleString()}`;
+  
+  if (discount > 0) {
+    discountRow.style.display = 'flex';
+    discountAmount.textContent = `-NT$ ${discount.toLocaleString()}`;
+  } else {
+    discountRow.style.display = 'none';
+  }
+  
+  cartTotal.textContent = `NT$ ${total.toLocaleString()}`;
+}
+
+// 商品照片切換功能
+function initializeProductPhotos() {
+  // 為每個商品載入照片資訊
+  const productCards = document.querySelectorAll('.product-card');
+  productCards.forEach(card => {
+    const productId = card.dataset.productId;
+    loadProductPhotos(productId, card);
+  });
+}
+
+// 載入商品照片資訊
+function loadProductPhotos(productId, card) {
+  $.ajax({
+    url: `/front-end/shop/product-photos/${productId}`,
+    type: 'GET',
+    success: function(photos) {
+      if (photos && photos.length > 1) {
+        // 只有當商品有多張照片時才顯示切換功能
+        productPhotos[productId] = photos;
+        setupPhotoNavigation(card, productId, photos);
+      }
+    },
+    error: function(xhr, status, error) {
+      console.log(`載入商品 ${productId} 的照片失敗:`, error);
+    }
+  });
+}
+
+// 設置照片切換功能
+function setupPhotoNavigation(card, productId, photos) {
+  const navigation = card.querySelector('.photo-navigation');
+  const indicators = card.querySelector('.photo-indicators');
+  const image = card.querySelector('.product-main-image');
+  const prevBtn = card.querySelector('.photo-prev');
+  const nextBtn = card.querySelector('.photo-next');
+  
+  if (navigation && indicators && image) {
+    // 顯示切換箭頭
+    navigation.style.display = 'flex';
+    
+    // 綁定箭頭按鈕事件
+    if (prevBtn) {
+      prevBtn.onclick = () => changeProductPhoto(prevBtn, -1);
+    }
+    if (nextBtn) {
+      nextBtn.onclick = () => changeProductPhoto(nextBtn, 1);
+    }
+    
+    // 創建指示器
+    photos.forEach((photo, index) => {
+      const indicator = document.createElement('div');
+      indicator.className = `photo-indicator ${index === 0 ? 'active' : ''}`;
+      indicator.onclick = () => showProductPhoto(card, productId, index);
+      indicators.appendChild(indicator);
+    });
+    
+    // 顯示指示器
+    indicators.style.display = 'flex';
+    
+    // 設置當前照片索引
+    card.dataset.currentPhotoIndex = '0';
+  }
+}
+
+// 切換商品照片
+function changeProductPhoto(button, direction) {
+  const card = button.closest('.product-card');
+  const productId = card.dataset.productId;
+  const photos = productPhotos[productId];
+  
+  if (!photos) return;
+  
+  let currentIndex = parseInt(card.dataset.currentPhotoIndex) || 0;
+  let newIndex = currentIndex + direction;
+  
+  // 循環切換
+  if (newIndex < 0) {
+    newIndex = photos.length - 1;
+  } else if (newIndex >= photos.length) {
+    newIndex = 0;
+  }
+  
+  showProductPhoto(card, productId, newIndex);
+}
+
+// 顯示指定索引的照片
+function showProductPhoto(card, productId, photoIndex) {
+  const photos = productPhotos[productId];
+  if (!photos || photoIndex < 0 || photoIndex >= photos.length) return;
+  
+  const image = card.querySelector('.product-main-image');
+  const indicators = card.querySelectorAll('.photo-indicator');
+  const prevBtn = card.querySelector('.photo-prev');
+  const nextBtn = card.querySelector('.photo-next');
+  
+  // 添加過渡效果
+  image.classList.add('transitioning');
+  
+  // 更新圖片
+  image.src = photos[photoIndex].imageUrl;
+  
+  // 圖片載入完成後移除過渡效果
+  image.onload = function() {
+    image.classList.remove('transitioning');
+  };
+  
+  // 更新指示器
+  indicators.forEach((indicator, index) => {
+    indicator.classList.toggle('active', index === photoIndex);
+  });
+  
+  // 更新當前索引
+  card.dataset.currentPhotoIndex = photoIndex;
+  
+  // 更新箭頭狀態
+  if (prevBtn) prevBtn.disabled = photos.length <= 1;
+  if (nextBtn) nextBtn.disabled = photos.length <= 1;
+} 

@@ -31,12 +31,12 @@ public class RoomTypeScheduleVO {
 	
 	@Column(name = "room_amount")
 	@NotNull(message="房間數量: 請勿空白", groups = Save.class)
-	@DecimalMin(value = "1", message = "房型數量: 不能小於{value}", groups = Save.class)
+	@DecimalMin(value = "0", message = "房型數量: 不能小於{value}", groups = Save.class)
 	@DecimalMax(value = "1000", message = "房型數量: 不能超過{value}", groups = Save.class)
 	private Integer roomAmount;
 	
 	@Column(name = "room_rsv_booked")
-	@DecimalMin(value = "1", message = "房型數量: 不能小於{value}", groups = Save.class)
+	@DecimalMin(value = "0", message = "房型數量: 不能小於{value}", groups = Save.class)
 	@DecimalMax(value = "1000", message = "房型數量: 不能超過{value}", groups = Save.class)
 	@NotNull(message="已訂房間數量: 請勿空白")
 	private Integer roomRSVBooked;
@@ -73,5 +73,8 @@ public class RoomTypeScheduleVO {
 	}
 	public void setRoomOrderDate(Date roomOrderDate) {
 		this.roomOrderDate = roomOrderDate;
+	}
+	public RoomTypeScheduleVO() {
+//		this.roomRSVBooked = 0;
 	}
 }

@@ -61,7 +61,10 @@ public class RoomTypeScheduleCriteriaHelper {
 
 		// 組裝查詢條件，都設進where
 		cq.where(predicateList.toArray(new Predicate[0]));
-		cq.orderBy(cb.asc(root.get("roomTypeScheduleId"))); // 可以改為其他欄位排序
+		cq.orderBy(
+			    cb.asc(root.get("roomOrderDate")),
+			    cb.asc(root.get("roomTypeVO").get("roomTypeId"))
+			);
 
 		return em.createQuery(cq).getResultList();
 	}

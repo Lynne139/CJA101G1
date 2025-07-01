@@ -1,6 +1,7 @@
 package com.prodCart.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.util.*;
@@ -72,7 +74,7 @@ public class ProdCartController {
 	
 	@GetMapping("listAllProdCartByMemberId")
 	public String listAllProdCartByMemberId(@RequestParam("memberId") Integer memberId, Model model) {
-	    List<ProdCartVO> list = prodCartSvc.getCartByMemberId(memberId);
+	    List<ProdCartVO> list = prodCartSvc.getProdCartByMemberId(memberId);
 	    model.addAttribute("prodCartListData", list);
 	    model.addAttribute("memberId", memberId);
 	    return "admin/fragments/shop/prodCart/listAllProdCart";
@@ -262,5 +264,39 @@ public class ProdCartController {
 		model.addAttribute("prodListData", prodSvc.getAll());
 		model.addAttribute("memberListData", memberSvc.getAll());
 		return "admin/fragments/shop/prodCart/addProdCart";
+	}
+
+	@GetMapping("/api/member-cart")
+	@ResponseBody
+	public List<ProdCartVO> getMemberCart(HttpSession session) {
+		com.member.model.MemberVO member = (com.member.model.MemberVO) session.getAttribute("memberVO");
+		if (member == null) return Collections.emptyList();
+		return prodCartSvc.getProdCartByMemberId(member.getMemberId());
+	}
+
+	@PostMapping("/front/add")
+	public String addProdCartFront(
+		@RequestParam("productId") Integer productId,
+		@RequestParam("quantity") Integer quantity,
+		HttpSession session
+	) {
+		com.member.model.MemberVO member = (com.member.model.MemberVO) session.getAttribute("memberVO");
+		if (member == null) {
+			// 未登入，導向登入頁
+			return "redirect:/login";
+		}
+		ProdCartVO cart = new ProdCartVO();
+		ProdMemberIdVO pmid = new ProdMemberIdVO();
+		pmid.setMemberId(member.getMemberId());
+		pmid.setProductId(productId);
+		cart.setPmid(pmid);
+		cart.setMemberVO(member);
+		ProdVO prod = new ProdVO();
+		prod.setProductId(productId);
+		cart.setProdVO(prod);
+		cart.setQuantity(quantity);
+		prodCartSvc.addProdCart(cart);
+		// 回到商城首頁或購物車頁
+		return "redirect:/front-end/shop";
 	}
 }

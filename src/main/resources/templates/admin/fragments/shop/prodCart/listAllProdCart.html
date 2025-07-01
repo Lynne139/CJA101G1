@@ -25,7 +25,16 @@
                         <div class="panel">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h3 class="panel-title">購物車列表</h3>
-                                <span class="text-muted">共 <span th:text="${prodCartListData.size()}"></span> 項購物車資料</span>
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="text-muted">共 <span th:text="${prodCartListData.size()}"></span> 項購物車資料</span>
+                                    <!-- 結帳按鈕 -->
+                                    <button type="button" class="btn btn-success" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#checkoutModal"
+                                            th:if="${!prodCartListData.isEmpty()}">
+                                        <i class="fas fa-shopping-cart"></i> 結帳
+                                    </button>
+                                </div>
                             </div>
                             <div class="table-responsive">
                                 <!-- 載入動畫 -->
@@ -50,7 +59,7 @@
                                         </thead>
                                         <tbody>
                                             <tr th:each="prodCartVO : ${prodCartListData}">
-                                                <td style="text-align: center;" th:text="${prodCartVO.memberVO.memberId}"></td>
+                                                <td style="text-align: center;" th:text="${prodCartVO.memberVO.memberId} + ' - ' + ${prodCartVO.memberVO.memberName}"></td>
                                                 <td style="text-align: center;" th:text="${prodCartVO.prodVO.productId}"></td>
                                                 <td style="text-align: center;" th:text="${prodCartVO.quantity}"></td>
                                                 
@@ -84,6 +93,78 @@
                     </div>
                 </div>
             </main>
+        </div>
+    </div>
+
+    <!-- 結帳 Modal -->
+    <div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="checkoutModalLabel">
+                        <i class="fas fa-shopping-cart"></i> 結帳
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post" th:action="@{/shopOrd/checkout}">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="memberId" class="form-label">會員編號 <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="memberId" name="memberId" required>
+                                        <option value="">請選擇會員</option>
+                                        <option th:each="member : ${memberListData}" 
+                                                th:value="${member.memberId}"
+                                                th:text="${member.memberId + ' - ' + member.memberName}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="couponCode" class="form-label">折價券代碼</label>
+                                    <input type="text" class="form-control" id="couponCode" name="couponCode" 
+                                           placeholder="請輸入折價券代碼（選填）">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">付款方式 <span class="text-danger">*</span></label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="paymentMethod1" value="true" checked>
+                                <label class="form-check-label" for="paymentMethod1">
+                                    <i class="fas fa-credit-card"></i> 信用卡
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="paymentMethod2" value="false">
+                                <label class="form-check-label" for="paymentMethod2">
+                                    <i class="fas fa-money-bill-wave"></i> 現金
+                                </label>
+                            </div>
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>結帳說明：</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>結帳後會自動建立訂單並清空購物車</li>
+                                <li>系統會自動計算商品總金額</li>
+                                <li>如有使用折價券，會自動套用折扣</li>
+                                <li>訂單狀態預設為「已付款」</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i> 取消
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check"></i> 確認結帳
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 

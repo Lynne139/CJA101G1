@@ -26,7 +26,7 @@
                             <h2 class="panel-title">商品資料</h2>
                             <span class="text-muted">所有欄位皆為必填</span>
                         </div>
-                        <form th:action="@{/prod/update}" method="post" th:object="${prodVO}" enctype="multipart/form-data" id="editProdForm">
+                        <form th:action="@{/shopOrd/update}" method="post" th:object="${shopOrdVO}" enctype="multipart/form-data" id="editShopOrdForm">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">商城訂單編號</label>
@@ -42,7 +42,7 @@
                                     <label class="form-label">付款方式</label>
                                     <select th:field="*{payMethod}" class="form-select">
                                         <option th:value="true">現金</option>
-                                        <option th:value="false">信用卡</option>
+                                        <option th:value="false">LinePay</option>
                                     </select>
                                     <span th:if="${#fields.hasErrors('payMethod')}" th:errors="*{payMethod}" class="text-danger small" id="payMethod.errors"></span>
                                 </div>
@@ -58,10 +58,23 @@
                                 </div>
                                 
                                 <div class="col-md-6">
-                                    <label class="form-label">折價卷編號</label>
-                                    <select th:field="*{couponVO.couponCode}" class="form-select">
-                                        <option th:each="couponVO : ${couponVO.couponCode}" th:value="${couponVO.couponCode}" th:text="${couponVO.couponCode + ' - ' + couponVO.couponName}"></option>
+                                    <label class="form-label">折價券</label>
+                                    <select th:field="*{coupon.couponCode}" class="form-select" id="couponSelect">
+                                        <option value="">（不使用折價券）</option>
+                                        <option th:each="coupon,stat : ${couponListData}" th:value="${coupon.couponCode}" th:text="${coupon.couponCode + ' - ' + coupon.couponName}"></option>
                                     </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">折扣金額</label>
+                                    <input type="number" th:field="*{discountAmount}" class="form-control" id="discountAmountInput" readonly />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">實際支付金額</label>
+                                    <input type="number" th:field="*{actualPaymentAmount}" class="form-control" id="actualPaymentAmountInput" readonly />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">訂單總金額</label>
+                                    <input type="number" th:field="*{prodAmount}" class="form-control" id="prodAmountInput" readonly />
                                 </div>
                             </div>
                             
@@ -85,7 +98,7 @@
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     
-    <script type="text/javascript">
+    <script th:inline="javascript">
     //清除提示信息
     function hideContent(d) {
          var el = document.getElementById(d);
@@ -94,14 +107,14 @@
     
     // 處理 Modal 中的表單提交
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('editProdForm');
+        const form = document.getElementById('editShopOrdForm');
         if (form) {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
                 const formData = new FormData(form);
                 
-                fetch('/prod/update', {
+                fetch('/shopOrd/update', {
                     method: 'POST',
                     body: formData
                 })
@@ -128,6 +141,27 @@
             });
         }
     });
+
+    // 折價券選擇自動帶出折扣金額與計算實際金額
+    var couponSelect = document.getElementById('couponSelect');
+    var discountInput = document.getElementById('discountAmountInput');
+    var prodAmountInput = document.getElementById('prodAmountInput');
+    var actualAmountInput = document.getElementById('actualPaymentAmountInput');
+    var couponMap = /*[[${couponMap}]]*/ {};
+    function updateDiscountAndActual() {
+        var code = couponSelect.value;
+        var prodAmount = parseInt(prodAmountInput ? prodAmountInput.value : 0) || 0;
+        var discount = 0;
+        if (code && couponMap[String(code)]) {
+            discount = Math.min(couponMap[String(code)], prodAmount);
+        }
+        discountInput.value = discount;
+        if (actualAmountInput) actualAmountInput.value = prodAmount - discount;
+    }
+    if (couponSelect) {
+        couponSelect.addEventListener('change', updateDiscountAndActual);
+    }
+    updateDiscountAndActual();
     </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 package com.roomtypeschedule.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -11,8 +12,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.roomtype.model.RoomTypeService;
+import com.roomtype.model.RoomTypeVO;
 import com.roomtypeschedule.model.RoomTypeScheduleService;
 import com.roomtypeschedule.model.RoomTypeScheduleVO;
 
@@ -89,5 +94,36 @@ public class RoomTypeScheduleController {
 		model.addAttribute("mainFragment", "admin/fragments/room/listAllRoomTypeSchedule");
 		return "admin/index_admin";
 
+	}
+	
+//	@GetMapping("/roomTypeSchedule/init")
+//	public String initializeRoomTypeSchedules(@RequestParam Integer roomTypeId, Model model) {
+//	    RoomTypeVO roomType = roomTypeSvc.getOneRoomType(roomTypeId);
+//
+//	    LocalDate startDate = LocalDate.now();
+//	    LocalDate endDate = startDate.plusMonths(6);
+//
+//	    roomTypeScheduleSvc.initializeOrUpdateRoomTypeSchedule(roomType, startDate, endDate);
+//
+//	    model.addAttribute("message", "成功初始化未來半年資料");
+//	    return "redirect:/admin/roomType/list";
+//	}
+	
+	@GetMapping("/listAllRoomTypeSchedule/initAll")
+	@ResponseBody
+	public String initializeAllRoomTypeSchedules(RedirectAttributes ra, Model model) {
+	    List<RoomTypeVO> roomTypes = roomTypeSvc.getAll();
+
+	    LocalDate startDate = LocalDate.now();
+	    LocalDate endDate = startDate.plusMonths(1);
+
+	    for (RoomTypeVO roomType : roomTypes) {
+	        roomTypeScheduleSvc.initializeOrUpdateRoomTypeSchedule(roomType, startDate, endDate);
+	    }
+
+	    ra.addFlashAttribute("success", "已為所有房型批次產生未來 1 個月排程！");
+	    model.addAttribute("mainFragment", "admin/fragments/room/listAllRoomTypeSchedule");
+		return "admin/index_admin";
+//	    return "redirect:/admin/roomType/list";
 	}
 }

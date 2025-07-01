@@ -11,9 +11,9 @@ import jakarta.servlet.http.HttpServletRequest;
 public class CouponPageController {
 
 	// 顯示查詢折價券頁面
-	@GetMapping("/coupon/select")
+	@GetMapping("/coupon/select_page")
     public String couponSelectPage(HttpServletRequest request, Model model) {
-        model.addAttribute("mainFragment", "admin/fragments/coupon/coupon-select-page");
+        model.addAttribute("mainFragment", "admin/fragments/coupon/select_page");
         model.addAttribute("currentURI", request.getRequestURI());
         return "admin/index_admin";
     }
@@ -21,7 +21,7 @@ public class CouponPageController {
 	// 顯示新增折價券頁面
     @GetMapping("/coupon/add")
     public String couponAddPage(HttpServletRequest request, Model model) {
-        model.addAttribute("mainFragment", "admin/fragments/coupon/add-coupon");
+        model.addAttribute("mainFragment", "admin/fragments/coupon/addCoupon");
         model.addAttribute("currentURI", request.getRequestURI());
         return "admin/index_admin";
     }
@@ -30,7 +30,7 @@ public class CouponPageController {
     @GetMapping("/coupon/update/{couponCode}")
     public String couponUpdatePage(@PathVariable String couponCode, HttpServletRequest request, Model model) {
         model.addAttribute("couponCode", couponCode); // 把 couponcode 傳給前端 JS 用
-        model.addAttribute("mainFragment", "admin/fragments/coupon/update-coupon");
+        model.addAttribute("mainFragment", "admin/fragments/coupon/updateCoupon");
         model.addAttribute("currentURI", request.getRequestURI());
         return "admin/index_admin";
     }

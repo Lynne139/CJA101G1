@@ -29,6 +29,7 @@ public class CouponController {
         Optional<Coupon> coupon = couponService.getCouponByCode(couponCode);
         return coupon.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+        // 註：傳給前端時，預設 Jackson 會把 enum 的名稱變成字串來傳 e.g."ROOM_ONLY"
     }
 
     // 2. 依 couponName 查詢
@@ -71,12 +72,12 @@ public class CouponController {
         }
     }
 
-    // 6. 查詢可領且尚未領取過的優惠券
+    // 6. 讓會員查詢可領且尚未領取過的優惠券
     @GetMapping("/claimable")
     public ResponseEntity<List<Coupon>> getClaimableCouponsForMember(
             @RequestParam OrderType orderType,
             @RequestParam Integer memberId,
-            @RequestParam int memberPoints) {
+            @RequestParam Integer memberPoints) {
         List<Coupon> coupons = couponService.getClaimableCouponsForMember(orderType, memberId, memberPoints);
         return ResponseEntity.ok(coupons);
     }

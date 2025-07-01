@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>風格房型 - Maison d’Yuko</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+<link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+<link rel="stylesheet" th:href="@{/css/admin/layout/form_modal.css}">
+<link rel="stylesheet" th:href="@{/css/room/roomtypes.css}">
+</head>
+<body>
+
+	<!-- Header -->
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<section class="rooms-section py-5">
+		<div class="container rooms-container">
+			<div class="rooms-info mb-4">
+				<h3 class="rooms-en-title">ROOMS</h3>
+				<h2 class="rooms-title">風格房型</h2>
+				<p class="rooms-desc mt-4">無論獨旅放鬆、雙人浪漫，還是親子同樂，嶼蔻都精心為您準備好了完美空間！</p>
+			</div>
+
+			<div class="d-flex flex-column gap-4">
+				<div class="card roomtype-card shadow p-4 rounded-4 mb-4"
+					th:each="roomType : ${roomTypes}">
+					<div class="row g-3 flex-row-reverse align-items-center">
+						<div class="col-md-6">
+							<img th:src="@{/roomtypes/img/{id}(id=${roomType.roomTypeId})}"
+								class="img-fluid rounded-4 hover-zoom" alt="房型圖片"
+								style="object-fit: cover; width: 100%; height: 300px;">
+						</div>
+						<div class="col-md-6">
+							<h4 class="mb-3" th:text="${roomType.roomTypeName}">房型名稱</h4>
+							<p class="mb-2" th:text="${roomType.roomTypeContent}">房型介紹</p>
+							<p class="mb-2">
+								<i class="fas fa-tag me-2" style="color: #7E4E24;"></i> <strong>價格：</strong>
+								NT$ <span th:text="${roomType.roomTypePrice}">3000</span>
+							</p>
+							<!-- 							<p class="mb-4"> -->
+							<!-- 								<i class="fas fa-bed me-2" style="color: #7E4E24;"></i> <strong>可售房間數：</strong> -->
+							<!-- 								<span th:text="${roomType.roomTypeAmount}">5</span> -->
+							<!-- 							</p> -->
+							<button
+								class="btn btn-outline-brown d-inline-flex align-items-center gap-2"
+								style="border-color: #7E4E24; color: #7E4E24;"
+								th:attr="data-id=${roomType.roomTypeId},
+							             data-name=${roomType.roomTypeName},
+							             data-price=${roomType.roomTypePrice},
+							             data-content=${roomType.roomTypeContent},
+							             data-img=@{'/roomtypes/img/' + ${roomType.roomTypeId}}"
+								onclick="showRoomTypeModal(this)">
+								<i class="fas fa-info-circle"></i> 查看詳情
+							</button>
+							<a th:href="@{'/roomtype/' + ${roomType.roomTypeId}+'/calendar'}"
+								class="btn btn-outline-brown d-inline-flex align-items-center gap-2"
+								style="border-color: #7E4E24; color: #7E4E24;"> <i
+								class="fas fa-calendar-check"></i> 立即訂房
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 無資料提示 -->
+			<div th:if="${#lists.isEmpty(roomTypes)}" class="text-center py-5">
+				<i class="fas fa-bed fa-3x text-muted mb-3"></i>
+				<h4 class="text-muted">目前沒有可預訂的房型</h4>
+			</div>
+		</div>
+	</section>
+
+	<div class="modal fade" id="roomTypeModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-scrollable">
+			<div class="modal-content rounded-4 p-4"
+				style="background-color: #fdf6ee;">
+
+				<!-- Modal標題與關閉按鈕 -->
+				<div
+					class="modal-header d-flex justify-content-between align-items-center mb-2 mt-2 px-3">
+					<h5 class="modal-title">房型資訊</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+
+				<!-- Modal內容 -->
+				<div class="modal-body">
+					<h6
+						class="modal_sub_title d-flex justify-content-start align-items-center gap-2">
+						房型名稱 <span id="modalRoomTypeName"></span>
+					</h6>
+
+					<div class="modal_section">
+						<div>
+							<img id="modalRoomTypeImg" alt="房型圖片"
+								class="roomType_img img-fluid mb-4 d-block mx-auto"
+								onerror="this.src='/images/admin/no_img.svg';">
+						</div>
+						<div class="modal_detail d-flex flex-column align-items-start">
+							<p>
+								<strong>價格：</strong> NT$ <span id="modalRoomTypePrice"></span>
+							</p>
+							<p>
+								<strong>房型介紹：</strong>
+							</p>
+							<div id="modalRoomTypeContent"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Footer -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script th:src="@{/js/room/roomCards.js}"></script>
+</body>
+</html>

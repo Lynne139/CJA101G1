@@ -1,0 +1,21 @@
+
+/* 基本 spinner */
+.spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+/* loading 狀態按鈕 */
+.btn.loading {
+  cursor: not-allowed;
+  opacity: 0.7;
+  pointer-events: none;
+}
+

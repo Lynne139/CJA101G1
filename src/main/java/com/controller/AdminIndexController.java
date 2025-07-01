@@ -1,6 +1,8 @@
 package com.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,13 +11,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.member.model.MemberVO;
 import com.member.model.MemberService;
 import com.resto.model.RestoService;
 import com.resto.model.RestoVO;
+
+import com.coupon.entity.Coupon;
+import com.coupon.service.CouponService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.prod.model.ProdService;
 import com.prodCate.model.ProdCateService;
 import com.prodCate.model.ProdCateVO;
@@ -39,36 +47,50 @@ import com.news.service.NewsService;
 import com.news.entity.HotNews;
 import com.news.entity.News;
 import com.news.entity.PromotionNews;
-
 import com.employee.service.EmployeeService;
 import com.employee.entity.Employee;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import com.resto.dto.RestoDTO;
+import com.resto.entity.PeriodVO;
+import com.resto.entity.RestoVO;
+import com.resto.entity.TimeslotVO;
+import com.resto.model.PeriodService;
+import com.resto.model.RestoService;
+import com.resto.model.TimeslotService;
+import com.roomOrder.model.RoomOrder;
+import com.roomOrder.model.RoomOrderService;
+import com.shopOrd.model.ShopOrdService;
+import com.shopOrd.model.ShopOrdVO;
+import com.shopOrdDet.model.ShopOrdDetService;
+
 
 @Controller
 @RequestMapping("/admin")
 public class AdminIndexController {
 	
 	@Autowired
-    MemberService memberSvc;
-
-	@Autowired
 	RestoService restoService;
-
+	@Autowired
+	PeriodService periodService;
+	@Autowired
+	TimeslotService timeslotService;
+	
 	@Autowired
 	ProdService prodSvc;
-
+	
 	@Autowired
 	ProdCateService prodCateSvc;
-
-
+	
 	@Autowired
 	ProdPhotoService prodPhotoSvc;
 	
 	@Autowired
 	ProdCartService prodCartSvc;
+	
+	@Autowired
+	MemberService memberSvc;
 	
 	@Autowired
 	ShopOrdService shopOrdSvc;
@@ -78,16 +100,11 @@ public class AdminIndexController {
 	
 	@Autowired
 	ShopOrdDetService shopOrdDetSvc;
-
-	@Autowired
-	RoomTypeService roomTypeService;
-
-	@Autowired
-	RoomService roomService;
-
-	@Autowired
-	RoomTypeScheduleService roomTypeScheduleService;
 	
+	@Autowired
+	RoomOrderService roomOrderService;
+	
+
     @Autowired
     private RoomOrderService roomOrderService;
 
@@ -116,14 +133,17 @@ public class AdminIndexController {
     } 
 	
     
-    // === 會員管理 ===
-    @GetMapping("/member1")
-    public String member1(HttpServletRequest request,Model model) {
-    	String mainFragment = "admin/fragments/member/member1";
+ // === 會員查詢 ===
+    @GetMapping("/select_page")
+    public String showSelectPage(HttpServletRequest request,Model model) {
+    	String mainFragment = "admin/fragments/member/select_page";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
     	addPermissionInfo(request, model);
     	
+    	List<MemberVO> list = memberSvc.getAll();
+        model.addAttribute("memberListData", list);
+        
     	return "admin/index_admin";
     } 
     // === 會員列表 ===
@@ -140,6 +160,7 @@ public class AdminIndexController {
     	return "admin/index_admin";
     } 
     
+
     // === 新增會員 ===
     @GetMapping("/addMember")
     public String addMember(HttpServletRequest request, Model model) {
@@ -151,8 +172,8 @@ public class AdminIndexController {
     	return "admin/index_admin";
     } 
     
+
     // === 員工管理 ===
-    // === 新增 ===
     @GetMapping("/staff1")
     public String staff1(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/staff/staff1";
@@ -182,6 +203,7 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
     }
+
     
     // === 房間管理 ===
     @GetMapping("/room1")
@@ -192,8 +214,10 @@ public class AdminIndexController {
     	addPermissionInfo(request, model);
 
     	return "admin/index_admin";
+
     } 
-     
+
+
 
 	//===住宿訂單管理===
 	@GetMapping("/roomo_info")
@@ -223,25 +247,70 @@ public class AdminIndexController {
     	
     	// 複合查詢 + Datatables
     	Map<String, String[]> paramMap = request.getParameterMap();
-        List<RestoVO> restoList = restoService.compositeQuery(paramMap);
+        List<RestoDTO> restoList = restoService.compositeQueryAsDTO(paramMap);
     	model.addAttribute("restoList", restoList);
+    	
+    	// 給下拉選單用的isEnabled
+    	 Map<String, String> isEnabledOptions = new LinkedHashMap<>();
+         isEnabledOptions.put("", "--- 所有狀態 ---"); // 空字串代表不篩選
+         isEnabledOptions.put("true", "上架");
+         isEnabledOptions.put("false", "下架");
+         model.addAttribute("isEnabledOptions", isEnabledOptions);
     	
     	// 讓複合查詢欄位保持原值（用於 th:selected / th:value）
         for (String key : paramMap.keySet()) {
             model.addAttribute(key, paramMap.get(key)[0]);
         }
 
-    	return "admin/index_admin";
-    } 
-    @GetMapping("/resto_timeslot")
-    public String restoTimeslot(HttpServletRequest request, Model model) {
-    	String mainFragment = "admin/fragments/resto/restoTimeslot";
+    	return "admin/index_admin";  
+
+    	@GetMapping("/resto_timeslot")
+    	public String restoTimeslot(HttpServletRequest request,
+    								@RequestParam(value = "restoId", required = false) Integer restoId,
+    								Model model
+    	) {
+    		
+		// 把所有餐廳都傳給下拉選單使用
+        List<RestoVO> restoList = restoService.getAll();
+        model.addAttribute("restoList", restoList);
+
+        // 若選定某餐廳，才撈出該餐廳的區段與時段
+        if (restoId != null) {
+        	// 把選到的餐廳的詳細資訊放進 model 以顯示餐廳名稱
+            RestoVO selectedResto = restoService.getById(restoId);
+            model.addAttribute("selectedResto", selectedResto);
+            model.addAttribute("selectedRestoId", restoId);
+            
+         // 該餐廳的所有區段（period）與時段（timeslot）
+            List<PeriodVO> periodList = periodService.getPeriodsByRestoId(restoId);
+            List<TimeslotVO> timeslotList = timeslotService.getTimeslotsByRestoId(restoId);
+            model.addAttribute("periodList", periodList);
+            model.addAttribute("timeslotList", timeslotList);
+            
+            // 判斷區段有無綁定任何timeslot的period
+            Map<Integer, Boolean> deletableMap = new HashMap<>();
+            for (PeriodVO period : periodList) {
+                boolean hasTimeslot = timeslotList.stream()
+                    .anyMatch(ts -> ts.getPeriodVO() != null && ts.getPeriodVO().getPeriodId().equals(period.getPeriodId()));
+                deletableMap.put(period.getPeriodId(), !hasTimeslot);
+            }
+            model.addAttribute("deletableMap", deletableMap);
+        } else {
+        	// 若沒選餐廳，仍補空值避免渲染錯誤
+            model.addAttribute("selectedResto", null);
+            model.addAttribute("periodList", new ArrayList<>());
+            model.addAttribute("timeslotList", new ArrayList<>());
+        }
+        
+        String mainFragment = "admin/fragments/resto/restoTimeslot";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
-    	addPermissionInfo(request, model);
-
-    	return "admin/index_admin";
+        return "admin/index_admin";
+        
     } 
+    	
+
+    	
     @GetMapping("/resto_order")
     public String restoOrder(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/resto/restoOrder";
@@ -253,7 +322,6 @@ public class AdminIndexController {
     } 
     
     // === 商店管理 ===
-
     @GetMapping("/prod/select_page")
     public String prod(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/shop/prod/select_page";
@@ -483,6 +551,41 @@ public class AdminIndexController {
     	return "admin/index_admin";
     }
     
+    @GetMapping("/shopOrd/addShopOrd")
+    public String addShopOrd(HttpServletRequest request, Model model) {
+    	String mainFragment = "admin/fragments/shop/shopOrd/addShopOrd";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	// 添加訂單資料到 model 中
+    	model.addAttribute("shopOrdVO", new com.shopOrd.model.ShopOrdVO());
+    	
+    	// 從session獲取當前登入的會員資訊
+    	MemberVO memberVO = (MemberVO) request.getSession().getAttribute("memberVO");
+    	if (memberVO != null) {
+    		Integer memberId = memberVO.getMemberId();
+    		int memberPoints = memberVO.getMemberPoints() != null ? memberVO.getMemberPoints() : 0;
+    		
+    		// 查詢商城專用和通用優惠券
+    		List<Coupon> prodOnlyCoupons = couponSvc.getClaimableCouponsForMember(
+    			com.coupon.enums.OrderType.PROD_ONLY, memberId, memberPoints);
+    		List<Coupon> roomAndProdCoupons = couponSvc.getClaimableCouponsForMember(
+    			com.coupon.enums.OrderType.ROOM_AND_PROD, memberId, memberPoints);
+    		
+    		// 合併兩種類型的優惠券
+    		List<Coupon> allCoupons = new ArrayList<>();
+    		allCoupons.addAll(prodOnlyCoupons);
+    		allCoupons.addAll(roomAndProdCoupons);
+    		
+    		model.addAttribute("couponListData", allCoupons);
+    	} else {
+    		// 如果沒有登入會員，返回空列表
+    		model.addAttribute("couponListData", new ArrayList<>());
+    	}
+    	
+    	return "admin/index_admin";
+    }
+    
     @GetMapping("/shopOrdDet/select_page")
     public String shop6(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/shop/shopOrdDet/select_page";
@@ -529,8 +632,9 @@ public class AdminIndexController {
     
     // === 優惠管理 ===
     @GetMapping("/coupon/select")
-    public String couponSelectPage(HttpServletRequest request, Model model) {
-    	String mainFragment = "admin/fragments/coupon/coupon_select";
+    public String couponSelectPage(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/coupon/admin-select-coupon";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
     	addPermissionInfo(request, model);
@@ -550,7 +654,6 @@ public class AdminIndexController {
     }
     
     // === 消息管理 ===
-    // === 最新消息 ===
     @GetMapping("/news1")
     public String news1(HttpServletRequest request, Model model) {
     	String mainFragment = "admin/fragments/news/news1";
@@ -621,4 +724,7 @@ public class AdminIndexController {
         }
         */
     }
+    	return "admin/index_admin";
+    } 
+	
 }
