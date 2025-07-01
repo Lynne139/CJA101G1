@@ -1,21 +1,20 @@
 package com.roomOrder.controller;
 
 import com.member.model.MemberVO;
-//import com.room.model.RoomVO;
 import com.roomOrder.model.RoomOrder;
 import com.roomOList.model.RoomOList;
 import com.roomOList.model.RoomOListService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.*;
 
+import com.roomtypeschedule.model.RoomTypeScheduleService;
+import com.roomtypeschedule.model.RoomTypeScheduleVO;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -43,13 +42,60 @@ public class RoomOrderController {
 	@Autowired
 	private MemberCouponService memberCouponService;
 
+	@Autowired
+	private RoomTypeScheduleService roomScheduleService;
+
 	// ===== 新增 =====
 
 	@GetMapping("/roomo_info/add")
 	public String showAddModal(Model model) {
 		model.addAttribute("roomOrder", new RoomOrder());
 		model.addAttribute("roomTypeList", roomTypeService.getAll()); // 加這行
+
 		return "admin/fragments/roomo/modals/roomo_add :: addModalContent";
+	}
+
+	@GetMapping("/roomo_info/check_schedule")
+	@ResponseBody
+	public Map<String, Object> checkRoomAvailability(@RequestParam("roomTypeId") Integer roomTypeId,
+			@RequestParam("checkInDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date checkInDate,
+			@RequestParam("checkOutDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date checkOutDate) {
+
+		Map<String, Object> result = new HashMap<>();
+
+		RoomTypeVO roomTypeVO = roomTypeService.getOneRoomType(roomTypeId);
+		int totalRooms = roomTypeVO.getRoomTypeAmount();
+
+		List<String> fullyBookedDates = new ArrayList<>();
+
+		LocalDate start = checkInDate.toLocalDate();
+		LocalDate end = checkOutDate.toLocalDate();
+
+		while (!start.isAfter(end.minusDays(1))) {
+			Date currentDate = Date.valueOf(start);
+			Optional<RoomTypeScheduleVO> optional = roomScheduleService
+					.getByRoomTypeVO_RoomTypeIdAndRoomOrderDate(roomTypeId, currentDate);
+
+			int booked = optional.map(RoomTypeScheduleVO::getRoomRSVBooked).orElse(0);
+			int remaining = totalRooms - booked;
+
+			if (remaining <= 0) {
+				fullyBookedDates.add(currentDate.toString());
+			}
+
+			start = start.plusDays(1);
+		}
+
+		if (!fullyBookedDates.isEmpty()) {
+			result.put("available", false);
+			result.put("message", "以下日期已滿房，請重新選擇其他日期");
+			result.put("unavailableDates", fullyBookedDates);
+		} else {
+			result.put("available", true);
+			result.put("message", "選定區間內皆有空房");
+		}
+
+		return result;
 	}
 
 	// ===== 修改 =====
@@ -98,11 +144,13 @@ public class RoomOrderController {
 				if (old != null) {
 					detail.setCreateDate(old.getCreateDate());
 				} else {
-					detail.setCreateDate(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date()));
+					detail.setCreateDate(
+							new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date()));
 				}
 			} else {
 				// 新增明細，設現在時間
-				detail.setCreateDate(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date()));
+				detail.setCreateDate(
+						new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date()));
 			}
 
 			// 其他欄位
@@ -114,13 +162,16 @@ public class RoomOrderController {
 			detail.setRoomType(roomType);
 
 			String roomAmountStr = request.getParameter("orderDetails[" + i + "].roomAmount");
-			detail.setRoomAmount((roomAmountStr != null && !roomAmountStr.isEmpty()) ? Integer.valueOf(roomAmountStr) : 0);
+			detail.setRoomAmount(
+					(roomAmountStr != null && !roomAmountStr.isEmpty()) ? Integer.valueOf(roomAmountStr) : 0);
 
 			String roomPriceStr = request.getParameter("orderDetails[" + i + "].roomPrice");
 			detail.setRoomPrice((roomPriceStr != null && !roomPriceStr.isEmpty()) ? Integer.valueOf(roomPriceStr) : 0);
 
 			String numberOfPeopleStr = request.getParameter("orderDetails[" + i + "].numberOfPeople");
-			detail.setNumberOfPeople((numberOfPeopleStr != null && !numberOfPeopleStr.isEmpty()) ? Integer.valueOf(numberOfPeopleStr) : 0);
+			detail.setNumberOfPeople(
+					(numberOfPeopleStr != null && !numberOfPeopleStr.isEmpty()) ? Integer.valueOf(numberOfPeopleStr)
+							: 0);
 
 			detail.setRoomGuestName(request.getParameter("orderDetails[" + i + "].roomGuestName"));
 			detail.setSpecialReq(request.getParameter("orderDetails[" + i + "].specialReq"));
@@ -142,7 +193,6 @@ public class RoomOrderController {
 		return "redirect:/admin/roomo_info";
 	}
 
-	
 	// ===== 填入ID查詢會員名稱 =====
 
 	@Autowired
@@ -218,6 +268,27 @@ public class RoomOrderController {
 		}
 		return result;
 	}
+	
+	// ===== 取消訂單 =====
+	@PostMapping("/roomo_info/cancel")
+    @ResponseBody
+    public Map<String, Object> cancelRoomOrder(@RequestParam Integer roomOrderId) {
+        RoomOrder order = orderService.getById(roomOrderId);
+        if (order != null) {
+            order.setOrderStatus(0); // 0:取消
+            List<Integer> olistIds = new ArrayList<>();
+            if (order.getOrderDetails() != null) {
+                for (RoomOList detail : order.getOrderDetails()) {
+                    detail.setListStatus("0"); // 0:取消
+                    roomOListService.save(detail);
+                    olistIds.add(detail.getRoomOrderListId());
+                }
+            }
+            orderService.save(order);
+            return Map.of("success", true, "olistIds", olistIds);
+        }
+        return Map.of("success", false, "message", "找不到訂單");
+    }
 
 	// ===== 查詢會員擁有的所有適用優惠券列表 =====
 
@@ -268,4 +339,16 @@ public class RoomOrderController {
 		}
 		return details;
 	}
+
+	// ===== 檢視訂單 =====
+	@GetMapping("/roomo_info/view")
+	public String viewRoomOrder(@RequestParam("roomOrderId") Integer roomOrderId, Model model) {
+		RoomOrder order = orderService.getById(roomOrderId);
+		List<RoomOList> details = roomOListService.findByRoomOrderId(roomOrderId);
+		model.addAttribute("roomOrder", order);
+		model.addAttribute("roomOLists", details);
+		return "admin/fragments/roomo/modals/roomo_view :: viewModalContent";
+	}
+
+	
 }

@@ -16,7 +16,7 @@
                         <option value="">---所有狀態---</option>
                         <option value="2" th:selected="${isEnabled} == '2'">完成</option>
                         <option value="1" th:selected="${isEnabled} == '1'">成立</option>
-                        <option value="0" th:selected="${isEnabled} == '0'">取消</option>
+                        <option value="0" th:selected="${isEnabled} == '0'">已取消</option>
                     </select>
                 </div>
 
@@ -46,19 +46,19 @@
                         <th>訂單編號</th>
                         <th>會員名稱</th>
                         <th>訂單成立日期</th>
-                        <th>是否加購專案</th>
+                        <th class="text-center">訂單狀態</th>
                         <th>付款狀態</th>
                         <th>訂單總金額</th>
                         <th>實際支付金額</th>
-                        <th class="text-center">訂單狀態</th>
                         <th class="text-center">入住日期</th>
                         <th class="text-center">退房日期</th>
 
-                        <th>使用折價券</th>
+                        <!-- <th>使用折價券</th>
                         <th>折扣金額</th>
                         <th>付款方式</th>
+                        <th>是否加購專案</th>
                         <th>最後更新日期</th>
-                        <th>最後更新人</th>
+                        <th>最後更新人</th> -->
 
                         <th>操作</th>
                     </tr>
@@ -68,24 +68,24 @@
                         <td th:text="${roomo.roomOrderId}"></td>
                         <td th:text="${roomo.member.memberName}"></td>
                         <td th:text="${roomo.orderDate}"></td>
-                        <td th:text="${roomo.projectAddOn} == 1 ? '是' : '否'"></td>
-                        <td th:text="${roomo.payStatus} == 1 ? '已付款' : '未付款'"></td>
-                        <td th:text="${roomo.roomAmount}"></td>
-                        <td th:text="${roomo.actualAmount}"></td>
                         <td class="text-center">
                             <span th:classappend="${roomo.orderStatus} == 2 ? 'badge bg-success' : (${roomo.orderStatus} == 1 ? 'badge bg-primary' : 'badge bg-secondary')"
                                   th:text="${roomo.orderStatus} == 2 ? '完成' : (${roomo.orderStatus} == 1 ? '成立' : '取消')"></span>
                         </td>
-                        <td th:text="${roomo.checkInDate}"></td>
-                        <td th:text="${roomo.checkOutDate}"></td>
+                        <td th:text="${roomo.payStatus} == 1 ? '已付款' : '未付款'"></td>
+                        <td th:text="${roomo.roomAmount}"></td>
+                        <td th:text="${roomo.actualAmount}"></td>
+                        <td style="white-space: nowrap;" th:text="${roomo.checkInDate}"></td>
+                        <td style="white-space: nowrap;" th:text="${roomo.checkOutDate}"></td>
 
                         
                         
-                        <td th:text="${roomo.coupon != null ? roomo.coupon.couponCode : '無'}"></td>
+                        <!-- <td th:text="${roomo.coupon != null ? roomo.coupon.couponCode : '無'}"></td>
                         <td th:text="${roomo.discountAmount != null ? roomo.discountAmount : 0}"></td>
                         <td th:text="${roomo.payMethod} == 1 ? '信用卡' : '現金'"></td>
+                        <td th:text="${roomo.projectAddOn} == 1 ? '是' : '否'"></td>
                         <td th:text="${roomo.updateDate}"></td>
-                        <td th:text="${roomo.employee.name}"></td>
+                        <td th:text="${roomo.employee.name}"></td> -->
                         <td>
                             <div class="table_row_actions d-flex justify-content-center align-items-start">
                                 <!-- <button class="btn_icon btn_detail" th:data-id="${roomo.roomOrderId}"><i class="fas fa-info-circle"></i></button> -->

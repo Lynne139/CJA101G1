@@ -1,5 +1,8 @@
 <div th:fragment="viewModalContent">
 
+    <!-- 錯誤訊息顯示區塊 -->
+    <div th:if="${errorMessage}" class="alert alert-danger mb-3" th:text="${errorMessage}"></div>
+
     <div class="modal fade" id="roomoViewModal" tabindex="-1" aria-hidden="true">
           <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content rounded-4 p-4" style="background-color: var(--color-background);">
@@ -12,6 +15,26 @@
 
                 <!-- Modal內容 -->
                   <div class="modal-body">
+                    <!-- 訂單基本資訊 -->
+                    <h6 class="modal_sub_title d-flex justify-content-start align-items-center gap-2">
+                        訂單基本資訊
+                    </h6>
+                    <div class="modal_section">
+                        <div class="modal_detail d-flex flex-column align-items-start">
+                            <p><strong>使用折價券：</strong> <span th:text="${roomOrder != null && roomOrder.coupon != null ? roomOrder.coupon.couponCode : '無'}"></span></p>
+                            <p><strong>折扣金額：</strong> <span th:text="${roomOrder != null && roomOrder.discountAmount != null ? roomOrder.discountAmount : 0}"></span></p>
+                            <p><strong>付款方式：</strong> <span th:text="${roomOrder != null && roomOrder.payMethod == 1 ? '信用卡' : '現金'}"></span></p>
+                            <p><strong>是否加購專案：</strong> <span th:text="${roomOrder != null && roomOrder.projectAddOn == 1 ? '是' : '否'}"></span></p>
+                            <p><strong>最後更新日期：</strong> <span th:text="${roomOrder != null ? roomOrder.updateDate : ''}"></span></p>
+                            <p><strong>最後更新人：</strong><span th:text="${roomOrder != null && roomOrder.employee != null ? roomOrder.employee.name : ''}"></span></p>
+                        </div>
+                    </div>
+                    <hr/>
+                    
+                    <!-- 訂單明細 -->
+                    <h6 class="modal_sub_title d-flex justify-content-start align-items-center gap-2">
+                        訂單明細
+                    </h6>
                     <div th:each="roomOList : ${roomOLists}">
                         <h6 class="modal_sub_title d-flex justify-content-start align-items-center gap-2">
                             明細編號 <span th:text="'#' + ${roomOList.roomOrderListId}"></span>
@@ -24,10 +47,10 @@
                                 <p><strong>入住人數：</strong> <span th:text="${roomOList.numberOfPeople}"></span></p>
                                 <p><strong>房間價格：</strong> <span th:text="${roomOList.roomPrice}"></span></p>
                                 <p><strong>房間數量：</strong> <span th:text="${roomOList.roomAmount}"></span></p>
-                                <p><strong>入住人姓名：</strong> <span th:text="${roomOList.roomGuestName}"></span></p>
+                                <p><strong>房客代表：</strong> <span th:text="${roomOList.roomGuestName}"></span></p>
                                 <p><strong>特殊需求：</strong> <span th:text="${roomOList.specialReq}"></span></p>
                                 <p><strong>建立日期：</strong> <span th:text="${roomOList.createDate}"></span></p>
-                                <p><strong>明細狀態：</strong> <span th:text="${roomOList.listStatus}"></span></p>
+                                <p><strong>明細狀態：</strong> <span th:text="${roomOList.listStatus} == 1 ? '已成立':'已取消'"></span></p>
                             </div>
                         </div>
                         <hr/>

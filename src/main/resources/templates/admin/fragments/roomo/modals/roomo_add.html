@@ -60,11 +60,13 @@
                     <!-- 訂單明細狀態 0:已取消 1:已成立 -->
                     <input type="hidden" name="orderDetails[0].listStatus" value="1">
                   </div>
-                  
+
                   <div class="col-md-2">
                     <label class="form-label">房間數量 <span class="text-danger">*</span></label>
-                    <input type="number" name="orderDetails[0].roomAmount" class="form-control roomAmountInput" min="1"
-                      value="1" required>
+                    <select name="orderDetails[0].roomAmount" class="form-control roomAmountSelect" required disabled>
+                      <option value="">請先選擇房型與日期</option>
+                    </select>
+                    <div id="roomWarning" class="text-danger mt-1"></div>
                   </div>
                   <div class="col-md-2">
                     <label class="form-label">房間價格 <span class="text-danger">*</span></label>
@@ -91,7 +93,7 @@
                   </div>
                 </div>
                 <div class="text-end mt-2">
-                  <button type="button" class="btn btn-danger remove-detail-btn">移除</button>
+                  <button type="button" class="btn btn-danger remove-detail-btn" th:attr="data-id=${detail?.roomOrderListId}">移除</button>
                 </div>
 
               </div>
@@ -116,11 +118,41 @@
 
             <!-- 是否加購專案 -->
             <div class="mb-3">
-              <label class="form-label">是否加購專案</label>
-              <select th:field="*{projectAddOn}" class="form-select">
-                <option value="0">否</option>
-                <option value="1">是</option>
-              </select>
+              <label class="form-label">是否加購專案 <span class="text-danger">*</span></label>
+              <div class="form-check">
+                <input type="radio" id="projectAddOnNo" name="projectAddOn" value="0" class="form-check-input" checked required>
+                <label for="projectAddOnNo" class="form-check-label">否</label>
+              </div>
+              <div class="form-check">
+                <input type="radio" id="projectAddOnYes" name="projectAddOn" value="1" class="form-check-input" required>
+                <label for="projectAddOnYes" class="form-check-label">是</label>
+              </div>
+            </div>
+
+            <!-- 餐廳專案加購區（預設隱藏） -->
+            <div class="mb-3" id="restoProjectArea" style="display:none;">
+              <!-- 隱藏的餐廳訂單ID -->
+              <input type="hidden" id="restoOrderId" name="restoOrderId" value="">
+              <div class="row g-2">
+                <div class="col-md-4">
+                  <label class="form-label">餐廳</label>
+                  <select id="restoSelect" class="form-select" disabled required>
+                    <option value="">請選擇餐廳</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">用餐時段</label>
+                  <select id="timeslotSelect" class="form-select" disabled required>
+                    <option value="">請先選擇餐廳</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">用餐人數</label>
+                  <select id="diningPeopleSelect" class="form-select" disabled required>
+                    <option value="">請先選擇餐廳與時段</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
             <!-- 付款狀態 -->
