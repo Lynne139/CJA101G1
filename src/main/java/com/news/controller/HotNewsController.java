@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,13 +20,6 @@ import java.util.Optional;
 public class HotNewsController {
     @Autowired
     private HotNewsService service;
-
-    @GetMapping
-    public String list(Model model) {
-        model.addAttribute("hotNewsList", service.findAll());
-        model.addAttribute("hotNews", new HotNews());
-        return "admin/fragments/news/news1";
-    }
 
     @PostMapping("/add")
     public String add(@ModelAttribute HotNews hotNews, @RequestParam(value = "photo", required = false) MultipartFile photo) throws IOException {
