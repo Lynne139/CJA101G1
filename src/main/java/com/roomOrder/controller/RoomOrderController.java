@@ -76,6 +76,33 @@ public class RoomOrderController {
 	    return minRemaining;
 	}
 
+	// ===== 取消訂單 =====
+	@PostMapping("/roomo_info/cancel")
+    @ResponseBody
+    public Map<String, Object> cancelRoomOrder(@RequestParam Integer roomOrderId) {
+        RoomOrder order = orderService.getById(roomOrderId);
+        if (order != null) {
+            order.setOrderStatus(0); // 0:取消
+            // 這裡補查明細
+            List<RoomOList> details = roomOListService.findByRoomOrderId(roomOrderId);
+            List<Integer> olistIds = new ArrayList<>();
+            if (details != null) {
+                for (RoomOList detail : details) {
+                    detail.setListStatus("0"); // 0:取消
+                    roomOListService.save(detail);
+                    olistIds.add(detail.getRoomOrderListId());
+
+					// 取消訂單後，將房間數量還原
+					// 房型schedule service有功能可以還原
+                }
+			//
+            }
+            orderService.save(order);
+            return Map.of("success", true, "olistIds", olistIds);
+        }
+        return Map.of("success", false, "message", "找不到訂單");
+    }
+
 	// ===== 檢視訂單 =====
 	@GetMapping("/roomo_info/view")
 	public String viewRoomOrder(@RequestParam("roomOrderId") Integer roomOrderId, Model model) {
@@ -257,28 +284,7 @@ public class RoomOrderController {
 		return result;
 	}
 	
-	// ===== 取消訂單 =====
-	@PostMapping("/roomo_info/cancel")
-    @ResponseBody
-    public Map<String, Object> cancelRoomOrder(@RequestParam Integer roomOrderId) {
-        RoomOrder order = orderService.getById(roomOrderId);
-        if (order != null) {
-            order.setOrderStatus(0); // 0:取消
-            // 這裡補查明細
-            List<RoomOList> details = roomOListService.findByRoomOrderId(roomOrderId);
-            List<Integer> olistIds = new ArrayList<>();
-            if (details != null) {
-                for (RoomOList detail : details) {
-                    detail.setListStatus("0"); // 0:取消
-                    roomOListService.save(detail);
-                    olistIds.add(detail.getRoomOrderListId());
-                }
-            }
-            orderService.save(order);
-            return Map.of("success", true, "olistIds", olistIds);
-        }
-        return Map.of("success", false, "message", "找不到訂單");
-    }
+	
 
 	// ===== 查詢會員擁有的所有適用優惠券列表 =====
 
