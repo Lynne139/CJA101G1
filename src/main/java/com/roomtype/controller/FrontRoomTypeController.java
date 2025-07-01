@@ -3,9 +3,12 @@ package com.roomtype.controller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -23,9 +26,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.roomtype.model.RoomTypeService;
 import com.roomtype.model.RoomTypeVO;
+import com.roomtypeschedule.model.RoomTypeScheduleService;
+import com.roomtypeschedule.model.RoomTypeScheduleVO;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,6 +44,9 @@ public class FrontRoomTypeController {
 
 	@Autowired
 	RoomTypeService roomTypeSvc;
+	
+	@Autowired
+	RoomTypeScheduleService roomTypeScheduleSvc;
 
 	@ModelAttribute("roomTypeVOListData")
 	protected List<RoomTypeVO> referenceListData() {
@@ -105,5 +115,74 @@ public class FrontRoomTypeController {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	@GetMapping("/roomtype/{roomTypeId}/calendar")
+	public String showRoomTypeCalendar(@PathVariable Integer roomTypeId, Model model) {
+	    RoomTypeVO roomType = roomTypeSvc.getOneRoomType(roomTypeId);
+	    if (roomType == null) {
+	        return "redirect:/roomtypes/list"; // 或首頁
+	    }
+	    model.addAttribute("roomType", roomType);
+	    return "front-end/room/roomTypeCalendar";
+	}
+	
+	@GetMapping("/roomtype/{roomTypeId}/inventory-map")
+	@ResponseBody
+	public Map<String, Integer> getInventoryMap(@PathVariable Integer roomTypeId,
+	                                            @RequestParam String start,
+	                                            @RequestParam String end) {
+	    RoomTypeVO roomTypeVO = roomTypeSvc.getOneRoomType(roomTypeId);
+
+	    java.sql.Date startDate = java.sql.Date.valueOf(start);
+	    java.sql.Date endDate = java.sql.Date.valueOf(end);
+
+	    List<RoomTypeScheduleVO> schedules = roomTypeScheduleSvc.findSchedules(roomTypeVO, startDate, endDate);
+
+	    return schedules.stream()
+	            .collect(Collectors.toMap(
+	                s -> s.getRoomOrderDate().toString(),
+	                s -> s.getRoomAmount() - s.getRoomRSVBooked()
+	            ));
+	}
+	
+	@GetMapping("/roomtype/{roomTypeId}/inventory")
+	@ResponseBody
+	public Integer getRoomInventory(@PathVariable Integer roomTypeId, 
+	                                @RequestParam String date) {
+	    // 轉 java.sql.Date
+	    java.sql.Date orderDate = java.sql.Date.valueOf(date);
+	    RoomTypeVO roomType = roomTypeSvc.getOneRoomType(roomTypeId);
+	    
+	    // 找這天的預定資料
+	    Optional<RoomTypeScheduleVO> scheduleOpt = 
+	        roomTypeScheduleSvc.getByRoomTypeVOAndRoomOrderDate(roomType, orderDate);
+	        
+	    if (scheduleOpt.isPresent()) {
+	        RoomTypeScheduleVO schedule = scheduleOpt.get();
+	        return schedule.getRoomAmount() - schedule.getRoomRSVBooked();
+	    }
+	    return 0; // 沒資料就當作滿房
+	}
+	
+	@GetMapping("/roomtype/{roomTypeId}/inventory-range")
+	@ResponseBody
+	public Integer getRoomInventoryRange(@PathVariable Integer roomTypeId,
+	                                     @RequestParam String start,
+	                                     @RequestParam String end) {
+	    java.sql.Date startDate = java.sql.Date.valueOf(start);
+	    java.sql.Date endDate = java.sql.Date.valueOf(end);
+
+	    RoomTypeVO roomType = roomTypeSvc.getOneRoomType(roomTypeId);
+	    List<RoomTypeScheduleVO> schedules = roomTypeScheduleSvc
+	        .findSchedules(roomType, startDate, endDate);
+	    
+	    // 找區間內的最少可訂
+	    int minRemaining = schedules.stream()
+	        .mapToInt(s -> s.getRoomAmount() - s.getRoomRSVBooked())
+	        .min()
+	        .orElse(0);
+
+	    return minRemaining;
 	}
 }

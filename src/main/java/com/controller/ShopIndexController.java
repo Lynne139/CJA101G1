@@ -1,6 +1,9 @@
 package com.controller;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.prod.model.ProdService;
 import com.prod.model.ProdVO;
@@ -108,6 +112,39 @@ public class ShopIndexController {
                     .contentType(MediaType.IMAGE_JPEG)
                     .body(photo.getProdPhoto());
             }
+        }
+        return ResponseEntity.notFound().build();
+    }
+    
+    /**
+     * 獲取特定商品的所有照片資訊（JSON格式）
+     */
+    @GetMapping("/shop/product-photos/{productId}")
+    @ResponseBody
+    public List<Map<String, Object>> getProductPhotos(@PathVariable Integer productId) {
+        List<ProdPhotoVO> photos = prodPhotoService.getPhotosByProductId(productId);
+        List<Map<String, Object>> photoList = new ArrayList<>();
+        
+        for (ProdPhotoVO photo : photos) {
+            Map<String, Object> photoInfo = new HashMap<>();
+            photoInfo.put("photoId", photo.getProdPhotoId());
+            photoInfo.put("imageUrl", "/front-end/shop/product-image/" + productId + "/" + photo.getProdPhotoId());
+            photoList.add(photoInfo);
+        }
+        
+        return photoList;
+    }
+    
+    /**
+     * 商品照片圖片服務（指定照片ID）
+     */
+    @GetMapping("/shop/product-image/{productId}/{photoId}")
+    public ResponseEntity<byte[]> getProductImageById(@PathVariable Integer productId, @PathVariable Integer photoId) {
+        ProdPhotoVO photo = prodPhotoService.getOneProdPhoto(photoId);
+        if (photo != null && photo.getProdVO().getProductId().equals(productId)) {
+            return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(photo.getProdPhoto());
         }
         return ResponseEntity.notFound().build();
     }

@@ -44,5 +44,11 @@ public class ProdPhotoService {
 		return repository.findAll();
 	}
 
+	/**
+	 * 根據商品ID查詢該商品的所有照片
+	 */
+	public List<ProdPhotoVO> getPhotosByProductId(Integer productId) {
+		return repository.findByOthers(productId);
+	}
 
 }
