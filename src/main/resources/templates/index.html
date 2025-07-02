@@ -63,7 +63,13 @@
       </li>
       <li class="nav-item"><a class="nav-link" href="#rooms">精緻客房</a></li>
       <li class="nav-item"><a class="nav-link" href="#faq">交通資訊</a></li>
-      <li class="nav-item"><a class="nav-link" href="#footer">聯絡我們</a></li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">聯絡我們</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" th:href="@{/contact}">聯絡客服</a></li>
+          <li><a class="dropdown-item" th:href="@{/chatbot}">智慧客服</a></li>
+        </ul>
+      </li>
       <li class="nav-item"><a class="nav-link" href="#faq">常見問題</a></li>
     </ul>
 
