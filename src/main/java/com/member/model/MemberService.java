@@ -60,13 +60,14 @@ public class MemberService {
 	}
 	
 	@Transactional
-	public void updateConsumptionAndLevelAndPoints(Integer memberId, int price) {
+	public void updateConsumptionAndLevelAndPoints(Integer memberId, int priceChange) {
 	    Optional<MemberVO> optional = repository.findById(memberId);
 	    if (optional.isPresent()) {
 	        MemberVO member = optional.get();
 
 	        // 更新累積消費金額
-	        int newConsumption = member.getMemberAccumulativeConsumption() + price;
+	        int newConsumption = member.getMemberAccumulativeConsumption() + priceChange;
+	        if (newConsumption < 0) newConsumption = 0; // 防止累積消費變負
 	        member.setMemberAccumulativeConsumption(newConsumption);
 
 	        // 根據新的累積消費金額調整會員等級
@@ -81,8 +82,9 @@ public class MemberService {
 	        }
 	        
 	        // 更新點數（向下取整）
-	        int additionalPoints = (int) (price * 0.1);
+	        int additionalPoints = (int) (priceChange * 0.1);
 	        int newPoints = member.getMemberPoints() + additionalPoints;
+	        if (newPoints < 0) newPoints = 0; // 防止點數變負
 	        member.setMemberPoints(newPoints);
 	        
 	        // 儲存更新

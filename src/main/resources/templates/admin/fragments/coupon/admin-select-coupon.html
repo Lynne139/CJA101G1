@@ -46,12 +46,12 @@
                 <button id="btnAddCoupon" class="btn btn-success btn-sm">＋ 新增折價券</button>
             </div>
             <div class="card-body">
-                <!-- 第一列：折價券代碼和名稱查詢 -->
+                <!-- 第一列：折價券編號和名稱查詢 -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label">折價券代碼</label>
+                        <label class="form-label">折價券編號</label>
                         <div class="input-group">
-                            <input type="text" id="couponCode" class="form-control" placeholder="輸入折價券代碼">
+                            <input type="text" id="couponCode" class="form-control" placeholder="輸入折價券編號">
                             <button class="btn btn-outline-primary" id="searchByCodeBtn">查詢</button>
                         </div>
                     </div>
@@ -327,7 +327,7 @@
 	
 	        document.getElementById('searchByCodeBtn').addEventListener('click', function () {
 	            const code = document.getElementById('couponCode').value.trim();
-	            if (!code) return alert("請輸入折價券代碼");
+	            if (!code) return alert("請輸入折價券編號");
 	            fetch(`/api/coupons/code/${code}`)
 	                .then(response => response.ok ? response.json() : null)
 	                .then(data => renderResults(data ? [data] : []));
