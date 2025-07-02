@@ -4,25 +4,10 @@
         <div class="panel mb-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="panel-title">訂單明細篩選</h2>
-                <button type="button" class="btn btn_accent" data-bs-toggle="modal" data-bs-target="#addShopOrdDetModal">
-                    <i class="fas fa-plus me-2"></i>
-                    新增訂單明細
-                </button>
             </div>
             
             <div th:if="${errorMessage}" class="alert alert-danger mb-3">
                 [[${errorMessage}]]
-            </div>
-            
-            <div th:if="${param.success}" class="alert alert-success mb-3 d-flex justify-content-between align-items-center">
-                <div>
-                    <i class="fas fa-check-circle me-2"></i>
-                    訂單明細新增成功！
-                </div>
-                <button type="button" class="btn btn-outline-success btn-sm" onclick="clearSuccessMessage()">
-                    <i class="fas fa-times me-1"></i>
-                    關閉
-                </button>
             </div>
             
             <div th:if="${param.updateSuccess}" class="alert alert-success mb-3 d-flex justify-content-between align-items-center">
@@ -37,50 +22,21 @@
             </div>
             
             <div class="row g-2">
-                <!-- 輸入訂單編號 -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <form method="get" th:action="@{/admin/shopOrdDet/select_page}">
-                        <label class="form-label">訂單編號</label>
+                        <label class="form-label">訂單編號 + 商品編號</label>
                         <div class="input-group">
-                            <input type="text" name="prodOrdId" th:value="${param.prodOrdId}" 
-                                   class="form-control" placeholder="輸入訂單編號">
-                            <button type="submit" class="btn btn_secondary" title="查詢">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- 選擇訂單編號 -->
-                <div class="col-md-4">
-                    <form method="get" th:action="@{/admin/shopOrdDet/select_page}">
-                        <label class="form-label">訂單編號</label>
-                        <div class="input-group">
-                            <select name="prodOrdId" class="form-select">
+                            <select name="prodOrdId" class="form-select" id="prodOrdIdSelect" required>
                                 <option value="" selected disabled>請選擇訂單編號</option>
-                                <option th:each="shopOrdDetVO : ${shopOrdDetListData}" 
-                                        th:value="${shopOrdDetVO.shopOrdVO.prodOrdId}" 
-                                        th:text="${shopOrdDetVO.shopOrdVO.prodOrdId}"></option>
+                                <option th:each="prodOrdId : ${uniqueProdOrdIdList}"
+                                        th:value="${prodOrdId}"
+                                        th:text="${prodOrdId}"></option>
                             </select>
-                            <button type="submit" class="btn btn_secondary" title="查詢">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- 選擇商品名稱 -->
-                <div class="col-md-4">
-                    <form method="get" th:action="@{/admin/shopOrdDet/select_page}">
-                        <label class="form-label">商品名稱</label>
-                        <div class="input-group">
-                            <select name="productId" class="form-select">
-                                <option value="" selected disabled>請選擇商品名稱</option>
-                                <option th:each="shopOrdDetVO : ${shopOrdDetListData}" 
-                                        th:value="${shopOrdDetVO.prodVO.productId}" 
-                                        th:text="${shopOrdDetVO.prodVO.productName}"></option>
+                            <span class="input-group-text">+</span>
+                            <select name="productId" class="form-select" id="productIdSelect" required>
+                                <option value="" selected disabled>請選擇商品編號</option>
                             </select>
-                            <button type="submit" class="btn btn_secondary" title="查詢">
+                            <button type="submit" class="btn btn_accent" title="查詢">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
@@ -99,26 +55,6 @@
             <div th:insert="~{admin/fragments/shop/shopOrdDet/listAllShopOrdDet :: listAllShopOrdDet-div}"></div>
         </div>
     </div>
-</div>
-
-<!-- 新增訂單明細 Modal -->
-<div class="modal fade" id="addShopOrdDetModal" tabindex="-1" aria-labelledby="addShopOrdDetModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addShopOrdDetModalLabel">新增訂單明細</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="addShopOrdDetModalBody">
-        <!-- 載入中... -->
-        <div class="text-center">
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">載入中...</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- 修改訂單明細 Modal -->
@@ -141,64 +77,31 @@
   </div>
 </div>
 
+<script th:inline="javascript">
+    var orderToProducts = JSON.parse(/*[[${orderToProductsJson}]]*/'{}');
+</script>
 <script>
-// 當 modal 開啟時載入 addShopOrdDet 頁面內容
-document.getElementById('addShopOrdDetModal').addEventListener('show.bs.modal', function () {
-  const modalBody = document.getElementById('addShopOrdDetModalBody');
-  
-  // 顯示載入中
-  modalBody.innerHTML = `
-    <div class="text-center">
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">載入中...</span>
-      </div>
-    </div>
-  `;
-  
-  // 用 AJAX 載入 addShopOrdDet 頁面內容
-  fetch('/admin/shopOrdDet/addShopOrdDet')
-    .then(response => response.text())
-    .then(html => {
-      // 解析 HTML 並提取表單內容
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      
-      // 只提取 form 和相關內容而不是整個 body
-      const formContainer = doc.querySelector('.panel');
-      if (formContainer) {
-        modalBody.innerHTML = formContainer.outerHTML;
-      } else {
-        // 如果找不到 .panel，就提取 body 內容但移除多餘的容器
-        const bodyContent = doc.body.innerHTML;
-        // 移除 container-fluid, row, main 等容器
-        const cleanContent = bodyContent
-          .replace(/<div class="container-fluid">[\s\S]*?<main[^>]*>/g, '')
-          .replace(/<\/main>[\s\S]*?<\/div>/g, '')
-          .replace(/<div class="w-100 mx-auto">/g, '')
-          .replace(/<\/div>/g, '');
-        modalBody.innerHTML = cleanContent;
-      }
-      
-      // 重新初始化 Bootstrap 元件
-      if (typeof bootstrap !== 'undefined') {
-        // 重新初始化 tooltips、popovers 等
-        const tooltipTriggerList = [].slice.call(modalBody.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-          return new bootstrap.Tooltip(tooltipTriggerEl);
+document.addEventListener('DOMContentLoaded', function() {
+    var orderSelect = document.getElementById('prodOrdIdSelect');
+    var productSelect = document.getElementById('productIdSelect');
+    if (orderSelect && productSelect) {
+        orderSelect.addEventListener('change', function() {
+            var orderId = this.value;
+            productSelect.innerHTML = '<option value="" selected disabled>請選擇商品編號</option>';
+            if (orderToProducts[orderId]) {
+                orderToProducts[orderId].forEach(function(prod) {
+                    var opt = document.createElement('option');
+                    opt.value = prod.productId;
+                    opt.text = prod.productId + ' - ' + prod.productName;
+                    productSelect.appendChild(opt);
+                });
+            }
         });
-      }
-    })
-    .catch(error => {
-      console.error('載入失敗:', error);
-      modalBody.innerHTML = `
-        <div class="alert alert-danger">
-          <i class="fas fa-exclamation-triangle me-2"></i>
-          載入失敗，請重新整理頁面再試
-        </div>
-      `;
-    });
+    }
 });
+</script>
 
+<script>
 // 載入修改訂單明細 Modal 內容
 function loadEditShopOrdDetModal(button) {
   const prodOrdId = button.getAttribute('data-prod-ord-id');
@@ -261,7 +164,6 @@ function clearSuccessMessage() {
   const url = new URL(window.location);
   url.searchParams.delete('prodOrdId');
   url.searchParams.delete('productId');
-  url.searchParams.delete('success');
   url.searchParams.delete('updateSuccess');
   window.location.href = url.toString();
 }
@@ -286,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // 初始化 DataTable
       const dataTable = $('#shopOrdDetTable').DataTable({
-        "lengthMenu": [3, 5, 10, 20, 50, 100],
+        "lengthMenu": [5, 10, 20, 50, 100],
         "searching": true,  // 搜尋功能
         "paging": true,     // 分頁功能
         "ordering": true,   // 排序功能

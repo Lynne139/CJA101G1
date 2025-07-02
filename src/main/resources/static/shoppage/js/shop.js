@@ -5,6 +5,7 @@ let cart = JSON.parse(localStorage.getItem('shopCart')) || [];
 let currentMemberId = null; // 當前會員ID
 let availableCoupons = []; // 可用的折價券列表
 let selectedCoupon = null; // 選擇的折價券
+let productPhotos = {}; // 儲存每個商品的照片資訊
 
 // 購物車數據
 let products = [
@@ -71,8 +72,8 @@ function initializeShop() {
   // 初始化購物車
   updateCartDisplay();
   
-  // 載入可用的折價券
-  loadAvailableCoupons();
+  // 初始化商品照片切換功能
+  initializeProductPhotos();
   
   // 綁定事件監聽器
   bindEventListeners();
@@ -371,53 +372,129 @@ function removeFromCart(productId) {
   localStorage.setItem('shopCart', JSON.stringify(cart));
   updateCartDisplay();
   showNotification('商品已從購物車移除', 'info');
+
+  // 2. 後端同步刪除（如果有登入會員）
+  const memberId = getMemberIdFromSession && getMemberIdFromSession();
+  if (memberId) {
+    fetch('/prodCart/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: `productId=${productId}&memberId=${memberId}`
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('後端刪除失敗');
+      // 可選：showNotification('後端購物車同步刪除成功', 'success');
+    })
+    .catch(err => {
+      showNotification('後端購物車同步刪除失敗', 'error');
+    });
+  }
 }
 
-// 顯示商品詳情 Modal
+// 快速查看商品詳情 Modal
 function showProductModal(productId) {
-  // 從頁面中獲取商品資訊
-  const productCard = document.querySelector(`[data-product-id="${productId}"]`);
-  
-  if (productCard) {
-    const productName = productCard.querySelector('.product-title').textContent;
-    const productDescription = productCard.querySelector('.product-description').textContent;
-    const productPrice = productCard.querySelector('.product-price').textContent;
-    const productImage = productCard.querySelector('.product-image img').src;
-    
-    const modalTitle = document.getElementById('productModalTitle');
-    const modalBody = document.getElementById('productModalBody');
-    
-    if (modalTitle) {
-      modalTitle.textContent = productName;
+  // 取得商品資料（可根據實際需求擴充）
+  const product = products.find(p => p.id == productId);
+  if (!product) return;
+
+  // 載入商品所有照片
+  $.ajax({
+    url: `/front-end/shop/product-photos/${productId}`,
+    type: 'GET',
+    success: function(photos) {
+      renderProductModal(product, photos);
+      $('#productModal').modal('show');
+    },
+    error: function() {
+      renderProductModal(product, []);
+      $('#productModal').modal('show');
     }
-    
-    if (modalBody) {
-      modalBody.innerHTML = `
-        <div class="row">
-          <div class="col-md-6">
-            <img src="${productImage}" alt="${productName}" class="img-fluid rounded" onerror="this.src='/images/admin/no_img.svg'">
-          </div>
-          <div class="col-md-6">
-            <h4 class="text-brown">${productName}</h4>
-            <p class="text-muted">${productDescription}</p>
-            <div class="h3 text-brown mb-3">${productPrice}</div>
-            <button class="btn btn-primary add-to-cart-btn" 
-                    data-product-id="${productId}" 
-                    data-product-name="${productName}" 
-                    data-product-price="${productCard.dataset.price}">
-              <i class="fas fa-shopping-cart"></i> 加入購物車
-            </button>
-          </div>
-        </div>
-      `;
-    }
-    
-    // 顯示 Modal
-    const modal = new bootstrap.Modal(document.getElementById('productModal'));
-    modal.show();
+  });
+}
+
+function renderProductModal(product, photos) {
+  // 主圖
+  const mainPhotoUrl = (photos && photos.length > 0) ? photos[0].imageUrl : '/shoppage/image/icon/bag.svg';
+  const modalBody = document.getElementById('productModalBody');
+  if (!modalBody) return;
+
+  // 設定主圖
+  const mainPhoto = modalBody.querySelector('.modal-main-photo');
+  if (mainPhoto) mainPhoto.src = mainPhotoUrl;
+
+  // 箭頭
+  const prevBtn = modalBody.querySelector('.modal-photo-prev');
+  const nextBtn = modalBody.querySelector('.modal-photo-next');
+  if (photos && photos.length > 1) {
+    prevBtn.style.display = 'flex';
+    nextBtn.style.display = 'flex';
   } else {
-    showNotification('找不到商品資訊', 'error');
+    prevBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
   }
+
+  // 指示器
+  const indicators = modalBody.querySelector('.modal-photo-indicators');
+  indicators.innerHTML = '';
+  if (photos && photos.length > 1) {
+    photos.forEach((photo, idx) => {
+      const dot = document.createElement('div');
+      dot.className = 'modal-photo-indicator' + (idx === 0 ? ' active' : '');
+      dot.style.width = '10px';
+      dot.style.height = '10px';
+      dot.style.borderRadius = '50%';
+      dot.style.background = '#ccc';
+      dot.style.cursor = 'pointer';
+      dot.onclick = () => showModalPhoto(idx, photos);
+      indicators.appendChild(dot);
+    });
+    indicators.style.display = 'flex';
+  } else {
+    indicators.style.display = 'none';
+  }
+
+  // 綁定箭頭事件
+  prevBtn.onclick = () => changeModalPhoto(-1, photos);
+  nextBtn.onclick = () => changeModalPhoto(1, photos);
+
+  // 記錄目前索引
+  modalBody.dataset.currentModalPhotoIndex = '0';
+  modalBody.dataset.modalPhotoCount = photos.length;
+  window._modalPhotos = photos;
+
+  // 商品資訊
+  const infoDiv = modalBody.querySelector('.modal-product-info');
+  if (infoDiv) {
+    infoDiv.innerHTML = `
+      <h4>${product.name || product.productName}</h4>
+      <div class="mb-2">${product.description || ''}</div>
+      <div class="mb-2">價格：NT$ ${product.price || product.productPrice}</div>
+    `;
+  }
+}
+
+function showModalPhoto(idx, photos) {
+  const modalBody = document.getElementById('productModalBody');
+  if (!modalBody || !photos || idx < 0 || idx >= photos.length) return;
+  const mainPhoto = modalBody.querySelector('.modal-main-photo');
+  if (mainPhoto) mainPhoto.src = photos[idx].imageUrl;
+  // 更新指示器
+  const indicators = modalBody.querySelectorAll('.modal-photo-indicator');
+  indicators.forEach((dot, i) => dot.classList.toggle('active', i === idx));
+  // 更新索引
+  modalBody.dataset.currentModalPhotoIndex = idx;
+}
+
+function changeModalPhoto(direction, photos) {
+  const modalBody = document.getElementById('productModalBody');
+  if (!modalBody || !photos || photos.length === 0) return;
+  let idx = parseInt(modalBody.dataset.currentModalPhotoIndex) || 0;
+  idx += direction;
+  if (idx < 0) idx = photos.length - 1;
+  if (idx >= photos.length) idx = 0;
+  showModalPhoto(idx, photos);
 }
 
 // 結帳功能
@@ -447,7 +524,11 @@ function checkout() {
       return;
     }
   }
-  
+
+  // ====== 這裡加 log ======
+  console.log('selectedCoupon:', selectedCoupon);
+  // =========================
+
   // 獲取付款方式
   const paymentMethod = document.getElementById('paymentMethod').value === 'true';
   
@@ -681,165 +762,268 @@ if (!document.getElementById('notification-styles')) {
   document.head.appendChild(styleSheet);
 }
 
-// 取代本地 cart，從後端載入會員購物車
+// ====== 後端購物車串接 START ======
+
 function loadCartFromBackend() {
-  $.get("/prodCart/api/member-cart", function(cartItems) {
-    // cartItems 是後端回傳的購物車陣列
-    let html = "";
-    let total = 0;
-    let itemCount = 0;
-    if (cartItems.length === 0) {
-      html = `<div class="cart-empty">
-        <i class="fas fa-shopping-cart"></i>
-        <p>購物車是空的</p>
-      </div>`;
-    } else {
-      html = cartItems.map(item => {
-        itemCount += item.quantity;
-        total += item.quantity * item.prodVO.productPrice;
-        return `<div class="cart-item">
-          <div class="cart-item-image">
-            <img src="/front-end/shop/product-image/${item.prodVO.productId}" alt="${item.prodVO.productName}" onerror="this.src='/shoppage/image/icon/bag.svg'">
-          </div>
-          <div class="cart-item-info">
-            <div class="cart-item-title">${item.prodVO.productName}</div>
-            <div class="cart-item-price">NT$ ${item.prodVO.productPrice}</div>
-            <div class="cart-item-quantity">
-              <span>${item.quantity}</span>
-            </div>
-          </div>
-        </div>`;
-      }).join('');
-    }
-    $("#cartItems").html(html);
-    
-    // 更新商品總計
+  fetch('/prodCart/api/member-cart')
+    .then(res => res.json())
+    .then(cartList => {
+      renderCartItems(cartList);
+    });
+}
+
+function renderCartItems(cartList) {
+  const cartItems = document.getElementById('cartItems');
+  if (!cartItems) return;
+  if (!cartList || cartList.length === 0) {
+    cartItems.innerHTML = '<div class="cart-empty"><i class="fas fa-shopping-cart"></i><p>購物車是空的</p></div>';
+    // 更新總計
+    const cartTotal = document.getElementById('cartTotal');
+    if (cartTotal) cartTotal.textContent = 'NT$ 0';
     const subtotalElement = document.getElementById('subtotal');
-    if (subtotalElement) {
-      subtotalElement.textContent = `NT$ ${total.toLocaleString()}`;
-    }
-    
-    // 更新應付金額（考慮折價券）
+    if (subtotalElement) subtotalElement.textContent = 'NT$ 0';
+    // 載入折價券（總金額為0）
+    loadAvailableCoupons(0);
     updatePriceBreakdown();
-    
-    const cartIcon = document.querySelector('.cart-icon');
-    if (cartIcon) {
-      cartIcon.setAttribute('data-count', itemCount);
-      cartIcon.classList.toggle('has-items', itemCount > 0);
+    return;
+  }
+  let total = 0;
+  let itemCount = 0;
+  cartItems.innerHTML = cartList.map(item => {
+    itemCount += item.quantity;
+    total += item.quantity * item.prodVO.productPrice;
+    return `
+      <div class="cart-item">
+        <div class="cart-item-image">
+          <img src="/front-end/shop/product-image/${item.prodVO.productId}" alt="${item.prodVO.productName}">
+        </div>
+        <div class="cart-item-info">
+          <div class="cart-item-title">${item.prodVO.productName}</div>
+          <div class="cart-item-price">NT$ ${item.prodVO.productPrice}</div>
+          <div class="cart-item-quantity">
+            <span>${item.quantity}</span>
+          </div>
+        </div>
+        <button class="cart-item-remove" onclick="deleteCartItem(${item.prodVO.productId}, ${item.memberVO.memberId})">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    `;
+  }).join('');
+  // 更新總計
+  const cartTotal = document.getElementById('cartTotal');
+  if (cartTotal) cartTotal.textContent = `NT$ ${total.toLocaleString()}`;
+  const subtotalElement = document.getElementById('subtotal');
+  if (subtotalElement) subtotalElement.textContent = `NT$ ${total.toLocaleString()}`;
+  // 更新購物車圖標
+  const cartIcon = document.querySelector('.cart-icon');
+  if (cartIcon) {
+    cartIcon.setAttribute('data-count', itemCount);
+    cartIcon.classList.toggle('has-items', itemCount > 0);
+  }
+  // 載入折價券
+  loadAvailableCoupons(total);
+  updatePriceBreakdown();
+}
+
+function deleteCartItem(productId, memberId) {
+  if (!confirm('確定要刪除此商品嗎？')) return;
+  fetch('/prodCart/delete', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: `productId=${productId}&memberId=${memberId}`
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('刪除失敗');
+    loadCartFromBackend(); // 重新載入購物車
+  })
+  .catch(err => {
+    alert('刪除失敗');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadCartFromBackend();
+});
+// ====== 後端購物車串接 END ======
+
+// 商品照片切換功能
+function initializeProductPhotos() {
+  // 為每個商品載入照片資訊
+  const productCards = document.querySelectorAll('.product-card');
+  productCards.forEach(card => {
+    const productId = card.dataset.productId;
+    loadProductPhotos(productId, card);
+  });
+}
+
+// 載入商品照片資訊
+function loadProductPhotos(productId, card) {
+  $.ajax({
+    url: `/front-end/shop/product-photos/${productId}`,
+    type: 'GET',
+    success: function(photos) {
+      if (photos && photos.length > 1) {
+        // 只有當商品有多張照片時才顯示切換功能
+        productPhotos[productId] = photos;
+        setupPhotoNavigation(card, productId, photos);
+      }
+    },
+    error: function(xhr, status, error) {
+      console.log(`載入商品 ${productId} 的照片失敗:`, error);
     }
   });
 }
 
-// 頁面載入時自動載入購物車
-$(function() {
-  loadCartFromBackend();
-});
-
-// 載入可用的折價券
-function loadAvailableCoupons() {
-  console.log('開始載入折價券...');
+// 設置照片切換功能
+function setupPhotoNavigation(card, productId, photos) {
+  const navigation = card.querySelector('.photo-navigation');
+  const indicators = card.querySelector('.photo-indicators');
+  const image = card.querySelector('.product-main-image');
+  const prevBtn = card.querySelector('.photo-prev');
+  const nextBtn = card.querySelector('.photo-next');
   
-  // 計算購物車總金額
-  let cartTotal = 0;
-  $('.cart-item').each(function() {
-    const price = parseInt($(this).find('.item-price').text().replace(/[^\d]/g, ''));
-    const quantity = parseInt($(this).find('.quantity-input').val());
-    cartTotal += price * quantity;
+  if (navigation && indicators && image) {
+    // 顯示切換箭頭
+    navigation.style.display = 'flex';
+    
+    // 綁定箭頭按鈕事件
+    if (prevBtn) {
+      prevBtn.onclick = () => changeProductPhoto(prevBtn, -1);
+    }
+    if (nextBtn) {
+      nextBtn.onclick = () => changeProductPhoto(nextBtn, 1);
+    }
+    
+    // 創建指示器
+    photos.forEach((photo, index) => {
+      const indicator = document.createElement('div');
+      indicator.className = `photo-indicator ${index === 0 ? 'active' : ''}`;
+      indicator.onclick = () => showProductPhoto(card, productId, index);
+      indicators.appendChild(indicator);
+    });
+    
+    // 顯示指示器
+    indicators.style.display = 'flex';
+    
+    // 設置當前照片索引
+    card.dataset.currentPhotoIndex = '0';
+  }
+}
+
+// 切換商品照片
+function changeProductPhoto(button, direction) {
+  const card = button.closest('.product-card');
+  const productId = card.dataset.productId;
+  const photos = productPhotos[productId];
+  
+  if (!photos) return;
+  
+  let currentIndex = parseInt(card.dataset.currentPhotoIndex) || 0;
+  let newIndex = currentIndex + direction;
+  
+  // 循環切換
+  if (newIndex < 0) {
+    newIndex = photos.length - 1;
+  } else if (newIndex >= photos.length) {
+    newIndex = 0;
+  }
+  
+  showProductPhoto(card, productId, newIndex);
+}
+
+// 顯示指定索引的照片
+function showProductPhoto(card, productId, photoIndex) {
+  const photos = productPhotos[productId];
+  if (!photos || photoIndex < 0 || photoIndex >= photos.length) return;
+  
+  const image = card.querySelector('.product-main-image');
+  const indicators = card.querySelectorAll('.photo-indicator');
+  const prevBtn = card.querySelector('.photo-prev');
+  const nextBtn = card.querySelector('.photo-next');
+  
+  // 添加過渡效果
+  image.classList.add('transitioning');
+  
+  // 更新圖片
+  image.src = photos[photoIndex].imageUrl;
+  
+  // 圖片載入完成後移除過渡效果
+  image.onload = function() {
+    image.classList.remove('transitioning');
+  };
+  
+  // 更新指示器
+  indicators.forEach((indicator, index) => {
+    indicator.classList.toggle('active', index === photoIndex);
   });
   
-  console.log('購物車總金額:', cartTotal);
+  // 更新當前索引
+  card.dataset.currentPhotoIndex = photoIndex;
   
+  // 更新箭頭狀態
+  if (prevBtn) prevBtn.disabled = photos.length <= 1;
+  if (nextBtn) nextBtn.disabled = photos.length <= 1;
+}
+
+function loadAvailableCoupons(cartTotal = 0) {
   $.ajax({
     url: '/shopOrd/api/available-coupons',
     type: 'GET',
     data: { cartTotal: cartTotal },
     success: function(response) {
-      console.log('折價券API響應:', response);
-      
       if (response.success) {
         availableCoupons = response.coupons || [];
-        console.log('可用折價券數量:', availableCoupons.length);
-        console.log('折價券列表:', availableCoupons);
         populateCouponSelect();
       } else {
-        console.log('載入折價券失敗:', response.message);
         showNotification('載入折價券失敗: ' + response.message, 'error');
       }
     },
     error: function(xhr, status, error) {
-      console.error('載入折價券錯誤:', error);
-      console.error('HTTP狀態:', xhr.status);
-      console.error('響應文本:', xhr.responseText);
       showNotification('載入折價券失敗，請檢查網路連線', 'error');
     }
   });
 }
 
-// 填充折價券下拉選單
 function populateCouponSelect() {
   const couponSelect = document.getElementById('couponSelect');
   if (!couponSelect) return;
-  
+
   // 清空現有選項（保留第一個"不使用折價券"選項）
   couponSelect.innerHTML = '<option value="">不使用折價券</option>';
-  
+
   // 添加可用的折價券
   availableCoupons.forEach(coupon => {
     const option = document.createElement('option');
     option.value = coupon.couponCode;
-    
+
     // 顯示詳細的折價券信息
     let couponText = `${coupon.couponName} - 折抵 NT$ ${coupon.discountValue}`;
     if (coupon.minPurchase > 0) {
       couponText += ` (最低消費 NT$ ${coupon.minPurchase})`;
     }
-    
+
     option.textContent = couponText;
     option.dataset.coupon = JSON.stringify(coupon);
     couponSelect.appendChild(option);
   });
 }
 
-// 處理折價券選擇
 function handleCouponSelection() {
   const couponSelect = document.getElementById('couponSelect');
-  const couponInfo = document.getElementById('couponInfo');
-  
-  if (!couponSelect || !couponInfo) return;
-  
+  if (!couponSelect) return;
   const selectedValue = couponSelect.value;
-  
   if (selectedValue === '') {
-    // 沒有選擇折價券
     selectedCoupon = null;
-    couponInfo.style.display = 'none';
   } else {
-    // 選擇了折價券
     const selectedOption = couponSelect.options[couponSelect.selectedIndex];
     selectedCoupon = JSON.parse(selectedOption.dataset.coupon);
-    
-    // 檢查最低消費
-    const subtotalElement = document.getElementById('subtotal');
-    const subtotalText = subtotalElement.textContent;
-    const subtotal = parseInt(subtotalText.replace(/[^0-9]/g, '')) || 0;
-    
-    if (selectedCoupon.minPurchase > 0 && subtotal < selectedCoupon.minPurchase) {
-      // 未達最低消費
-      couponInfo.innerHTML = `<small class="text-danger">未達最低消費 NT$ ${selectedCoupon.minPurchase}</small>`;
-      couponInfo.style.display = 'block';
-      selectedCoupon = null; // 不允許使用此折價券
-    } else {
-      // 可以使用折價券
-      couponInfo.innerHTML = `<small class="text-success">已選擇折價券</small>`;
-      couponInfo.style.display = 'block';
-    }
   }
-  
-  // 重新計算價格
   updatePriceBreakdown();
 }
 
-// 更新價格明細
 function updatePriceBreakdown() {
   const subtotalElement = document.getElementById('subtotal');
   const discountRow = document.getElementById('discountRow');
@@ -848,7 +1032,7 @@ function updatePriceBreakdown() {
   
   if (!subtotalElement || !discountRow || !discountAmount || !cartTotal) return;
   
-  // 獲取商品總計
+  // 取得商品總計
   const subtotalText = subtotalElement.textContent;
   const subtotal = parseInt(subtotalText.replace(/[^0-9]/g, '')) || 0;
   
@@ -861,9 +1045,7 @@ function updatePriceBreakdown() {
   // 計算應付金額
   const total = Math.max(0, subtotal - discount);
   
-  // 更新顯示
-  subtotalElement.textContent = `NT$ ${subtotal.toLocaleString()}`;
-  
+  // 不要再覆蓋 subtotalElement.textContent
   if (discount > 0) {
     discountRow.style.display = 'flex';
     discountAmount.textContent = `-NT$ ${discount.toLocaleString()}`;

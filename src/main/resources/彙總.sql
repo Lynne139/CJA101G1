@@ -155,7 +155,6 @@ VALUES
   (2, 1, 1, '吳永志', TRUE, '2025-01-01', '1234', NULL),
   (3, 2, 5, '吳冠宏', TRUE, '2025-02-15', '1234', NULL);
 
-
 -- 權限
 create table function_access_right (
   Access_id int  auto_increment primary key,
@@ -733,3 +732,4 @@ CREATE TABLE role_list (
 INSERT INTO role_list (Role_id, Role_name, Remark, Is_active) VALUES
   (1, '總經理室', '最高管理部門', TRUE),
   (2, '客服部', '處理顧客問題', TRUE);
+

@@ -22,6 +22,11 @@ document.addEventListener("DOMContentLoaded", function () {
             lengthMenu: [5, 10],
             order: [[0, 'asc']],
             autoWidth: false,
+            scrollX: true,
+            fixedColumns: {
+                leftColumns: 1,
+                rightColumns: 0
+            },
             columnDefs: [
                 { targets: [0], width: "20%" },
                 { targets: [1], width: "25%" },
@@ -32,7 +37,18 @@ document.addEventListener("DOMContentLoaded", function () {
             ],
             searching: false,
             ordering: true,
-            info: true
+            info: true,
+            // 預設隱藏已取消的訂單
+            initComplete: function () {
+                // 檢查是否有訂單狀態篩選條件
+                const urlParams = new URLSearchParams(window.location.search);
+                const isEnabled = urlParams.get('isEnabled');
+
+                // 如果沒有明確指定要顯示已取消的訂單，則隱藏它們
+                if (isEnabled !== '0') {
+                    this.api().column(3).search('^(?!.*取消).*$', true, false).draw();
+                }
+            }
         });
     }
 
@@ -51,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-    // ===== 刪除 =====
+    // ===== 取消訂單 =====
     document.addEventListener("click", function (e) {
         if (e.target.closest(".btn_delete")) {
             const btn = e.target.closest(".btn_delete");
@@ -59,32 +75,69 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (!roomoId) return;
 
-            if (confirm("項目一旦刪除將無法復原，是否確定刪除？")) {
-                fetch('/admin/roomo_info/delete', {
+            if (confirm("確定要取消此訂單嗎？")) {
+                fetch('/admin/roomo_info/cancel', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'roomOrderId=' + encodeURIComponent(roomoId) // 這裡要用 roomoId
+                    body: 'roomOrderId=' + encodeURIComponent(roomoId)
                 })
                     .then(res => res.json())
-                    .then(data => { /* ... */ })
-                    .catch(err => {
-                        alert("刪除失敗：" + err.message);
-                    });
-                // 刪除後動畫消失
-                const row = btn.closest("tr");
-                if (row) {
-                    row.classList.add("fade-out");
-                    setTimeout(() => {
-                        row.remove();
-                        // 如果刪除後沒有資料了，重新載入表格
-                        if (document.querySelectorAll("#roomoTable tbody tr").length === 0) {
-                            initRoomoTable();
+                    .then(data => {
+                        if (data.success) {
+                            // 更新表格中的訂單狀態顯示
+                            const row = btn.closest("tr");
+                            if (row) {
+                                const statusCell = row.querySelector("td:nth-child(4)"); // 訂單狀態欄位
+                                if (statusCell) {
+                                    statusCell.innerHTML = '<span class="badge bg-secondary">取消</span>';
+                                }
+                                // 隱藏取消按鈕，因為已經取消了
+                                btn.style.display = 'none';
+                            }
+                            // 直接前端更新所有明細狀態顯示為取消
+                            if (data.olistIds && Array.isArray(data.olistIds)) {
+                                data.olistIds.forEach(olistId => {
+                                    // 編輯modal select
+                                    const detailSelect = document.querySelector(`.order-detail-status[data-id="${olistId}"]`);
+                                    if (detailSelect) {
+                                        detailSelect.value = '0';
+                                        const selectContainer = detailSelect.closest('.form-group') || detailSelect.parentElement;
+                                        if (selectContainer) {
+                                            selectContainer.innerHTML = '<span class="badge bg-secondary">取消</span>';
+                                        }
+                                    }
+                                    // 檢視modal
+                                    const viewModal = document.getElementById('roomoViewModal');
+                                    if (viewModal && viewModal.classList.contains('show')) {
+                                        const detailSections = viewModal.querySelectorAll('.modal_section');
+                                        detailSections.forEach(section => {
+                                            const titleElement = section.previousElementSibling;
+                                            if (titleElement && titleElement.textContent.includes(`#${olistId}`)) {
+                                                const statusElement = section.querySelector('p:last-child strong');
+                                                if (statusElement && statusElement.textContent.includes('明細狀態')) {
+                                                    const statusTextElement = statusElement.nextElementSibling;
+                                                    if (statusTextElement) {
+                                                        statusTextElement.textContent = '已取消';
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                            alert("訂單已成功取消");
+                        } else {
+                            alert("取消訂單失敗：" + (data.message || "未知錯誤"));
                         }
-                    }, 500); // 等待動畫結束後再移除行
-                }
+                    })
+                    .catch(err => {
+                        alert("取消訂單失敗：" + err.message);
+                    });
             }
         }
     });
+
+
 
 
     // ===== Modal - View =====
@@ -204,11 +257,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     // 房型選擇後自動填入價格
                     bindRoomDetailPriceAutoFill();
 
-                    // 房間數量變動時更新總數
-                    updateRoomCount();
 
                     // 自動查詢優惠券
                     bindCouponAutoQuery();
+
+                    // 房型選擇後自動檢查是否有空房
+                    bindRoomAmountSelectUpdate();
+
+                    // 加購專案區塊顯示/隱藏與資料載入
+                    bindProjectAddOnArea();
+
+                    // 在 modal 開啟時呼叫
+                    bindRoomScheduleCheck();
 
                 });
 
@@ -358,7 +418,6 @@ document.addEventListener("DOMContentLoaded", function () {
             fetch(`/admin/roomo_info/edit?roomOrderId=${roomoId}`)
                 .then(res => res.text())
                 .then(html => {
-
                     container.innerHTML = html;
 
                     const modalEl = document.getElementById("roomoEditModal");
@@ -370,39 +429,69 @@ document.addEventListener("DOMContentLoaded", function () {
                     const modal = new bootstrap.Modal(modalEl);
                     modal.show();
 
-                    //確保modal內的textarea完全呈現(bs開modal預設有動畫可能導致延遲)
-                    modalEl.addEventListener("shown.bs.modal", async () => {
+                    let hasUnsavedChanges = false; // ✅ 用於判斷是否變更
 
-                        await new Promise(resolve => setTimeout(resolve, 300)); // 等Bootstrap完成動畫
-                        //保險先清掉原本的tinymce以及重新初始化以下功能
-                        //必須這樣是因為每次modal開啟都是fetch後動態載入插入的新dom
-                        //addEventListener()是一次性的綁定，綁舊dom上的會失效，必須重新綁新渲染的dom
-                        //timymce須清除，因為舊的tinymce編輯器有實體殘留
+                    // ✅ 當 modal 開啟完成後才執行初始化邏輯
+                    modalEl.addEventListener("shown.bs.modal", async () => {
+                        console.log("✅ modal 已開啟");
+                        await new Promise(resolve => setTimeout(resolve, 300));
+
                         tinymce.remove();
                         initTinyMCE();
                         bindFormSubmitEdit();
-                        // 房型選擇後自動填入價格
                         bindRoomTypeRoomCascade();
-
-                        // 新增房型訂購區
                         bindAddRoomDetailBlock();
-
-                        // 房型選擇後自動填入價格
                         bindRoomDetailPriceAutoFill();
-
-                        // 房間數量變動時更新總數
-                        updateRoomCount();
-
-                        // 自動查詢優惠券
                         bindCouponAutoQuery();
+                        // 房型選擇後自動檢查是否有空房
+                        bindRoomAmountSelectUpdate();
+                        // 加購專案區塊顯示/隱藏與資料載入
+                        bindProjectAddOnArea();
 
+                        // ✅ 只要表單有變更就標記
+                        const editForm = document.getElementById("roomOrderEditForm");
+                        if (editForm) {
+                            editForm.addEventListener("input", () => {
+                                hasUnsavedChanges = true;
+                                console.log("✏️ 使用者輸入內容 → 設定 hasUnsavedChanges = true");
+                            });
+                        }
 
+                        // ✅ 攔截 modal 關閉
+                        modalEl.addEventListener("hide.bs.modal", async function (e) {
+                            if (hasUnsavedChanges) {
+                                e.preventDefault();
+                                if (confirm("尚未儲存變更，是否儲存？\n按「確定」儲存，按「取消」放棄變更。")) {
+                                    // 按「確定」→ 儲存
+                                    const success = await doSave();
+                                    if (success) {
+                                        hasUnsavedChanges = false;
+                                        bootstrap.Modal.getInstance(modalEl).hide(); // 再次關閉
+                                    }
+                                } else {
+                                    // 按「取消」→ 直接關閉，不儲存
+                                    hasUnsavedChanges = false;
+                                    bootstrap.Modal.getInstance(modalEl).hide();
+                                }
+                            }
+                        });
+
+                        // ✅ 如果你有儲存成功後的 callback，也可以這樣清除
+                        window.resetEditChangeFlag = () => {
+                            hasUnsavedChanges = false;
+                            console.log("✅ 已儲存 → hasUnsavedChanges 設為 false");
+                        };
+
+                        // 在 modal 開啟時呼叫
+                        bindRoomScheduleCheck();
                     });
-
                 })
                 .catch(err => {
                     alert("載入表單失敗：" + err.message);
                 });
+
+
+
         }
     });
 
@@ -416,7 +505,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             showBtnOverlay(submitBtn); // 加入 loading 遮罩
 
-            const form = document.getElementById("roomoEditForm");
+            // 修正 form id
+            const form = document.getElementById("roomOrderEditForm");
 
             // ====== 新增入住/退房日期驗證 ======
             const checkInDate = form.querySelector("[name='checkInDate']").value;
@@ -491,6 +581,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ...在 modal 載入後呼叫此函數...
+    // 填入MID後自動搜尋會員名字
     function bindMemberIdAutoFill() {
         const memberIdInput = document.getElementById("memberId");
         const memberNameInput = document.getElementById("memberName");
@@ -558,22 +649,29 @@ document.addEventListener("DOMContentLoaded", function () {
             if (e.target.classList.contains("roomTypeSelect")) {
                 const item = e.target.closest(".order-detail-item");
                 const price = e.target.selectedOptions[0].getAttribute("data-price") || 0;
-                const amountInput = item.querySelector(".roomAmountInput");
+                const amountInput = item.querySelector(".roomAmountInput, .roomAmountSelect");
                 const priceInput = item.querySelector(".roomPriceInput");
-                priceInput.value = price * (amountInput.value || 1);
+                const amount = Number(amountInput?.value) || 1;
+                priceInput.value = price * amount;
+                // 存單價到 input 的 data 屬性，方便數量變動時用
+                priceInput.setAttribute("data-unit-price", price);
             }
             // 房間數量變動時
-            if (e.target.classList.contains("roomAmountInput")) {
+            if (e.target.classList.contains("roomAmountInput") || e.target.classList.contains("roomAmountSelect")) {
                 const item = e.target.closest(".order-detail-item");
-                const price = item.querySelector(".roomTypeSelect").selectedOptions[0].getAttribute("data-price") || 0;
-                item.querySelector(".roomPriceInput").value = price * (e.target.value || 1);
+                const priceInput = item.querySelector(".roomPriceInput");
+                // 取單價
+                let unitPrice = priceInput.getAttribute("data-unit-price");
+                if (!unitPrice) {
+                    // 若沒抓過單價，預設 0
+                    unitPrice = 0;
+                }
+                const amount = Number(e.target.value) || 1;
+                priceInput.value = unitPrice * amount;
             }
-            calcActualAmount(); // 每次明細變動都重新計算
-            updateRoomCount(); // <--- 新增這行，讓 roomCount 及時更新
+            calcActualAmount(); // 每次明細變動都重新計算總價
+
         });
-        // 初始也算一次
-        calcActualAmount();
-        updateRoomCount(); // <--- 新增這行，初始化時也更新
     }
 
     // 折扣金額變動時
@@ -663,32 +761,93 @@ document.addEventListener("DOMContentLoaded", function () {
             if (hiddenId) hiddenId.value = "";
 
             detailList.appendChild(newItem);
+            hasUnsavedChanges = true;
         });
 
-        // 綁定移除按鈕
-        detailList.addEventListener("click", function (e) {
-            if (e.target.classList.contains("remove-detail-btn")) {
-                const item = e.target.closest(".order-detail-item");
-                if (!item) return;
 
-                if (detailList.querySelectorAll(".order-detail-item").length > 1) {
-                    item.remove();
-                } else {
-                    alert("至少要保留一個房型");
+        if (detailList) {
+            detailList.addEventListener("click", function (e) {
+                const btn = e.target.closest(".remove-detail-btn");
+                if (btn) {
+                    console.log("orderlistid:", btn.getAttribute("data-id"));
+
+                    const item = btn.closest(".order-detail-item");
+                    if (!item) return;
+
+                    const roomOrderListId = btn.getAttribute("data-id");
+
+                    if (!confirm("確定要移除這筆訂單明細嗎？")) {
+                        return;
+                    }
+
+                    // 新增模式：只刪除前端區塊
+                    if (detailList.querySelectorAll(".order-detail-item").length > 1) {
+                        item.remove();
+                        calcActualAmount();
+                    } else {
+                        alert("至少要保留一個房型");
+                    }
+                    return;
                 }
-            }
-        });
+            });
+        }
     }
 
-    // 房間數量變動時更新總數
-    function updateRoomCount() {
-        const detailItems = document.querySelectorAll("#orderDetailList .order-detail-item");
-        let total = 0;
-        detailItems.forEach(item => {
-            const amountInput = item.querySelector("[name$='.roomAmount']");
-            total += Number(amountInput?.value) || 0;
-        });
-        document.getElementById("roomCount").value = total;
+
+
+    function checkSchedule() {
+        const roomTypeId = roomTypeSelect.value;
+        const checkInDate = checkInInput.value;
+        const checkOutDate = checkOutInput.value;
+        // 先移除外層提示
+        const parent = warningArea.parentElement;
+        let oldMsg = parent.nextElementSibling;
+        if (oldMsg && oldMsg.classList.contains('roomWarningMsg')) {
+            oldMsg.remove();
+        }
+        // 如果有一個沒填，直接 return，不顯示任何提示
+        if (!roomTypeId || !checkInDate || !checkOutDate) {
+            warningArea.textContent = '';
+            return;
+        }
+        // 呼叫API
+        fetch(`/admin/roomo_info/${roomTypeId}/check_schedule?start=${checkInDate}&end=${checkOutDate}`)
+            .then(res => res.json())
+            .then(minAvailable => {
+                // 先移除舊的
+                const parent = warningArea.parentElement;
+                let oldMsg = parent.nextElementSibling;
+                if (oldMsg && oldMsg.classList.contains('roomWarningMsg')) {
+                    oldMsg.remove();
+                }
+
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'roomWarningMsg mt-1';
+
+                if (minAvailable > 0) {
+                    msgDiv.textContent = '該房型於選定日期內皆有空房';
+                    msgDiv.classList.add('text-success');
+                    roomAmountSelect.disabled = false;
+                    roomAmountSelect.innerHTML = "";
+                    for (let i = 1; i <= minAvailable; i++) {
+                        const opt = document.createElement("option");
+                        opt.value = i;
+                        opt.textContent = i;
+                        roomAmountSelect.appendChild(opt);
+                    }
+                } else {
+                    msgDiv.textContent = '選定區間內有滿房日期';
+                    msgDiv.classList.add('text-danger');
+                    roomAmountSelect.innerHTML = `<option value="">無法選擇</option>`;
+                    roomAmountSelect.disabled = true;
+                }
+                parent.after(msgDiv);
+            })
+            .catch(() => {
+                warningArea.textContent = '查詢失敗，請稍後再試';
+                warningArea.classList.remove('text-success');
+                warningArea.classList.add('text-danger');
+            });
     }
 
     // ===== 自動查詢優惠券 =====
@@ -830,6 +989,285 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    function bindRoomAmountSelectUpdate() {
+        const roomTypeSelect = document.getElementById("roomTypeId");
+        const checkInInput = document.getElementById("checkInDate");
+        const checkOutInput = document.getElementById("checkOutDate");
+        const roomAmountSelect = document.querySelector(".roomAmountSelect");
+        const warningArea = document.getElementById("roomWarning");
 
+        if (!roomTypeSelect || !checkInInput || !checkOutInput || !roomAmountSelect || !warningArea) {
+            console.warn("部分元素未找到，無法綁定房間數更新事件");
+            return;
+        }
+
+        function updateRoomAmountOptions() {
+            const roomTypeId = roomTypeSelect.value;
+            const checkIn = checkInInput.value;
+            const checkOut = checkOutInput.value;
+
+            if (!roomTypeId || !checkIn || !checkOut) {
+                roomAmountSelect.innerHTML = `<option value="">請先選擇房型與日期</option>`;
+                roomAmountSelect.disabled = true;
+                warningArea.textContent = "";
+                return;
+            }
+
+            fetch(`/admin/roomo_info/${roomTypeId}/check_schedule?start=${checkIn}&end=${checkOut}`)
+                .then(res => res.json())
+                .then(minAvailable => {
+                    if (minAvailable > 0) {
+                        warningArea.textContent = '該房型於選定日期內皆有空房';
+                        warningArea.classList.remove('text-danger');
+                        warningArea.classList.add('text-success');
+                        roomAmountSelect.disabled = false;
+                        // 產生可選數量
+                        roomAmountSelect.innerHTML = "";
+                        for (let i = 1; i <= minAvailable; i++) {
+                            const opt = document.createElement("option");
+                            opt.value = i;
+                            opt.textContent = i;
+                            roomAmountSelect.appendChild(opt);
+                        }
+                    } else {
+                        warningArea.textContent = '選定區間內有滿房日期';
+                        warningArea.classList.remove('text-success');
+                        warningArea.classList.add('text-danger');
+                        roomAmountSelect.innerHTML = `<option value="">無法選擇</option>`;
+                        roomAmountSelect.disabled = true;
+                    }
+                })
+                .catch(err => {
+                    console.error("fetch 錯誤", err);
+                    warningArea.textContent = "房型查詢失敗，請稍後重試";
+                    roomAmountSelect.disabled = true;
+                });
+        }
+
+        // 綁定事件
+        roomTypeSelect.addEventListener("change", updateRoomAmountOptions);
+        checkInInput.addEventListener("change", updateRoomAmountOptions);
+        checkOutInput.addEventListener("change", updateRoomAmountOptions);
+    }
+
+    // ===== 加購專案區塊顯示/隱藏與資料載入 =====
+    function bindProjectAddOnArea() {
+        const projectAddOnRadios = document.querySelectorAll('input[name="projectAddOn"]');
+        const restoProjectArea = document.getElementById("restoProjectArea");
+        const restoSelect = document.getElementById("restoSelect");
+        const timeslotSelect = document.getElementById("timeslotSelect");
+        const diningPeopleSelect = document.getElementById("diningPeopleSelect");
+        const checkInDateInput = document.getElementById("checkInDate");
+
+        if (!projectAddOnRadios.length || !restoProjectArea) return;
+
+        // 檢查初始狀態（編輯模式可能已經有選值）
+        const initialValue = document.querySelector('input[name="projectAddOn"]:checked')?.value;
+        if (initialValue === "1") {
+            // 編輯模式：如果原本就有加購專案，顯示區塊並啟用欄位
+            restoProjectArea.style.display = "block";
+            if (restoSelect) restoSelect.disabled = false;
+            if (timeslotSelect) timeslotSelect.disabled = false;
+            if (diningPeopleSelect) diningPeopleSelect.disabled = false;
+        }
+
+        // 監聽radio button變化
+        projectAddOnRadios.forEach(radio => {
+            radio.addEventListener("change", function () {
+                if (this.value === "1") {
+                    // 選擇「是」
+                    restoProjectArea.style.display = "block";
+                    restoSelect.disabled = false;
+                    timeslotSelect.disabled = false;
+                    diningPeopleSelect.disabled = false;
+                    // 加 required
+                    restoSelect.setAttribute("required", "required");
+                    timeslotSelect.setAttribute("required", "required");
+                    diningPeopleSelect.setAttribute("required", "required");
+                } else {
+                    // 選擇「否」
+                    restoProjectArea.style.display = "none";
+                    restoSelect.disabled = true;
+                    timeslotSelect.disabled = true;
+                    diningPeopleSelect.disabled = true;
+                    // 移除 required
+                    restoSelect.removeAttribute("required");
+                    timeslotSelect.removeAttribute("required");
+                    diningPeopleSelect.removeAttribute("required");
+                    // 清空值
+                    restoSelect.value = "";
+                    timeslotSelect.value = "";
+                    diningPeopleSelect.value = "";
+                }
+            });
+        });
+
+        // 餐廳選擇後載入時段
+        restoSelect.addEventListener("change", function () {
+            const restoId = this.value;
+            timeslotSelect.innerHTML = '<option value="">請先選擇餐廳</option>';
+            diningPeopleSelect.innerHTML = '<option value="">請先選擇餐廳與時段</option>';
+            timeslotSelect.disabled = true;
+            diningPeopleSelect.disabled = true;
+            if (!restoId) return;
+            fetch(`/admin/resto/timeslots?restoId=${restoId}`)
+                .then(res => res.json())
+                .then(data => {
+                    timeslotSelect.innerHTML = '<option value="">請選擇時段</option>';
+                    data.forEach(item => {
+                        const opt = document.createElement("option");
+                        opt.value = item.timeslotId;
+                        opt.textContent = item.periodName + ' ' + item.timeslotName;
+                        timeslotSelect.appendChild(opt);
+                    });
+                    timeslotSelect.disabled = false;
+                });
+        });
+
+        // 時段選擇後載入剩餘人數
+        timeslotSelect.addEventListener("change", function () {
+            const restoId = restoSelect.value;
+            const timeslotId = this.value;
+            const checkInDate = checkInDateInput.value;
+            diningPeopleSelect.innerHTML = '<option value="">請先選擇餐廳與時段</option>';
+            diningPeopleSelect.disabled = true;
+            if (!restoId || !timeslotId || !checkInDate) return;
+            fetch(`/admin/resto/available-seats?restoId=${restoId}&timeslotId=${timeslotId}&date=${checkInDate}`)
+                .then(res => res.json())
+                .then(data => {
+                    diningPeopleSelect.innerHTML = '';
+                    for (let i = 1; i <= data.availableSeats; i++) {
+                        const opt = document.createElement("option");
+                        opt.value = i;
+                        opt.textContent = i;
+                        diningPeopleSelect.appendChild(opt);
+                    }
+                    diningPeopleSelect.disabled = false;
+                });
+        });
+    }
+
+    function bindRoomScheduleCheck() {
+        // 取得所有房型、入住、退房欄位
+        // 注意：多明細時要針對每一組動態綁定
+        document.querySelectorAll('.order-detail-item').forEach(function (item) {
+            const roomTypeSelect = item.querySelector('.roomTypeSelect');
+            const checkInInput = document.getElementById('checkInDate');
+            const checkOutInput = document.getElementById('checkOutDate');
+            const roomAmountSelect = item.querySelector('.roomAmountSelect');
+            let warningArea = item.querySelector('.roomWarning');
+            if (!warningArea) {
+                // 若沒有就自動加一個
+                warningArea = document.createElement('div');
+                warningArea.className = 'roomWarning text-danger mt-1';
+                roomTypeSelect.parentElement.insertBefore(warningArea, roomTypeSelect.nextSibling);
+            }
+
+            function checkSchedule() {
+                const roomTypeId = roomTypeSelect.value;
+                const checkInDate = checkInInput.value;
+                const checkOutDate = checkOutInput.value;
+                // 先移除外層提示
+                const parent = warningArea.parentElement;
+                let oldMsg = parent.nextElementSibling;
+                if (oldMsg && oldMsg.classList.contains('roomWarningMsg')) {
+                    oldMsg.remove();
+                }
+                // 如果有一個沒填，直接 return，不顯示任何提示
+                if (!roomTypeId || !checkInDate || !checkOutDate) {
+                    warningArea.textContent = '';
+                    return;
+                }
+                // 呼叫API
+                fetch(`/admin/roomo_info/${roomTypeId}/check_schedule?start=${checkInDate}&end=${checkOutDate}`)
+                    .then(res => res.json())
+                    .then(minAvailable => {
+                        // 先移除舊的
+                        const parent = warningArea.parentElement;
+                        let oldMsg = parent.nextElementSibling;
+                        if (oldMsg && oldMsg.classList.contains('roomWarningMsg')) {
+                            oldMsg.remove();
+                        }
+
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = 'roomWarningMsg mt-1';
+
+                        if (minAvailable > 0) {
+                            msgDiv.textContent = '該房型於選定日期內皆有空房';
+                            msgDiv.classList.add('text-success');
+                            roomAmountSelect.disabled = false;
+                            roomAmountSelect.innerHTML = "";
+                            for (let i = 1; i <= minAvailable; i++) {
+                                const opt = document.createElement("option");
+                                opt.value = i;
+                                opt.textContent = i;
+                                roomAmountSelect.appendChild(opt);
+                            }
+                        } else {
+                            msgDiv.textContent = '選定區間內有滿房日期';
+                            msgDiv.classList.add('text-danger');
+                            roomAmountSelect.innerHTML = `<option value="">無法選擇</option>`;
+                            roomAmountSelect.disabled = true;
+                        }
+                        parent.after(msgDiv);
+                    })
+                    .catch(() => {
+                        warningArea.textContent = '查詢失敗，請稍後再試';
+                        warningArea.classList.remove('text-success');
+                        warningArea.classList.add('text-danger');
+                    });
+            }
+
+            // 綁定事件
+            roomTypeSelect.addEventListener('change', checkSchedule);
+            checkInInput.addEventListener('change', checkSchedule);
+            checkOutInput.addEventListener('change', checkSchedule);
+        });
+    }
 
 });
+
+async function doSave() {
+    // 取得編輯表單
+    const form = document.getElementById("roomOrderEditForm");
+    if (!form) return false;
+
+    // 準備 FormData
+    const formData = new FormData(form);
+
+    // 如果有用 TinyMCE，記得同步內容
+    if (window.tinymce && tinymce.get("roomoContent")) {
+        formData.set("roomoContent", tinymce.get("roomoContent").getContent() || "");
+    }
+
+    try {
+        const res = await fetch("/admin/roomo_info/update", {
+            method: "POST",
+            body: formData
+        });
+
+        // 如果後端有 redirect，代表成功
+        if (res.redirected) {
+            window.location.href = res.url;
+            return true;
+        }
+
+        // 如果沒 redirect，可能是表單驗證失敗，顯示錯誤
+        const html = await res.text();
+        // 更新 modal 內容（只更新 .modal-body）
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const newBody = doc.querySelector(".modal-body");
+        const oldBody = document.querySelector("#roomoEditModal .modal-body");
+        if (newBody && oldBody) {
+            oldBody.replaceWith(newBody);
+        }
+        alert("儲存失敗，請檢查表單內容！");
+        return false;
+    } catch (err) {
+        alert("儲存失敗：" + err.message);
+        return false;
+    }
+}
+
+

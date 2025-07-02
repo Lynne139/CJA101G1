@@ -12,6 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.util.Date;
+import java.io.IOException;
 
 import java.util.List;
 import java.util.Optional;
@@ -153,5 +156,31 @@ public class EmployeeController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // 新增：支援表單送出
+    @PostMapping("/form")
+    public String createEmployeeForm(
+        @RequestParam("name") String name,
+        @RequestParam("password") String password,
+        @RequestParam("roleId") Integer roleId,
+        @RequestParam("jobTitleId") Integer jobTitleId,
+        @RequestParam("status") Boolean status,
+        @RequestParam("createdDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date createdDate,
+        @RequestParam(value = "employeePhoto", required = false) MultipartFile employeePhoto
+    ) throws IOException {
+        Employee employee = new Employee();
+        employee.setName(name);
+        employee.setPassword(password);
+        employee.setRoleId(roleId);
+        employee.setJobTitleId(jobTitleId);
+        employee.setStatus(status);
+        employee.setCreatedDate(createdDate);
+        if (employeePhoto != null && !employeePhoto.isEmpty()) {
+            employee.setEmployeePhoto(employeePhoto.getBytes());
+        }
+        employeeService.createEmployee(employee);
+        // 新增成功後導回員工管理頁
+        return "redirect:/admin/staff1";
     }
 } 

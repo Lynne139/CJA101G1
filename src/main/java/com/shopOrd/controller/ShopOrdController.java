@@ -37,6 +37,7 @@ import com.shopOrd.model.ShopOrdVO;
 import com.coupon.entity.Coupon;
 import com.coupon.service.CouponService;
 import com.coupon.service.MemberCouponService;
+import com.coupon.repository.MemberCouponRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -59,6 +60,9 @@ public class ShopOrdController {
 	
 	@Autowired
 	MemberCouponService memberCouponService;
+	
+	@Autowired
+	MemberCouponRepository memberCouponRepository;
 	
 	@GetMapping("/admin/shopOrd/select_page")
 	public String selectPage(Model model) {
@@ -102,7 +106,33 @@ public class ShopOrdController {
 		ShopOrdVO shopOrdVO = shopOrdSvc.getOneShopOrd(Integer.valueOf(prodOrdId));
 
 		/*************************** 3.查詢完成,準備轉交(Send the Success view) **************/
+		if (shopOrdVO == null || shopOrdVO.getMemberVO() == null) {
+			model.addAttribute("errorMessage", "查無此訂單或會員資料");
+			model.addAttribute("couponListData", new java.util.ArrayList<>());
+			model.addAttribute("couponMap", new java.util.HashMap<>());
+			return "admin/fragments/shop/shopOrd/update_shopOrd_input";
+		}
 		model.addAttribute("shopOrdVO", shopOrdVO);
+
+		// 查詢該會員已領取且可用的商城折價券
+		Integer memberId = shopOrdVO.getMemberVO().getMemberId();
+		Integer prodAmount = shopOrdVO.getProdAmount() != null ? shopOrdVO.getProdAmount() : 0;
+		List<Coupon> couponList = memberCouponRepository.findProdOnlyOrAllCoupons(
+			memberId,
+			java.time.LocalDate.now(),
+			prodAmount
+		);
+		if (couponList == null) couponList = new java.util.ArrayList<>();
+		model.addAttribute("couponListData", couponList);
+
+		// 新增：產生 couponMap 給前端
+		java.util.Map<String, Integer> couponMap = couponList.stream()
+			.collect(java.util.stream.Collectors.toMap(
+				c -> c.getCouponCode(),
+				c -> c.getDiscountValue()
+			));
+		model.addAttribute("couponMap", couponMap);
+
 		return "admin/fragments/shop/shopOrd/update_shopOrd_input"; // 查詢完成後轉交update_emp_input.html
 	}
 
@@ -342,11 +372,12 @@ public class ShopOrdController {
 		try {
 			System.out.println("=== 開始獲取可用折價券 ===");
 			System.out.println("購物車總金額: " + cartTotal);
+			System.out.println("Session ID: " + request.getSession().getId());
 			
 			// 從session獲取當前登入的會員資訊
 			MemberVO memberVO = (MemberVO) request.getSession().getAttribute("memberVO");
 			if (memberVO == null) {
-				System.out.println("會員未登入");
+				System.out.println("會員未登入 - session中沒有memberVO");
 				response.put("success", false);
 				response.put("message", "請先登入會員");
 				return response;
@@ -354,6 +385,7 @@ public class ShopOrdController {
 			
 			Integer memberId = memberVO.getMemberId();
 			System.out.println("會員ID: " + memberId);
+			System.out.println("會員名稱: " + memberVO.getMemberName());
 			
 			// 使用MemberCouponService查詢會員可用於商城訂單的折價券
 			List<Coupon> availableCoupons = memberCouponService.getProductOrderApplicableCoupons(
@@ -361,7 +393,9 @@ public class ShopOrdController {
 			
 			System.out.println("可用折價券數量: " + availableCoupons.size());
 			for (Coupon coupon : availableCoupons) {
-				System.out.println("折價券: " + coupon.getCouponCode() + " - " + coupon.getCouponName());
+				System.out.println("折價券: " + coupon.getCouponCode() + " - " + coupon.getCouponName() + 
+					" (類型: " + coupon.getOrderType().getLabel() + ", 折扣: " + coupon.getDiscountValue() + 
+					", 最低消費: " + coupon.getMinPurchase() + ")");
 			}
 			System.out.println("=== 獲取折價券完成 ===");
 			
@@ -376,6 +410,26 @@ public class ShopOrdController {
 			response.put("message", "獲取折價券失敗: " + e.getMessage());
 			return response;
 		}
+	}
+
+	/**
+	 * 後台取消訂單（ordStat=2）
+	 */
+	@PostMapping("/admin/shopOrd/cancel")
+	@ResponseBody
+	public Map<String, Object> cancelOrder(@RequestParam("prodOrdId") Integer prodOrdId) {
+		Map<String, Object> response = new HashMap<>();
+		ShopOrdVO order = shopOrdSvc.getOneShopOrd(prodOrdId);
+		if (order == null) {
+			response.put("success", false);
+			response.put("message", "查無此訂單");
+			return response;
+		}
+		order.setOrdStat(2); // 2 代表取消
+		shopOrdSvc.updateShopOrd(order);
+		response.put("success", true);
+		response.put("message", "訂單已取消");
+		return response;
 	}
 
 }

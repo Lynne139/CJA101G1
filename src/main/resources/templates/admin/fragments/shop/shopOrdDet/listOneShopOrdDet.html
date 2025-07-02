@@ -3,19 +3,6 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="panel-title">訂單明細詳細資訊</h2>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-outline-primary" 
-                        data-bs-toggle="modal" data-bs-target="#editShopOrdDetModal"
-                        th:data-prod-ord-id="${shopOrdDetVO.shopOrdVO.prodOrdId}"
-                        th:data-product-id="${shopOrdDetVO.prodVO.productId}"
-                        onclick="loadEditShopOrdDetModal(this)">
-                    <i class="fas fa-edit me-2"></i>
-                    修改
-                </button>
-                <button type="button" class="btn btn-outline-danger"
-                        th:onclick="'deleteShopOrdDet(' + ${shopOrdDetVO.shopOrdVO.prodOrdId} + ', ' + ${shopOrdDetVO.prodVO.productId} + ')'">
-                    <i class="fas fa-trash me-2"></i>
-                    刪除
-                </button>
                 <a href="/admin/shopOrdDet/select_page" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>
                     返回列表
@@ -48,8 +35,8 @@
                         <div class="row mb-2">
                             <div class="col-4 fw-bold">付款方式：</div>
                             <div class="col-8">
-                                <span th:if="${shopOrdDetVO.shopOrdVO.payMethod}" class="badge bg-success">現金</span>
-                                <span th:unless="${shopOrdDetVO.shopOrdVO.payMethod}" class="badge bg-info">信用卡</span>
+                                <span th:if="${shopOrdDetVO.shopOrdVO.payMethod}" class="badge bg-success">LinePay</span>
+                                <span th:unless="${shopOrdDetVO.shopOrdVO.payMethod}" class="badge bg-info">現金</span>
                             </div>
                         </div>
                         <div class="row mb-2">
@@ -103,30 +90,14 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-3">
-                        <div class="text-center p-3 bg-light rounded">
-                            <div class="h4 text-primary" th:text="${'$' + shopOrdDetVO.purchasePrice}"></div>
-                            <div class="text-muted">購買價格</div>
-                        </div>
-                    </div>
+                   
                     <div class="col-md-3">
                         <div class="text-center p-3 bg-light rounded">
                             <div class="h4 text-success" th:text="${shopOrdDetVO.prodQuantity}"></div>
                             <div class="text-muted">購買數量</div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="text-center p-3 bg-light rounded">
-                            <div class="h4 text-danger" th:text="${'$' + (shopOrdDetVO.purchasePrice * shopOrdDetVO.prodQuantity)}"></div>
-                            <div class="text-muted">小計金額</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="text-center p-3 bg-light rounded">
-                            <div class="h4 text-warning" th:text="${'$' + shopOrdDetVO.shopOrdVO.discountAmount}"></div>
-                            <div class="text-muted">折價金額</div>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         </div>

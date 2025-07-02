@@ -1,5 +1,6 @@
 package com.coupon.service;
 
+import com.coupon.dto.CouponUsageDTO;
 import com.coupon.entity.Coupon;
 import com.coupon.entity.MemberCoupon;
 import com.coupon.entity.MemberCouponId;
@@ -34,10 +35,10 @@ public class MemberCouponService {
     }
 
     // 1. 查詢會員已使用的折價券
-    public List<Coupon> getUsedCouponsByMember(Integer memberId) {
-        return memberCouponRepository.findUsedCouponsByMemberId(memberId);
+    public List<CouponUsageDTO> getUsedCouponUsagesByMember(Integer memberId) {
+        return memberCouponRepository.findUsedCouponUsagesByMemberId(memberId);
     }
-
+    
     // 2. 查詢會員可用於訂房或商城、未過期、未使用的折價券
     public List<Coupon> getAvailableCouponsByOrderTypes(Integer memberId, OrderType selectedOrderType) {
         List<Integer> orderTypes;

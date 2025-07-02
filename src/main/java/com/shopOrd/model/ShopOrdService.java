@@ -48,7 +48,57 @@ public class ShopOrdService {
     private SessionFactory sessionFactory;
 
 	public void updateShopOrd(ShopOrdVO shopOrdVO) {
-		repository.save(shopOrdVO);
+		ShopOrdVO dbOrder = repository.findById(shopOrdVO.getProdOrdId()).orElse(null);
+		if (dbOrder == null) return;
+
+		// 取得原本 couponCode
+		String oldCouponCode = dbOrder.getCoupon() != null ? dbOrder.getCoupon().getCouponCode() : null;
+		String newCouponCode = (shopOrdVO.getCoupon() != null && shopOrdVO.getCoupon().getCouponCode() != null && !shopOrdVO.getCoupon().getCouponCode().isBlank())
+			? shopOrdVO.getCoupon().getCouponCode() : null;
+		Integer memberId = dbOrder.getMemberVO() != null ? dbOrder.getMemberVO().getMemberId() : null;
+
+		// 1. 若原本有 coupon，且換成新 coupon 或取消，則將原本的 MemberCoupon 設為 isUsed=false
+		if (oldCouponCode != null && memberId != null && !oldCouponCode.equals(newCouponCode)) {
+			MemberCouponId oldId = new MemberCouponId(oldCouponCode, memberId);
+			memberCouponRepository.findById(oldId).ifPresent(mc -> {
+				mc.setIsUsed(false);
+				mc.setUsedTime(null);
+				memberCouponRepository.save(mc);
+			});
+		}
+		// 2. 若新 coupon 不為空，則將新 coupon 的 MemberCoupon 設為 isUsed=true
+		if (newCouponCode != null && memberId != null && !newCouponCode.equals(oldCouponCode)) {
+			MemberCouponId newId = new MemberCouponId(newCouponCode, memberId);
+			memberCouponRepository.findById(newId).ifPresent(mc -> {
+				mc.setIsUsed(true);
+				mc.setUsedTime(java.time.LocalDateTime.now());
+				memberCouponRepository.save(mc);
+			});
+		}
+
+		// 折價券處理：如果 couponCode 為空，設為 null
+		if (shopOrdVO.getCoupon() == null || 
+			shopOrdVO.getCoupon().getCouponCode() == null || 
+			shopOrdVO.getCoupon().getCouponCode().isBlank()) {
+			dbOrder.setCoupon(null);
+			dbOrder.setDiscountAmount(0);
+		} else {
+			// 以資料庫 coupon 的 discountValue 為主
+			String couponCode = shopOrdVO.getCoupon().getCouponCode();
+			Coupon coupon = couponRepository.findById(couponCode).orElse(null);
+			dbOrder.setCoupon(coupon);
+			int discount = (coupon != null) ? coupon.getDiscountValue() : 0;
+			dbOrder.setDiscountAmount(discount);
+		}
+
+		dbOrder.setOrdStat(shopOrdVO.getOrdStat());
+		dbOrder.setPayMethod(shopOrdVO.getPayMethod());
+
+		Integer prodAmount = dbOrder.getProdAmount() != null ? dbOrder.getProdAmount() : 0;
+		Integer discountAmount = dbOrder.getDiscountAmount() != null ? dbOrder.getDiscountAmount() : 0;
+		dbOrder.setActualPaymentAmount(prodAmount - discountAmount);
+
+		repository.save(dbOrder);
 	}
 
 	public ShopOrdVO getOneShopOrd(Integer prodOrdId) {
@@ -276,7 +326,7 @@ public class ShopOrdService {
 		order.setMemberVO(member);
 		order.setProdOrdDate(LocalDateTime.now());
 		order.setPayMethod(paymentMethod);
-		order.setOrdStat(1); // 已付款（LINE Pay 付款成功）
+		order.setOrdStat(0); // 已付款
 
 		// 3. 建立明細，計算總金額
 		List<ShopOrdDetVO> detailList = new ArrayList<>();

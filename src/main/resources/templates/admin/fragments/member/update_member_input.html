@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>修改會員資料</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5" th:fragment="update_member_input">
+  <h3>修改會員資料</h3>
+
+  <form th:action="@{/admin/update}" method="post" enctype="multipart/form-data" th:object="${memberVO}">
+
+    <input type="hidden" th:field="*{memberId}" />
+
+    <div class="mb-3">
+      <label for="memberName" class="form-label">會員名稱</label>
+      <input type="text" class="form-control" id="memberName" th:field="*{memberName}" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="memberEmail" class="form-label">電子信箱</label>
+      <input type="email" class="form-control" id="memberEmail" th:field="*{memberEmail}" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="memberPassword" class="form-label">密碼</label>
+      <input type="text" class="form-control" id="memberPassword" th:field="*{memberPassword}" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="memberPhone" class="form-label">電話</label>
+      <input type="text" class="form-control" id="memberPhone" th:field="*{memberPhone}">
+    </div>
+
+    <div class="mb-3">
+      <label for="memberBirthday" class="form-label">生日</label>
+      <input type="date" class="form-control" id="memberBirthday" th:field="*{memberBirthday}">
+    </div>
+
+    <div class="mb-3">
+      <label for="memberAddress" class="form-label">地址</label>
+      <input type="text" class="form-control" id="memberAddress" th:field="*{memberAddress}">
+    </div>
+
+    <div class="mb-3">
+      <label for="memberLevel" class="form-label">會員等級</label>
+      <input type="text" class="form-control" id="memberLevel" th:field="*{memberLevel}">
+    </div>
+
+    <div class="mb-3">
+      <label for="memberPoints" class="form-label">會員積分</label>
+      <input type="number" class="form-control" id="memberPoints" th:field="*{memberPoints}">
+    </div>
+
+    <div class="mb-3">
+      <label for="memberAccumulativeConsumption" class="form-label">會員累積消費金額</label>
+      <input type="number" class="form-control" id="memberAccumulativeConsumption" th:field="*{memberAccumulativeConsumption}">
+    </div>
+
+    <div class="mb-3">
+	  <label for="memberStatus" class="form-label">會員狀態</label>
+	  <select class="form-select" id="memberStatus" th:field="*{memberStatus}">
+	    <option th:value="0" th:text="'0: 尚未認證'" 
+	            th:selected="${memberVO.memberStatus == 0}">尚未認證</option>
+	    <option th:value="1" th:text="'1: 啟用'" 
+	            th:selected="${memberVO.memberStatus == 1}">啟用</option>
+	    <option th:value="2" th:text="'2: 停權'" 
+	            th:selected="${memberVO.memberStatus == 2}">停權</option>
+	  </select>
+	</div>
+
+    <div class="mb-3">
+      <label class="form-label">會員圖片</label><br>
+      <img th:src="@{/member/ImageReader(memberId=${memberVO.memberId})}" width="120" height="120" class="mb-2" />
+      <input type="file" class="form-control" name="uploadPic" th:field="*{uploadPic}">
+    </div>
+
+    <button type="submit" class="btn btn-primary">送出修改</button>
+    <a th:href="@{/admin/listAllMember}" class="btn btn-secondary">取消</a>
+
+  </form>
+</div>
+</body>
+</html>

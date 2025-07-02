@@ -32,4 +32,8 @@ public class PromotionNewsService {
     public List<PromotionNews> findByIsDisplayTrue() {
         return repo.findByIsDisplayTrue();
     }
+
+    public Optional<PromotionNews> findLatestDisplay() {
+        return repo.findFirstByIsDisplayTrueOrderByStartDateDesc();
+    }
 } 

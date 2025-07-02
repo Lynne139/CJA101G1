@@ -4,185 +4,361 @@
     <meta charset="UTF-8">
     <title>查詢折價券</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-	<link rel="stylesheet" th:href="@{/css/all_admin.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" th:href="@{/css/all_admin.css}">
+    <style>
+        :root { --color-background: #F4EDE1; --color-primary: #7E4E24; --color-secondary: #B88D67; --color-tertiary: #9D3C3C; --color-accent: #FF7449; --color-black: #000000; --color-white: #FFFFFF; --color-success: #55AE6E; --color-error: #E96060; --color-bg-panel: #ffffff52; --panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); --hover-opacity: 80%; }
+        body { background-color: var(--color-background); color: var(--color-primary); }
+        .date-input { max-width: 160px; }
+        .pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+        .pagination-info { color: var(--color-secondary); }
+        .card { background: var(--color-bg-panel); border: 1px solid var(--color-primary); box-shadow: var(--panel-shadow); }
+        .card-header { background: transparent; border-bottom: 1px solid var(--color-primary); color: var(--color-primary); }
+        .form-control { background-color: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); }
+        .form-control:focus { background-color: transparent; color: var(--color-primary); border-color: var(--color-accent); box-shadow: 0 0 4px 0 var(--color-accent); }
+        .form-control::placeholder { color: var(--color-secondary); }
+        .form-label { color: var(--color-primary); }
+        .input-group-text { background-color: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); }
+        .btn-outline-primary { color: var(--color-primary); border-color: var(--color-primary); background-color: transparent; }
+        .btn-outline-primary:hover { color: var(--color-white); background-color: var(--color-primary); border-color: var(--color-primary); opacity: var(--hover-opacity); }
+        .btn-success { background-color: var(--color-accent); border-color: var(--color-accent); color: var(--color-white); font-size: 1em; }
+        .btn-success:hover { background-color: var(--color-accent); border-color: var(--color-accent); color: var(--color-white); opacity: var(--hover-opacity); }
+        .table { --bs-table-bg: transparent; color: var(--color-primary); }
+        .table-bordered { --bs-table-border-color: var(--color-primary); }
+        .table thead th { color: var(--color-primary); background-color: transparent; border: 1px solid var(--color-primary); text-align: center; vertical-align: middle; }
+        .table tbody td { color: var(--color-primary); }
+        .text-danger { color: var(--color-error) !important; }
+        .pagination .page-link { background-color: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); }
+        .pagination .page-item.active .page-link { background-color: var(--color-accent); border-color: var(--color-accent); color: var(--color-white); }
+        .pagination .page-item:hover .page-link { opacity: var(--hover-opacity); }
+        .pagination .page-item.disabled .page-link { opacity: 0.3; pointer-events: none; }
+        .datetime-cell { line-height: 1.2; }
+        .coupon-name {word-wrap: break-word; white-space: normal; max-width: 145px;}
+    </style>
 </head>
 <body>
-	<div class="container py-4">
-	    <div class="card mb-4">
-	        <div class="card-header d-flex justify-content-between align-items-center">
-	            <h4 class="mb-0">查詢折價券</h4>
-	            <!-- 新增折價券按鈕 -->
-	            <button id="btnAddCoupon" class="btn btn-success btn-sm">新增折價券</button>
-	        </div>
-	        <div class="card-body">
-	            <div class="row g-3">
-	                <div class="col-md-4">
-	                    <label class="form-label">折價券代碼</label>
-	                    <div class="input-group">
-	                        <input type="text" id="couponCode" class="form-control" placeholder="輸入折價券代碼">
-	                        <button class="btn btn-outline-primary" id="searchByCodeBtn">查詢</button>
-	                    </div>
-	                </div>
-	
-	                <div class="col-md-4">
-	                    <label class="form-label">折價券名稱</label>
-	                    <div class="input-group">
-	                        <input type="text" id="couponName" class="form-control" placeholder="輸入折價券名稱">
-	                        <button class="btn btn-outline-primary" id="searchByNameBtn">查詢</button>
-	                    </div>
-	                </div>
-	
-	                <div class="col-md-4">
-	                    <label class="form-label">建立日期區間</label>
-	                    <div class="input-group">
-	                        <input type="date" id="startDate" class="form-control">
-	                        <span class="input-group-text">至</span>
-	                        <input type="date" id="endDate" class="form-control">
-	                        <button class="btn btn-outline-primary" id="searchByDateBtn">查詢</button>
-	                    </div>
-	                </div>
-	            </div>
-	        </div>
-	    </div>
-	
-	    <!-- 查詢結果 -->
-	    <div class="card" id="resultSection" style="display: none;">
-	        <div class="card-header">
-	            <h5 class="mb-0">查詢結果</h5>
-	        </div>
-	        <div class="card-body">
-	            <div class="table-responsive">
-	                <table class="table table-bordered align-middle text-center">
-	                    <thead class="table-light">
-	                        <tr>
-	                            <th>折價券編號</th>
-	                            <th>名稱</th>
-	                            <th>訂單類型</th>
-	                            <th>折扣金額</th>
-	                            <th>低銷限制</th>
-	                            <th>領取開始</th>
-	                            <th>領取結束</th>
-	                            <th>到期日</th>
-	                            <th>建立時間</th>
-	                            <th>操作</th> <!-- 修改按鈕欄 -->
-	                        </tr>
-	                    </thead>
-	                    <tbody id="resultBody"></tbody>
-	                </table>
-	            </div>
-	        </div>
-	    </div>
-	</div>
+    <div class="container py-4">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">查詢折價券</h4>
+                <!-- 新增折價券按鈕 -->
+                <button id="btnAddCoupon" class="btn btn-success btn-sm">＋ 新增折價券</button>
+            </div>
+            <div class="card-body">
+                <!-- 第一列：折價券編號和名稱查詢 -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">折價券編號</label>
+                        <div class="input-group">
+                            <input type="text" id="couponCode" class="form-control" placeholder="輸入折價券編號">
+                            <button class="btn btn-outline-primary" id="searchByCodeBtn">查詢</button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">折價券名稱</label>
+                        <div class="input-group">
+                            <input type="text" id="couponName" class="form-control" placeholder="輸入折價券名稱">
+                            <button class="btn btn-outline-primary" id="searchByNameBtn">查詢</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二列：日期區間查詢 -->
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">建立日期區間</label>
+                        <div class="input-group">
+                            <input type="date" id="startDate" class="form-control date-input">
+                            <span class="input-group-text">至</span>
+                            <input type="date" id="endDate" class="form-control date-input">
+                            <button class="btn btn-outline-primary" id="searchByDateBtn">查詢</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 查詢結果 -->
+        <div class="card" id="resultSection" style="display: none;">
+            <div class="card-header">
+                <h5 class="mb-0">查詢結果</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>折價券<br>編號</th>
+                                <th>名稱</th>
+                                <th>訂單<br>類型</th>
+                                <th>折扣<br>金額</th>
+                                <th>低銷<br>限制</th>
+                                <th>領取<br>開始</th>
+                                <th>領取<br>結束</th>
+                                <th>到期日</th>
+                                <th>建立<br>時間</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultBody"></tbody>
+                    </table>
+                </div>
+                
+                <!-- 分頁控制 -->
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        <span id="paginationInfo">顯示 0 - 0 筆，共 0 筆資料</span>
+                    </div>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0" id="pagination">
+                            <!-- 分頁按鈕將由 JavaScript 動態生成 -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const resultSection = document.getElementById('resultSection');
-
-            const orderTypeLabels = {
-                1: "限訂房",
-                2: "限商城",
-                3: "訂房和商城"
-            };
-
-            function renderResults(coupons) {
-                const tbody = document.getElementById('resultBody');
-                // 清空原本的 <tbody>
-                tbody.innerHTML = '';
-				// 如果是空的 ➜ 顯示「查無資料」紅字
-                if (!coupons || coupons.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" class="text-center text-danger">查無資料</td></tr>';
-                    resultSection.style.display = 'block';
-                    return;
-                }
-				// 否則動態建立 <tr> 資料列、插入對應欄位。
-                coupons.forEach(coupon => {
-                    let orderTypeText = '未知';
-
-                    if (coupon.orderType == null) {
-                        orderTypeText = '未知';
-                    } else if (typeof coupon.orderType === 'number') {
-                        orderTypeText = orderTypeLabels[coupon.orderType] || '未知';
-                    } 
-                    // 目前我的後端是傳字串e.g.'ROOM_ONLY'過來的
-                    else if (typeof coupon.orderType === 'string') {
-                        const key = coupon.orderType.toUpperCase();
-                        switch (key) {
-                            case 'ROOM_ONLY': orderTypeText = '限訂房'; break;
-                            case 'PROD_ONLY': orderTypeText = '限商城'; break;
-                            case 'ROOM_AND_PROD': orderTypeText = '訂房和商城'; break;
-                            default: orderTypeText = '未知';
-                        }
-                    } else if (coupon.orderType.label) {
-                        orderTypeText = coupon.orderType.label;
-                    }
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${coupon.couponCode || ''}</td>
-                        <td>${coupon.couponName || ''}</td>
-                        <td>${orderTypeText}</td>
-                        <td>${coupon.discountValue != null ? coupon.discountValue : ''}</td>
-                        <td>${coupon.minPurchase != null ? coupon.minPurchase : ''}</td>
-                        <td>${coupon.claimStartDate || ''}</td>
-                        <td>${coupon.claimEndDate || ''}</td>
-                        <td>${coupon.expiryDate || ''}</td>
-                        <td>${coupon.createdAt || ''}</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary btn-edit" data-code="${coupon.couponCode}">
-                                修改
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                // 綁定修改按鈕事件，點擊就會跳轉到 /admin/coupon/update/{couponCode}。
-                document.querySelectorAll('.btn-edit').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const code = btn.getAttribute('data-code');
-                        window.location.href = `/admin/coupon/update/${code}`;
-                    });
-                });
-
-                resultSection.style.display = 'block';
-            }
-
-            document.getElementById('searchByCodeBtn').addEventListener('click', function () {
-                const code = document.getElementById('couponCode').value.trim();
-                if (!code) return alert("請輸入折價券代碼");
-                fetch(`/api/coupons/code/${code}`)
-                    .then(response => response.ok ? response.json() : null)
-                    .then(data => renderResults(data ? [data] : []));
-            });
-
-            document.getElementById('searchByNameBtn').addEventListener('click', function () {
-                const name = document.getElementById('couponName').value.trim();
-                if (!name) return alert("請輸入折價券名稱");
-                fetch(`/api/coupons/name/${name}`)
-                    .then(response => response.json())
-                    .then(renderResults);
-            });
-
-            document.getElementById('searchByDateBtn').addEventListener('click', function () {
-                const start = document.getElementById('startDate').value;
-                const end = document.getElementById('endDate').value;
-                if (!start || !end) return alert("請選擇日期區間");
-
-                const startDateTime = `${start}T00:00:00`;
-                const endDateTime = `${end}T23:59:59`;
-
-                fetch(`/api/coupons/created-range?start=${startDateTime}&end=${endDateTime}`)
-                    .then(response => response.json())
-                    .then(renderResults);
-            });
-
-            // 新增折價券按鈕事件
-            document.getElementById('btnAddCoupon').addEventListener('click', () => {
-                window.location.href = '/admin/coupon/add';
-            });
-        });
-    </script>
+	<script>
+	    document.addEventListener("DOMContentLoaded", function () {
+	        const resultSection = document.getElementById('resultSection');
+	        let currentData = [];
+	        let currentPage = 1;
+	        const itemsPerPage = 5;
+	
+	        const orderTypeLabels = {
+	            1: "限訂房",
+	            2: "限商城",
+	            3: "訂房和商城"
+	        };
+	
+	        // 格式化日期時間函數
+	        function formatDateTime(dateTimeString) {
+	            if (!dateTimeString) return '';
+	            
+	            try {
+	                const date = new Date(dateTimeString);
+	                const year = date.getFullYear();
+	                const month = String(date.getMonth() + 1).padStart(2, '0');
+	                const day = String(date.getDate()).padStart(2, '0');
+	                const hours = String(date.getHours()).padStart(2, '0');
+	                const minutes = String(date.getMinutes()).padStart(2, '0');
+	                const seconds = String(date.getSeconds()).padStart(2, '0');
+	                
+	                return `${year}<br>${month}-${day}<br>${hours}:${minutes}:${seconds}`;
+	            } catch (error) {
+	                return dateTimeString;
+	            }
+	        }
+	
+	        // 自定義格式化日期函數（包含斷行）
+	        function formatCustomDate(dateTimeString) {
+	            if (!dateTimeString) return '';
+	
+	            try {
+	                const date = new Date(dateTimeString);
+	                const year = date.getFullYear();
+	                const month = String(date.getMonth() + 1).padStart(2, '0');
+	                const day = String(date.getDate()).padStart(2, '0');
+	                
+	                return `${year}<br>${month}-${day}`;
+	            } catch (error) {
+	                return dateTimeString;
+	            }
+	        }
+	
+	        // 日期選擇邏輯
+	        const startDateInput = document.getElementById('startDate');
+	        const endDateInput = document.getElementById('endDate');
+	
+	        startDateInput.addEventListener('change', function() {
+	            if (this.value) {
+	                endDateInput.min = this.value;
+	                if (endDateInput.value && endDateInput.value < this.value) {
+	                    endDateInput.value = this.value;
+	                }
+	            }
+	        });
+	
+	        function renderPagination(totalItems, currentPage, itemsPerPage) {
+	            const totalPages = Math.ceil(totalItems / itemsPerPage);
+	            const pagination = document.getElementById('pagination');
+	            const paginationInfo = document.getElementById('paginationInfo');
+	            
+	            // 更新資訊顯示
+	            const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+	            const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+	            paginationInfo.textContent = `顯示 ${startItem} - ${endItem} 筆，共 ${totalItems} 筆資料`;
+	            
+	            // 清空分頁按鈕
+	            pagination.innerHTML = '';
+	            
+	            if (totalPages <= 1) return;
+	            
+	            // 上一頁按鈕
+	            const prevLi = document.createElement('li');
+	            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+	            prevLi.innerHTML = '<a class="page-link" href="#" data-page="prev">上一頁</a>';
+	            pagination.appendChild(prevLi);
+	            
+	            // 頁碼按鈕
+	            let startPage = Math.max(1, currentPage - 2);
+	            let endPage = Math.min(totalPages, currentPage + 2);
+	            
+	            // 如果當前頁接近開始，顯示更多後面的頁碼
+	            if (currentPage <= 3) {
+	                endPage = Math.min(totalPages, 5);
+	            }
+	            
+	            // 如果當前頁接近結束，顯示更多前面的頁碼
+	            if (currentPage > totalPages - 3) {
+	                startPage = Math.max(1, totalPages - 4);
+	            }
+	            
+	            for (let i = startPage; i <= endPage; i++) {
+	                const li = document.createElement('li');
+	                li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+	                li.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+	                pagination.appendChild(li);
+	            }
+	            
+	            // 下一頁按鈕
+	            const nextLi = document.createElement('li');
+	            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+	            nextLi.innerHTML = '<a class="page-link" href="#" data-page="next">下一頁</a>';
+	            pagination.appendChild(nextLi);
+	            
+	            // 綁定分頁點擊事件
+	            pagination.querySelectorAll('.page-link').forEach(link => {
+	                link.addEventListener('click', function(e) {
+	                    e.preventDefault();
+	                    const page = this.getAttribute('data-page');
+	                    
+	                    if (page === 'prev' && currentPage > 1) {
+	                        renderResults(currentData, currentPage - 1);
+	                    } else if (page === 'next' && currentPage < totalPages) {
+	                        renderResults(currentData, currentPage + 1);
+	                    } else if (!isNaN(page)) {
+	                        renderResults(currentData, parseInt(page));
+	                    }
+	                });
+	            });
+	        }
+	
+	        function renderResults(coupons, page = 1) {
+	            const tbody = document.getElementById('resultBody');
+	            currentData = coupons || [];
+	            currentPage = page;
+	            
+	            // 清空原本的 <tbody>
+	            tbody.innerHTML = '';
+	            
+	            // 如果是空的 ➜ 顯示「查無資料」紅字
+	            if (!coupons || coupons.length === 0) {
+	                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-danger">查無資料</td></tr>';
+	                document.getElementById('paginationInfo').textContent = '顯示 0 - 0 筆，共 0 筆資料';
+	                document.getElementById('pagination').innerHTML = '';
+	                resultSection.style.display = 'block';
+	                return;
+	            }
+	            
+	            // 計算當前頁面要顯示的資料
+	            const startIndex = (page - 1) * itemsPerPage;
+	            const endIndex = startIndex + itemsPerPage;
+	            const pageData = coupons.slice(startIndex, endIndex);
+	            
+	            // 渲染當前頁面的資料
+	            pageData.forEach(coupon => {
+	                let orderTypeText = '未知';
+	
+	                if (coupon.orderType == null) {
+	                    orderTypeText = '未知';
+	                } else if (typeof coupon.orderType === 'number') {
+	                    orderTypeText = orderTypeLabels[coupon.orderType] || '未知';
+	                } 
+	                // 目前我的後端是傳字串e.g.'ROOM_ONLY'過來的
+	                else if (typeof coupon.orderType === 'string') {
+	                    const key = coupon.orderType.toUpperCase();
+	                    switch (key) {
+	                        case 'ROOM_ONLY': orderTypeText = '限訂房'; break;
+	                        case 'PROD_ONLY': orderTypeText = '限商城'; break;
+	                        case 'ROOM_AND_PROD': orderTypeText = '訂房和商城'; break;
+	                        default: orderTypeText = '未知';
+	                    }
+	                } else if (coupon.orderType.label) {
+	                    orderTypeText = coupon.orderType.label;
+	                }
+	
+	                const tr = document.createElement('tr');
+	                tr.innerHTML = `
+	                    <td>${coupon.couponCode || ''}</td>
+	                    <td class="coupon-name">${coupon.couponName || ''}</td>
+	                    <td>${orderTypeText}</td>
+	                    <td>${coupon.discountValue != null ? coupon.discountValue : ''}</td>
+	                    <td>${coupon.minPurchase != null ? coupon.minPurchase : ''}</td>
+	                    <td>${formatCustomDate(coupon.claimStartDate)}</td>
+	                    <td>${formatCustomDate(coupon.claimEndDate)}</td>
+	                    <td>${formatCustomDate(coupon.expiryDate)}</td>
+	                    <td class="datetime-cell">${formatDateTime(coupon.createdAt)}</td>
+	                    <td>
+	                        <button class="btn btn-sm btn-primary btn-edit" data-code="${coupon.couponCode}">
+	                            修改
+	                        </button>
+	                    </td>
+	                `;
+	                tbody.appendChild(tr);
+	            });
+	
+	            // 綁定修改按鈕事件，點擊就會跳轉到 /admin/coupon/update/{couponCode}。
+	            document.querySelectorAll('.btn-edit').forEach(btn => {
+	                btn.addEventListener('click', () => {
+	                    const code = btn.getAttribute('data-code');
+	                    window.location.href = `/admin/coupon/update/${code}`;
+	                });
+	            });
+	
+	            // 渲染分頁
+	            renderPagination(coupons.length, page, itemsPerPage);
+	            
+	            resultSection.style.display = 'block';
+	        }
+	
+	        document.getElementById('searchByCodeBtn').addEventListener('click', function () {
+	            const code = document.getElementById('couponCode').value.trim();
+	            if (!code) return alert("請輸入折價券編號");
+	            fetch(`/api/coupons/code/${code}`)
+	                .then(response => response.ok ? response.json() : null)
+	                .then(data => renderResults(data ? [data] : []));
+	        });
+	
+	        document.getElementById('searchByNameBtn').addEventListener('click', function () {
+	            const name = document.getElementById('couponName').value.trim();
+	            if (!name) return alert("請輸入折價券名稱");
+	            fetch(`/api/coupons/name/${name}`)
+	                .then(response => response.json())
+	                .then(renderResults);
+	        });
+	
+	        document.getElementById('searchByDateBtn').addEventListener('click', function () {
+	            const start = document.getElementById('startDate').value;
+	            const end = document.getElementById('endDate').value;
+	            if (!start || !end) return alert("請選擇日期區間");
+	
+	            const startDateTime = `${start}T00:00:00`;
+	            const endDateTime = `${end}T23:59:59`;
+	
+	            fetch(`/api/coupons/created-range?start=${startDateTime}&end=${endDateTime}`)
+	                .then(response => response.json())
+	                .then(renderResults);
+	        });
+	
+	        // 新增折價券按鈕事件
+	        document.getElementById('btnAddCoupon').addEventListener('click', () => {
+	            window.location.href = '/admin/coupon/add';
+	        });
+	    });
+	</script>
 </body>
 </html>

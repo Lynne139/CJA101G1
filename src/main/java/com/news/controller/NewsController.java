@@ -63,10 +63,4 @@ public class NewsController {
         Optional<News> news = service.findById(id);
         return news.map(News::getNewsPhoto).orElse(null);
     }
-
-    @GetMapping("/admin/news3")
-    public String showNews3(Model model) {
-        model.addAttribute("newsList", service.findAll());
-        return "admin/fragments/news/news3";
-    }
 } 

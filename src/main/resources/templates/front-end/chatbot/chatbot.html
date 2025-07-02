@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>智慧客服 - Maison d'Yuko</title>
+
+  <!-- ✅ global CSS -->
+  <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" integrity="sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- ✅ main CSS -->
+  <style>
+    /* 聊天室頁面專用樣式 */
+    .chatbot-section { padding: 60px 0; background: #fdf6ef; min-height: 80vh; }
+    .chatbot-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    .chatbot-header { text-align: center; margin-bottom: 40px; }
+    .chatbot-title { font-size: 2.5rem; color: #8B4513; margin-bottom: 10px; }
+    .chatbot-subtitle { font-size: 1.1rem; color: #666; margin-bottom: 30px; }
+    
+    /* 聊天室容器 */
+    .chat-container { background: white; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; height: 600px; display: flex; flex-direction: column; }
+    
+    /* 聊天室標題欄 */
+    .chat-header { background: linear-gradient(135deg, #8B4513, #d4a574); color: white; padding: 20px; text-align: center; font-size: 1.2rem; font-weight: 600; }
+    
+    /* 聊天訊息區域 */
+    .chat-messages { flex: 1; padding: 20px; overflow-y: auto; background: #f9f9f9; display: flex; flex-direction: column; gap: 15px; }
+    
+    /* 訊息氣泡 */
+    .message { max-width: 70%; padding: 12px 16px; border-radius: 18px; line-height: 1.4; font-size: 0.95rem; word-wrap: break-word; animation: fadeInMessage 0.3s ease-in; }
+    @keyframes fadeInMessage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* 用戶訊息 */
+    .message.user { background: #8B4513; color: white; align-self: flex-end; border-bottom-right-radius: 6px; }
+    
+    /* 機器人訊息 */
+    .message.bot { background: white; color: #333; align-self: flex-start; border: 1px solid #e0e0e0; border-bottom-left-radius: 6px; position: relative; margin-left: 35px; }
+    .message.bot::before { content: "🐱"; position: absolute; left: -45px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; background: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 2px solid #d4a574; }
+    
+    /* 歡迎訊息 */
+    .welcome-message { text-align: center; color: #666; font-style: italic; padding: 20px; margin: 0 -20px 0 -20px; background: transparent; transition: all 0.3s ease; }
+    .welcome-message.hidden { opacity: 0; transform: translateY(-20px); pointer-events: none; }
+    
+    /* 輸入區域 */
+    .chat-input-container { padding: 20px; background: white; border-top: 1px solid #e0e0e0; }
+    .chat-input-wrapper { display: flex; gap: 10px; align-items: center; }
+    .chat-input { flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 25px; font-size: 1rem; outline: none; transition: border-color 0.3s ease; }
+    .chat-input:focus { border-color: #8B4513; }
+    .chat-send-btn { background: #8B4513; color: white; border: none; padding: 12px 20px; border-radius: 25px; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; min-width: 80px; }
+    .chat-send-btn:hover:not(:disabled) { background: #6d3410; transform: translateY(-1px); }
+    .chat-send-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+    
+    /* 載入動畫 */
+    .typing-indicator { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: white; border: 1px solid #e0e0e0; border-radius: 18px; border-bottom-left-radius: 6px; max-width: 70%; align-self: flex-start; position: relative; margin-left: 35px; }
+    .typing-indicator::before { content: "🐱"; position: absolute; left: -45px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; background: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 2px solid #d4a574; }
+    .typing-text { color: #666; font-style: italic; }
+    .typing-dots { display: flex; gap: 3px; }
+    .typing-dot { width: 6px; height: 6px; background: #8B4513; border-radius: 50%; animation: typing 1.4s infinite; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
+    
+    /* 快捷問題按鈕 */
+    .quick-questions { padding: 15px 20px; background: #f8f8f8; border-top: 1px solid #e0e0e0; }
+    .quick-questions-title { font-size: 0.9rem; color: #666; margin-bottom: 10px; text-align: center; }
+    .quick-questions-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .quick-question-btn { background: white; border: 1px solid #d4a574; color: #8B4513; padding: 6px 12px; border-radius: 15px; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; }
+    .quick-question-btn:hover { background: #d4a574; color: white; }
+    
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .chatbot-title { font-size: 2rem; }
+      .chat-container { height: 500px; }
+      .message { max-width: 85%; }
+      .message.bot { margin-left: 20px; }
+      .message.bot::before, .typing-indicator::before { left: -30px; width: 24px; height: 24px; font-size: 1.1rem; }
+      .chat-input-wrapper { flex-direction: column; }
+      .chat-input { margin-bottom: 10px; }
+      .quick-questions-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+      .quick-question-btn { text-align: center; }
+    }
+    @media (min-width: 992px) { .chatbot-container { margin-left: 120px; margin-right: 120px; } }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ header -->
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <!-- ✅ 子選單 Navbar -->
+  <nav class="sub-navbar d-flex justify-content-center align-items-center">
+    <ul class="nav">
+      <li class="nav-item"><a class="nav-link" href="#">關於嶼蔻</a></li>
+      <li class="nav-item"><a class="nav-link" href="#">最新消息</a></li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" tabindex="0">探索嶼蔻</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">珍饈美饌</a></li>
+          <li><a class="dropdown-item" href="#">多元設施</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a class="nav-link" href="#rooms">精緻客房</a></li>
+      <li class="nav-item"><a class="nav-link" href="#faq">交通資訊</a></li>
+      <li class="nav-item"><a class="nav-link" href="#footer">聯絡我們</a></li>
+      <li class="nav-item"><a class="nav-link" href="#faq">常見問題</a></li>
+    </ul>
+  </nav>
+
+  <!-- ✅ Sticky 右側按鈕 -->
+  <div class="sticky-icons d-none d-lg-block">
+    <a href="#"><img th:src="@{/images/icon/bed.svg}" alt="bed" class="icon"/><br>線上訂房</a>
+    <a th:href="@{/front-end/shop}"><img th:src="@{/images/icon/bag.svg}" alt="bag" class="icon"/><br>帳號選物</a>
+    <a href="#"><img th:src="@{/images/icon/dish.svg}" alt="dish" class="icon"/><br>餐廳訂位</a>
+  </div>
+
+  <!-- ✅ Main Content -->
+  <section class="chatbot-section">
+    <div class="chatbot-container">
+      
+      <!-- 頁面標題 -->
+      <div class="chatbot-header">
+        <h1 class="chatbot-title">智慧客服</h1>
+        <p class="chatbot-subtitle">有任何問題嗎？我來回答您！</p>
+      </div>
+
+      <!-- 聊天室容器 -->
+      <div class="chat-container">
+        
+        <!-- 聊天室標題欄 -->
+        <div class="chat-header">
+          <div>Maison d'Yuko 智慧客服聊天室</div>
+        </div>
+
+        <!-- 聊天訊息區域 -->
+        <div class="chat-messages" id="chatMessages">
+          <div class="message bot">
+            歡迎使用 Maison d'Yuko 智慧客服！<br>
+            您可以詢問關於飯店設施、服務或其他相關問題。
+          </div>
+        </div>
+        
+        <!-- 快捷問題 -->
+        <div class="quick-questions">
+          <div class="quick-questions-title">常見問題</div>
+          <div class="quick-questions-list">
+            <button class="quick-question-btn" onclick="sendQuickQuestion('早餐時間是什麼時候？')">早餐時間</button>
+            <button class="quick-question-btn" onclick="sendQuickQuestion('有停車場嗎？')">停車場</button>
+            <button class="quick-question-btn" onclick="sendQuickQuestion('入住時間是幾點？')">入住時間</button>
+            <button class="quick-question-btn" onclick="sendQuickQuestion('有免費wifi嗎？')">WiFi</button>
+            <button class="quick-question-btn" onclick="sendQuickQuestion('有洗衣服務嗎？')">洗衣服務</button>
+            <button class="quick-question-btn" onclick="sendQuickQuestion('健身房在哪裡？')">健身房</button>
+            <button class="quick-question-btn" onclick="sendQuickQuestion('有游泳池嗎？')">游泳池</button>
+            <button class="quick-question-btn" onclick="sendQuickQuestion('可以寄放行李嗎？')">行李寄放</button>
+            <button class="quick-question-btn" onclick="sendQuickQuestion('可以帶寵物嗎？')">寵物政策</button>
+          </div>
+        </div>
+
+        <!-- 輸入區域 -->
+        <div class="chat-input-container">
+          <div class="chat-input-wrapper">
+            <input type="text" class="chat-input" id="chatInput" placeholder="請輸入您的問題..." maxlength="200">
+            <button class="chat-send-btn" id="sendBtn" onclick="sendMessage()">發送</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ✅ Overlay Full Menu -->
+  <div class="overlay-menu" id="overlayMenu">
+    <div class="overlay-menu-header d-flex justify-content-between align-items-start">
+      <div class="overlay-mobile-menu d-flex justify-content-between align-items-center p-3">
+        <div class="mb-menu-header">Maison d'Yuko</div>
+      </div>
+      <div class="overlay-logo-contact mb-5">
+        <img th:src="@{/images/logo/logo_hp.png}" alt="logo" class="overlay-logo mb-3" />
+        <div class="overlay-title">嶼蔻渡假村 Maison d'Yuko</div>
+        <div class="overlay-contact">
+          <div>+886-7-123-4567</div>
+          <div>service@maisondyuko.com</div>
+        </div>
+      </div>
+      <div class="close-btn" id="menuClose">&times;</div>
+    </div>
+    <div class="overlay-center">
+      <div class="overlay-menu-member px-5 mb-5 d-flex justify-content-center">
+        <img th:src="@{/images/icon/member.svg}" alt="member" class="text-center" style="padding:0 5px"/>
+        <a href="#" class="text-center">會員登入</a>
+      </div>
+      <div class="px-5 mb-5 d-flex justify-content-between">
+        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_bed.svg}" alt="bed" class="menu-icon"/><br>線上訂房</a>
+        <a th:href="@{/front-end/shop}" class="text-center"><img th:src="@{/images/icon/menu_bag.svg}" alt="bag" class="menu-icon"/><br>帳號選物</a>
+        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_dish.svg}" alt="dish" class="menu-icon"/><br>餐廳訂位</a>
+      </div>
+      <div class="overlay-menu-row d-flex justify-content-center">
+        <div class="overlay-menu-col">
+          <h5>關於嶼蔻</h5>
+          <a href="#">品牌故事</a>
+          <a href="#">環境簡介</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>最新消息</h5>
+          <a th:href="@{/news/notice}">最新公告</a>
+          <a th:href="@{/news/promotion}">活動通知</a>
+          <a th:href="@{/news/news}">媒體報導</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>探索嶼蔻</h5>
+          <a href="#">珍饈美饌</a>
+          <a href="#">豐富設施</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>精緻客房</h5>
+          <a href="#">蔻香居</a>
+          <a href="#">海音居</a>
+          <a href="#">晨曦之庭</a>
+          <a href="#">月影行館</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>其他</h5>
+          <a href="#">交通資訊</a>
+          <a href="#">聯絡我們</a>
+          <a href="#">常見問題</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ footer -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
+
+  <!-- ✅ global JS -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- ✅ Main JS -->
+  <script>
+    // 聊天室相關變數
+    let isWaitingForResponse = false;
+    let isFirstMessage = true;
+    const chatMessages = $('#chatMessages');
+    const chatInput = $('#chatInput');
+    const sendBtn = $('#sendBtn');
+
+    // 初始化
+    $(document).ready(function() {
+      initializeEventHandlers();
+      // 聚焦輸入框
+      chatInput.focus();
+    });
+
+    // 初始化事件處理器
+    function initializeEventHandlers() {
+      // Menu 收合功能
+      $('#menuToggle').on('click', function () {
+        $('#overlayMenu').addClass('active');
+      });
+      $('#menu-Toggle').on('click', function () {
+        $('#overlayMenu').addClass('active');
+      });
+      $('#menuClose').on('click', function () {
+        $('#overlayMenu').removeClass('active');
+      });
+
+      // 輸入框 Enter 鍵發送
+      chatInput.on('keypress', function(e) {
+        if (e.which === 13 && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      // 輸入框狀態變化
+      chatInput.on('input', function() {
+        const hasText = $(this).val().trim().length > 0;
+        sendBtn.prop('disabled', !hasText || isWaitingForResponse);
+      });
+    }
+
+    // 發送訊息
+    function sendMessage() {
+      const message = chatInput.val().trim();
+      if (!message || isWaitingForResponse) return;
+
+      // 添加用戶訊息
+      addMessage(message, 'user');
+      
+      // 清空輸入框
+      chatInput.val('');
+      updateSendButton();
+
+      // 顯示載入動畫
+      showTypingIndicator();
+      
+      // 發送到後端
+      sendToBot(message);
+    }
+
+    // 快捷問題
+    function sendQuickQuestion(question) {
+      if (isWaitingForResponse) return;
+      
+      // 設置輸入框的值並發送
+      chatInput.val(question);
+      sendMessage();
+    }
+
+    // 發送到機器人
+    function sendToBot(message) {
+      isWaitingForResponse = true;
+      updateSendButton();
+
+      $.ajax({
+        url: '/api/chatbot',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ message: message }),
+        timeout: 10000, // 10秒超時
+        success: function(response) {
+          hideTypingIndicator();
+          addMessage(response.reply || '抱歉，我現在無法回答您的問題。', 'bot');
+        },
+        error: function(xhr, status, error) {
+          hideTypingIndicator();
+          let errorMessage = '抱歉，服務暫時無法使用，請稍後再試。';
+          
+          if (status === 'timeout') {
+            errorMessage = '請求超時，請稍後再試。';
+          } else if (xhr.status === 404) {
+            errorMessage = '服務不存在，請聯繫管理員。';
+          } else if (xhr.status >= 500) {
+            errorMessage = '伺服器錯誤，請稍後再試。';
+          }
+          
+          addMessage(errorMessage, 'bot');
+          console.error('聊天機器人錯誤:', error);
+        },
+        complete: function() {
+          isWaitingForResponse = false;
+          updateSendButton();
+          chatInput.focus();
+        }
+      });
+    }
+
+    // 添加訊息到聊天室
+    function addMessage(message, type) {
+   	  // 如果是機器人訊息，就先 escape + 換行轉換
+   	  let content = message;
+   	  if (type === 'bot') {
+   	    content = escapeHtml(message).replace(/\n/g, '<br>');
+   	  } else {
+   	    content = escapeHtml(message);
+   	  }
+      const messageDiv = $(`
+        <div class="message ${type}">
+          ${content}
+        </div>
+      `);
+      
+      chatMessages.append(messageDiv);
+      scrollToBottom();
+    }
+
+    // 顯示載入動畫
+    function showTypingIndicator() {
+      const typingDiv = $(`
+        <div class="typing-indicator" id="typingIndicator">
+          <span class="typing-text">正在輸入</span>
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      `);
+      
+      chatMessages.append(typingDiv);
+      scrollToBottom();
+    }
+
+    // 隱藏載入動畫
+    function hideTypingIndicator() {
+      $('#typingIndicator').remove();
+    }
+
+    // 更新發送按鈕狀態
+    function updateSendButton() {
+      const hasText = chatInput.val().trim().length > 0;
+      sendBtn.prop('disabled', !hasText || isWaitingForResponse);
+      sendBtn.text(isWaitingForResponse ? '發送中...' : '發送');
+    }
+
+    // 滾動到底部
+    function scrollToBottom() {
+      chatMessages.animate({
+        scrollTop: chatMessages[0].scrollHeight
+      }, 300);
+    }
+
+    // HTML 轉義
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
