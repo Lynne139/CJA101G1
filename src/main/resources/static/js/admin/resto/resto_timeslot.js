@@ -22,10 +22,18 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!periodId || !restoId) return;
 
       if (confirm("項目一旦刪除將無法復原，是否確定刪除？")) {
+		
+		const params = new URLSearchParams();
+		params.append("periodId",  periodId);
+		params.append("restoId",  restoId);
+		
         // 存卷軸位置
         sessionStorage.setItem("scrollY", window.scrollY);
-        fetch(`/admin/resto_timeslot/period/delete?periodId=${periodId}&restoId=${restoId}`, {
-          method: 'GET'
+        
+		fetch(`/admin/resto_timeslot/period/delete`, {
+			method: 'POST',
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: params
         })
           .then(res => {
             if (res.redirected) {
@@ -390,7 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ===== 時段 ========================================================
 
-  // ===== 刪除時段 =====
+  // ===== (軟)刪除時段 =====
   document.addEventListener("click", function (e) {
 
     if (e.target.closest(".btn_timeslot_del")) {
@@ -401,11 +409,18 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!timeslotId || !restoId) return;
 
       if (confirm("項目一旦刪除將無法復原，是否確定刪除？")) {
+		
+		const params = new URLSearchParams();
+		params.append("timeslotId",  timeslotId);
+		params.append("restoId",  restoId);
+		
         // 存卷軸位置
         sessionStorage.setItem("scrollY", window.scrollY);
 
-        fetch(`/admin/resto_timeslot/timeslot/delete?timeslotId=${timeslotId}&restoId=${restoId}`, {
-          method: 'GET'
+        fetch(`/admin/resto_timeslot/timeslot/delete`, {
+			method: 'POST',
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: params
         })
           .then(res => {
             if (res.redirected) {

@@ -36,7 +36,7 @@ public class PeriodController {
 	// ===== restoInfo.html ====================================================== //
 	
 	// ===== 刪除 =====
-		@GetMapping("/resto_timeslot/period/delete")
+		@PostMapping("/resto_timeslot/period/delete")
 		public String deletePeriod(@RequestParam("periodId") Integer periodId,
 								   @RequestParam Integer restoId,
 								   RedirectAttributes redirectAttributes
