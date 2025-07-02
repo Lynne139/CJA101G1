@@ -130,12 +130,12 @@
         
         <!-- 聊天室標題欄 -->
         <div class="chat-header">
-          <div>🐱 Maison d'Yuko 智慧客服</div>
+          <div>Maison d'Yuko 智慧客服聊天室</div>
         </div>
 
         <!-- 聊天訊息區域 -->
         <div class="chat-messages" id="chatMessages">
-          <div class="welcome-message" id="welcomeMessage">
+          <div class="message bot">
             歡迎使用 Maison d'Yuko 智慧客服！<br>
             您可以詢問關於飯店設施、服務或其他相關問題。
           </div>
@@ -246,7 +246,6 @@
     const chatMessages = $('#chatMessages');
     const chatInput = $('#chatInput');
     const sendBtn = $('#sendBtn');
-    const welcomeMessage = $('#welcomeMessage');
 
     // 初始化
     $(document).ready(function() {
@@ -283,24 +282,10 @@
       });
     }
 
-    // 隱藏歡迎訊息
-    function hideWelcomeMessage() {
-      if (isFirstMessage) {
-        welcomeMessage.addClass('hidden');
-        setTimeout(() => {
-          welcomeMessage.remove();
-        }, 300);
-        isFirstMessage = false;
-      }
-    }
-
     // 發送訊息
     function sendMessage() {
       const message = chatInput.val().trim();
       if (!message || isWaitingForResponse) return;
-
-      // 隱藏歡迎訊息
-      hideWelcomeMessage();
 
       // 添加用戶訊息
       addMessage(message, 'user');
@@ -365,9 +350,16 @@
 
     // 添加訊息到聊天室
     function addMessage(message, type) {
+   	  // 如果是機器人訊息，就先 escape + 換行轉換
+   	  let content = message;
+   	  if (type === 'bot') {
+   	    content = escapeHtml(message).replace(/\n/g, '<br>');
+   	  } else {
+   	    content = escapeHtml(message);
+   	  }
       const messageDiv = $(`
         <div class="message ${type}">
-          ${escapeHtml(message)}
+          ${content}
         </div>
       `);
       

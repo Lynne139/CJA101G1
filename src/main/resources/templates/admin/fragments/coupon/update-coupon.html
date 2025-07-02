@@ -7,6 +7,29 @@
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 	<link rel="stylesheet" th:href="@{/css/all_admin.css}">
+	<style>
+        :root { --color-background: #F4EDE1; --color-primary: #7E4E24; --color-secondary: #B88D67; --color-tertiary: #9D3C3C; --color-accent: #FF7449; --color-black: #000000; --color-white: #FFFFFF; --color-success: #55AE6E; --color-error: #E96060; --color-bg-panel: #ffffff52; --panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); --hover-opacity: 80%; }
+        body { background-color: var(--color-background); color: var(--color-primary); }
+        .card { background: var(--color-bg-panel); border: 1px solid var(--color-primary); box-shadow: var(--panel-shadow); }
+        .card-header { background: transparent; border-bottom: 1px solid var(--color-primary); color: var(--color-primary); }
+        .form-control { background-color: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); }
+        .form-control:focus { background-color: transparent; color: var(--color-primary); border-color: var(--color-accent); box-shadow: 0 0 4px 0 var(--color-accent); }
+        .form-control::placeholder { color: var(--color-secondary); }
+        .form-control[readonly] { background-color: var(--color-bg-panel); color: var(--color-secondary); opacity: 0.7; }
+        .form-label { color: var(--color-primary); }
+        .form-select { background-color: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); }
+        .form-select:focus { background-color: transparent; color: var(--color-primary); border-color: var(--color-accent); box-shadow: 0 0 4px 0 var(--color-accent); }
+        .btn-outline-secondary { color: var(--color-primary); border-color: var(--color-primary); background-color: transparent; }
+        .btn-outline-secondary:hover { color: var(--color-white); background-color: var(--color-primary); border-color: var(--color-primary); opacity: var(--hover-opacity); }
+        .btn-primary {color: var(--color-white); }
+        .btn-primary:hover {color: var(--color-white); opacity: var(--hover-opacity); }
+        .text-danger { color: var(--color-error) !important; }
+        .invalid-feedback { color: var(--color-error); }
+        .form-control.is-invalid { border-color: var(--color-error); }
+        .form-control.is-invalid:focus { border-color: var(--color-error); box-shadow: 0 0 4px 0 var(--color-error); }
+        .form-select.is-invalid { border-color: var(--color-error); }
+        .form-select.is-invalid:focus { border-color: var(--color-error); box-shadow: 0 0 4px 0 var(--color-error); }
+    </style>
 </head>
 <body>
 <div class="container py-5">
