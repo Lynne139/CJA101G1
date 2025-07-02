@@ -21,6 +21,8 @@
                     </h6>
                     <div class="modal_section">
                         <div class="modal_detail d-flex flex-column align-items-start">
+                            <p><strong>訂單總金額：</strong> <span th:text="${roomOrder != null && roomOrder.totalAmount != null ? roomOrder.totalAmount : 0}"></span></p>
+                            <p><strong>房間總數：</strong> <span th:text="${roomOrder != null && roomOrder.roomAmount != null ? roomOrder.roomAmount : 0}"></span></p>
                             <p><strong>使用折價券：</strong> <span th:text="${roomOrder != null && roomOrder.coupon != null ? roomOrder.coupon.couponCode : '無'}"></span></p>
                             <p><strong>折扣金額：</strong> <span th:text="${roomOrder != null && roomOrder.discountAmount != null ? roomOrder.discountAmount : 0}"></span></p>
                             <p><strong>付款方式：</strong> <span th:text="${roomOrder != null && roomOrder.payMethod == 1 ? '信用卡' : '現金'}"></span></p>

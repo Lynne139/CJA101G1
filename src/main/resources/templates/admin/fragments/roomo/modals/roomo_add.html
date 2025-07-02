@@ -132,32 +132,18 @@
                 <label for="projectAddOnYes" class="form-check-label">是</label>
               </div>
             </div>
-
-            <!-- 餐廳專案加購區（預設隱藏） -->
-            <div class="mb-3" id="restoProjectArea" style="display:none;">
-              <!-- 隱藏的餐廳訂單ID -->
-              <input type="hidden" id="restoOrderId" name="restoOrderId" value="">
-              <div class="row g-2">
-                <div class="col-md-4">
-                  <label class="form-label">餐廳</label>
-                  <select id="restoSelect" class="form-select" disabled required>
-                    <option value="">請選擇餐廳</option>
-                  </select>
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label">用餐時段</label>
-                  <select id="timeslotSelect" class="form-select" disabled required>
-                    <option value="">請先選擇餐廳</option>
-                  </select>
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label">用餐人數</label>
-                  <select id="diningPeopleSelect" class="form-select" disabled required>
-                    <option value="">請先選擇餐廳與時段</option>
-                  </select>
-                </div>
-              </div>
+            <!-- 專案方案選擇 -->
+            <div class="mb-3" id="projectPlanArea" style="display:none;">
+              <label class="form-label">選擇專案方案 <span class="text-danger">*</span></label>
+              <select id="projectPlanSelect" class="form-select">
+                <option value="">請選擇專案</option>
+                <option value="1" data-price="800">南島晨光專案 +800/人</option>
+                <option value="2" data-price="1800">蔚藍晨夕專案 +1800/人</option>
+                <option value="3" data-price="2800">悠日饗茶專案 +2800/人</option>
+              </select>
             </div>
+            <!-- 專案加購區塊（動態產生） -->
+            <div id="restoProjectArea" style="display:none;"></div>
 
             <!-- 付款狀態 -->
             <div class="mb-3">
@@ -179,14 +165,23 @@
 
             <!-- 房間總數量 -->
             <div class="mb-3">
-              <label for="totalRoomCount" class="form-label">房間總數量</label>
-              <input type="number" id="roomCount" name="roomCount" class="form-control" readonly required>
+              <label for="totalRoomAmount" class="form-label">房間總數量</label>
+              <input type="number" id="roomAmount" name="roomAmount" class="form-control" readonly required>
             </div>
+
+            <!-- 房間總價格 -->
+            <!-- 純計算欄位，不輸入資料庫 -->
+            <div class="mb-3">
+              <label for="totalRoomPrice" class="form-label">房間總價格</label>
+              <input type="number" id="totalRoomPrice" name="totalRoomPrice" class="form-control" default="0" readonly
+                required>
+            </div>
+            
 
             <!-- 訂單總金額 -->
             <div class="mb-3">
-              <label for="totalRoomPrice" class="form-label">訂單總金額</label>
-              <input type="number" id="totalRoomPrice" name="roomAmount" class="form-control" default="0" readonly
+              <label for="totalPrice" class="form-label">訂單總金額</label>
+              <input type="number" id="totalPrice" name="totalAmount" class="form-control" default="0" readonly
                 required>
             </div>
 

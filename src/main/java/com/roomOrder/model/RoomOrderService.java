@@ -52,6 +52,28 @@ public class RoomOrderService {
         return repository.save(order);
     }
 
-    
+    // 計算專案加購總金額（專案價格 × 專案人數）
+    public int calculateProjectTotal(RoomOrder order) {
+        if (order == null || order.getOrderDetails() == null) return 0;
+        int projectPrice = 0;
+        int people = 0;
+        // 依照專案方案決定價格
+        // 這裡假設 order 物件有 projectPlan 屬性（若無請補充），或用其他方式取得方案價格
+        // 範例：1:800, 2:1800, 3:2800
+        Integer plan = null;
+        try {
+            plan = (Integer) order.getClass().getMethod("getProjectPlan").invoke(order);
+        } catch (Exception e) {
+            plan = null;
+        }
+        if (plan != null) {
+            if (plan == 1) projectPrice = 800;
+            else if (plan == 2) projectPrice = 1800;
+            else if (plan == 3) projectPrice = 2800;
+        }
+        // 專案人數 = 所有明細入住人數總和
+        people = order.getOrderDetails().stream().mapToInt(od -> od.getNumberOfPeople() != null ? od.getNumberOfPeople() : 0).sum();
+        return projectPrice * people;
+    }
 
 }

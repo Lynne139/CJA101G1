@@ -436,19 +436,20 @@ CREATE TABLE ROOM_ORDER (
     ROOM_ORDER_ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     MEMBER_ID INT NOT NULL,
     ORDER_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 自動抓訂單進入時間
-                            ROOM_ORDER_STATUS TINYINT(1) NOT NULL DEFAULT 1,  -- 0:取消, 1:成立, 2:完成
+    ROOM_ORDER_STATUS TINYINT(1) NOT NULL DEFAULT 1,  -- 0:取消, 1:成立, 2:完成
+    TOTAL_AMOUNT INT NOT NULL,
     ROOM_AMOUNT INT NOT NULL,
-                            ROOM_COUNT INT NOT NULL,
-                            CHECK_IN_DATE DATE NOT NULL,
-                            CHECK_OUT_DATE DATE NOT NULL,
+    CHECK_IN_DATE DATE NOT NULL,
+    CHECK_OUT_DATE DATE NOT NULL,
     COUPON_CODE CHAR(8),
     DISCOUNT_AMOUNT INT,
     ACTUAL_AMOUNT INT NOT NULL,
-                            PAY_STATUS TINYINT(1) NOT NULL DEFAULT 0, -- 0:未付款 1:已付款
-                            PAY_METHOD TINYINT(1) NOT NULL DEFAULT 0, -- 0:現金 1:信用卡
+    PAY_STATUS TINYINT(1) NOT NULL DEFAULT 0, -- 0:未付款 1:已付款
+    PAY_METHOD TINYINT(1) NOT NULL DEFAULT 0, -- 0:現金 1:信用卡
     PROJECT_ADD_ON BOOLEAN NOT NULL DEFAULT 0,
-                            UPDATE_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, /* 新增修改都自動寫入 */
-                            UPDATE_EMP INT NOT NULL DEFAULT 1, -- 系統id=1
+    UPDATE_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, /* 新增修改都自動寫入 */
+    UPDATE_EMP INT NOT NULL DEFAULT 1, -- 系統id=1
+     
     FOREIGN KEY (MEMBER_ID) REFERENCES MEMBER(MEMBER_ID),
                             FOREIGN KEY (COUPON_CODE) REFERENCES COUPON(COUPON_CODE),
                             FOREIGN KEY (UPDATE_EMP) REFERENCES EMPLOYEE(EMPLOYEE_ID)
@@ -457,7 +458,7 @@ CREATE TABLE ROOM_ORDER (
 ALTER TABLE room_order AUTO_INCREMENT = 1000;
 
 
-INSERT INTO ROOM_ORDER (MEMBER_ID, ROOM_ORDER_STATUS, ROOM_AMOUNT, ROOM_COUNT, CHECK_IN_DATE, CHECK_OUT_DATE, COUPON_CODE, DISCOUNT_AMOUNT, ACTUAL_AMOUNT, PROJECT_ADD_ON,UPDATE_EMP)
+INSERT INTO ROOM_ORDER (MEMBER_ID, ROOM_ORDER_STATUS, TOTAL_AMOUNT, ROOM_AMOUNT, CHECK_IN_DATE, CHECK_OUT_DATE, COUPON_CODE, DISCOUNT_AMOUNT, ACTUAL_AMOUNT, PROJECT_ADD_ON,UPDATE_EMP)
 VALUES 
     (1, 1, 50000,1, '2025-06-01', '2025-06-03', 'A2505AAA', 100, 49900, 0 ,1),
     (2, 2, 60000,2, '2025-06-05', '2025-06-07', 'B2505AAA', 150, 59850, 1 ,1);
@@ -501,26 +502,24 @@ INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room
 CREATE TABLE ROOM_ORDER_LIST (
     ROOM_ORDER_LIST_ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     ROOM_TYPE_ID INT NOT NULL,
-    ROOM_ID INT,
     ROOM_ORDER_ID INT NOT NULL,
     NUMBER_OF_PEOPLE INT NOT NULL,
     SPECIAL_REQ VARCHAR(50),
     ROOM_PRICE INT NOT NULL,
     ROOM_AMOUNT INT NOT NULL,
-                                 ROOM_GUEST_NAME VARCHAR(50),
-                                 CREATE_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 自動抓訂單進入時間
-                                 LIST_STATUS INT NOT NULL DEFAULT 1,
-                                 FOREIGN KEY (ROOM_ORDER_ID) REFERENCES room_order(ROOM_ORDER_ID) ON DELETE CASCADE,
-    FOREIGN KEY (ROOM_ID) REFERENCES ROOM(ROOM_ID),
+	ROOM_GUEST_NAME VARCHAR(50),
+	CREATE_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 自動抓訂單進入時間
+	LIST_STATUS INT NOT NULL DEFAULT 1,
+	FOREIGN KEY (ROOM_ORDER_ID) REFERENCES room_order(ROOM_ORDER_ID) ON DELETE CASCADE,
     FOREIGN KEY (ROOM_TYPE_ID) REFERENCES ROOM_TYPE(ROOM_TYPE_ID)
 );
 
 
-INSERT INTO ROOM_ORDER_LIST (ROOM_TYPE_ID, ROOM_ID, ROOM_ORDER_ID, NUMBER_OF_PEOPLE, SPECIAL_REQ, ROOM_PRICE, ROOM_AMOUNT,ROOM_GUEST_NAME,LIST_STATUS)
+INSERT INTO ROOM_ORDER_LIST (ROOM_TYPE_ID,  ROOM_ORDER_ID, NUMBER_OF_PEOPLE, SPECIAL_REQ, ROOM_PRICE, ROOM_AMOUNT,ROOM_GUEST_NAME,LIST_STATUS)
 VALUES
-    (1, 1101, 1000, 2, 'No smoking', 50000, 1,'王大明',1),
-    (2, 2101, 1001, 3, 'No smoking', 30000, 1,'周牛牛',1),
-    (3, 3101, 1001, 3, 'Extra bed', 20000, 1,'楊大胖',1);
+    (1, 1000, 2, 'No smoking', 50000, 1,'王大明',1),
+    (2, 1001, 3, 'No smoking', 30000, 1,'周牛牛',1),
+    (3, 1001, 3, 'Extra bed', 20000, 1,'楊大胖',1);
 
 -- 以下設定: 自增主鍵的起點值，也就是初始值，取值範圍是1 .. 655355 --
 set auto_increment_offset=1;
@@ -643,6 +642,7 @@ CREATE TABLE resto_order (
     resto_id INT NOT NULL,
     
     regi_date DATE NOT NULL,
+    regi_period_id INT NOT NULL,
     regi_timeslot_id INT NOT NULL,
     regi_seats INT NOT NULL,
     high_chairs INT DEFAULT 0,
@@ -653,7 +653,7 @@ CREATE TABLE resto_order (
     snapshot_resto_name VARCHAR(40) NOT NULL,
 	snapshot_resto_name_en VARCHAR(40),
     -- period
-	snapshot_period_name VARCHAR(10) NOT NULL,
+	snapshot_period_name VARCHAR(20) NOT NULL,
     -- timeslot
 	snapshot_timeslot_name VARCHAR(5) NOT NULL,
 
@@ -661,42 +661,39 @@ CREATE TABLE resto_order (
      -- 訂單客戶資料
     order_guest_name VARCHAR(30) NOT NULL,
     order_guest_phone VARCHAR(20) NOT NULL,
-    order_guest_email VARCHAR(200) NOT NULL,
+    order_guest_email VARCHAR(100) NOT NULL,
 	order_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 自動抓訂單進入時間
     
-	-- 管理+狀態與時效欄位
-    admin_note VARCHAR(500), -- 管理員備註
-    order_source TINYINT NOT NULL DEFAULT 1, -- 0:會員登入預約MEMBER, 1:住房訂單ROOM, 2:管理員建置ADMIN
-	order_status TINYINT NOT NULL DEFAULT 1,  -- 0:取消CANCELED, 1:成立CREATED, 2:完成DONE, 3:保留WITHHOLD, 4:逾時NOSHOW
-	reserve_expire_time DATETIME NOT NULL, -- 自動逾時時間（regi_date + timeslotName + 等待10min）
+	-- 狀態與時效欄位
+	order_status TINYINT NOT NULL DEFAULT 1,  -- 0:取消, 1:成立, 2:完成, 3:保留, 4:逾時
+	reserve_expire_time DATETIME DEFAULT NULL, -- 自動逾時時間（regi_date + timeslot.start_time + 等待分鐘）
+
     
 	CONSTRAINT resto_order_pk PRIMARY KEY (resto_order_id),
     CONSTRAINT resto_order_member_fk FOREIGN KEY (member_id) REFERENCES member (member_id),
     CONSTRAINT resto_order_room_order_fk FOREIGN KEY (room_order_id) REFERENCES room_order (room_order_id),
 	CONSTRAINT resto_order_resto_fk FOREIGN KEY (resto_id) REFERENCES resto (resto_id),
-    CONSTRAINT resto_order_timeslot_fk FOREIGN KEY (regi_timeslot_id) REFERENCES resto_timeslot(timeslot_id)	
+	CONSTRAINT resto_order_period_fk FOREIGN KEY (regi_period_id) REFERENCES resto_period(period_id),
+    CONSTRAINT resto_order_timeslot_fk FOREIGN KEY (regi_timeslot_id) REFERENCES resto_timeslot(timeslot_id)
 );
 -- 訂單編號從1開始
 ALTER TABLE resto_order AUTO_INCREMENT = 1;
-CREATE INDEX idx_resto_date_slot ON resto_order (resto_id, regi_date, regi_timeslot_id); -- 查某日某餐廳某時段是否已滿
-CREATE INDEX idx_member_order ON resto_order (member_id); -- 查某會員所有訂單
-
 
 INSERT INTO resto_order ( member_id, room_order_id, resto_id, 
-regi_date, regi_timeslot_id, regi_seats, high_chairs, regi_req,
+regi_date, regi_period_id, regi_timeslot_id, regi_seats, high_chairs, regi_req,
   snapshot_resto_name, snapshot_resto_name_en, snapshot_period_name, snapshot_timeslot_name,
   order_guest_name, order_guest_phone, order_guest_email, 
-  order_source, order_status,reserve_expire_time
+  order_status
 )
 VALUES 
-	(3,NULL,2,'2025-05-25',9,1,0,NULL, '嶼間餐館', 'Islespace Bistro', '早午餐', '11:00', '周柏睿','0933444555','boerh.chou@example.com',0,2,'2025-05-25 11:10:00'),
-	(2,1001,1,'2025-06-05',6,6,1,NULL, '沐光餐廳', 'Luma Buffet', '晚餐', '17:30', '張書涵','0912345678','shuhan.chang@example.com',1,2,'2025-06-05 17:40:00'),
-	(2,1001,1,'2025-06-06',1,6,1,NULL, '沐光餐廳', 'Luma Buffet', '早餐', '07:00', '張書涵','0912345678','shuhan.chang@example.com',1,2,'2025-06-06 07:10:00'),
-	(2,1001,1,'2025-06-06',4,6,1,NULL, '沐光餐廳', 'Luma Buffet', '午餐', '13:00', '張書涵','0912345678','shuhan.chang@example.com',1,2,'2025-06-06 13:10:00'),
-	(2,1001,1,'2025-06-06',6,6,1,NULL, '沐光餐廳', 'Luma Buffet', '晚餐', '17:30', '張書涵','0912345678','shuhan.chang@example.com',1,2,'2025-06-06 17:40:00'),
-	(2,1001,1,'2025-06-07',2,6,1,NULL, '沐光餐廳', 'Luma Buffet', '早餐', '09:30', '張書涵','0912345678','shuhan.chang@example.com',1,2,'2025-06-07 09:40:00'),
-	(3,NULL,2,'2025-06-10',11,2,0,NULL, '嶼間餐館', 'Islespace Bistro', '晚餐', '17:00', '周柏睿','0933444555','boerh.chou@example.com',0,0,'2025-06-10 17:10:00'),
-    (3,NULL,2,'2025-06-10',11,3,0,NULL, '嶼間餐館', 'Islespace Bistro', '晚餐', '17:00', '周柏睿','0933444555','boerh.chou@example.com',0,2,'2025-06-10 17:10:00');
+	(3,NULL,2,'2025-05-25',5,9,1,0,NULL, '嶼間餐館', 'Islespace Bistro', '早午餐', '11:00', '周柏睿','0933444555','boerh.chou@example.com',2),
+	(2,1001,1,'2025-06-05',4,6,6,1,NULL, '沐光餐廳', 'Luma Buffet', '晚餐', '17:30', '張書涵','0912345678','shuhan.chang@example.com',2),
+	(2,1001,1,'2025-06-06',1,1,6,1,NULL, '沐光餐廳', 'Luma Buffet', '早餐', '07:00', '張書涵','0912345678','shuhan.chang@example.com',2),
+	(2,1001,1,'2025-06-06',2,4,6,1,NULL, '沐光餐廳', 'Luma Buffet', '午餐', '13:00', '張書涵','0912345678','shuhan.chang@example.com',2),
+	(2,1001,1,'2025-06-06',4,6,6,1,NULL, '沐光餐廳', 'Luma Buffet', '晚餐', '17:30', '張書涵','0912345678','shuhan.chang@example.com',2),
+	(2,1001,1,'2025-06-07',1,2,6,1,NULL, '沐光餐廳', 'Luma Buffet', '早餐', '09:30', '張書涵','0912345678','shuhan.chang@example.com',2),
+	(3,NULL,2,'2025-06-10',6,11,2,0,NULL, '嶼間餐館', 'Islespace Bistro', '晚餐', '17:00', '周柏睿','0933444555','boerh.chou@example.com',0),
+    (3,NULL,2,'2025-06-10',6,11,3,0,NULL, '嶼間餐館', 'Islespace Bistro', '晚餐', '17:00', '周柏睿','0933444555','boerh.chou@example.com',2);
     
 
 -- 餐廳預訂表
