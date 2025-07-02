@@ -441,12 +441,33 @@ public class AdminIndexController {
                 model.addAttribute(key, values[0]);
             }
         }
-    	
-   
-        
 
     	return "admin/index_admin";
     } 
+    
+    @GetMapping("/resto_reservation")
+    public String restoReservation(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/resto/restoReservation";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+
+    } 
+
+    @GetMapping("/resto_order_today")
+    public String restoOrderToday(HttpServletRequest request,Model model) {
+    	
+    	String mainFragment = "admin/fragments/resto/restoOrderToday";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	return "admin/index_admin";
+    	
+    } 
+    
+    
     
     // === 商店管理 ===
     @GetMapping("/prod/select_page")

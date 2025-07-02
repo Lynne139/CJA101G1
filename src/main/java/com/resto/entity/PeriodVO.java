@@ -3,7 +3,6 @@ package com.resto.entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -38,7 +37,7 @@ public class PeriodVO{
 	private Integer sortOrder;
 	
 	@ManyToOne
-	@JoinColumn(name="resto_id")
+	@JoinColumn(name="resto_id", nullable = false)
 	private RestoVO restoVO;
 	
 	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="periodVO", orphanRemoval = true)

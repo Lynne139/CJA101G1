@@ -83,7 +83,7 @@ public class OrderController {
 	@PostMapping("/resto_order/insert")
 	public String insertRestoOrder(
 			@Validated({Default.class, ValidationGroups.Ordered.class}) 
-			@ModelAttribute("restoOrder") RestoOrderVO order,
+			@ModelAttribute("restoOrder") RestoOrderVO restoOrder,
 	        BindingResult result,
 	        RedirectAttributes redirectAttributes,
 	        Model model
@@ -93,28 +93,28 @@ public class OrderController {
 	    boolean hasAnyError = false;
 		
 		// valid+bindingresult只驗證基本型別與嵌套物件，關聯的捕捉要自己寫
-	    if (order.getRestoVO() == null || order.getRestoVO().getRestoId() == null) {
+	    if (restoOrder.getRestoVO() == null || restoOrder.getRestoVO().getRestoId() == null) {
 	        result.rejectValue("restoVO.restoId", null, "請選擇餐廳");
 	        hasAnyError = true;
 	    }
-	    if (order.getTimeslotVO() == null || order.getTimeslotVO().getTimeslotId() == null) {
+	    if (restoOrder.getTimeslotVO() == null || restoOrder.getTimeslotVO().getTimeslotId() == null) {
 	        result.rejectValue("timeslotVO.timeslotId", null, "請選擇時段");
 	        hasAnyError = true;
 	    }
   
     	// 自行補齊 timeslotVO（含 restoVO）
 	    if (!result.hasErrors()
-	            && order.getTimeslotVO() != null
-	            && order.getTimeslotVO().getTimeslotId() != null) {
-	        order.setTimeslotVO(timeslotService.getById(order.getTimeslotVO().getTimeslotId()));
+	            && restoOrder.getTimeslotVO() != null
+	            && restoOrder.getTimeslotVO().getTimeslotId() != null) {
+	    	restoOrder.setTimeslotVO(timeslotService.getById(restoOrder.getTimeslotVO().getTimeslotId()));
 	    }
 
 	    // 防呆，檢查是否選到別間餐廳的時段
 	    if (!result.hasErrors()
-	            && order.getRestoVO() != null
-	            && order.getTimeslotVO() != null
-	            && order.getTimeslotVO().getRestoVO() != null
-	            && !order.getTimeslotVO().getRestoVO().getRestoId().equals(order.getRestoVO().getRestoId())) {
+	            && restoOrder.getRestoVO() != null
+	            && restoOrder.getTimeslotVO() != null
+	            && restoOrder.getTimeslotVO().getRestoVO() != null
+	            && !restoOrder.getTimeslotVO().getRestoVO().getRestoId().equals(restoOrder.getRestoVO().getRestoId())) {
 
 	        result.rejectValue("timeslotVO.timeslotId",
 	                "timeslot.mismatch",
@@ -124,13 +124,13 @@ public class OrderController {
 
 	    // 防呆，檢查是否選到已過的時段
 	    if (!result.hasErrors()
-	            && order.getRegiDate() != null
-	            && order.getTimeslotVO() != null
-	            && order.getTimeslotVO().getTimeslotName() != null) {
+	            && restoOrder.getRegiDate() != null
+	            && restoOrder.getTimeslotVO() != null
+	            && restoOrder.getTimeslotVO().getTimeslotName() != null) {
 	        try {
 	            LocalDateTime slotDateTime = LocalDateTime.of(
-	                    order.getRegiDate(),
-	                    LocalTime.parse(order.getTimeslotVO().getTimeslotName()));
+	            		restoOrder.getRegiDate(),
+	                    LocalTime.parse(restoOrder.getTimeslotVO().getTimeslotName()));
 
 	            if (!slotDateTime.isAfter(LocalDateTime.now())) {
 	                result.rejectValue("timeslotVO.timeslotId",
@@ -150,11 +150,11 @@ public class OrderController {
 	    // 名額驗證
 	    if (!result.hasErrors()) {   // 其他欄位都OK時才檢查
 	        int remaining = reservationService.getRemaining(
-	        		order.getRestoVO().getRestoId(),
-	        		order.getTimeslotVO().getTimeslotId(),
-	        		order.getRegiDate());
+	        		restoOrder.getRestoVO().getRestoId(),
+	        		restoOrder.getTimeslotVO().getTimeslotId(),
+	        		restoOrder.getRegiDate());
 
-	        if (order.getRegiSeats() > remaining) {
+	        if (restoOrder.getRegiSeats() > remaining) {
 	            result.rejectValue(    // 綁定在regiSeats欄位
 	                    "regiSeats",
 	                    "seats.exceed",      // errorCode(messages.properties配文案)
@@ -165,7 +165,7 @@ public class OrderController {
 	    }
  
 	    // 防呆，擋掉過往日期
-	    if (order.getRegiDate() != null && order.getRegiDate().isBefore(LocalDate.now())) {
+	    if (restoOrder.getRegiDate() != null && restoOrder.getRegiDate().isBefore(LocalDate.now())) {
 	        result.rejectValue("regiDate", "invalid.past.date", "不能預約過去的日期");
 	    }	    
 	    
@@ -178,7 +178,8 @@ public class OrderController {
 	        model.addAttribute("timeslotVOList", timeslotService.getAllEnabled());
 		    model.addAttribute("orderStatusOptions", List.of(RestoOrderStatus.values()));
 		    model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
-	        model.addAttribute("order", order);
+		    model.addAttribute("today", LocalDate.now());     // 加回 today，避免 JS 抓不到 min 值
+	        model.addAttribute("restoOrder", restoOrder);
 
 
 	       // 除錯用:把所有 field/object error 都列出
@@ -197,7 +198,7 @@ public class OrderController {
 	    }
 
 	    // 寫入資料庫
-		restoOrderService.insert(order);
+		restoOrderService.insert(restoOrder);
 	    return "redirect:/admin/resto_order";
 	}
 
@@ -226,20 +227,20 @@ public class OrderController {
 	    model.addAttribute("orderStatusOptions", List.of(RestoOrderStatus.values()));
 	    model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
 	    // 抓當日日期，避免過往日期可預約
-	    model.addAttribute("today", LocalDate.now());
+//	    model.addAttribute("today", LocalDate.now());
 	    return "admin/fragments/resto/modals/order_resto_edit";
 	}
 	
 	//寫入新增內容到資料庫
 	@PostMapping("/resto_order/update")
 	public String updateRestoOrder(
-	        @Valid @ModelAttribute("restoOrder") RestoOrderVO order,
+	        @Valid @ModelAttribute("restoOrder") RestoOrderVO restoOrder,
 	        BindingResult result,
 	        RedirectAttributes redirectAttributes,
 	        Model model
 	) {
 		
-		RestoOrderVO original = restoOrderService.getById(order.getRestoOrderId());
+		RestoOrderVO original = restoOrderService.getById(restoOrder.getRestoOrderId());
 	    if (original == null) {
 	    	result.reject("notfound", "資料不存在或已刪除");
 	        return "admin/fragments/common/error_modal";
@@ -251,28 +252,28 @@ public class OrderController {
 	    boolean hasAnyError = false;
 		
 		// valid+bindingresult只驗證基本型別與嵌套物件，關聯的捕捉要自己寫
-	    if (order.getRestoVO() == null || order.getRestoVO().getRestoId() == null) {
+	    if (restoOrder.getRestoVO() == null || restoOrder.getRestoVO().getRestoId() == null) {
 	        result.rejectValue("restoVO.restoId", null, "請選擇餐廳");
 	        hasAnyError = true;
 	    }
-	    if (order.getTimeslotVO() == null || order.getTimeslotVO().getTimeslotId() == null) {
+	    if (restoOrder.getTimeslotVO() == null || restoOrder.getTimeslotVO().getTimeslotId() == null) {
 	        result.rejectValue("timeslotVO.timeslotId", null, "請選擇時段");
 	        hasAnyError = true;
 	    }
   
     	// 自行補齊 timeslotVO（含 restoVO）
 	    if (!result.hasErrors()
-	            && order.getTimeslotVO() != null
-	            && order.getTimeslotVO().getTimeslotId() != null) {
-	        order.setTimeslotVO(timeslotService.getById(order.getTimeslotVO().getTimeslotId()));
+	            && restoOrder.getTimeslotVO() != null
+	            && restoOrder.getTimeslotVO().getTimeslotId() != null) {
+	    	restoOrder.setTimeslotVO(timeslotService.getById(restoOrder.getTimeslotVO().getTimeslotId()));
 	    }
 
 	    // 防呆，檢查是否選到別間餐廳的時段
 	    if (!result.hasErrors()
-	            && order.getRestoVO() != null
-	            && order.getTimeslotVO() != null
-	            && order.getTimeslotVO().getRestoVO() != null
-	            && !order.getTimeslotVO().getRestoVO().getRestoId().equals(order.getRestoVO().getRestoId())) {
+	            && restoOrder.getRestoVO() != null
+	            && restoOrder.getTimeslotVO() != null
+	            && restoOrder.getTimeslotVO().getRestoVO() != null
+	            && !restoOrder.getTimeslotVO().getRestoVO().getRestoId().equals(restoOrder.getRestoVO().getRestoId())) {
 
 	        result.rejectValue("timeslotVO.timeslotId",
 	                "timeslot.mismatch",
@@ -289,14 +290,16 @@ public class OrderController {
 	        model.addAttribute("timeslotVOList", timeslotService.getAllEnabled());
 		    model.addAttribute("orderStatusOptions", List.of(RestoOrderStatus.values()));
 		    model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
-	        model.addAttribute("order", order);
+//		    model.addAttribute("today", LocalDate.now());     // 加回 today，避免 JS 抓不到 min 值
+	        model.addAttribute("restoOrder", restoOrder);
 
-	        return "admin/fragments/resto/modals/order_resto_add";
+
+	        return "admin/fragments/resto/modals/order_resto_edit";
 	    }
 	    
 
 	    // 寫入資料庫
-		restoOrderService.update(order);
+		restoOrderService.update(restoOrder);
 	    return "redirect:/admin/resto_order";
 	}
 

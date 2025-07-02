@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.member.model.MemberVO;
 import com.resto.utils.RestoOrderSource;
@@ -23,8 +24,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
@@ -52,12 +51,12 @@ public class RestoOrderVO{
 	private RoomOrder roomOrder;
 	
 	@ManyToOne(fetch=FetchType.LAZY)
-	@NotNull
-	@JoinColumn(name="resto_id")
+	@JoinColumn(name="resto_id", nullable = false)
 	private RestoVO restoVO;
 	
 	// 預約需求
 	@NotNull
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 	@Column(name = "regi_date")
 	private LocalDate regiDate;
 	
@@ -80,19 +79,16 @@ public class RestoOrderVO{
 	private String regiReq;
 	
 	// 歷史訂單快照
-//	@NotBlank
-//	@Column(name = "snapshot_resto_name", length = 40)
+	@Column(name = "snapshot_resto_name")
 	private String snapshotRestoName;
 
-//	@Column(name = "snapshot_resto_name_en", length = 40)
+	@Column(name = "snapshot_resto_name_en")
 	private String snapshotRestoNameEn;
 
-//	@NotBlank
-//	@Column(name = "snapshot_period_name", length = 10)
+	@Column(name = "snapshot_period_name")
 	private String snapshotPeriodName;
 
-//	@NotBlank
-//	@Column(name = "snapshot_timeslot_name", length = 5)
+	@Column(name = "snapshot_timeslot_name")
 	private String snapshotTimeslotName;
 	
 	// 訂單客戶資料
@@ -112,7 +108,6 @@ public class RestoOrderVO{
 	@Column(name = "order_guest_email")
 	private String orderGuestEmail;
 	
-//	@NotNull
 	@CreationTimestamp
 	@Column(name = "order_time", updatable = false)
 	private LocalDateTime orderTime;
@@ -133,7 +128,6 @@ public class RestoOrderVO{
 	@Column(name = "order_status")
 	private RestoOrderStatus orderStatus = RestoOrderStatus.CREATED;
 	
-//	@NotNull
 	@Column(name = "reserve_expire_time")
 	private LocalDateTime reserveExpireTime;
 

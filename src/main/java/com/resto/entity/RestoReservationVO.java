@@ -12,10 +12,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "resto_reservation")
+@Table(name = "resto_reservation",
+uniqueConstraints = @UniqueConstraint(     // 每餐廳+日期+時段 只能一列
+        columnNames = {"resto_id","reserve_date","reserve_timeslot_id"}))
 public class RestoReservationVO {
 	
 	@Id
@@ -23,9 +26,8 @@ public class RestoReservationVO {
     @Column(name = "resto_reserve_id")
     private Integer restoReserveId;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "resto_id")
+    @JoinColumn(name = "resto_id", nullable = false)
     private RestoVO restoVO;
 
     @NotNull
@@ -41,7 +43,6 @@ public class RestoReservationVO {
     @Column(name = "resto_seats_total")
     private Integer restoSeatsTotal;
 
-    @NotNull
     @Column(name = "reserve_seats_total")
     private Integer reserveSeatsTotal = 0;
 
@@ -96,7 +97,7 @@ public class RestoReservationVO {
 
 
 	public void setTimeslotVO(TimeslotVO timeslotVO) {
-		this.reserveTimeslotVO = reserveTimeslotVO;
+		this.reserveTimeslotVO = timeslotVO;
 	}
 
 

@@ -103,10 +103,12 @@
               </div>
             </div>
        
-       
+              
+
             <div class="mb-3">
               <label for="regiDate" class="form-label">預約日期<span class="text-danger">*</span></label>
-              <input type="date" th:field="*{regiDate}" id="regiDate" class="form-control" required>
+              <input type="date" th:field="*{regiDate}" id="regiDate" class="form-control" required
+               th:attr="min=${today}">
               
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('regiDate')}">
@@ -122,7 +124,9 @@
                 <option th:each="timeslot : ${timeslotVOList}" 
                         th:value="${timeslot.timeslotId}" 
                         th:text="${timeslot.timeslotName + ' (' + timeslot.periodVO.periodName + ')'}"
-                        th:attr="data-resto-id=${timeslot.restoVO.restoId}">
+                        th:data-time="${timeslot.timeslotName}"
+                        th:data-label="${timeslot.timeslotName + ' (' + timeslot.periodVO.periodName + ')'}"
+                        th:data-resto-id="${timeslot.restoVO.restoId}">
                 </option>
               </select>
                         
@@ -134,8 +138,9 @@
             </div>
             
             <div class="mb-3">
-              <label for="regiSeats" class="form-label">用餐人數<span class="text-danger">*</span><small class="text-muted"> 請輸入大於1的正整數</small></label>
-              <input type="number" th:field="*{regiSeats}" id="regiSeats" class="form-control" min="1" required>
+              <label for="regiSeats" class="form-label">用餐人數<span class="text-danger">*</span><small class="text-muted"> 請輸入大於1且小於剩餘人數的正整數</small></label>
+              <input type="number" th:field="*{regiSeats}" id="regiSeats" class="form-control" min="1" required
+                     placeholder="">
               
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('regiSeats')}">
