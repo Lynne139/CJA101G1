@@ -44,6 +44,7 @@ public class TimeslotVO{
 	
 	
 	public TimeslotVO() {
+		super();
 	}
 
 

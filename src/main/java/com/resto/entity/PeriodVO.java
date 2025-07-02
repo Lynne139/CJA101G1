@@ -44,6 +44,12 @@ public class PeriodVO{
 	@OrderBy("timeslot_id asc")
 	private List<TimeslotVO> timeslots = new ArrayList<>();
 
+	
+	
+	public PeriodVO() {
+		super();
+	}
+
 	public Integer getPeriodId() {
 		return periodId;
 	}

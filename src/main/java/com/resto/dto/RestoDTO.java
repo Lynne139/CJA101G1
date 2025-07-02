@@ -9,7 +9,9 @@ public class RestoDTO {
     private Integer restoSeatsTotal;
     private Boolean isEnabled;
 
-    public RestoDTO() {}
+    public RestoDTO() {
+		super();
+    }
 
     public RestoDTO(Integer restoId, String restoName, String restoNameEn,
                     String restoLoc, Integer restoSeatsTotal, Boolean isEnabled) {
