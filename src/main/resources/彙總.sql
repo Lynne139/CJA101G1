@@ -643,7 +643,6 @@ CREATE TABLE resto_order (
     resto_id INT NOT NULL,
     
     regi_date DATE NOT NULL,
-    regi_period_id INT NOT NULL,
     regi_timeslot_id INT NOT NULL,
     regi_seats INT NOT NULL,
     high_chairs INT DEFAULT 0,
@@ -654,7 +653,7 @@ CREATE TABLE resto_order (
     snapshot_resto_name VARCHAR(40) NOT NULL,
 	snapshot_resto_name_en VARCHAR(40),
     -- period
-	snapshot_period_name VARCHAR(20) NOT NULL,
+	snapshot_period_name VARCHAR(10) NOT NULL,
     -- timeslot
 	snapshot_timeslot_name VARCHAR(5) NOT NULL,
 
@@ -662,39 +661,42 @@ CREATE TABLE resto_order (
      -- 訂單客戶資料
     order_guest_name VARCHAR(30) NOT NULL,
     order_guest_phone VARCHAR(20) NOT NULL,
-    order_guest_email VARCHAR(100) NOT NULL,
+    order_guest_email VARCHAR(200) NOT NULL,
 	order_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 自動抓訂單進入時間
     
-	-- 狀態與時效欄位
-	order_status TINYINT NOT NULL DEFAULT 1,  -- 0:取消, 1:成立, 2:完成, 3:保留, 4:逾時
-	reserve_expire_time DATETIME DEFAULT NULL, -- 自動逾時時間（regi_date + timeslot.start_time + 等待分鐘）
-
+	-- 管理+狀態與時效欄位
+    admin_note VARCHAR(500), -- 管理員備註
+    order_source TINYINT NOT NULL DEFAULT 1, -- 0:會員登入預約MEMBER, 1:住房訂單ROOM, 2:管理員建置ADMIN
+	order_status TINYINT NOT NULL DEFAULT 1,  -- 0:取消CANCELED, 1:成立CREATED, 2:完成DONE, 3:保留WITHHOLD, 4:逾時NOSHOW
+	reserve_expire_time DATETIME NOT NULL, -- 自動逾時時間（regi_date + timeslotName + 等待10min）
     
 	CONSTRAINT resto_order_pk PRIMARY KEY (resto_order_id),
     CONSTRAINT resto_order_member_fk FOREIGN KEY (member_id) REFERENCES member (member_id),
     CONSTRAINT resto_order_room_order_fk FOREIGN KEY (room_order_id) REFERENCES room_order (room_order_id),
 	CONSTRAINT resto_order_resto_fk FOREIGN KEY (resto_id) REFERENCES resto (resto_id),
-	CONSTRAINT resto_order_period_fk FOREIGN KEY (regi_period_id) REFERENCES resto_period(period_id),
-    CONSTRAINT resto_order_timeslot_fk FOREIGN KEY (regi_timeslot_id) REFERENCES resto_timeslot(timeslot_id)
+    CONSTRAINT resto_order_timeslot_fk FOREIGN KEY (regi_timeslot_id) REFERENCES resto_timeslot(timeslot_id)	
 );
 -- 訂單編號從1開始
 ALTER TABLE resto_order AUTO_INCREMENT = 1;
+CREATE INDEX idx_resto_date_slot ON resto_order (resto_id, regi_date, regi_timeslot_id); -- 查某日某餐廳某時段是否已滿
+CREATE INDEX idx_member_order ON resto_order (member_id); -- 查某會員所有訂單
+
 
 INSERT INTO resto_order ( member_id, room_order_id, resto_id, 
-regi_date, regi_period_id, regi_timeslot_id, regi_seats, high_chairs, regi_req,
+regi_date, regi_timeslot_id, regi_seats, high_chairs, regi_req,
   snapshot_resto_name, snapshot_resto_name_en, snapshot_period_name, snapshot_timeslot_name,
   order_guest_name, order_guest_phone, order_guest_email, 
-  order_status
+  order_source, order_status,reserve_expire_time
 )
 VALUES 
-	(3,NULL,2,'2025-05-25',5,9,1,0,NULL, '嶼間餐館', 'Islespace Bistro', '早午餐', '11:00', '周柏睿','0933444555','boerh.chou@example.com',2),
-	(2,1001,1,'2025-06-05',4,6,6,1,NULL, '沐光餐廳', 'Luma Buffet', '晚餐', '17:30', '張書涵','0912345678','shuhan.chang@example.com',2),
-	(2,1001,1,'2025-06-06',1,1,6,1,NULL, '沐光餐廳', 'Luma Buffet', '早餐', '07:00', '張書涵','0912345678','shuhan.chang@example.com',2),
-	(2,1001,1,'2025-06-06',2,4,6,1,NULL, '沐光餐廳', 'Luma Buffet', '午餐', '13:00', '張書涵','0912345678','shuhan.chang@example.com',2),
-	(2,1001,1,'2025-06-06',4,6,6,1,NULL, '沐光餐廳', 'Luma Buffet', '晚餐', '17:30', '張書涵','0912345678','shuhan.chang@example.com',2),
-	(2,1001,1,'2025-06-07',1,2,6,1,NULL, '沐光餐廳', 'Luma Buffet', '早餐', '09:30', '張書涵','0912345678','shuhan.chang@example.com',2),
-	(3,NULL,2,'2025-06-10',6,11,2,0,NULL, '嶼間餐館', 'Islespace Bistro', '晚餐', '17:00', '周柏睿','0933444555','boerh.chou@example.com',0),
-    (3,NULL,2,'2025-06-10',6,11,3,0,NULL, '嶼間餐館', 'Islespace Bistro', '晚餐', '17:00', '周柏睿','0933444555','boerh.chou@example.com',2);
+	(3,NULL,2,'2025-05-25',9,1,0,NULL, '嶼間餐館', 'Islespace Bistro', '早午餐', '11:00', '周柏睿','0933444555','boerh.chou@example.com',0,2,'2025-05-25 11:10:00'),
+	(2,1001,1,'2025-06-05',6,6,1,NULL, '沐光餐廳', 'Luma Buffet', '晚餐', '17:30', '張書涵','0912345678','shuhan.chang@example.com',1,2,'2025-06-05 17:40:00'),
+	(2,1001,1,'2025-06-06',1,6,1,NULL, '沐光餐廳', 'Luma Buffet', '早餐', '07:00', '張書涵','0912345678','shuhan.chang@example.com',1,2,'2025-06-06 07:10:00'),
+	(2,1001,1,'2025-06-06',4,6,1,NULL, '沐光餐廳', 'Luma Buffet', '午餐', '13:00', '張書涵','0912345678','shuhan.chang@example.com',1,2,'2025-06-06 13:10:00'),
+	(2,1001,1,'2025-06-06',6,6,1,NULL, '沐光餐廳', 'Luma Buffet', '晚餐', '17:30', '張書涵','0912345678','shuhan.chang@example.com',1,2,'2025-06-06 17:40:00'),
+	(2,1001,1,'2025-06-07',2,6,1,NULL, '沐光餐廳', 'Luma Buffet', '早餐', '09:30', '張書涵','0912345678','shuhan.chang@example.com',1,2,'2025-06-07 09:40:00'),
+	(3,NULL,2,'2025-06-10',11,2,0,NULL, '嶼間餐館', 'Islespace Bistro', '晚餐', '17:00', '周柏睿','0933444555','boerh.chou@example.com',0,0,'2025-06-10 17:10:00'),
+    (3,NULL,2,'2025-06-10',11,3,0,NULL, '嶼間餐館', 'Islespace Bistro', '晚餐', '17:00', '周柏睿','0933444555','boerh.chou@example.com',0,2,'2025-06-10 17:10:00');
     
 
 -- 餐廳預訂表

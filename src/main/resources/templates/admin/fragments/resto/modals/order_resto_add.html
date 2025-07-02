@@ -1,0 +1,251 @@
+<div th:fragment="addModalContent">
+
+  <div class="modal fade no-transform" id="restoOrderAddModal" tabindex="-1"
+    aria-hidden="true">
+    <div
+      class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content rounded-4 p-4"
+        style="background-color: var(--color-background);">
+
+        <div class="modal-header">
+          <h5 class="modal-title">新增訂單</h5>
+          <button type="button" class="btn-close"
+            data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <form id="restoOrderAddForm"
+                th:object="${restoOrder}" 
+                th:action="@{/admin/resto_order/insert}"
+                method="post">
+                
+<!--             <div class="mb-3"> -->
+<!--               <label for="orderSource" class="form-label">訂單來源<span class="text-danger">*</span></label> -->
+<!--               <select id="orderSource" class="form-select" th:field="*{orderSource}" required> -->
+<!--                 <option th:each="source : ${orderSourceOptions}"  -->
+<!--                         th:value="${source}"  -->
+<!--                         th:text="${source.label}"> -->
+<!--                 </option> -->
+<!--               </select> -->
+              
+<!--               錯誤提示 -->
+<!--               <div class="text-danger" th:if="${#fields.hasErrors('orderSource')}"> -->
+<!--                 <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i> -->
+<!--                 <span th:each="err : ${#fields.errors('orderSource')}" th:text="${err}"></span> -->
+<!--               </div> -->
+<!--             </div> -->
+
+              <div class="mb-3">
+                <label class="form-label">訂單來源</label>
+                <input id="orderSource" type="text" th:value="${orderSource}" th:field="*{orderSource}" class="form-control" readonly />
+              </div>
+           
+            
+              <!-- 來自會員:會員ID -->
+              <div class="mb-3" th:if="${restoOrder.orderSource?.name() == 'MEMBER'}">
+                <label for="memberId" class="form-label">會員ID<small class="text-muted"> 請輸入正整數</small></label>
+                <input type="number" th:field="*{memberVO.memberId}" id="memberId" class="form-control" min="0">
+                
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('restoOrder.memberVO.memberId')}" th:text="${err}"></span>
+              </div>
+              
+              <!-- 來自住房:會員ID+住宿訂單ID -->
+              <div class="mb-3" th:if="${restoOrder.orderSource?.name() == 'MEMBER'}">
+                <label for="memberId" class="form-label">會員ID<small class="text-muted"> 請輸入正整數</small></label>
+                <input type="number" th:field="*{memberVO.memberId}" id="memberId" class="form-control" min="0">
+                
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('restoOrder.memberVO.memberId')}" th:text="${err}"></span>
+              </div>
+              
+              <div class="mb-3" th:if="${restoOrder.orderSource?.name() == 'ROOM'}">
+                <label for="roomOrderId" class="form-label">住宿訂單ID<small class="text-muted"> 請輸入正整數</small></label>
+                <input type="number" th:field="*{restoOrder.roomOrder.roomOrderId}" id="roomOrderId" class="form-control" min="0">
+                
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('restoOrder.roomOrder.roomOrderId')}" th:text="${err}"></span>
+              </div>       
+                  
+            
+
+            <div class="mb-3">
+              <label for="restoId" class="form-label">餐廳<span class="text-danger">*</span></label>
+              <select id="restoId" class="form-select" th:field="*{restoVO.restoId}" required>
+                <option value="" th:selected="*{restoVO.restoId} == null">請選擇餐廳</option>
+                <option th:each="resto : ${restoVOList}" 
+                        th:value="${resto.restoId}" 
+                        th:text="${resto.restoName}">
+                </option>
+              </select>
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('restoVO.restoId')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('restoVO.restoId')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="orderStatus" class="form-label">訂單狀態<span class="text-danger">*</span></label>
+              <select id="orderStatus" class="form-select" th:field="*{orderStatus}" required>
+                <option th:each="status : ${orderStatusOptions}" 
+                        th:value="${status}" 
+                        th:text="${status.label}">
+                </option>
+              </select>
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('orderStatus')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('orderStatus')}" th:text="${err}"></span>
+              </div>
+            </div>
+       
+              
+
+            <div class="mb-3">
+              <label for="regiDate" class="form-label">預約日期<span class="text-danger">*</span></label>
+              <input type="date" th:field="*{regiDate}" id="regiDate" class="form-control" required
+               th:attr="min=${today}">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('regiDate')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('regiDate')}" th:text="${err}"></span>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="timeslotId" class="form-label">時段<span class="text-danger">*</span></label>
+              <select id="timeslotId" class="form-select" th:field="*{timeslotVO.timeslotId}" required>
+                <option value="" th:selected="*{timeslotVO.timeslotId} == null">請先選擇餐廳</option>
+                <option th:each="timeslot : ${timeslotVOList}" 
+                        th:value="${timeslot.timeslotId}" 
+                        th:text="${timeslot.timeslotName + ' (' + timeslot.periodVO.periodName + ')'}"
+                        th:data-time="${timeslot.timeslotName}"
+                        th:data-label="${timeslot.timeslotName + ' (' + timeslot.periodVO.periodName + ')'}"
+                        th:data-resto-id="${timeslot.restoVO.restoId}">
+                </option>
+              </select>
+                        
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('timeslotVO.timeslotId')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('timeslotVO.timeslotId')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="regiSeats" class="form-label">用餐人數<span class="text-danger">*</span><small class="text-muted"> 請輸入大於1且小於剩餘人數的正整數</small></label>
+              <input type="number" th:field="*{regiSeats}" id="regiSeats" class="form-control" min="1" required
+                     placeholder="">
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('regiSeats')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('regiSeats')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            
+            <div class="modal_section d-flex flex-column gap-2">
+               <p class="view_sec_title"><strong>需求備註</strong></p>
+               
+               <div class="mb-3">
+                <label for="highChairs" class="form-label">兒童座椅數<small class="text-muted"> 請輸入正整數</small></label>
+                <input type="number" th:field="*{highChairs}" id="highChairs" class="form-control" min="0">
+                
+                <!-- 錯誤提示 -->
+                <div class="text-danger" th:if="${#fields.hasErrors('highChairs')}">
+                  <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                  <span th:each="err : ${#fields.errors('highChairs')}" th:text="${err}"></span>
+                </div>
+              </div>
+  
+              <div class="mb-3">
+                <label for="regiReq" class="form-label">其他需求<small class="text-muted"> 最多可500字</small></label>
+                <textarea th:field="*{regiReq}" id="regiReq" class="form-control" maxlength="500"></textarea>
+                
+                <!-- 錯誤提示 -->
+                <div class="text-danger" th:if="${#fields.hasErrors('regiReq')}">
+                  <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                  <span th:each="err : ${#fields.errors('regiReq')}" th:text="${err}"></span>
+                </div>
+              </div>
+            </div>
+            
+            
+            <div class="modal_section d-flex flex-column gap-2">
+               <p class="view_sec_title"><strong>訂位者資訊</strong></p>
+               
+               <div class="mb-3">
+                <label for="orderGuestName" class="form-label">訂位者姓名<span class="text-danger">*</span><small class="text-muted"> 最多可30字</small></label>
+                <input type="text" th:field="*{orderGuestName}" id="orderGuestName" class="form-control" maxlength="30" required>
+                
+                <!-- 錯誤提示 -->
+                <div class="text-danger" th:if="${#fields.hasErrors('orderGuestName')}">
+                  <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                  <span th:each="err : ${#fields.errors('orderGuestName')}" th:text="${err}"></span>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="orderGuestPhone" class="form-label">聯絡電話<span class="text-danger">*</span><small class="text-muted"> 格式：0912345678</small></label>
+                <input type="tel" th:field="*{orderGuestPhone}" id="orderGuestPhone" class="form-control" required>
+                
+                <!-- 錯誤提示 -->
+                <div class="text-danger" th:if="${#fields.hasErrors('orderGuestPhone')}">
+                  <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                  <span th:each="err : ${#fields.errors('orderGuestPhone')}" th:text="${err}"></span>
+                </div>
+              </div>
+  
+              <div class="mb-3">
+                <label for="orderGuestEmail" class="form-label">信箱<span class="text-danger">*</span><small class="text-muted"> 最多可200字</small></label>
+                <input type="email" th:field="*{orderGuestEmail}" id="orderGuestEmail" class="form-control" required>
+                
+                <!-- 錯誤提示 -->
+                <div class="text-danger" th:if="${#fields.hasErrors('orderGuestEmail')}">
+                  <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                  <span th:each="err : ${#fields.errors('orderGuestEmail')}" th:text="${err}"></span>
+                </div>
+              </div>
+            </div>
+            
+             
+             
+            <div class="modal_section d-flex flex-column gap-2">
+               <p class="view_sec_title"><strong>註記</strong></p>
+               
+               <div class="mb-3">
+                  <label for="adminNote" class="form-label">管理員註記<small class="text-muted"> 最多可500字</small></label>
+                  <textarea th:field="*{adminNote}" id="adminNote" class="form-control" maxlength="500"></textarea>
+                  
+                  <!-- 錯誤提示 -->
+                  <div class="text-danger" th:if="${#fields.hasErrors('adminNote')}">
+                    <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                    <span th:each="err : ${#fields.errors('adminNote')}" th:text="${err}"></span>
+                  </div>
+                </div>           
+            </div> 
+             
+             
+                    
+          </form>
+        
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn_secondary "
+            data-bs-dismiss="modal">取消</button>
+          <button type="submit" form="restoOrderAddForm" id="btnSubmitAdd"
+            class="btn btn_accent ">新增</button>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
