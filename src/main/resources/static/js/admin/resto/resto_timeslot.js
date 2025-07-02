@@ -737,6 +737,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===== 拖曳時段改變所屬區段 =====
   
   function initTimeslotDnD() {
+	
+	if (window.readonly) {
+	    console.log("只讀模式，不可拖動");
+	    return; // 或根本不要初始化拖動元件
+	}
+	
     // 把每個 period 裡的 .timeslot_group 都變成 Sortable 清單
     document.querySelectorAll('.timeslot_group').forEach(groupEl => {
 

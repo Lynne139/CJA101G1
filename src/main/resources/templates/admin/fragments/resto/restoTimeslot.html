@@ -19,9 +19,16 @@
 		</div>
 	</form>
   
+        <div th:if="${readonly}" class="alert alert-warning">
+          <i class="fa-solid fa-lock me-2"></i> 本餐廳已封存，目前為只讀模式，無法編輯資料。
+        </div>
 
     <!-- 區段與時段 Panel -->
     <div class="panel panel_periodntimeslot p-4 mb-5">
+    
+        
+        <!-- readonly 狀態時顯示的遮罩 -->
+        <div th:if="${readonly}" class="block-overlay"></div>        
 
         <div th:if="${selectedResto == null}" class="text-center">請先選擇餐廳，以載入開放時段</div>
         
