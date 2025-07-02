@@ -56,7 +56,7 @@
 
   <!-- Sticky 右側按鈕 -->
   <div class="sticky-icons d-none d-lg-block">
-    <a href="#"><img th:src="@{/images/icon/bed.svg}" alt="bed" class="icon"/><br>線上訂房</span></a>
+    <a th:href="@{/bookMulti}"><img th:src="@{/images/icon/bed.svg}" alt="bed" class="icon"/><br>線上訂房</span></a>
     <a th:href="@{/front-end/shop}"><img th:src="@{/images/icon/bag.svg}" alt="bag" class="icon"/><br>帳號選物</span></a>
     <a href="#"><img th:src="@{/images/icon/dish.svg}" alt="dish" class="icon"/><br>餐廳訂位</span></a>
   </div>
@@ -106,10 +106,10 @@
         </div>
         <div class="overlay-menu-col">
           <h5>精緻客房</h5>
-          <a href="#">蔻香居</a>
-          <a href="#">海音居</a>
-          <a href="#">晨曦之庭</a>
-          <a href="#">月影行館</a>
+          <a href="/roomtypes#roomtype-4">蔻香居</a>
+          <a href="/roomtypes#roomtype-3">海音居</a>
+          <a href="/roomtypes#roomtype-2">晨曦之庭</a>
+          <a href="/roomtypes#roomtype-1">月影行館</a>
         </div>
         <div class="overlay-menu-col">
           <h5>其他</h5>
@@ -177,14 +177,14 @@
             無論獨旅放鬆、雙人浪漫，還是親子同樂，嶼蔻都精心為您準備好了完美空間！
           </div>
           <div class="rooms-images-row">
-            <div class="room-img-wrapper">
+            <div class="room-img-wrapper" onclick="window.location.href='/roomtypes#roomtype-2'">
               <div class="room-img-lg">
                 <img th:src="@{/images/room/room1.png}" alt="晨曦之庭" class="room-img" />
                 <div class="room-img-overlay"></div>
                 <div class="room-img-text" id="room-img-left1"></div>
               </div>
             </div>
-            <div class="room-img-wrapper">
+            <div class="room-img-wrapper" onclick="window.location.href='/roomtypes#roomtype-4'">
               <div class="room-img-md">
                 <img th:src="@{/images/room/room2.png}" alt="蔻香居" class="room-img" />
                 <div class="room-img-overlay"></div>
@@ -195,14 +195,14 @@
         </div>
         <div class="d-lg-flex">
           <div class="rooms-images-row">
-            <div class="room-img-wrapper">
+            <div class="room-img-wrapper" onclick="window.location.href='/roomtypes#roomtype-3'">
               <div class="room-img-mdd">
                 <img th:src="@{/images/room/room3.png}" alt="海音居" class="room-img" />
                 <div class="room-img-overlay"></div>
                 <div class="room-img-text" id="room-img-left2"></div>
               </div>
             </div>
-            <div class="room-img-wrapper">
+            <div class="room-img-wrapper" onclick="window.location.href='/roomtypes#roomtype-1'">
               <div class="room-img-lgd">
                 <img th:src="@{/images/room/room4.png}" alt="月影行館" class="room-img" />
                 <div class="room-img-overlay"></div>
@@ -212,7 +212,7 @@
           </div>
           <div class="rooms-quote py-3">
             <div class="rooms-quote-en">A room for every journey,<br>a view for every soul.</div>
-            <button class="rooms-book-btn">
+            <button class="rooms-book-btn" onclick="location.href='/roomtypes'">
               <span class="circle"></span>
               <span class="book-text">BOOK</span>
               <span class="arrow"></span>

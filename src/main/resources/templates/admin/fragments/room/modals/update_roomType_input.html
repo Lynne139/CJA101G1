@@ -54,6 +54,17 @@
 								<span th:each="err : ${#fields.errors('roomTypePrice')}" th:text="${err}"></span>
 							</div>
 						</div>
+						
+						<div class="mb-3">
+							<label for="guestNum" class="form-label">房型價格</label>
+							<input type="number" th:field="*{guestNum}" id="guestNum" class="form-control" required min="1">
+
+							<!-- 錯誤提示 -->
+							<div class="text-danger" th:if="${#fields.hasErrors('guestNum')}">
+								<i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+								<span th:each="err : ${#fields.errors('guestNum')}" th:text="${err}"></span>
+							</div>
+						</div>
 
 						<div class="mb-3">
 							<label class="form-label">上下架狀態 <span class="text-danger">*</span></label>
