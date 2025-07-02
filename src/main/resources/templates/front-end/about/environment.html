@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>環境簡介 - Maison d'Yuko</title>
+    <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+    <style>
+        .env-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .env-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #5a3c1a;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .env-section {
+            margin-bottom: 3rem;
+        }
+        .env-section h2 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #5a3c1a;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e0d6c3;
+            padding-bottom: 0.5rem;
+        }
+        .env-section h3 {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #7E4E24;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+        }
+        .env-section p {
+            color: #444;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        .env-section ul {
+            color: #444;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+            font-size: 1.1rem;
+        }
+        .env-section li {
+            margin-bottom: 0.8rem;
+        }
+        .env-image {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            border-radius: 12px;
+            margin: 2rem auto;
+            display: block;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .env-highlight {
+            background: #f6efe4;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border-left: 4px solid #B88D67;
+            font-size: 1.15rem;
+            color: #5a3c1a;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+    
+
+    
+    <div class="env-container">
+        <h1 class="env-title">環境簡介</h1>
+        
+        <div class="env-section">
+            <h2>自然環境</h2>
+            <p>嶼蔻渡假村座落於南海群島的映灣嶼，四面環海，擁有壯麗的珊瑚灣與潔白沙灘。這裡的海水清澈見底，海風溫柔，島上生態豐富，棲息著多種珍稀鳥類與海洋生物，是自然愛好者的天堂。</p>
+            <p>清晨，您可以在海邊散步，感受陽光灑落海面的金色波光；夜晚，則能仰望滿天星斗，聆聽海浪與蟲鳴交織的樂章。</p>
+            <img th:src="@{/images/dining/dining_03.png}" alt="嶼蔻自然環境" class="env-image" />
+        </div>
+        
+        <div class="env-section">
+            <h2>建築特色</h2>
+            <p>嶼蔻的建築設計融合了現代美學與在地文化元素，採用大量自然建材，並以開放式空間設計，讓每一間客房都能享有無敵海景與自然採光。</p>
+            <ul>
+                <li>主建築以白色與木質為主調，簡約而溫暖</li>
+                <li>每棟客房皆設有私人陽台，享受專屬的海天一色</li>
+                <li>園區內設有生態步道、觀星平台與戶外泳池</li>
+                <li>餐廳與公共空間皆可遠眺珊瑚灣美景</li>
+            </ul>
+            <img th:src="@{/images/room/room1.png}" alt="嶼蔻建築特色" class="env-image" />
+        </div>
+        
+        <div class="env-section">
+            <h2>永續理念</h2>
+            <div class="env-highlight">
+                嶼蔻堅持永續發展，從建築設計到日常營運，皆以環保為核心：
+            </div>
+            <ul>
+                <li>採用太陽能發電與雨水回收系統</li>
+                <li>推廣無塑生活，園區內全面減塑</li>
+                <li>支持在地農漁產品，推動綠色餐飲</li>
+                <li>舉辦生態導覽與環境教育活動</li>
+                <li>與在地社區合作，共同守護島嶼生態</li>
+            </ul>
+        </div>
+        
+        <div class="env-section">
+            <h2>體驗嶼蔻</h2>
+            <p>在嶼蔻，您不僅能享受頂級的住宿體驗，更能親身參與各種自然與文化活動：</p>
+            <ul>
+                <li>浮潛、獨木舟、SUP等海上活動</li>
+                <li>生態導覽、夜間觀星、珊瑚復育體驗</li>
+                <li>在地美食烹飪課程、手作工藝體驗</li>
+                <li>瑜伽、冥想與SPA療癒課程</li>
+            </ul>
+        </div>
+        
+        <div class="env-section">
+            <h2>我們的承諾</h2>
+            <p>嶼蔻團隊相信，唯有尊重自然、善待土地，才能讓這片美麗的島嶼永續傳承。誠摯邀請您一同加入我們，守護這片淨土，讓每一次的旅行都成為對地球最美好的祝福。</p>
+        </div>
+    </div>
+    
+    <div th:replace="fragments/footer :: footer"></div>
+</body>
+</html> 
