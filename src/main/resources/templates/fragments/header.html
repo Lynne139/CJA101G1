@@ -1,5 +1,5 @@
 <header th:fragment="header" class="d-flex justify-content-between align-items-center p-3">
-  <div class="fw-bold text-brown">Maison d’Yuko</div>
+  <a th:href="@{/}" class="fw-bold text-brown text-decoration-none" style="cursor: pointer;">Maison d'Yuko</a>
     <div class="menu-img-div">
       <a href="#" id="menuToggle" class="ml-3"><img th:src="@{/images/icon/menu.svg}" alt="menu" class="menu-img" /></a>
     </div>
@@ -73,6 +73,22 @@
 
       </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // menu收合
+        $(document).ready(function() {
+            $('#menuToggle').on('click', function () {
+                $('#overlayMenu').addClass('active');
+            });
+            $('#menu-Toggle').on('click', function () {
+                $('#overlayMenu').addClass('active');
+            });
+            $('#menuClose').on('click', function () {
+                $('#overlayMenu').removeClass('active');
+            });
+        });
+    </script>
     <script>
 		document.addEventListener('DOMContentLoaded', function () {
 		    const form = document.getElementById('loginForm');
@@ -106,6 +122,4 @@
 		    });
 		});
 	</script>
-    
-    
 </header>
