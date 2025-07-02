@@ -34,8 +34,7 @@ public class TimeslotVO{
 	private Boolean isDeleted = false;
 	
 	@ManyToOne
-	@NotNull
-	@JoinColumn(name="resto_id")
+	@JoinColumn(name="resto_id", nullable = false)
 	private RestoVO restoVO;
 	
 	@ManyToOne
@@ -44,8 +43,15 @@ public class TimeslotVO{
 	
 	
 	public TimeslotVO() {
-		super();
 	}
+
+
+	public TimeslotVO(Integer timeslotId) {
+		super();
+		this.timeslotId = timeslotId;
+	}
+
+
 
 	public Integer getTimeslotId() {
 		return timeslotId;

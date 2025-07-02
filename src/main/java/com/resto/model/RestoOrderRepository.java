@@ -12,27 +12,16 @@ import com.resto.utils.RestoOrderStatus;
 
 public interface RestoOrderRepository extends JpaRepository<RestoOrderVO, Integer>  {
 
-	@Query("""
+		// 每日該餐廳總訂位
+		@Query("""
 		    SELECT ro.regiDate, SUM(ro.regiSeats)
 		    FROM RestoOrderVO ro
-		    WHERE ro.restoVO.restoId = :restoId AND ro.orderStatus != 0
+		    WHERE ro.restoVO.restoId = :restoId 
+		      AND ro.orderStatus <> com.resto.utils.RestoOrderStatus.CANCELED
 		    GROUP BY ro.regiDate
 		""")
 		List<Object[]> findBookedSeatsPerDate(@Param("restoId") Integer restoId);
 
-
-		 /** 回傳 [regiDate, totalSeats] */
-	    @Query("""
-	        SELECT ro.regiDate, SUM(ro.regiSeats)
-	        FROM RestoOrderVO ro
-	        WHERE ro.restoVO.restoId = :restoId
-	          AND ro.orderStatus <> :canceled
-	        GROUP BY ro.regiDate
-	    """)
-	    List<Object[]> findBookedSeatsPerDate(@Param("restoId") Integer restoId,
-	                                          @Param("cancelled") RestoOrderStatus cancelled);
-	
-	
 	
 	
 	

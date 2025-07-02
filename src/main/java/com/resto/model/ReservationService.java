@@ -1,20 +1,20 @@
 package com.resto.model;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.resto.entity.RestoVO;
+import com.resto.entity.RestoReservationVO;
+import com.resto.entity.TimeslotVO;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class ReservationService {
 
     @PersistenceContext
@@ -22,57 +22,73 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final RestoRepository restoRepository;
-    private final RestoOrderRepository restoOrderRepository;
 
-    public ReservationService(ReservationRepository reservationRepository,RestoRepository restoRepository,RestoOrderRepository restoOrderRepository) {
+
+    public ReservationService(ReservationRepository reservationRepository,RestoRepository restoRepository) {
         this.reservationRepository = reservationRepository;
         this.restoRepository = restoRepository;
-        this.restoOrderRepository = restoOrderRepository;
     }
 
-    public List<LocalDate> getFullBookedDates(Integer restoId) {
-        RestoVO resto = restoRepository.findById(restoId).orElseThrow();
-        int totalSeats = resto.getRestoSeatsTotal();
+    
+    //取出、建立當天預約vo
+    private RestoReservationVO getEntry(Integer restoId,
+                                        Integer timeslotId,
+                                        LocalDate date) {
 
-        // 自訂查詢每個日期已訂人數
-        List<Object[]> result = restoOrderRepository.findBookedSeatsPerDate(restoId);
+        return reservationRepository
+            .findByRestoVO_RestoIdAndReserveDateAndReserveTimeslotVO_TimeslotId(
+                    restoId, date, timeslotId)
+            .orElseGet(() -> {  // 若無訂單存在就建一空的
+                RestoReservationVO vo = new RestoReservationVO();
+                
+                vo.setRestoVO(restoRepository.getReferenceById(restoId));
+                vo.setTimeslotVO(new TimeslotVO(timeslotId)); // 只需 idproxy
+                vo.setReserveDate(date);
+                vo.setRestoSeatsTotal(vo.getRestoVO().getRestoSeatsTotal());
+                
+                return reservationRepository.save(vo);
+            });
+    }
 
-        List<LocalDate> fullDates = new ArrayList<>();
-        for (Object[] row : result) {
-            LocalDate date = (LocalDate) row[0];
-            Long seatsBooked = (Long) row[1];
-            if (seatsBooked >= totalSeats) {
-                fullDates.add(date);
-            }
+    // 當日剩餘名額
+    public int getRemaining(Integer restoId, Integer timeslotId, LocalDate date){
+        var entry = getEntry(restoId,timeslotId,date);
+        return Math.max(entry.getRestoSeatsTotal()
+                     - entry.getReserveSeatsTotal(), 0);
+    }
+
+    // 更新預約狀況，防呆預約人數若超額丟 IllegalStateException
+    @Transactional
+    public void reserve(Integer restoId, Integer timeslotId,
+                        LocalDate date, int seats){
+
+        var entry  = getEntry(restoId,timeslotId,date);
+        int remain = entry.getRestoSeatsTotal() - entry.getReserveSeatsTotal();
+        if (seats > remain) {
+            throw new IllegalStateException("剩餘 " + remain + " 位，名額不足");
         }
-        return fullDates;
+        entry.setReserveSeatsTotal(entry.getReserveSeatsTotal() + seats);
+        // JPA 內部自動 flush
     }
     
     
-    public List<LocalDate> getAvailableDates(Integer restoId) {
-        RestoVO resto = restoRepository.findById(restoId).orElseThrow();
-        int totalSeats = resto.getRestoSeatsTotal();
+    // 更新(釋放/占用)每時段實際預約人數
+    @Transactional
+    public void adjust(Integer restoId,Integer timeslotId,
+                       LocalDate date,int deltaSeats){
 
-        // 查出每一天的總訂位數量
-        List<Object[]> results = restoOrderRepository.findBookedSeatsPerDate(restoId);
+        var entry = getEntry(restoId,timeslotId,date);
+        int newTotal = entry.getReserveSeatsTotal() + deltaSeats;
 
-        // 計算從今天起後一個月內的所有日期
-        List<LocalDate> allDates = IntStream.range(0, 30)
-            .mapToObj(i -> LocalDate.now().plusDays(i))
-            .collect(Collectors.toList());
+        if (newTotal < 0)
+            throw new IllegalStateException("reserveSeatsTotal < 0 ?!");
 
-        // 建立已訂座數 map
-        Map<LocalDate, Long> bookedMap = results.stream()
-            .collect(Collectors.toMap(r -> (LocalDate) r[0], r -> (Long) r[1]));
+        if (newTotal > entry.getRestoSeatsTotal())
+            throw new IllegalStateException("剩餘名額不足");
 
-        // 回傳未滿額的日期
-        return allDates.stream()
-            .filter(date -> bookedMap.getOrDefault(date, 0L) < totalSeats)
-            .collect(Collectors.toList());
+        entry.setReserveSeatsTotal(newTotal);
     }
 
-    
-    
     
     
     
@@ -95,4 +111,3 @@ public class ReservationService {
     
     
     
-

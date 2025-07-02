@@ -1,9 +1,10 @@
 package com.resto.controller;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,22 +21,23 @@ import com.resto.model.TimeslotService;
 public class ReservationController {
 	
 	@Autowired
-	RestoOrderService restoOrderService;
-	@Autowired
-	RestoService restoService;
-	@Autowired
-	TimeslotService timeslotService;
-	@Autowired
 	ReservationService reservationService;
 
 	// ===== restoOrder.html ====================================================== //
 
-	@GetMapping("/api/reservation/full-dates")
+	// 取得該餐廳每日每時段剩餘名額
+	@GetMapping("/api/reservation/remaining")
 	@ResponseBody
-	public List<LocalDate> getFullDates(@RequestParam Integer restoId) {
-	    return reservationService.getFullBookedDates(restoId);
-	}
-	
+	public Map<String,Integer> remaining(
+		    @RequestParam Integer restoId,
+		    @RequestParam Integer timeslotId,
+		    @RequestParam
+		    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+		    LocalDate date) {
+
+		    int remaining = reservationService.getRemaining(restoId,timeslotId,date);
+		    return Map.of("remaining", remaining);
+		}
 	
 	
 	

@@ -146,20 +146,20 @@ public class RestoOrderVO{
 
 	
 	
-	// Hibernate在儲存或更新前自動填入快照欄位(EntityManager.persist/merge()前觸發)
-	@PrePersist
-	@PreUpdate
-	private void fillSnapshot() {
-	    if (timeslotVO != null) {
-	        snapshotTimeslotName = timeslotVO.getTimeslotName();
-	        snapshotPeriodName   = timeslotVO.getPeriodVO().getPeriodName();
-	    }
-	    if (restoVO != null) {
-	        snapshotRestoName    = restoVO.getRestoName();
-	        snapshotRestoNameEn  = restoVO.getRestoNameEn();
-	    }
-	}
-	
+//	// Hibernate在儲存或更新前自動填入快照欄位(EntityManager.persist/merge()前觸發)
+//	@PrePersist
+//	@PreUpdate
+//	private void fillSnapshot() {
+//	    if (timeslotVO != null) {
+//	        snapshotTimeslotName = timeslotVO.getTimeslotName();
+//	        snapshotPeriodName   = timeslotVO.getPeriodVO().getPeriodName();
+//	    }
+//	    if (restoVO != null) {
+//	        snapshotRestoName    = restoVO.getRestoName();
+//	        snapshotRestoNameEn  = restoVO.getRestoNameEn();
+//	    }
+//	}
+//	
 
 
 

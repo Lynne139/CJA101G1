@@ -2,7 +2,7 @@ package com.resto.utils;
 
 public enum RestoOrderSource {
     MEMBER(0, "會員", "yuko-accent"),
-    ROOM(1, "住房", "warning"),
+    ROOM(1, "住宿", "warning"),
     ADMIN(2, "後台", "yuko-secondary");
 
     private final int code;

@@ -1,6 +1,6 @@
-<div th:fragment="addModalContent">
+<div th:fragment="editModalContent">
 
-  <div class="modal fade no-transform" id="restoOrderAddModal" tabindex="-1"
+  <div class="modal fade no-transform" id="restoOrderEditModal" tabindex="-1"
     aria-hidden="true">
     <div
       class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -8,17 +8,36 @@
         style="background-color: var(--color-background);">
 
         <div class="modal-header">
-          <h5 class="modal-title">新增訂單</h5>
+          <h5 class="modal-title">編輯訂單</h5>
           <button type="button" class="btn-close"
             data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
         <div class="modal-body">
+        
+        <!-- 若有不隸屬欄位而須統一顯示的錯誤提示 -->
+        <div th:if="${errorMsg}" class="alert alert-danger">
+          <i class="fa-solid fa-triangle-exclamation me-2"></i>
+          <span th:text="${errorMsg}"></span>
+        </div>
 
-          <form id="restoOrderAddForm"
+          <form id="restoOrderEditForm"
                 th:object="${restoOrder}" 
-                th:action="@{/admin/resto_order/insert}"
+                th:action="@{/admin/resto_order/update}"
                 method="post">
+                
+                
+            <input type="hidden" th:field="*{restoOrderId}"/>  
+                
+            <div class="mb-3">
+              <label class="form-label">訂單ID</label>
+              <input type="text" class="form-control"
+                th:field="*{restoOrderId}" readonly>
+            </div>
+            
+             <input type="hidden" th:field="*{memberVO.memberId}"/>
+             <input type="hidden" th:field="*{roomOrder.roomOrderId}"/>
+            
                 
 <!--             <div class="mb-3"> -->
 <!--               <label for="orderSource" class="form-label">訂單來源<span class="text-danger">*</span></label> -->
@@ -28,48 +47,27 @@
 <!--                         th:text="${source.label}"> -->
 <!--                 </option> -->
 <!--               </select> -->
-              
-<!--               錯誤提示 -->
-<!--               <div class="text-danger" th:if="${#fields.hasErrors('orderSource')}"> -->
-<!--                 <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i> -->
-<!--                 <span th:each="err : ${#fields.errors('orderSource')}" th:text="${err}"></span> -->
-<!--               </div> -->
-<!--             </div> -->
+
 
               <div class="mb-3">
                 <label class="form-label">訂單來源</label>
                 <input id="orderSource" type="text" th:value="${orderSource}" th:field="*{orderSource}" class="form-control" readonly />
               </div>
-           
-            
+              
               <!-- 來自會員:會員ID -->
               <div class="mb-3" th:if="${restoOrder.orderSource?.name() == 'MEMBER'}">
-                <label for="memberId" class="form-label">會員ID<small class="text-muted"> 請輸入正整數</small></label>
-                <input type="number" th:field="*{memberVO.memberId}" id="memberId" class="form-control" min="0">
-                
-                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
-                <span th:each="err : ${#fields.errors('restoOrder.memberVO.memberId')}" th:text="${err}"></span>
+                <label id="memberId" class="form-label">會員ID</label>
+                <input type="text" th:value="${restoOrder.memberVO.memberId}" class="form-control" readonly />
               </div>
-              
               <!-- 來自住房:會員ID+住宿訂單ID -->
-              <div class="mb-3" th:if="${restoOrder.orderSource?.name() == 'MEMBER'}">
-                <label for="memberId" class="form-label">會員ID<small class="text-muted"> 請輸入正整數</small></label>
-                <input type="number" th:field="*{memberVO.memberId}" id="memberId" class="form-control" min="0">
-                
-                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
-                <span th:each="err : ${#fields.errors('restoOrder.memberVO.memberId')}" th:text="${err}"></span>
-              </div>
-              
               <div class="mb-3" th:if="${restoOrder.orderSource?.name() == 'ROOM'}">
-                <label for="roomOrderId" class="form-label">住宿訂單ID<small class="text-muted"> 請輸入正整數</small></label>
-                <input type="number" th:field="*{restoOrder.roomOrder.roomOrderId}" id="roomOrderId" class="form-control" min="0">
-                
-                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
-                <span th:each="err : ${#fields.errors('restoOrder.roomOrder.roomOrderId')}" th:text="${err}"></span>
-              </div>       
-                  
-            
+                <label class="form-label">會員ID</label>
+                <input id="memberId" type="text" th:value="${restoOrder.memberVO.memberId}" class="form-control" readonly />
+                <label class="form-label mt-2">住宿訂單ID</label>
+                <input id="roomOrderId" type="text" th:value="${restoOrder.roomOrder.roomOrderId}" class="form-control" readonly />
+              </div>
 
+            
             <div class="mb-3">
               <label for="restoId" class="form-label">餐廳<span class="text-danger">*</span></label>
               <select id="restoId" class="form-select" th:field="*{restoVO.restoId}" required>
@@ -104,6 +102,7 @@
             </div>
        
        
+
             <div class="mb-3">
               <label for="regiDate" class="form-label">預約日期<span class="text-danger">*</span></label>
               <input type="date" th:field="*{regiDate}" id="regiDate" class="form-control" required>
@@ -122,7 +121,9 @@
                 <option th:each="timeslot : ${timeslotVOList}" 
                         th:value="${timeslot.timeslotId}" 
                         th:text="${timeslot.timeslotName + ' (' + timeslot.periodVO.periodName + ')'}"
-                        th:attr="data-resto-id=${timeslot.restoVO.restoId}">
+                        th:data-time="${timeslot.timeslotName}"
+                        th:data-label="${timeslot.timeslotName + ' (' + timeslot.periodVO.periodName + ')'}"
+                        th:data-resto-id="${timeslot.restoVO.restoId}">
                 </option>
               </select>
                         
@@ -134,8 +135,9 @@
             </div>
             
             <div class="mb-3">
-              <label for="regiSeats" class="form-label">用餐人數<span class="text-danger">*</span><small class="text-muted"> 請輸入大於1的正整數</small></label>
-              <input type="number" th:field="*{regiSeats}" id="regiSeats" class="form-control" min="1" required>
+              <label for="regiSeats" class="form-label">用餐人數<span class="text-danger">*</span><small class="text-muted"> 請輸入大於1且小於剩餘人數的正整數</small></label>
+              <input type="number" th:field="*{regiSeats}" id="regiSeats" class="form-control" min="1" required
+                     placeholder="">
               
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('regiSeats')}">
@@ -235,8 +237,8 @@
         <div class="modal-footer">
           <button type="button" class="btn btn_secondary "
             data-bs-dismiss="modal">取消</button>
-          <button type="submit" form="restoOrderAddForm" id="btnSubmitAdd"
-            class="btn btn_accent ">新增</button>
+          <button type="submit" form="restoOrderEditForm" id="btnSubmitEditSave"
+            class="btn btn_accent ">儲存</button>
         </div>
 
 
