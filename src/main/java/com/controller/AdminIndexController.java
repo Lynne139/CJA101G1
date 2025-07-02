@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -683,6 +686,34 @@ public class AdminIndexController {
     	// 添加訂單明細資料到 model 中
     	List<com.shopOrdDet.model.ShopOrdDetVO> list = shopOrdDetSvc.getAll();
     	model.addAttribute("shopOrdDetListData", list);
+    	
+    	// 添加唯一訂單編號清單
+    	Set<Integer> uniqueProdOrdIdList = list.stream()
+    		.map(vo -> vo.getShopOrdVO().getProdOrdId())
+    		.collect(Collectors.toCollection(LinkedHashSet::new));
+    	model.addAttribute("uniqueProdOrdIdList", uniqueProdOrdIdList);
+    	// 添加唯一商品編號清單
+    	Set<Integer> uniqueProductIdList = list.stream()
+    		.map(vo -> vo.getProdVO().getProductId())
+    		.collect(Collectors.toCollection(LinkedHashSet::new));
+    	model.addAttribute("uniqueProductIdList", uniqueProductIdList);
+    	
+    	// 構建 orderToProducts Map
+    	Map<Integer, List<Map<String, Object>>> orderToProducts = new LinkedHashMap<>();
+    	for (com.shopOrdDet.model.ShopOrdDetVO vo : list) {
+    		Integer orderId = vo.getShopOrdVO().getProdOrdId();
+    		Integer productId = vo.getProdVO().getProductId();
+    		String productName = vo.getProdVO().getProductName();
+    		orderToProducts.computeIfAbsent(orderId, k -> new ArrayList<>())
+    			.add(Map.of("productId", productId, "productName", productName));
+    	}
+    	try {
+    		ObjectMapper objectMapper = new ObjectMapper();
+    		String orderToProductsJson = objectMapper.writeValueAsString(orderToProducts);
+    		model.addAttribute("orderToProductsJson", orderToProductsJson);
+    	} catch (Exception e) {
+    		model.addAttribute("orderToProductsJson", "{}");
+    	}
     	
     	// 添加商品資料到 model 中
     	List<com.prod.model.ProdVO> prodList = prodSvc.getAll();
