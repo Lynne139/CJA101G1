@@ -28,50 +28,64 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // 新增職稱
-    document.getElementById("addJobTitleForm")?.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const jobTitleName = this.jobTitleName.value;
-        const description = this.description.value;
-        fetch("/employees/job-titles", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ jobTitleName, description, isActive: true })
-        }).then(() => {
-            // 重新載入職稱選單
-            fetch("/employees/job-titles").then(res => res.json()).then(data => {
-                const jobTitleSelect = document.getElementById("jobTitleSelect");
-                if (jobTitleSelect) {
-                    jobTitleSelect.innerHTML = '<option value="">請選擇職稱</option>' + 
-                        data.map(jt => `<option value="${jt.jobTitleId}">${jt.jobTitleName}</option>`).join("");
+    const addJobTitleForm = document.getElementById("addJobTitleForm");
+    if (addJobTitleForm) {
+        addJobTitleForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            const jobTitleName = this.jobTitleName.value;
+            const description = this.description.value;
+            fetch("/employees/job-titles", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ jobTitleName, description, isActive: true })
+            }).then(res => {
+                if (res.ok) {
+                    showJobTitleSuccessModal();
+                    this.reset();
+                    // 重新載入職稱選單
+                    fetch("/employees/job-titles").then(res => res.json()).then(data => {
+                        const jobTitleSelect = document.getElementById("jobTitleSelect");
+                        if (jobTitleSelect) {
+                            jobTitleSelect.innerHTML = '<option value="">請選擇職稱</option>' + 
+                                data.map(jt => `<option value="${jt.jobTitleId}">${jt.jobTitleName}</option>`).join("");
+                        }
+                    });
+                } else {
+                    alert('新增職稱失敗');
                 }
             });
-            // 清空表單
-            this.reset();
         });
-    });
+    }
 
     // 新增部門
-    document.getElementById("addRoleForm")?.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const roleName = this.roleName.value;
-        const remark = this.remark.value;
-        fetch("/employees/roles", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ roleName, remark, isActive: true })
-        }).then(() => {
-            // 重新載入部門選單
-            fetch("/employees/roles").then(res => res.json()).then(data => {
-                const roleSelect = document.getElementById("roleSelect");
-                if (roleSelect) {
-                    roleSelect.innerHTML = '<option value="">部門</option>' + 
-                        data.map(r => `<option value="${r.roleId}">${r.roleName}</option>`).join("");
+    const addRoleForm = document.getElementById("addRoleForm");
+    if (addRoleForm) {
+        addRoleForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            const roleName = this.roleName.value;
+            const remark = this.remark.value;
+            fetch("/employees/roles", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ roleName, remark, isActive: true })
+            }).then(res => {
+                if (res.ok) {
+                    showRoleSuccessModal();
+                    this.reset();
+                    // 重新載入部門選單
+                    fetch("/employees/roles").then(res => res.json()).then(data => {
+                        const roleSelect = document.getElementById("roleSelect");
+                        if (roleSelect) {
+                            roleSelect.innerHTML = '<option value="">部門</option>' + 
+                                data.map(r => `<option value="${r.roleId}">${r.roleName}</option>`).join("");
+                        }
+                    });
+                } else {
+                    alert('新增部門失敗');
                 }
             });
-            // 清空表單
-            this.reset();
         });
-    });
+    }
 
     // 新增權限
     document.getElementById("addAccessRightForm")?.addEventListener("submit", function (e) {
@@ -95,4 +109,40 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify({ accessId, accessName: newAccessName })
         }).then(() => location.reload());
     });
-}); 
+
+    // 攔截新增員工表單送出，成功時顯示 Bootstrap Modal
+    const addEmployeeForm = document.getElementById("addEmployeeForm");
+    if (addEmployeeForm) {
+        addEmployeeForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch("/employees/form", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => {
+                if (res.redirected || res.ok) {
+                    showSuccessModal();
+                    this.reset();
+                } else {
+                    alert('新增失敗');
+                }
+            });
+        });
+    }
+});
+
+function showSuccessModal() {
+    var modal = new bootstrap.Modal(document.getElementById('successModal'));
+    modal.show();
+}
+
+function showJobTitleSuccessModal() {
+    var modal = new bootstrap.Modal(document.getElementById('jobTitleSuccessModal'));
+    modal.show();
+}
+
+function showRoleSuccessModal() {
+    var modal = new bootstrap.Modal(document.getElementById('roleSuccessModal'));
+    modal.show();
+} 

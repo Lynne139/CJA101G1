@@ -24,7 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/admin/member")
+@RequestMapping("/member")
 public class MemberController {
  
 	@Autowired
@@ -40,6 +40,7 @@ public class MemberController {
         model.addAttribute("mainFragment", "admin/fragments/member/addMember");
         return "admin/index_admin";
     }
+	
 
 	/*
 	 * This method will serve as listAllMember.html handler.
@@ -59,28 +60,27 @@ public class MemberController {
 	 * request It also validates the user input
 	 */
 	@PostMapping("insert")
-    public String insert(@Valid @ModelAttribute("memberVO") MemberVO memberVO,
-                         BindingResult result, ModelMap model,
-                         HttpServletRequest request) {
+	public String insert(@ModelAttribute("memberVO") @Valid MemberVO memberVO,
+	                     BindingResult result,
+	                     @RequestParam("uploadPic") MultipartFile file,
+	                     Model model) {
+	    if (result.hasErrors()) {
+	        model.addAttribute("memberVO", memberVO);
+	        return "admin/fragments/member/addMember";
+	    }
 
-        if (result.hasErrors()) {
-            model.addAttribute("currentURI", request.getRequestURI());
-            model.addAttribute("mainFragment", "admin/fragments/member/addMember");
-            return "admin/index_admin";
-        }
+	    try {
+	        if (!file.isEmpty()) {
+	            memberVO.setMemberPic(file.getBytes());
+	        }
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
 
-        try {
-            MultipartFile file = memberVO.getUploadPic();
-            if (file != null && !file.isEmpty()) {
-                memberVO.setMemberPic(file.getBytes());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+	    memberSvc.addMember(memberVO);
+	    return "redirect:/admin/member/listAllMember";
+	}
 
-        memberSvc.addMember(memberVO);
-        return "redirect:/admin/member/listAllMember";
-    }
 
 	/*
 	 * This method will be called on listAllMember.html form submission, handling

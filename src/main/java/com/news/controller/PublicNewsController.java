@@ -24,7 +24,7 @@ public class PublicNewsController {
     @GetMapping("/news")
     public String showMediaNews(Model model) {
         model.addAttribute("newsList", service.findByIsDisplayTrue());
-        return "news/news";
+        return "front-end/news/news";
     }
 
     @GetMapping("/notice")
@@ -37,12 +37,12 @@ public class PublicNewsController {
             }
         }
         model.addAttribute("hotNewsList", hotNewsList);
-        return "news/notice";
+        return "front-end/news/notice";
     }
 
     @GetMapping("/promotion")
     public String showPromotion(Model model) {
         model.addAttribute("promotionNewsList", promotionNewsService.findByIsDisplayTrue());
-        return "news/promotion";
+        return "front-end/news/promotion";
     }
 } 

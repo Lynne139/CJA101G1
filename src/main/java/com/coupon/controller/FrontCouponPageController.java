@@ -15,14 +15,14 @@ public class FrontCouponPageController {
 
 	// 會員查詢持有的折價券頁面
     @GetMapping("/{memberId}/select")
-    public String MemberCouponSelectPage(@PathVariable Integer memberId, Model model) {
+    public String memberCouponSelectPage(@PathVariable Integer memberId, Model model) {
         model.addAttribute("memberId", memberId); // 給前端 JavaScript 用來發 AJAX
         return "front-end/coupon/member-select-coupon";
     }
     
 	// 會員領取折價券頁面
     @GetMapping("/{memberId}/claim")
-    public String MemberCouponClaimPage(
+    public String memberCouponClaimPage(
     		@PathVariable Integer memberId, 
     		Model model) {
         model.addAttribute("memberId", memberId); // 給前端 JavaScript 用來發 AJAX
