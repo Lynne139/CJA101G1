@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.resto.entity.PeriodVO;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class PeriodService {
 	
@@ -41,7 +43,13 @@ public class PeriodService {
     // 更新入資料庫
     @Transactional
     public void update(PeriodVO periodVO) {
-        periodRepository.save(periodVO);
+    	
+    	PeriodVO origin = periodRepository.findById(periodVO.getPeriodId())
+                .orElseThrow(() ->
+                   new EntityNotFoundException("找不到 Period"));
+    	
+    	// 只改需要的欄位，其餘欄位與 timeslotList 維持原狀
+        origin.setPeriodName(periodVO.getPeriodName());
     }
     
     // 檢查重名
