@@ -4,9 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>風格房型 - Maison d’Yuko</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet"
+	th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
 <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
 <link rel="stylesheet" th:href="@{/css/admin/layout/form_modal.css}">
 <link rel="stylesheet" th:href="@{/css/room/roomtypes.css}">
@@ -24,9 +27,17 @@
 				<p class="rooms-desc mt-4">無論獨旅放鬆、雙人浪漫，還是親子同樂，嶼蔻都精心為您準備好了完美空間！</p>
 			</div>
 
+			<div class="text-end mb-4">
+				<a href="/bookMulti"
+					class="btn btn-outline-brown d-inline-flex align-items-center gap-2"
+					style="border-color: #7E4E24; color: #7E4E24;"> <i
+					class="fas fa-layer-group"></i> 比較多房型 & 預訂
+				</a>
+			</div>
+
 			<div class="d-flex flex-column gap-4">
 				<div class="card roomtype-card shadow p-4 rounded-4 mb-4"
-					th:each="roomType : ${roomTypes}">
+					th:each="roomType : ${roomTypes}" th:attr="id='roomtype-' + ${roomType.roomTypeId}">
 					<div class="row g-3 flex-row-reverse align-items-center">
 						<div class="col-md-6">
 							<img th:src="@{/roomtypes/img/{id}(id=${roomType.roomTypeId})}"
@@ -35,7 +46,11 @@
 						</div>
 						<div class="col-md-6">
 							<h4 class="mb-3" th:text="${roomType.roomTypeName}">房型名稱</h4>
-							<p class="mb-2" th:text="${roomType.roomTypeContent}">房型介紹</p>
+							<p class="mb-2" th:utext="${roomType.roomTypeContent}">房型介紹</p>
+							<p class="mb-2">
+								<i class="fas fa-users me-2" style="color: #7E4E24;"></i> <strong>人數：</strong>
+								<span th:text="${roomType.guestNum} + ' 人'"></span>
+							</p>
 							<p class="mb-2">
 								<i class="fas fa-tag me-2" style="color: #7E4E24;"></i> <strong>價格：</strong>
 								NT$ <span th:text="${roomType.roomTypePrice}">3000</span>
@@ -59,6 +74,10 @@
 								class="btn btn-outline-brown d-inline-flex align-items-center gap-2"
 								style="border-color: #7E4E24; color: #7E4E24;"> <i
 								class="fas fa-calendar-check"></i> 立即訂房
+							</a> <a href="/bookMulti"
+								class="btn btn-outline-brown d-inline-flex align-items-center gap-2"
+								style="border-color: #7E4E24; color: #7E4E24;"> <i
+								class="fas fa-layer-group"></i> 比較多房型 & 預訂
 							</a>
 						</div>
 					</div>
@@ -73,7 +92,8 @@
 		</div>
 	</section>
 
-	<div class="modal fade" id="roomTypeModal" tabindex="-1" aria-hidden="true">
+	<div class="modal fade" id="roomTypeModal" tabindex="-1"
+		aria-hidden="true">
 		<div class="modal-dialog modal-dialog-scrollable">
 			<div class="modal-content rounded-4 p-4"
 				style="background-color: #fdf6ee;">
@@ -107,6 +127,35 @@
 								<strong>房型介紹：</strong>
 							</p>
 							<div id="modalRoomTypeContent"></div>
+							<div
+								class="room-facilities-horizontal mt-4 d-flex flex-wrap gap-3">
+								<div class="facility-item d-flex align-items-center">
+									<i class="fas fa-bath me-2" style="color: #7E4E24;"></i> 私人衛浴
+								</div>
+								<div class="facility-item d-flex align-items-center">
+									<i class="fas fa-snowflake me-2" style="color: #7E4E24;"></i>
+									空調
+								</div>
+								<div class="facility-item d-flex align-items-center">
+									<i class="fas fa-wifi me-2" style="color: #7E4E24;"></i> 免費
+									WiFi
+								</div>
+								<div class="facility-item d-flex align-items-center">
+									<i class="fas fa-tv me-2" style="color: #7E4E24;"></i> 平面電視
+								</div>
+								<div class="facility-item d-flex align-items-center">
+									<i class="fas fa-coffee me-2" style="color: #7E4E24;"></i> 咖啡機
+								</div>
+								<div class="facility-item d-flex align-items-center">
+									<i class="fas fa-wine-glass-alt me-2" style="color: #7E4E24;"></i>
+									迷你吧
+								</div>
+								<div class="facility-item d-flex align-items-center">
+									<i class="fas fa-water me-2" style="color: #7E4E24;"></i> 海景
+								</div>
+							</div>
+
+
 						</div>
 					</div>
 				</div>

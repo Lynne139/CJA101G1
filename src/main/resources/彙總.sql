@@ -1,3 +1,4 @@
+
 DROP DATABASE IF EXISTS maison;
 CREATE DATABASE IF NOT EXISTS maison;
 USE maison;
@@ -153,7 +154,6 @@ VALUES
   (1, 1, 7, 'SYSTEM', TRUE, '2025-01-01', '1234', NULL),
   (2, 1, 1, '吳永志', TRUE, '2025-01-01', '1234', NULL),
   (3, 2, 5, '吳冠宏', TRUE, '2025-02-15', '1234', NULL);
-
 
 -- 權限
 create table function_access_right (
@@ -467,18 +467,19 @@ VALUES
 CREATE TABLE room_type (
 	room_type_id	INT AUTO_INCREMENT NOT NULL,
 	room_type_name	  VARCHAR(50) NOT NULL,
-	room_type_amount	INT NOT NULL,	  
+		  
     room_type_content	VARCHAR(1000) NOT NULL,
     room_sale_status	BOOLEAN,
     room_type_pic	MEDIUMBLOB,
     room_type_price	INT NOT NULL,
+    guest_num INT NOT NULL,
 	CONSTRAINT room_type_pk PRIMARY KEY (room_type_id)
 ) AUTO_INCREMENT = 1;
 
-INSERT INTO room_type (room_type_id, room_type_name, room_type_amount, room_type_content, room_sale_status, room_type_pic, room_type_price) VALUES (null, '月影行館', 10, '房間介紹一', 1, null, 50000);
-INSERT INTO room_type (room_type_id, room_type_name, room_type_amount, room_type_content, room_sale_status, room_type_pic, room_type_price) VALUES (null, '晨曦之庭', 10, '房間介紹二', 1, null, 30000);
-INSERT INTO room_type (room_type_id, room_type_name, room_type_amount, room_type_content, room_sale_status, room_type_pic, room_type_price) VALUES (null, '海音居', 10, '房間介紹三', 1, null, 20000);
-INSERT INTO room_type (room_type_id, room_type_name, room_type_amount, room_type_content, room_sale_status, room_type_pic, room_type_price) VALUES (null, '蔻香居', 10, '房間介紹四', 1, null, 15000);
+INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '月影行館', '房間介紹一', 1, null, 50000, 6);
+INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '晨曦之庭', '房間介紹二', 1, null, 30000, 4);
+INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '海音居', '房間介紹三', 1, null, 20000, 2);
+INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '蔻香居', '房間介紹四', 1, null, 15000, 2);
 
 -- 房間 
 CREATE TABLE room (
@@ -547,8 +548,8 @@ CREATE TABLE room_type_schedule (
 ) AUTO_INCREMENT = 1;
 
 
-INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 1, 10, 1, '2025-05-18');
-INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 2, 10, 2, '2025-05-17');
+-- INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 3, 10, 6, '2025-05-13');
+-- INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 4, 10, 2, '2025-05-14');
 
 
 -- 餐廳 

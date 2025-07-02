@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +54,8 @@ public class FrontRoomTypeController {
 		List<RoomTypeVO> list = roomTypeSvc.getAll();
 		return list;
 	}
-	
+
+//  ====房型介紹卡片頁面====	
 	@GetMapping("/roomtypes")
 	public String showRoomTypeCards(
 			HttpServletRequest request, HttpServletResponse response,
@@ -116,7 +118,7 @@ public class FrontRoomTypeController {
 		}
 		return null;
 	}
-	
+//  ====單一房型訂房頁面====	
 	@GetMapping("/roomtype/{roomTypeId}/calendar")
 	public String showRoomTypeCalendar(@PathVariable Integer roomTypeId, Model model) {
 	    RoomTypeVO roomType = roomTypeSvc.getOneRoomType(roomTypeId);
@@ -126,7 +128,7 @@ public class FrontRoomTypeController {
 	    model.addAttribute("roomType", roomType);
 	    return "front-end/room/roomTypeCalendar";
 	}
-	
+//  ====剩餘間數顯示於小日曆上=====	
 	@GetMapping("/roomtype/{roomTypeId}/inventory-map")
 	@ResponseBody
 	public Map<String, Integer> getInventoryMap(@PathVariable Integer roomTypeId,
@@ -145,7 +147,8 @@ public class FrontRoomTypeController {
 	                s -> s.getRoomAmount() - s.getRoomRSVBooked()
 	            ));
 	}
-	
+//	====下拉式選單使用=====
+//  ====1.點擊入住日計算剩餘間數=====	
 	@GetMapping("/roomtype/{roomTypeId}/inventory")
 	@ResponseBody
 	public Integer getRoomInventory(@PathVariable Integer roomTypeId, 
@@ -164,7 +167,7 @@ public class FrontRoomTypeController {
 	    }
 	    return 0; // 沒資料就當作滿房
 	}
-	
+//  ====2.點擊入住日及退房日計算剩餘間數=====	
 	@GetMapping("/roomtype/{roomTypeId}/inventory-range")
 	@ResponseBody
 	public Integer getRoomInventoryRange(@PathVariable Integer roomTypeId,
@@ -184,5 +187,51 @@ public class FrontRoomTypeController {
 	        .orElse(0);
 
 	    return minRemaining;
+	}
+
+//  ====多房型預定頁面====	
+	@GetMapping("/bookMulti")
+	public String showBookMulti(
+			HttpServletRequest request, HttpServletResponse response,
+			 Model model) {
+		List<RoomTypeVO> roomTypes = roomTypeSvc.getAllAvailableRoomTypes();
+	    model.addAttribute("roomTypes", roomTypes);
+	    return "front-end/room/bookMulti";
+
+	}
+//	====下拉式選單使用=====	
+	@GetMapping("/bookMulti/inventory")
+	@ResponseBody
+	public Map<Integer, Integer> getMultiInventory(
+	    @RequestParam String start,
+	    @RequestParam String end
+	) {
+	    List<RoomTypeVO> allRoomTypes = roomTypeSvc.getAll();
+	    Map<Integer, Integer> inventoryMap = new HashMap<>();
+
+	    for (RoomTypeVO roomType : allRoomTypes) {
+	        List<RoomTypeScheduleVO> schedules = roomTypeScheduleSvc.findSchedules(roomType, 
+	            java.sql.Date.valueOf(start), 
+	            java.sql.Date.valueOf(end));
+
+	        int minAvailable = schedules.stream()
+	            .mapToInt(s -> s.getRoomAmount() - s.getRoomRSVBooked())
+	            .min()
+	            .orElse(0);
+
+	        inventoryMap.put(roomType.getRoomTypeId(), minAvailable);
+	    }
+	    return inventoryMap;
+	}
+
+//  ====日曆限制可選擇日期=====	
+	@GetMapping("/bookMulti/enabled-dates")
+	@ResponseBody
+	public List<String> getEnabledDates() {
+		return roomTypeScheduleSvc.getEnabledDates().stream()
+		        .map(RoomTypeScheduleVO::getRoomOrderDate) // -> java.sql.Date
+		        .map(java.sql.Date::toLocalDate) // -> LocalDate
+		        .map(LocalDate::toString) // -> "yyyy-MM-dd"
+		        .collect(Collectors.toList());
 	}
 }
