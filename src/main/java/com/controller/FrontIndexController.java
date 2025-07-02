@@ -38,7 +38,12 @@ public class FrontIndexController {
         model.addAttribute("memberVO", new MemberVO());
 
         MemberVO loggedInMember = (MemberVO) session.getAttribute("loggedInMember");
-        model.addAttribute("loggedInMember", loggedInMember); 
+        model.addAttribute("loggedInMember", loggedInMember);
+
+        // 新增：查詢三種最新消息
+        hotNewsService.findLatestDisplay().ifPresent(hotNews -> model.addAttribute("latestHotNews", hotNews));
+        promotionNewsService.findLatestDisplay().ifPresent(promotionNews -> model.addAttribute("latestPromotionNews", promotionNews));
+        newsService.findLatestDisplay().ifPresent(news -> model.addAttribute("latestMediaNews", news));
 
         return "index";
     }
@@ -49,6 +54,12 @@ public class FrontIndexController {
         model.addAttribute("memberVO", new MemberVO());
         MemberVO loggedInMember = (MemberVO) session.getAttribute("loggedInMember");
         model.addAttribute("loggedInMember", loggedInMember);
+
+        // 新增：查詢三種最新消息
+        hotNewsService.findLatestDisplay().ifPresent(hotNews -> model.addAttribute("latestHotNews", hotNews));
+        promotionNewsService.findLatestDisplay().ifPresent(promotionNews -> model.addAttribute("latestPromotionNews", promotionNews));
+        newsService.findLatestDisplay().ifPresent(news -> model.addAttribute("latestMediaNews", news));
+
         return "index";
     }
 

@@ -85,30 +85,39 @@
         <!-- 左側消息 -->
         <div class="col-md-7 news-list">
           <h2 class="news-title">最新消息</h2>
-          <div class="news-item">
-            <div class="news-item-title">海島夏日祭典．盛大登場！</div>
-            <div class="news-item-content">
-              迎著海風，熱情奔放假夜——專屬於海島的慶典時光來了！音樂、在地美食、火舞秀與浪花交響，打造最Chill的島嶼派對。
+
+          <!-- 最新公告 -->
+          <div class="news-item" th:if="${latestHotNews != null}">
+            <div class="news-item-title">
+              <span th:text="${latestHotNews.title}"></span>
             </div>
-            <div class="news-item-date">MAR 25 2025</div>
+            <div class="news-item-content" th:text="${#strings.abbreviate(latestHotNews.content, 60)}"></div>
+            <div class="news-item-date" th:text="${latestHotNews.createdDate}"></div>
+            <a th:href="@{/news/notice}" class="stretched-link"></a>
           </div>
-          <div class="news-item">
-            <div class="news-item-title">海島夏日祭典．盛大登場！</div>
-            <div class="news-item-content">
-              迎著海風，熱情奔放假夜——專屬於海島的慶典時光來了！音樂、在地美食、火舞秀與浪花交響，打造最Chill的島嶼派對。
+
+          <!-- 活動通知 -->
+          <div class="news-item" th:if="${latestPromotionNews != null}">
+            <div class="news-item-title">
+              <span th:text="${latestPromotionNews.title}"></span>
             </div>
-            <div class="news-item-date">MAR 25 2025</div>
+            <div class="news-item-content" th:text="${#strings.abbreviate(latestPromotionNews.content, 60)}"></div>
+            <div class="news-item-date" th:text="${latestPromotionNews.startDate}"></div>
+            <a th:href="@{/news/promotion}" class="stretched-link"></a>
           </div>
-          <div class="news-item">
-            <div class="news-item-title">海島夏日祭典．盛大登場！</div>
-            <div class="news-item-content">
-              迎著海風，熱情奔放假夜——專屬於海島的慶典時光來了！音樂、在地美食、火舞秀與浪花交響，打造最Chill的島嶼派對。
+
+          <!-- 媒體報導 -->
+          <div class="news-item" th:if="${latestMediaNews != null}">
+            <div class="news-item-title">
+              <span th:text="${latestMediaNews.title}"></span>
             </div>
-            <div class="news-item-date">MAR 25 2025</div>
+            <div class="news-item-content" th:text="${#strings.abbreviate(latestMediaNews.content, 60)}"></div>
+            <div class="news-item-date" th:text="${latestMediaNews.publishedDate}"></div>
+            <a th:href="@{/news/news}" class="stretched-link"></a>
           </div>
           <div class="news-more">
-            <button class="news-more-btn">
-              <span class="circle"></span>
+			<button class="news-more-btn">              
+			  <span class="circle"></span>
               <span class="more-text">MORE</span>
               <span class="arrow"></span>
             </button>
@@ -267,13 +276,14 @@
   </section>
 
   <!-- 匯入 footer.html -->
-  <div th:replace="~{fragments/footer :: footer}"></div>
+  <th:block th:replace="~{fragments/footer :: footer}" />
+
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-
+	
     //menu收合
     $('#menuToggle').on('click', function () {
       $('#overlayMenu').addClass('active'); // 將 .show 改為 .active
