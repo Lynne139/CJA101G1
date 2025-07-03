@@ -54,7 +54,7 @@
                     <select name="orderDetails[0].roomTypeId" class="form-select roomTypeSelect" required>
                       <option value="">請選擇</option>
                       <option th:each="rt : ${roomTypeList}" th:value="${rt.roomTypeId}" th:text="${rt.roomTypeName}"
-                        th:attr="data-price=${rt.roomTypePrice}">
+                        th:attr="data-price=${rt.roomTypePrice},data-guest-num=${rt.guestNum}">
                       </option>
                       </option>
                     </select>
@@ -83,8 +83,9 @@
                   </div>
                   <div class="col-md-3">
                     <label class="form-label" style="padding: 5px;">入住人數 <span class="text-danger">*</span></label>
-                    <input type="number" name="orderDetails[0].numberOfPeople" class="form-control" min="1"
-                      style="width:100px" required>
+                    <select name="orderDetails[0].numberOfPeople" class="form-control numberOfPeopleSelect" style="width:100px" required>
+                      <option value="">請先選擇房型</option>
+                    </select>
                   </div>
 
                 </div>
@@ -125,11 +126,11 @@
               <label class="form-label">是否加購專案 <span class="text-danger">*</span></label>
               <div class="form-check">
                 <input type="radio" id="projectAddOnNo" name="projectAddOn" value="0" class="form-check-input" required>
-                <label for="projectAddOnNo" class="form-check-label">否</label>
+                <label for="projectAddOnNo" class="form-check-label" value="0">否</label>
               </div>
               <div class="form-check">
                 <input type="radio" id="projectAddOnYes" name="projectAddOn" value="1" class="form-check-input">
-                <label for="projectAddOnYes" class="form-check-label">是</label>
+                <label for="projectAddOnYes" class="form-check-label" value="1">是</label>
               </div>
             </div>
             <!-- 專案方案選擇 -->

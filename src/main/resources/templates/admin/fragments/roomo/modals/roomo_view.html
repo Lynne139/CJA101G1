@@ -45,7 +45,6 @@
                             <div class="modal_detail d-flex flex-column align-items-start">
                                 <p><strong>訂單編號：</strong> <span th:text="${roomOList.roomOrder.roomOrderId}"></span></p>
                                 <p><strong>房型名稱：</strong> <span th:text="${roomOList.roomType.roomTypeName}"></span></p>
-                                <p><strong>房間編號：</strong> <span th:text="${roomOList.room != null ? roomOList.room.roomId : '-'}"></span></p>
                                 <p><strong>入住人數：</strong> <span th:text="${roomOList.numberOfPeople}"></span></p>
                                 <p><strong>房間價格：</strong> <span th:text="${roomOList.roomPrice}"></span></p>
                                 <p><strong>房間數量：</strong> <span th:text="${roomOList.roomAmount}"></span></p>
