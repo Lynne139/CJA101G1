@@ -23,5 +23,8 @@ public interface RoomOrderRepository extends JpaRepository<RoomOrder, Integer> {
 
     // 更新 
     RoomOrder save(RoomOrder roomOrder);
+
+    // 用 member 的 memberId 查
+    List<RoomOrder> getByMember_MemberId(Integer memberId);
 }
 

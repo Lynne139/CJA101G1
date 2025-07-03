@@ -92,50 +92,70 @@ public class RoomOrderController {
 			@ModelAttribute RoomOrder roomOrder,
 			HttpServletRequest request,
 			Model model) {
-
-		// 取得 memberId
-		String memberIdStr = request.getParameter("memberId");
-		if (memberIdStr != null && !memberIdStr.isEmpty()) {
-			Integer memberId = Integer.valueOf(memberIdStr);
-			MemberVO member = memberService.getOneMember(memberId);
-			roomOrder.setMember(member);
-		}
-
-		// 取得 couponCode
-		String couponCode = request.getParameter("couponCode");
-		if (couponCode != null && !couponCode.isEmpty()) {
-			String couponCodeTrimmed = couponCode.trim();
-			Coupon coupon = couponService.getCouponByCode(couponCodeTrimmed)
-					.orElse(null); // 如果找不到就設為 null
-			roomOrder.setCoupon(coupon);
-		} else {
-			roomOrder.setCoupon(null); // 沒有券就設為 null
-		}
-
-		// 1. 先存主表
-		RoomOrder savedOrder = orderService.save(roomOrder);
-
-		// 2. 逐筆取得明細欄位
-		List<RoomOList> details = parseOrderDetailsFromRequest(request, savedOrder);
-		for (RoomOList detail : details) {
-			roomOListService.save(detail);
-		}
-
-		// 3. 更新庫存
-		for (RoomOList detail : details) {
-			roomScheduleService.reserve(detail);
-		}
-		Integer memberId = roomOrder.getMember().getMemberId();
-		// 4. 更新優惠券使用狀態
-		memberCouponService.useCoupon(memberId, couponCode);
-
-		// 5. 更新會員累計金額
-		memberService.updateConsumptionAndLevelAndPoints(memberId, roomOrder.getActualAmount());
 		
-		// 6.發送通知
-		notificationService.createNotification(memberId, "訂單成立", "訂單成立成功");
+		try {
+			// 取得 memberId
+			String memberIdStr = request.getParameter("memberId");
+			if (memberIdStr != null && !memberIdStr.isEmpty()) {
+				Integer memberId = Integer.valueOf(memberIdStr);
+				MemberVO member = memberService.getOneMember(memberId);
+				roomOrder.setMember(member);
+			}
 
-		return "redirect:/admin/roomo_info";
+			// 取得 couponCode
+			String couponCode = request.getParameter("couponCode");
+			if (couponCode != null && !couponCode.isEmpty()) {
+				String couponCodeTrimmed = couponCode.trim();
+				Coupon coupon = couponService.getCouponByCode(couponCodeTrimmed)
+						.orElse(null); // 如果找不到就設為 null
+				roomOrder.setCoupon(coupon);
+			} else {
+				roomOrder.setCoupon(null); // 沒有券就設為 null
+			}
+
+			// 1. 先存主表
+			RoomOrder savedOrder = orderService.save(roomOrder);
+
+			// 2. 逐筆取得明細欄位
+			List<RoomOList> details = parseOrderDetailsFromRequest(request, savedOrder);
+			for (RoomOList detail : details) {
+				roomOListService.save(detail);
+			}
+
+			// 3. 更新庫存
+			for (RoomOList detail : details) {
+				roomScheduleService.reserve(detail);
+			}
+			
+			Integer memberId = roomOrder.getMember().getMemberId();
+			
+			// 4. 更新會員累計金額
+			System.out.println("更新會員累計金額：" + roomOrder.getActualAmount());
+			Integer price = roomOrder.getActualAmount();
+			memberService.updateConsumptionAndLevelAndPoints(memberId, price);
+			
+			// 5. 發送通知
+			notificationService.createNotification(memberId, "訂單成立", "訂單成立成功");
+
+			// 6. 處理折價券（如果有選擇）
+			if (couponCode != null && !couponCode.trim().isEmpty()) {
+				try {
+					memberCouponService.useCoupon(memberId, couponCode);
+				} catch (IllegalArgumentException e) {
+					// 折價券處理失敗，但訂單已建立，回傳成功但顯示警告
+					return "redirect:/admin/roomo_info?message=訂單建立成功，但折價券處理失敗：" + e.getMessage();
+				}
+			}
+
+			return "redirect:/admin/roomo_info?message=訂單建立成功";
+			
+		} catch (Exception e) {
+			// 記錄例外
+			e.printStackTrace();
+			// 回傳錯誤訊息
+			model.addAttribute("errorMessage", "訂單建立失敗：" + e.getMessage());
+			return "admin/fragments/roomo/modals/roomo_add :: addModalContent";
+		}
 	}
 
 	// ===== 取消訂單 =====
@@ -176,6 +196,12 @@ public class RoomOrderController {
 	@GetMapping("/roomo_info/view")
 	public String viewRoomOrder(@RequestParam("roomOrderId") Integer roomOrderId, Model model) {
 		RoomOrder order = orderService.getById(roomOrderId);
+		if (order == null) {
+			model.addAttribute("errorMessage", "查無此訂單");
+			model.addAttribute("roomOrder", null);
+			model.addAttribute("roomOLists", Collections.emptyList());
+			return "admin/fragments/roomo/modals/roomo_view :: viewModalContent";
+		}
 		List<RoomOList> details = roomOListService.findByRoomOrderId(roomOrderId);
 		// 待補餐廳訂單明細
 		model.addAttribute("roomOrder", order);
@@ -187,49 +213,12 @@ public class RoomOrderController {
 	// 取得edit modal
 	@GetMapping("/roomo_info/edit")
 	public String showEditModal(@Valid @RequestParam("roomOrderId") Integer roomOrderId, Model model) {
-		RoomOrder roomOrder = orderService.getById(roomOrderId);
-		List<RoomOList> orderDetails = roomOListService.findByRoomOrderId(roomOrderId);
-		roomOrder.setOrderDetails(orderDetails != null ? orderDetails : new ArrayList<>());
-		model.addAttribute("roomTypeList", roomTypeService.getAll());
-		model.addAttribute("roomOrder", roomOrder);
-
-		// 計算房間總數量
-		int roomAmount = (orderDetails != null) ? orderDetails.stream().mapToInt(RoomOList::getRoomAmount).sum() : 0;
-		// 計算房間總價格
-		int totalRoomPrice = (orderDetails != null) ? orderDetails.stream().mapToInt(od -> od.getRoomAmount() * od.getRoomPrice()).sum() : 0;
-		// 專案總價 = 專案價格 × 專案人數
-		int projectTotal = roomOrder.getProjectAddOn() != null && roomOrder.getProjectAddOn() == 1 && roomOrder.getOrderDetails() != null
-			? orderService.calculateProjectTotal(roomOrder)
-			: 0;
-		// 計算入住天數
-		int stayNights = 1; // 預設1天
-		if (roomOrder.getCheckInDate() != null && roomOrder.getCheckOutDate() != null) {
-			try {
-				java.time.LocalDate checkIn = java.time.LocalDate.parse(roomOrder.getCheckInDate());
-				java.time.LocalDate checkOut = java.time.LocalDate.parse(roomOrder.getCheckOutDate());
-				stayNights = (int) java.time.temporal.ChronoUnit.DAYS.between(checkIn, checkOut);
-				if (stayNights <= 0) stayNights = 1; // 至少1天
-			} catch (Exception e) {
-				stayNights = 1; // 解析失敗時預設1天
-			}
-		}
-		// 訂單總金額 = (總房價 + 專案總價) × 入住天數
-		int totalAmount = (totalRoomPrice + projectTotal) * stayNights;
-		// 實際支付金額 = 訂單總金額 - 折扣金額
-		int discount = roomOrder.getDiscountAmount() != null ? roomOrder.getDiscountAmount() : 0;
-		int actualAmount = totalAmount - discount;
-		model.addAttribute("roomAmount", roomAmount);
-		model.addAttribute("totalRoomPrice", totalRoomPrice);
-		model.addAttribute("totalAmount", totalAmount);
-		model.addAttribute("actualAmount", actualAmount);
-
-		// 查詢該會員可用的優惠券
-		Integer memberId = roomOrder.getMember() != null ? roomOrder.getMember().getMemberId() : null;
-		Integer priceBeforeUsingCoupon = roomOrder.getTotalAmount(); // 或你要的金額欄位
-		List<Coupon> couponList = memberCouponService.getRoomOrderApplicableCoupons(memberId, priceBeforeUsingCoupon);
-		model.addAttribute("couponList", couponList);
-
-		return "admin/fragments/roomo/modals/roomo_edit :: editModalContent";
+		RoomOrder order = orderService.getById(roomOrderId);
+		List<RoomOList> details = roomOListService.findByRoomOrderId(roomOrderId);
+		order.setOrderDetails(details);
+		model.addAttribute("order", order);
+		model.addAttribute("isAdmin", true);
+		return "common/order_edit :: editModalContent";
 	}
 
 	// 更新訂單
@@ -247,6 +236,7 @@ public class RoomOrderController {
 		if (oldOrder.getActualAmount() != roomOrder.getActualAmount()) {
 			Integer price = roomOrder.getActualAmount() - oldOrder.getActualAmount();
 			memberService.updateConsumptionAndLevelAndPoints(memberId, price);
+			System.out.println("更新會員累計金額：" + price);
 		}
 
 		// 1. 更新主表

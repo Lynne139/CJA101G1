@@ -76,4 +76,8 @@ public class RoomOrderService {
         return projectPrice * people;
     }
 
+    public List<RoomOrder> getByMemberId(Integer memberId) {
+        return repository.getByMember_MemberId(memberId);
+    }
+
 }
