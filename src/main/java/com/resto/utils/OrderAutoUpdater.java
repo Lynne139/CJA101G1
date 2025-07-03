@@ -23,7 +23,7 @@ public class OrderAutoUpdater {
 //	// 間隔 60 秒執行一次
 //    @Scheduled(fixedRate = 60_000)
 	// 每日 04:00~23:59間，每1min都觸發一次
-	@Scheduled(cron = "0 */1 4-23 * * ?") // 整點 0 秒 每n分 每小時 每日 每月 星期(?不指定，與日期擇一）
+//	@Scheduled(cron = "0 */1 4-23 * * ?") // 整點 0 秒 每n分 每小時 每日 每月 星期(?不指定，與日期擇一） 暫關
     public void updateStatus() {
 
         LocalDateTime now = LocalDateTime.now();
