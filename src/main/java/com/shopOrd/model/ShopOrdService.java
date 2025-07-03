@@ -25,6 +25,7 @@ import com.prodCart.model.ProdCartVO;
 import com.shopOrdDet.model.ShopOrdDetIdVO;
 import com.shopOrdDet.model.ShopOrdDetRepository;
 import com.shopOrdDet.model.ShopOrdDetVO;
+import com.member.model.MemberService;
 
 @Service("shopOrdService")
 public class ShopOrdService {
@@ -47,6 +48,9 @@ public class ShopOrdService {
 	@Autowired
     private SessionFactory sessionFactory;
 
+	@Autowired
+	private MemberService memberService;
+
 	public void updateShopOrd(ShopOrdVO shopOrdVO) {
 		ShopOrdVO dbOrder = repository.findById(shopOrdVO.getProdOrdId()).orElse(null);
 		if (dbOrder == null) return;
@@ -56,6 +60,9 @@ public class ShopOrdService {
 		String newCouponCode = (shopOrdVO.getCoupon() != null && shopOrdVO.getCoupon().getCouponCode() != null && !shopOrdVO.getCoupon().getCouponCode().isBlank())
 			? shopOrdVO.getCoupon().getCouponCode() : null;
 		Integer memberId = dbOrder.getMemberVO() != null ? dbOrder.getMemberVO().getMemberId() : null;
+
+		// 1. 取得原本的實際付款金額
+		int oldActualPayment = dbOrder.getActualPaymentAmount() != null ? dbOrder.getActualPaymentAmount() : 0;
 
 		// 1. 若原本有 coupon，且換成新 coupon 或取消，則將原本的 MemberCoupon 設為 isUsed=false
 		if (oldCouponCode != null && memberId != null && !oldCouponCode.equals(newCouponCode)) {
@@ -91,12 +98,34 @@ public class ShopOrdService {
 			dbOrder.setDiscountAmount(discount);
 		}
 
+		// 取得原本狀態
+		Integer oldOrdStat = dbOrder.getOrdStat();
 		dbOrder.setOrdStat(shopOrdVO.getOrdStat());
 		dbOrder.setPayMethod(shopOrdVO.getPayMethod());
 
 		Integer prodAmount = dbOrder.getProdAmount() != null ? dbOrder.getProdAmount() : 0;
 		Integer discountAmount = dbOrder.getDiscountAmount() != null ? dbOrder.getDiscountAmount() : 0;
-		dbOrder.setActualPaymentAmount(prodAmount - discountAmount);
+		int newActualPayment = prodAmount - discountAmount;
+		dbOrder.setActualPaymentAmount(newActualPayment);
+
+		// 新增：狀態切換點數補扣/補回
+		if (memberId != null && oldOrdStat != null && shopOrdVO.getOrdStat() != null) {
+			// 1. 非取消→取消，扣回點數
+			if (oldOrdStat != 2 && shopOrdVO.getOrdStat() == 2) {
+				int minus = -oldActualPayment;
+				memberService.updateConsumptionAndLevelAndPoints(memberId, minus);
+			// 2. 取消→非取消，補回點數
+			} else if (oldOrdStat == 2 && shopOrdVO.getOrdStat() != 2) {
+				int plus = newActualPayment;
+				memberService.updateConsumptionAndLevelAndPoints(memberId, plus);
+			} else {
+				// 其他情境，維持原本金額差異邏輯
+				int priceChange = newActualPayment - oldActualPayment;
+				if (priceChange != 0) {
+					memberService.updateConsumptionAndLevelAndPoints(memberId, priceChange);
+				}
+			}
+		}
 
 		repository.save(dbOrder);
 	}
@@ -199,6 +228,10 @@ public class ShopOrdService {
 
 		// 6. 刪除購物車項目
 		prodCartRepository.deleteAll(cartItems);
+		// 新增：更新會員消費與點數
+		if (memberId != null && (total - discount) > 0) {
+			memberService.updateConsumptionAndLevelAndPoints(memberId, total - discount);
+		}
 	}
 
 	/**
@@ -264,6 +297,12 @@ public class ShopOrdService {
 			detail.setShopOrdVO(savedOrder); // 設定 FK 關聯
 			shopOrdDetRepository.save(detail);
 		}
+
+		// 7. 更新會員消費與點數
+		Integer memberId = savedOrder.getMemberVO() != null ? savedOrder.getMemberVO().getMemberId() : null;
+		if (memberId != null && actualAmount > 0) {
+			memberService.updateConsumptionAndLevelAndPoints(memberId, actualAmount);
+		}
 	}
 
 	/**
@@ -299,6 +338,11 @@ public class ShopOrdService {
 
 		// 4. 儲存訂單主檔
 		repository.save(shopOrdVO);
+		// 新增：更新會員消費與點數
+		Integer memberId = shopOrdVO.getMemberVO() != null ? shopOrdVO.getMemberVO().getMemberId() : null;
+		if (memberId != null && shopOrdVO.getActualPaymentAmount() != null && shopOrdVO.getActualPaymentAmount() > 0) {
+			memberService.updateConsumptionAndLevelAndPoints(memberId, shopOrdVO.getActualPaymentAmount());
+		}
 	}
 
 	/**
@@ -396,6 +440,10 @@ public class ShopOrdService {
 
 		// 6. 刪除購物車項目
 		prodCartRepository.deleteAll(cartItems);
+		// 新增：更新會員消費與點數
+		if (memberId != null && (total - discount) > 0) {
+			memberService.updateConsumptionAndLevelAndPoints(memberId, total - discount);
+		}
 	}
 
 }
