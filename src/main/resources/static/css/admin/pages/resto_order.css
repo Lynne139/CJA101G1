@@ -1,0 +1,29 @@
+/* ===== data table ===== */
+#restoOrderTable {
+  min-width: 1200px;
+}
+
+#restoOrderTable td {
+  word-break: break-word;
+  white-space: normal;
+  
+}
+
+/* ===== view modal ===== */
+#restoOrderViewModal .modal_section{
+	margin-bottom:1rem;
+}
+#restoOrderViewModal .view_sec_title{
+	padding:0.5rem 0;
+	border-bottom:1px solid var(--color-primary);
+	color:var(--color-primary);
+}
+
+#restoOrderAddModal .modal_section{
+	margin-bottom:1rem;
+}
+#restoOrderAddModal .view_sec_title{
+	padding:0.5rem 0;
+	border-bottom:1px solid var(--color-primary);
+	color:var(--color-primary);
+}

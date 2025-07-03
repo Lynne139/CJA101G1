@@ -23,6 +23,12 @@ import com.resto.entity.TimeslotVO;
 	    public List<TimeslotVO> getTimeslotsByRestoId(Integer restoId) {
 	        return timeslotRepository.findActiveWithPeriodByResto(restoId);
 	    }
+	    
+	    //拿未刪多筆(給order add modal用)
+	    @Transactional(readOnly = true)
+	    public List<TimeslotVO> getAllEnabled() {
+	        return timeslotRepository.findActiveWithPeriod();
+	    }
 
 	    
 	    // id拿單筆

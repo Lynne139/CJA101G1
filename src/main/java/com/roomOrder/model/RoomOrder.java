@@ -35,8 +35,8 @@ public class RoomOrder {
     @Column(name = "ROOM_AMOUNT")
     private Integer roomAmount;
 
-    @Column(name="ROOM_COUNT")
-    private Integer roomCount;
+    @Column(name="TOTAL_AMOUNT")
+    private Integer totalAmount;
 
     @NotNull(message = "入住日期不可為空")
     @Column(name = "CHECK_IN_DATE")
@@ -180,12 +180,12 @@ public class RoomOrder {
         this.updateDate = updateDate;
     }
 
-    public Integer getRoomCount() {
-        return roomCount;
+    public Integer getTotalAmount() {
+        return totalAmount;
     }
 
-    public void setRoomCount(Integer roomCount) {
-        this.roomCount = roomCount;
+    public void setTotalAmount(Integer totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     public List<RoomOList> getOrderDetails() {
