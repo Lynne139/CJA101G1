@@ -1,12 +1,12 @@
 package com.memberLevelType.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.memberLevelType.model.MemberLevelType;
 import com.memberLevelType.model.MemberLevelTypeService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @Controller
@@ -21,56 +22,74 @@ import jakarta.validation.Valid;
 public class MemberLevelTypeController {
 	 
 	@Autowired
-    private MemberLevelTypeService memberLevelTypeService;
+    private MemberLevelTypeService memberLevelTypeSvc;
 
-    // 顯示新增表單
+	// 顯示新增表單
     @GetMapping("/addMemberLevelType")
-    public String addMemberLevelType(ModelMap model) {
-    	MemberLevelType memberLevelType = new MemberLevelType();
-        model.addAttribute("memberLevelType", memberLevelType);
-        return "back-end/memberLevelType/addMemberLevelType";
+    public String addMemberLevelType(Model model, HttpServletRequest request) {
+    	model.addAttribute("memberLevelType", new MemberLevelType());
+    	model.addAttribute("memberLevelTypeList", memberLevelTypeSvc.getAll());
+	    model.addAttribute("currentURI", request.getRequestURI());
+	    model.addAttribute("mainFragment", "admin/fragments/memberLevelType/addMemberLevelType");
+	    return "admin/index_admin";
     }
 
     // 處理新增
-    @PostMapping("/insert")
-    public String insert(@Valid MemberLevelType memberLevelType, BindingResult result, ModelMap model) {
+    @PostMapping("/insertL")
+    public String insertMemberLevelType(@ModelAttribute("memberLevelType") @Valid MemberLevelType memberLevelType,
+    					BindingResult result,
+    					Model model) {
         if (result.hasErrors()) {
+        	model.addAttribute("memberLevelType", memberLevelType);
             return "back-end/memberLevelType/addMemberLevelType";
         }
-        memberLevelTypeService.addMemberLevelType(memberLevelType);
-        return "redirect:/memberLevelType/listAllMemberLevelType";
+        memberLevelTypeSvc.addMemberLevelType(memberLevelType);
+        return "redirect:/admin/listAllMemberLevelType";
     }
 
     // 顯示全部資料
     @GetMapping("/listAllMemberLevelType")
-    public String listAllMemberLevelType(ModelMap model) {
-        List<MemberLevelType> list = memberLevelTypeService.getAll();
-        model.addAttribute("memberLevelTypeList", list);
-        return "back-end/memberLevelType/listAllMemberLevelType";
+    public String listAllMemberLevelType(Model model, HttpServletRequest request) {
+    	model.addAttribute("memberLevelTypeList", memberLevelTypeSvc.getAll());
+	    model.addAttribute("currentURI", request.getRequestURI());
+	    model.addAttribute("mainFragment", "admin/fragments/memberLevelType/listAllMemberLevelType");
+	    return "admin/index_admin";
     }
 
-    // 顯示修改表單
-    @PostMapping("/getOneForUpdate")
-    public String getOneForUpdate(@RequestParam("memberLevel") String memberLevel, ModelMap model) {
-        MemberLevelType memberLevelType = memberLevelTypeService.getOneMemberLevelType(memberLevel);
-        model.addAttribute("memberLevelType", memberLevelType);
-        return "back-end/memberLevelType/listOneMemberLevelType";
+    // 修改資料畫面
+    @GetMapping("/updateMemberLevelType/{memberLevel}")
+    public String getUpdateMemberLevelTypePage(@PathVariable("memberLevel") String memberLevel,
+                                               Model model,
+                                               HttpServletRequest request) {
+        MemberLevelType memberLevelTypeList = memberLevelTypeSvc.getOneMemberLevelType(memberLevel);
+        model.addAttribute("memberLevelType", memberLevelTypeList);
+        model.addAttribute("currentURI", request.getRequestURI());
+        model.addAttribute("mainFragment", "admin/fragments/memberLevelType/update_memberLevelType_input");
+        return "admin/index_admin";
     }
 
-    // 處理更新
-    @PostMapping("/update")
-    public String update(@Valid MemberLevelType memberLevelType, BindingResult result, ModelMap model) {
+    
+    // 更新資料
+    @PostMapping("/updateL")
+    public String updateMmemberLevel(@Valid @ModelAttribute("memberLevelType") MemberLevelType memberLevelType, 
+    					BindingResult result,
+    					Model model, HttpServletRequest request) {
         if (result.hasErrors()) {
-            return "back-end/memberLevelType/update_memberLevelType_input";
+        	model.addAttribute("memberLevelType", memberLevelType);
+    	    model.addAttribute("currentURI", request.getRequestURI());
+    	    model.addAttribute("mainFragment", "admin/fragments/memberLevelType/update_memberLevelType_input");
+    	    return "admin/index_admin";
         }
-        memberLevelTypeService.updateMemberLevelType(memberLevelType);
-        return "redirect:/memberLevelType/listOneMemberLevelType";
+        
+        return "redirect:/admin/listAllMemberLevelType";
     }
 
     // 處理刪除
-    @PostMapping("/delete")
-    public String delete(@RequestParam("memberLevel") String memberLevel, ModelMap model) {
-        memberLevelTypeService.deleteMemberLevelType(memberLevel);
-        return "redirect:/memberLevelType/listAllMemberLevelType";
+    @PostMapping("/deleteL")
+    public String deleteMmemberLevel(@RequestParam("memberLevel") String memberLevel, 
+    									Model model) {
+        memberLevelTypeSvc.deleteMemberLevelType(memberLevel);
+        model.addAttribute("success", "- (刪除成功)");
+        return "redirect:/admin/listAllMemberLevelType";
     }
 }

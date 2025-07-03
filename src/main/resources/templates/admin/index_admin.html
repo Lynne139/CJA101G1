@@ -54,7 +54,19 @@
 			      		 
 			      		</div>
 			    	</div>
-
+					
+					<!-- 會員等級 -->
+					<div class="sidebar_section"
+						th:classappend="${currentURI.startsWith('/admin/memberLevelType')} ? '-active'">
+						<a class="sidebar_link">
+							<i class="fa-solid fa-user"></i> 會員等級
+						</a>
+						<div class="submenu_block ps-4"
+							th:classappend="${currentURI.startsWith('/admin/memberLevelType')} ? 'show'">
+			        		<a th:href="@{/admin/listAllMemberLevelType}" th:classappend="${currentURI == '/admin/listAllMemberLevelType'} ? '-active'" class="sidebar_sub_link">等級列表</a>
+			        		<a th:href="@{/admin/addAllMemberLevelType}" th:classappend="${currentURI == '/admin/addAllMemberLevelType'} ? '-active'" class="sidebar_sub_link">等級新增</a>
+			      		</div>
+			    	</div>
 			
 					<!-- 員工管理 -->
 					<div class="sidebar_section"

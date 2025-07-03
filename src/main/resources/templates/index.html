@@ -360,6 +360,16 @@
       }
     });
   </script>
+  <script th:inline="javascript">
+	  /*<![CDATA[*/
+	  const forceLogin = /*[[${forceLogin}]]*/ false;
+	  if (forceLogin) {
+	      const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+	      loginModal.show();
+	  }
+	  /*]]>*/
+	</script>
+
   
   
 </body>

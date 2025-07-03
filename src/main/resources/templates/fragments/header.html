@@ -18,6 +18,7 @@
 
 <div th:if="${loggedInMember != null}">
     <span th:text="'歡迎，' + ${loggedInMember.memberName} + '！'" class="me-2"></span>
+    <a th:href="@{/member/center}" class="btn btn-outline-primary btn-sm me-2">會員中心</a>
     <a th:href="@{/member/logout}" class="btn btn-link p-0 m-0 text-dark text-decoration-none">
         會員登出
     </a>
@@ -66,7 +67,7 @@
 					    	<a th:href="@{/front-end/member/registerMember}" class="text-decoration-none text-success">
 							    <i class="fa-solid fa-user-plus"></i> 註冊新會員
 							</a>
-						    <a th:href="@{front-end/member/forgot-password}" class="text-decoration-none text-primary">
+						    <a th:href="@{/front-end/member/forgot-password}" class="text-decoration-none text-primary">
 						        <i class="fa-solid fa-lock"></i> 忘記密碼
 						    </a>
 						    					    	   

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>修改會員資料</title>
+  <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+</head>
+<body>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>修改會員資料</title>
+    <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">修改會員資料</h2>
+
+    <form th:action="@{/member/center/update}" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="memberName" class="form-label">會員姓名</label>
+            <input type="text" class="form-control" id="memberName" name="memberName" th:value="${memberVO.memberName}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="memberPhone" class="form-label">電話</label>
+            <input type="text" class="form-control" id="memberPhone" name="memberPhone" th:value="${memberVO.memberPhone}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="memberBirthday" class="form-label">生日</label>
+            <input type="date" class="form-control" id="memberBirthday" name="memberBirthday" th:value="${memberVO.memberBirthday}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="memberPassword" class="form-label">密碼</label>
+            <input type="password" class="form-control" id="memberPassword" name="memberPassword" th:value="${memberVO.memberPassword}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="memberAddress" class="form-label">地址</label>
+            <input type="text" class="form-control" id="memberAddress" name="memberAddress" th:value="${memberVO.memberAddress}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="memberPic" class="form-label">上傳頭像</label>
+            <input type="file" class="form-control" id="memberPic" name="memberPic" accept="image/*">
+            <div class="mt-2">
+                <img th:if="${memberVO.memberPic != null}" th:src="@{'/member/pic/' + ${memberVO.memberId}}" alt="目前頭像" style="max-height: 150px;" />
+            </div>
+        </div>
+
+        <!-- 不可修改欄位（隱藏提交） -->
+        <input type="hidden" name="memberId" th:value="${memberVO.memberId}" />
+        <input type="hidden" name="memberEmail" th:value="${memberVO.memberEmail}" />
+        <input type="hidden" name="memberLevel" th:value="${memberVO.memberLevel}" />
+        <input type="hidden" name="memberStatus" th:value="${memberVO.memberStatus}" />
+        <input type="hidden" name="memberPoints" th:value="${memberVO.memberPoints}" />
+        <input type="hidden" name="memberAccumulativeConsumption" th:value="${memberVO.memberAccumulativeConsumption}" />
+
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">儲存修改</button>
+            <a th:href="@{/member/center}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>
+
+</body>
+</html>

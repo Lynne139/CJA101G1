@@ -56,5 +56,8 @@ public class MemberService {
 	public Integer getMemberPointsById(Integer memberId) {
 	    Optional<MemberVO> optional = repository.findById(memberId);
 	    return optional.map(MemberVO::getMemberPoints).orElse(null);
+	    
+//	public boolean sendResetPasswordEmail(String email);
+	
 	}
 }
