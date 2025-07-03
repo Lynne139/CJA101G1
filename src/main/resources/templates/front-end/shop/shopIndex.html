@@ -10,18 +10,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="d-flex justify-content-between align-items-center p-3">
-    <div class="fw-bold text-brown">Maison d'Yuko</div>
-    <div class="d-flex">
-      <div class="d-none d-lg-block">
-        <img src="/shoppage/image/icon/member.svg" alt="member" class="logo-header" />
-        <a href="#" th:if="${session.memberVO == null}">會員登入</a>
-        <span th:if="${session.memberVO != null}" class="fw-bold text-brown" th:text="${session.memberVO.memberName}"></span>
-      </div>
-      <a href="#" id="menuToggle" class="ms-lg-3">☰ MENU</a>
-    </div>
-  </header>
+  <!-- 共用Header（含登入彈窗） -->
+  <div th:replace="~{fragments/header :: header}"></div>
+  <input type="hidden" name="memberId" th:value="${loggedInMember != null ? loggedInMember.memberId : ''}" />
 
   <!-- 付款狀態顯示區域 -->
   <div th:if="${paymentStatus}" class="payment-status-alert" th:classappend="${paymentStatus == 'success' ? 'alert-success' : 'alert-danger'}">
@@ -203,7 +194,6 @@
             <div class="product-price" th:text="'NT$ ' + ${#numbers.formatInteger(product.productPrice, 1, 'COMMA')}">NT$ 0</div>
             <div class="product-actions">
               <form th:action="@{/prodCart/front/add}" method="post" style="display:inline-flex;align-items:center;gap:8px;">
-                <input type="hidden" name="memberId" th:value="${session.memberVO.memberId}" />
                 <input type="hidden" name="productId" th:value="${product.productId}" />
                 <input type="number" name="quantity" value="1" min="1" max="999" class="form-control" style="width:60px;display:inline-block;" required />
                 <button type="submit" class="btn btn-primary btn-sm">

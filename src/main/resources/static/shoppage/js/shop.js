@@ -978,7 +978,7 @@ function loadAvailableCoupons(cartTotal = 0) {
         availableCoupons = response.coupons || [];
         populateCouponSelect();
       } else {
-        showNotification('載入折價券失敗: ' + response.message, 'error');
+        showNotification(response.message, 'error');
       }
     },
     error: function(xhr, status, error) {

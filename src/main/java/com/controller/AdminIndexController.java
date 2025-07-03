@@ -643,7 +643,7 @@ public class AdminIndexController {
     	model.addAttribute("memberVO", new MemberVO());
     	
     	// 從session獲取當前登入的會員資訊
-    	MemberVO memberVO = (MemberVO) request.getSession().getAttribute("memberVO");
+    	MemberVO memberVO = (MemberVO) request.getSession().getAttribute("loggedInMember");
     	if (memberVO != null) {
     		Integer memberId = memberVO.getMemberId();
     		int memberPoints = memberVO.getMemberPoints() != null ? memberVO.getMemberPoints() : 0;
@@ -699,7 +699,7 @@ public class AdminIndexController {
     	model.addAttribute("shopOrdVO", new com.shopOrd.model.ShopOrdVO());
     	
     	// 從session獲取當前登入的會員資訊
-    	MemberVO memberVO = (MemberVO) request.getSession().getAttribute("memberVO");
+    	MemberVO memberVO = (MemberVO) request.getSession().getAttribute("loggedInMember");
     	if (memberVO != null) {
     		Integer memberId = memberVO.getMemberId();
     		int memberPoints = memberVO.getMemberPoints() != null ? memberVO.getMemberPoints() : 0;
