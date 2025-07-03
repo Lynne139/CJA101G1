@@ -1,0 +1,60 @@
+<div th:fragment="editModalContent(order, isAdmin)">
+  <div class="modal fade" id="roomoEditModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content rounded-4 p-4" style="background-color: var(--color-background);">
+        <div class="modal-header">
+          <h5 class="modal-title">編輯訂單</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="roomOrderEditForm" th:object="${order}" th:action="@{${isAdmin} ? '/admin/roomo_info/update' : '/member/room/update'}" method="post">
+            <!-- 訂單編號 -->
+            <div class="mb-3">
+              <label class="form-label">訂單編號</label>
+              <input type="number" th:value="*{roomOrderId}" class="form-control" readonly name="roomOrderId">
+            </div>
+            <!-- 入住日期 -->
+            <div class="mb-3">
+              <label class="form-label">入住日期</label>
+              <input type="date" th:field="*{checkInDate}" class="form-control" required id="editCheckInDate">
+            </div>
+            <!-- 退房日期 -->
+            <div class="mb-3">
+              <label class="form-label">退房日期</label>
+              <input type="date" th:field="*{checkOutDate}" class="form-control" required id="editCheckOutDate">
+            </div>
+            <!-- RoomOList 明細特殊需求（假設只顯示第一筆） -->
+            <div class="mb-3">
+              <label class="form-label">特殊需求</label>
+              <input type="text" th:name="'orderDetails[0].specialReq'" class="form-control" maxlength="50" th:value="${order.orderDetails[0].specialReq}">
+            </div>
+            <!-- 僅後台可編輯欄位 -->
+            <div th:if="${isAdmin}">
+              <div class="mb-3">
+                <label class="form-label">訂單狀態</label>
+                <select th:field="*{orderStatus}" class="form-select" required>
+                  <option value="0">取消</option>
+                  <option value="1">成立</option>
+                  <option value="2">完成</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">付款狀態</label>
+                <select th:field="*{payStatus}" class="form-select">
+                  <option value="0">未付款</option>
+                  <option value="1">已付款</option>
+                </select>
+              </div>
+            </div>
+            <input type="hidden" th:field="*{member.memberId}" />
+            <input type="hidden" th:field="*{roomOrderId}" />
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+              <button type="submit" class="btn btn-primary">儲存變更</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

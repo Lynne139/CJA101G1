@@ -1467,6 +1467,10 @@ section {
 
   }
 
+  .d-flex.align-items-center.gap-3{
+    display: none !important;
+  }
+
 
   header .me-3 a {
     margin-right: 0;
