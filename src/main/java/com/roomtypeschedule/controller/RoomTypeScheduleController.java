@@ -112,7 +112,7 @@ public class RoomTypeScheduleController {
 	@GetMapping("/listAllRoomTypeSchedule/initAll")
 	@ResponseBody
 	public String initializeAllRoomTypeSchedules(RedirectAttributes ra, Model model) {
-	    List<RoomTypeVO> roomTypes = roomTypeSvc.getAll();
+	    List<RoomTypeVO> roomTypes = roomTypeSvc.getAllAvailableRoomTypes();
 
 	    LocalDate startDate = LocalDate.now();
 	    LocalDate endDate = startDate.plusMonths(1);

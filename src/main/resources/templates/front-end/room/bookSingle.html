@@ -10,7 +10,7 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
 	rel="stylesheet">
 <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
-<link rel="stylesheet" th:href="@{/css/room/roomtypeorder.css}">
+<link rel="stylesheet" th:href="@{/css/room/bookSingle.css}">
 </head>
 <body>
 	<div th:replace="~{fragments/header :: header}"></div>
@@ -149,7 +149,13 @@
 						</div>
 					</div>
 					<button class="multi-book-btn">新增其他房型</button>
-					<button class="btn-book" onclick="proceedBooking()">確認預訂</button>
+					
+					<form id="singleRoomForm" action="/orderInfo" method="post" style="display:none;">
+					    <input type="hidden" name="checkin">
+					    <input type="hidden" name="checkout">
+					    <input type="hidden" name="guests">
+					</form>
+					<button class="btn-book" id="bookBtn">確認預訂</button>
 				</div>
 			</div>
 		</div>
@@ -158,6 +164,6 @@
 	<!-- Footer -->
 	<div th:replace="~{fragments/footer :: footer}"></div>
 
-	<script th:src="@{/js/room/roomtypeorder.js}"></script>
+	<script th:src="@{/js/room/bookSingle.js}"></script>
 </body>
 </html>

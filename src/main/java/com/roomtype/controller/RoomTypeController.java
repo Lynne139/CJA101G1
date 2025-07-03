@@ -192,8 +192,9 @@ public class RoomTypeController {
 
 	// 第二部新增到資料庫
 	@PostMapping("/listAllRoomType/insert") // 表單送出請求
-	public String insertRoomType(
-			@Validated(RoomTypeVO.Save.class) @ModelAttribute("roomTypeVO") RoomTypeVO roomTypeVO, // 自動把表單欄位填入																										// roomTypeVO，並進行格式驗證
+	public String insertRoomType(@Validated(RoomTypeVO.Save.class) @ModelAttribute("roomTypeVO") RoomTypeVO roomTypeVO, // 自動把表單欄位填入
+																														// //
+																														// roomTypeVO，並進行格式驗證
 			BindingResult result, // 儲存驗證錯誤結果
 			@RequestParam(value = "uploadImg", required = false) MultipartFile imageFile,
 			@RequestParam(value = "clearImgFlag", required = false) String clearImgFlag,
@@ -262,60 +263,61 @@ public class RoomTypeController {
 
 	// 第二步將修改資料送進資料庫
 	@PostMapping("/listAllRoomType/update")
-	public String updateRoomType(@Validated(RoomTypeVO.Save.class) @ModelAttribute("roomTypeVO") RoomTypeVO roomTypeVO, BindingResult result,
-			@RequestParam(value = "uploadImg", required = false) MultipartFile imageFile,
+	public String updateRoomType(@Validated(RoomTypeVO.Save.class) @ModelAttribute("roomTypeVO") RoomTypeVO roomTypeVO,
+			BindingResult result, @RequestParam(value = "uploadImg", required = false) MultipartFile imageFile,
 			@RequestParam(value = "clearImgFlag", required = false) String clearImgFlag,
 			RedirectAttributes redirectAttributes, Model model) {
 
 		// 錯誤 flag（初始 false）
-	    boolean hasImageError = false;
+		boolean hasImageError = false;
 
-	    // 處理圖片格式與大小
-	    if (imageFile != null && !imageFile.isEmpty()) {
-	        String contentType = imageFile.getContentType();
-	        long maxSize = 16 * 1024 * 1024;
+		// 處理圖片格式與大小
+		if (imageFile != null && !imageFile.isEmpty()) {
+			String contentType = imageFile.getContentType();
+			long maxSize = 16 * 1024 * 1024;
 
-	        if (!isValidImageType(contentType)) {
-	            model.addAttribute("imageError", "只接受 PNG / JPEG / GIF 格式圖片");
-	            hasImageError = true;
-	        } else if (imageFile.getSize() > maxSize) {
-	            model.addAttribute("imageError", "圖片大小不得超過 16MB");
-	            hasImageError = true;
-	        } else {
-	            try {
-	            	roomTypeVO.setRoomTypePic(imageFile.getBytes());
-	            } catch (IOException e) {
-	                model.addAttribute("imageError", "圖片處理失敗");
-	                hasImageError = true;
-	            }
-	        }
-	    }
+			if (!isValidImageType(contentType)) {
+				model.addAttribute("imageError", "只接受 PNG / JPEG / GIF 格式圖片");
+				hasImageError = true;
+			} else if (imageFile.getSize() > maxSize) {
+				model.addAttribute("imageError", "圖片大小不得超過 16MB");
+				hasImageError = true;
+			} else {
+				try {
+					roomTypeVO.setRoomTypePic(imageFile.getBytes());
+				} catch (IOException e) {
+					model.addAttribute("imageError", "圖片處理失敗");
+					hasImageError = true;
+				}
+			}
+		}
 
-	    // 驗證名稱重複
-	    if (roomTypeSvc.isDuplicateName(roomTypeVO.getRoomTypeName(),roomTypeVO.getRoomTypeId())) {
-	        result.rejectValue("roomTypeName", null, "房型名稱已存在，請重新輸入！");
-	    }
+		// 驗證名稱重複
+		if (roomTypeSvc.isDuplicateName(roomTypeVO.getRoomTypeName(), roomTypeVO.getRoomTypeId())) {
+			result.rejectValue("roomTypeName", null, "房型名稱已存在，請重新輸入！");
+		}
 
-	    // 若欄位驗證有錯，或圖片錯誤，回填 modal
-	    if (result.hasErrors() || hasImageError) {
-	    	// 把資料庫圖片補回去(避免input有新選其他圖，但表單驗證被擋時，回填的model記成input失敗的內容導致preview錯亂)
-	        byte[] originalImg = roomTypeSvc.getOneRoomType(roomTypeVO.getRoomTypeId()).getRoomTypePic();
-	        roomTypeVO.setRoomTypePic(originalImg);
+		// 若欄位驗證有錯，或圖片錯誤，回填 modal
+		if (result.hasErrors() || hasImageError) {
+			// 把資料庫圖片補回去(避免input有新選其他圖，但表單驗證被擋時，回填的model記成input失敗的內容導致preview錯亂)
+			byte[] originalImg = roomTypeSvc.getOneRoomType(roomTypeVO.getRoomTypeId()).getRoomTypePic();
+			roomTypeVO.setRoomTypePic(originalImg);
 
-	        model.addAttribute("roomTypeVO", roomTypeVO);
-	        return "admin/fragments/room/modals/update_roomType_input :: editRoomTypeModalContent";
-	    }
-	    
-	    //送出時以version判斷是否期間有人做更動避免覆蓋更新
+			model.addAttribute("roomTypeVO", roomTypeVO);
+			return "admin/fragments/room/modals/update_roomType_input :: editRoomTypeModalContent";
+		}
+
+		// 送出時以version判斷是否期間有人做更動避免覆蓋更新
 //	    try {
-	    	roomTypeSvc.saveWithImage(roomTypeVO, imageFile, clearImgFlag);
+		roomTypeSvc.saveWithImage(roomTypeVO, imageFile, clearImgFlag);
 //	    } catch (ObjectOptimisticLockingFailureException | OptimisticLockException e) {
 //	        model.addAttribute("errorMsg", e.getMessage());
 //	        model.addAttribute("resto", resto); // 回填原輸入
 //	        return "admin/fragments/resto/modals/resto_edit :: editModalContent";
 //	    }
-	    redirectAttributes.addFlashAttribute("message", "編輯成功！");
-	    return "redirect:/admin/listAllRoomType";
+		System.out.println("👉 guestNum = " + roomTypeVO.getGuestNum());
+		redirectAttributes.addFlashAttribute("message", "編輯成功！");
+		return "redirect:/admin/listAllRoomType";
 	}
 
 //	@PostMapping("getOne_For_Display")
