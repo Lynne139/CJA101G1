@@ -20,7 +20,7 @@ CREATE TABLE member (
     member_phone VARCHAR(10) NOT NULL,
 	member_address VARCHAR(255) NOT NULL,
 	member_pic LONGBLOB,
-	member_status TINYINT(1) default 0,
+	member_status TINYINT(1) default 1,
 	member_email VARCHAR(50) NOT NULL,
 	member_points INT NOT NULL,
 	member_accumulative_consumption INT NOT NULL,
@@ -30,10 +30,10 @@ CREATE TABLE member (
 
 INSERT INTO MEMBER_LEVEL_TYPE (member_level, level_rank)
 VALUES 
-('白金卡會員', 1),
-('金卡會員', 2),
-('銀卡會員', 3),
-('普通會員', 4);
+('白金卡會員', 4),
+('金卡會員', 3),
+('銀卡會員', 2),
+('普通會員', 1);
 
 
 INSERT INTO MEMBER (
@@ -88,9 +88,21 @@ CREATE TABLE member_coupon
 );
 
 INSERT INTO coupon (coupon_code, coupon_name, order_type, discount_value, min_purchase, claim_start_date, claim_end_date, expiry_date)
-VALUES('A2505AAA', '第一款測試折價券', 1, 100, 0, '2025-05-16', '2025-05-31', '2025-07-31'),
-	('B2505AAA', '第二款測試折價券', 2, 150, 0, '2025-05-16', '2025-05-31', '2025-07-31'),
-	('C2505AAA', '第三款測試折價券', 3, 200, 0, '2025-05-16', '2025-05-31', '2025-07-31');
+VALUES('A2501AAA', '乙巳新春折價券A', 1, 200, 300, '2025-01-01', '2025-06-30', '2025-07-31'),
+	('B2501AAA', '乙巳新春折價券B', 2, 150, 300, '2025-01-01', '2025-06-30', '2025-07-31'),
+	('C2501AAA', '乙巳新春折價券C', 3, 300, 500, '2025-01-01', '2025-06-30', '2025-07-31'),
+    ('A2504AAA', '乙巳夏日折價券A', 1, 200, 300, '2025-04-01', '2025-09-30', '2025-10-31'),
+	('B2504AAA', '乙巳夏日折價券B', 2, 150, 300, '2025-04-01', '2025-09-30', '2025-10-31'),
+	('C2504AAA', '乙巳夏日折價券C', 3, 300, 500, '2025-04-01', '2025-09-30', '2025-10-31'),
+    ('A2505AAA', '乙巳端午折價券A', 1, 100, 100, '2025-05-01', '2025-06-30', '2025-07-31'),
+	('B2505AAA', '乙巳端午折價券B', 2, 150, 150, '2025-05-01', '2025-06-30', '2025-07-31'),
+	('C2505AAA', '乙巳端午折價券C', 3, 200, 200, '2025-05-01', '2025-06-30', '2025-07-31'),
+	('A2507AAA', '乙巳中秋折價券A', 1, 200, 300, '2025-07-01', '2025-09-30', '2025-10-31'),
+	('B2507AAA', '乙巳中秋折價券B', 2, 150, 300, '2025-07-01', '2025-09-30', '2025-10-31'),
+	('C2507AAA', '乙巳中秋折價券C', 3, 300, 500, '2025-07-01', '2025-09-30', '2025-10-31'),
+	('A2507AAB', '乙巳秋季折價券A', 1, 200, 300, '2025-07-01', '2025-12-31', '2026-01-31'),
+	('B2507AAB', '乙巳秋季折價券B', 2, 150, 300, '2025-07-01', '2025-12-31', '2026-01-31'),
+	('C2507AAB', '乙巳秋季折價券C', 3, 300, 500, '2025-07-01', '2025-12-31', '2026-01-31');
 
 INSERT INTO member_coupon (coupon_code, member_id, used_time)
 VALUES('A2505AAA', 1, NULL),
@@ -117,8 +129,11 @@ CREATE TABLE notification
 
 INSERT INTO notification (member_id, title, content)
 VALUES (1, '測試通知標題一', '測試通知內容一'),
-	(2, '測試通知標題二', '測試通知內容二'),
-	(3, '測試通知標題三', '測試通知內容三');
+	(1, '測試通知標題二', '測試通知內容二'),
+	(2, '測試通知標題三', '測試通知內容三'),
+    (2, '測試通知標題四', '測試通知內容四'),
+	(3, '測試通知標題五', '測試通知內容五'),
+	(3, '測試通知標題六', '測試通知內容六');
 
 -- 職稱
 CREATE TABLE job_title (
@@ -215,9 +230,9 @@ CREATE TABLE customer_service_message
 
 INSERT INTO customer_service_message (member_id, customer_name, email, message)
 VALUES
-    (1, '林冠宇', 'guanyu.lin@example.com', '訂房有哪些優惠?'),
-    (2, NULL, 'shuhan.chang@example.com', '早上幾點check out?'),
-    (NULL, '杜宥瑄', 'yousyuan.tu@example.com', '住宿有公共洗衣機嗎?');
+    (1, '林冠宇', 'guanyu.lin@example.com', '請問洗衣間有提供柔軟精嗎?'),
+    (2, NULL, 'shuhan.chang@example.com', '我非常想帶我的狗一同入住可以嗎?'),
+    (NULL, '杜宥瑄', 'yousyuan.tu@example.com', '請問有接駁專車嗎?');
 
 -- 商品類別 
 create table product_category(
