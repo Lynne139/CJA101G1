@@ -46,19 +46,6 @@ public class ShopIndexController {
      * 商城首頁（原本版本，已註解）
      */
     
-//    @GetMapping("/shop")
-//    public String shopIndex(Model model) {
-//        // 獲取所有商品
-//        List<ProdVO> products = prodService.getAll();
-//        model.addAttribute("products", products);
-//        // 獲取所有商品照片
-//        List<ProdPhotoVO> productPhotos = prodPhotoService.getAll();
-//        model.addAttribute("productPhotos", productPhotos);
-//        // 獲取所有商品分類
-//        List<ProdCateVO> categories = prodCateService.getAll();
-//        model.addAttribute("categories", categories);
-//        return "front-end/shop/shopIndex";
-//    }
     
 
     /**
