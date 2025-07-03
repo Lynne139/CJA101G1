@@ -16,7 +16,7 @@ import com.resto.entity.TimeslotVO;
 	public class TimeslotService {
 
 		@Autowired
-	    private TimeslotRepository timeslotRepository;
+	    TimeslotRepository timeslotRepository;
 
 	    // 餐廳+區段拿多筆(未刪)
 	    @Transactional(readOnly = true)

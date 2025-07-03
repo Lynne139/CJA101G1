@@ -4,11 +4,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import com.resto.entity.PeriodVO;
+import com.resto.integration.room.RestoPeriodCode;
 
+@Repository
 public interface PeriodRepository  extends JpaRepository<PeriodVO, Integer>{
 	
 	// 讀取時照sort_order排
@@ -32,6 +36,31 @@ public interface PeriodRepository  extends JpaRepository<PeriodVO, Integer>{
     Optional<PeriodVO> 
     findTopByRestoVO_RestoIdAndSortOrderGreaterThanOrderBySortOrderAsc(
     		Integer restoId, Integer sortOrder);
+    
+    
+    // ===== 住宿訂單相關 =====
+    // 依餐廳 + code 找到 period
+    Optional<PeriodVO> findByRestoVO_RestoIdAndPeriodCode(Integer restoId, RestoPeriodCode code);
 
 
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE PeriodVO p SET p.periodCode = NULL " +
+           "WHERE p.periodId = :pid AND p.restoVO.restoId = :rid")
+    int clearPeriodCode(@Param("pid") Integer pid,
+                        @Param("rid") Integer rid);
+    
+    
+    // Perod+Timeslot+Resto
+    @Query("""
+            SELECT DISTINCT p
+            FROM PeriodVO p
+            JOIN FETCH p.restoVO r
+            LEFT JOIN FETCH p.timeslots t
+            WHERE p.periodCode = :code
+              AND r.isDeleted = false
+            ORDER BY r.restoId, p.sortOrder, t.timeslotName
+            """)
+        List<PeriodVO> findByPeriodCodeWithRestoAndTimeslots(@Param("code") RestoPeriodCode code);
+
+    
 }

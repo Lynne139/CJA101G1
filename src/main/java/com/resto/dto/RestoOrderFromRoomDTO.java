@@ -1,4 +1,4 @@
-package com.resto.integration.room;
+package com.resto.dto;
 
 import java.time.LocalDate;
 import java.util.Objects;

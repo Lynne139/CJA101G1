@@ -1,4 +1,4 @@
-package com.resto.model;
+package com.resto.utils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,12 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.resto.entity.RestoOrderVO;
-import com.resto.utils.RestoOrderStatus;
+import com.resto.model.RestoOrderRepository;
 
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class OrderAutoUpdater {
 	

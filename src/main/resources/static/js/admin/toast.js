@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// 你原本就有定義的 showToast()
+// 原本定義的 showToast()
 function showToast(message) {
   const toastEl = document.createElement("div");
   toastEl.className = "toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-3";

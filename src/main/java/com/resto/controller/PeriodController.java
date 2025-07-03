@@ -1,8 +1,10 @@
 package com.resto.controller;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,9 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.resto.entity.PeriodVO;
+import com.resto.integration.room.RestoPeriodCode;
+import com.resto.model.PeriodRepository;
 import com.resto.model.PeriodService;
 import com.resto.model.RestoService;
-import com.resto.model.TimeslotService;
 
 import jakarta.validation.Valid;
 
@@ -31,6 +34,7 @@ public class PeriodController {
 	
 	@Autowired
 	PeriodService periodService;
+
 	
 	
 	// ===== restoInfo.html ====================================================== //
@@ -150,5 +154,52 @@ public class PeriodController {
 	}
 
 
+	// ===== 住宿訂單相關：為選定period加上code =====
+	@PostMapping("/resto_timeslot/period/setCode")
+	@ResponseBody
+	public ResponseEntity<?> setPeriodCode(
+	        @RequestParam(required = false) Integer periodId,
+	        @RequestParam(required = false) RestoPeriodCode code,
+	        @RequestParam(required = false) Integer restoId) {
 
+	    if (periodId == null || code == null || restoId == null) {
+	        return ResponseEntity.badRequest().body(Map.of("error", "參數缺漏"));
+	    }
+
+	    periodService.setCode(periodId, code, restoId);
+	    return ResponseEntity.ok(Map.of("success", true));
+	}
+
+
+	@PostMapping("/resto_timeslot/period/clearCode")
+	@ResponseBody
+	public ResponseEntity<?> clearPeriodCode(
+	        @RequestParam(required = false) Integer periodId,
+	        @RequestParam(required = false) Integer restoId) {
+
+
+	    PeriodVO p = periodService.getById(periodId);
+
+	    if (!Objects.equals(p.getRestoVO().getRestoId(), restoId))
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+	                             .body(Map.of("error","restoId 不符"));
+
+	    if (p.getPeriodCode() == null) {   // 已經是空，不必更新
+	        return ResponseEntity.ok(Map.of("success", true));
+	    }
+
+	    periodService.clearCode(periodId, restoId);
+	    return ResponseEntity.ok(Map.of("success", true));
+	}
+
+
+	
+
+	
+	
+	
+	
+	
+	
+	
 }

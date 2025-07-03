@@ -394,6 +394,81 @@ document.addEventListener("DOMContentLoaded", () => {
 	  });
 	}
 
+	
+	
+	// ===== 設置住宿方案用code =====
+	document.querySelectorAll('.period-code-select').forEach(sel => {
+	  
+	  // 使select 的 value 一開始不是空字串，就記成 prevId
+	  sel.dataset.prevPeriodId = sel.value || "";
+		
+	  sel.addEventListener('change', async (e) => {
+	    const periodId = e.target.value;
+	    const code     = e.target.dataset.code;
+	    const restoId  = document.getElementById('restoSelect').value;
+		const prevId   = sel.dataset.prevPeriodId;     // 可能 undefined
+
+//		console.table({ periodId, code, restoId, prevId });
+
+		if (!restoId) return;                        // 防呆
+
+		try{
+			let success = false;
+
+			
+		// 有選period 
+		if (periodId !== '') {                     // 選了新 period
+		        await fetch('/admin/resto_timeslot/period/setCode', {
+		          method : 'POST',
+		          headers: {'Content-Type':'application/x-www-form-urlencoded'},
+		          body   : new URLSearchParams({ periodId, code, restoId })
+		        });
+		        sel.dataset.prevPeriodId = periodId;     // 更新備份
+				success = true;
+
+		      }
+			  
+		// 不開放
+		else if (prevId !== '') {   // 必須先有舊綁定
+			await fetch('/admin/resto_timeslot/period/clearCode', {
+		          method : 'POST',
+		          headers: {'Content-Type':'application/x-www-form-urlencoded'},
+		          body   : new URLSearchParams({ periodId: prevId, restoId })
+		        });
+
+		        sel.dataset.prevPeriodId = '';           // 清掉備份
+				success = true;
+
+		      }
+
+			  location.reload();  
+			  sessionStorage.setItem("toastMessage", "編輯成功！");
+
+			  
+//				if (success) {
+//				  showToast("操作成功！");
+//				}
+			  
+			                         // 重新載入頁面
+			      } catch (err) {
+			        console.error(err);
+			        alert('操作失敗，請稍後再試');
+			      }
+		
+	  });
+	});
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 
   // ===== 時段 ========================================================

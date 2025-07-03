@@ -1,6 +1,8 @@
 package com.resto.model;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.resto.entity.PeriodVO;
+import com.resto.integration.room.RestoPeriodCode;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -115,6 +118,50 @@ public class PeriodService {
         periodRepository.save(self);
         
     }
+    
+    
+    
+    
+    // ===== 住宿訂單相關 =====
+    @Transactional
+    public void setCode(Integer periodId, RestoPeriodCode code, Integer restoId) {
+
+        Objects.requireNonNull(code, "code 不可為空");
+
+        PeriodVO period = periodRepository.findById(periodId)
+                              .orElseThrow(() -> new NoSuchElementException("period"));
+
+        if (!Objects.equals(period.getRestoVO().getRestoId(), restoId)) {
+            throw new IllegalArgumentException("restoId 不符，拒絕操作");
+        }
+
+        // 取消同餐廳其他區段的相同 code
+        periodRepository.findByRestoVO_RestoIdAndPeriodCode(restoId, code)
+            .filter(p -> !p.getPeriodId().equals(periodId))
+            .ifPresent(p -> p.setPeriodCode(null));
+        periodRepository.flush();
+
+        period.setPeriodCode(code);
+
+        // 如果 DB 有唯一索引，可省略 flush
+        periodRepository.flush();
+    }
+
+    @Transactional
+    public void clearCode(Integer periodId, Integer restoId) {
+        int rows = periodRepository.clearPeriodCode(periodId, restoId);
+        if (rows == 0)
+            throw new IllegalArgumentException("找不到對應 period");
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
 }

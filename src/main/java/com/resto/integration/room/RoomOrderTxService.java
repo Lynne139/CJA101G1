@@ -8,14 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.resto.dto.RestoOrderFromRoomDTO;
 import com.roomOList.model.RoomOList;
 import com.roomOrder.model.RoomOrder;
 import com.roomOrder.model.RoomOrderService;
 
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class RoomOrderTxService {
 	
 	@Autowired

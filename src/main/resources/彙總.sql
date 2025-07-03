@@ -566,6 +566,25 @@ CREATE TABLE room_type_schedule (
 -- INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 4, 10, 2, '2025-05-14');
 
 
+CREATE TABLE role_list (
+  Role_id int auto_increment primary key not null,
+  Role_name Varchar(50) not null,
+  Remark Varchar(100),
+  Is_active boolean not null default true
+);
+
+INSERT INTO role_list (Role_id, Role_name, Remark, Is_active) VALUES
+  (1, '總經理室', '最高管理部門', TRUE),
+  (2, '客服部', '處理顧客問題', TRUE);
+
+  
+  
+  
+  
+  
+  
+  
+  
 -- 餐廳 
 CREATE TABLE resto (
 	resto_id INT AUTO_INCREMENT NOT NULL, -- PK用流水號
@@ -801,16 +820,3 @@ VALUES
 	(1,'2025-06-06',6,250,6),
 	(1,'2025-06-07',2,250,6),
 	(2,'2025-06-10',13,200,3);
-
-
-CREATE TABLE role_list (
-  Role_id int auto_increment primary key not null,
-  Role_name Varchar(50) not null,
-  Remark Varchar(100),
-  Is_active boolean not null default true
-);
-
-INSERT INTO role_list (Role_id, Role_name, Remark, Is_active) VALUES
-  (1, '總經理室', '最高管理部門', TRUE),
-  (2, '客服部', '處理顧客問題', TRUE);
-

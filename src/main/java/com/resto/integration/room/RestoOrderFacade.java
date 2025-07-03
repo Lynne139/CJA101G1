@@ -1,17 +1,14 @@
 package com.resto.integration.room;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.resto.dto.RestoOrderFromRoomDTO;
 import com.resto.entity.RestoOrderVO;
-import com.resto.entity.RestoVO;
-import com.resto.entity.TimeslotVO;
 import com.resto.model.ReservationService;
 import com.resto.model.RestoOrderRepository;
 import com.resto.model.RestoOrderService;
@@ -22,10 +19,8 @@ import com.resto.utils.RestoOrderStatus;
 import com.roomOList.model.RoomOList;
 import com.roomOrder.model.RoomOrder;
 
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class RestoOrderFacade {
 
 	@Autowired
