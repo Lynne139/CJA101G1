@@ -39,10 +39,23 @@
   <!-- 子選單 Navbar -->
   <nav class="sub-navbar d-flex justify-content-center align-items-center">
     <ul class="nav">
-      <li class="nav-item"><a class="nav-link" href="#">關於嶼蔻</a></li>
-      <li class="nav-item"><a class="nav-link" href="#">最新消息</a></li>
       <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" tabindex="0">探索嶼蔻</a>
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">關於嶼蔻</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" th:href="@{/front-end/about/brand-story}">品牌故事</a></li>
+          <li><a class="dropdown-item" th:href="@{/front-end/about/environment}">環境簡介</a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">最新消息</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" th:href="@{/news/notice}">最新公告</a></li>
+          <li><a class="dropdown-item" th:href="@{/news/promotion}">活動通知</a></li>
+          <li><a class="dropdown-item" th:href="@{/news/news}">媒體報導</a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">探索嶼蔻</a>
         <ul class="dropdown-menu">
           <li><a class="dropdown-item" href="#">珍饈美饌</a></li>
           <li><a class="dropdown-item" href="#">多元設施</a></li>
@@ -50,7 +63,13 @@
       </li>
       <li class="nav-item"><a class="nav-link" href="#rooms">精緻客房</a></li>
       <li class="nav-item"><a class="nav-link" href="#faq">交通資訊</a></li>
-      <li class="nav-item"><a class="nav-link" href="#footer">聯絡我們</a></li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">聯絡我們</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" th:href="@{/contact}">聯絡客服</a></li>
+          <li><a class="dropdown-item" th:href="@{/chatbot}">智慧客服</a></li>
+        </ul>
+      </li>
       <li class="nav-item"><a class="nav-link" href="#faq">常見問題</a></li>
     </ul>
 
@@ -58,10 +77,11 @@
 
   <!-- Sticky 右側按鈕 -->
   <div class="sticky-icons d-none d-lg-block">
-    <a href="#"><img th:src="@{/images/icon/bed.svg}" alt="bed" class="icon"/><br>線上訂房</span></a>
+    <a th:href="@{/bookMulti}"><img th:src="@{/images/icon/bed.svg}" alt="bed" class="icon"/><br>線上訂房</span></a>
     <a th:href="@{/front-end/shop}"><img th:src="@{/images/icon/bag.svg}" alt="bag" class="icon"/><br>帳號選物</span></a>
     <a href="#"><img th:src="@{/images/icon/dish.svg}" alt="dish" class="icon"/><br>餐廳訂位</span></a>
   </div>
+
 
   <!-- Overlay Full Menu -->
   <div class="overlay-menu" id="overlayMenu">
@@ -108,10 +128,10 @@
         </div>
         <div class="overlay-menu-col">
           <h5>精緻客房</h5>
-          <a href="#">蔻香居</a>
-          <a href="#">海音居</a>
-          <a href="#">晨曦之庭</a>
-          <a href="#">月影行館</a>
+          <a href="/roomtypes#roomtype-4">蔻香居</a>
+          <a href="/roomtypes#roomtype-3">海音居</a>
+          <a href="/roomtypes#roomtype-2">晨曦之庭</a>
+          <a href="/roomtypes#roomtype-1">月影行館</a>
         </div>
         <div class="overlay-menu-col">
           <h5>其他</h5>
@@ -123,6 +143,9 @@
     </div>
   </div>
 
+
+
+
   <!-- Content -->
   <section class="section news-section" id="news">
     <div class="container news-container">
@@ -130,30 +153,39 @@
         <!-- 左側消息 -->
         <div class="col-md-7 news-list">
           <h2 class="news-title">最新消息</h2>
-          <div class="news-item">
-            <div class="news-item-title">海島夏日祭典．盛大登場！</div>
-            <div class="news-item-content">
-              迎著海風，熱情奔放假夜——專屬於海島的慶典時光來了！音樂、在地美食、火舞秀與浪花交響，打造最Chill的島嶼派對。
+
+          <!-- 最新公告 -->
+          <div class="news-item" th:if="${latestHotNews != null}">
+            <div class="news-item-title">
+              <span th:text="${latestHotNews.title}"></span>
             </div>
-            <div class="news-item-date">MAR 25 2025</div>
+            <div class="news-item-content" th:text="${#strings.abbreviate(latestHotNews.content, 60)}"></div>
+            <div class="news-item-date" th:text="${latestHotNews.createdDate}"></div>
+            <a th:href="@{/news/notice}" class="stretched-link"></a>
           </div>
-          <div class="news-item">
-            <div class="news-item-title">海島夏日祭典．盛大登場！</div>
-            <div class="news-item-content">
-              迎著海風，熱情奔放假夜——專屬於海島的慶典時光來了！音樂、在地美食、火舞秀與浪花交響，打造最Chill的島嶼派對。
+
+          <!-- 活動通知 -->
+          <div class="news-item" th:if="${latestPromotionNews != null}">
+            <div class="news-item-title">
+              <span th:text="${latestPromotionNews.title}"></span>
             </div>
-            <div class="news-item-date">MAR 25 2025</div>
+            <div class="news-item-content" th:text="${#strings.abbreviate(latestPromotionNews.content, 60)}"></div>
+            <div class="news-item-date" th:text="${latestPromotionNews.startDate}"></div>
+            <a th:href="@{/news/promotion}" class="stretched-link"></a>
           </div>
-          <div class="news-item">
-            <div class="news-item-title">海島夏日祭典．盛大登場！</div>
-            <div class="news-item-content">
-              迎著海風，熱情奔放假夜——專屬於海島的慶典時光來了！音樂、在地美食、火舞秀與浪花交響，打造最Chill的島嶼派對。
+
+          <!-- 媒體報導 -->
+          <div class="news-item" th:if="${latestMediaNews != null}">
+            <div class="news-item-title">
+              <span th:text="${latestMediaNews.title}"></span>
             </div>
-            <div class="news-item-date">MAR 25 2025</div>
+            <div class="news-item-content" th:text="${#strings.abbreviate(latestMediaNews.content, 60)}"></div>
+            <div class="news-item-date" th:text="${latestMediaNews.publishedDate}"></div>
+            <a th:href="@{/news/news}" class="stretched-link"></a>
           </div>
           <div class="news-more">
-            <button class="news-more-btn">
-              <span class="circle"></span>
+			<button class="news-more-btn">              
+			  <span class="circle"></span>
               <span class="more-text">MORE</span>
               <span class="arrow"></span>
             </button>
@@ -179,14 +211,14 @@
             無論獨旅放鬆、雙人浪漫，還是親子同樂，嶼蔻都精心為您準備好了完美空間！
           </div>
           <div class="rooms-images-row">
-            <div class="room-img-wrapper">
+            <div class="room-img-wrapper" onclick="window.location.href='/roomtypes#roomtype-2'">
               <div class="room-img-lg">
                 <img th:src="@{/images/room/room1.png}" alt="晨曦之庭" class="room-img" />
                 <div class="room-img-overlay"></div>
                 <div class="room-img-text" id="room-img-left1"></div>
               </div>
             </div>
-            <div class="room-img-wrapper">
+            <div class="room-img-wrapper" onclick="window.location.href='/roomtypes#roomtype-4'">
               <div class="room-img-md">
                 <img th:src="@{/images/room/room2.png}" alt="蔻香居" class="room-img" />
                 <div class="room-img-overlay"></div>
@@ -197,14 +229,14 @@
         </div>
         <div class="d-lg-flex">
           <div class="rooms-images-row">
-            <div class="room-img-wrapper">
+            <div class="room-img-wrapper" onclick="window.location.href='/roomtypes#roomtype-3'">
               <div class="room-img-mdd">
                 <img th:src="@{/images/room/room3.png}" alt="海音居" class="room-img" />
                 <div class="room-img-overlay"></div>
                 <div class="room-img-text" id="room-img-left2"></div>
               </div>
             </div>
-            <div class="room-img-wrapper">
+            <div class="room-img-wrapper" onclick="window.location.href='/roomtypes#roomtype-1'">
               <div class="room-img-lgd">
                 <img th:src="@{/images/room/room4.png}" alt="月影行館" class="room-img" />
                 <div class="room-img-overlay"></div>
@@ -214,7 +246,7 @@
           </div>
           <div class="rooms-quote py-3">
             <div class="rooms-quote-en">A room for every journey,<br>a view for every soul.</div>
-            <button class="rooms-book-btn">
+            <button class="rooms-book-btn" onclick="location.href='/roomtypes'">
               <span class="circle"></span>
               <span class="book-text">BOOK</span>
               <span class="arrow"></span>
@@ -312,13 +344,14 @@
   </section>
 
   <!-- 匯入 footer.html -->
-  <div th:replace="~{fragments/footer :: footer}"></div>
+  <th:block th:replace="~{fragments/footer :: footer}" />
+
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-
+	
     //menu收合
     $('#menuToggle').on('click', function () {
       $('#overlayMenu').addClass('active'); // 將 .show 改為 .active
@@ -328,6 +361,15 @@
     });
     $('#menuClose').on('click', function () {
       $('#overlayMenu').removeClass('active'); // 將 .show 改為 .active
+    });
+
+    // 初始化Bootstrap下拉選單
+    $(document).ready(function() {
+      // 初始化所有下拉選單
+      var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+      var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+        return new bootstrap.Dropdown(dropdownToggleEl);
+      });
     });
 
     // FAQ 展開/收合功能
@@ -360,6 +402,8 @@
       }
     });
   </script>
+  
+  
 </body>
 
 </html>

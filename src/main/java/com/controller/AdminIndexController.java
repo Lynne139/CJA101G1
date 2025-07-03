@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -128,153 +130,141 @@ public class AdminIndexController {
     } 
 	
     
-    // === 會員查詢 ===
-    @GetMapping("/select_page")
-    public String showSelectPage(HttpServletRequest request,Model model) {
-    	String mainFragment = "admin/fragments/member/select_page";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-    	
-    	List<MemberVO> list = memberSvc.getAll();
-        model.addAttribute("memberListData", list);
-        
-    	return "admin/index_admin";
-    } 
-    
-    @PostMapping("/searchById")
-    public String searchById(@RequestParam("memberId") String memberId,
-                             Model model, HttpServletRequest request) {
-        List<MemberVO> memberList = new ArrayList<>();
-        try {
-            MemberVO memberVO = memberSvc.getOneMember(Integer.valueOf(memberId));
-            if (memberVO != null) memberList.add(memberVO);
-        } catch (NumberFormatException e) {
-            model.addAttribute("error", "會員編號格式錯誤");
-        }
-        model.addAttribute("memberListData", memberList);
-        model.addAttribute("currentURI", request.getRequestURI());
-        model.addAttribute("mainFragment", "admin/fragments/member/listAllMember");
-        return "admin/index_admin";
-    }
-
-    @PostMapping("/searchByName")
-    public String searchByName(@RequestParam("memberName") String memberName,
-                               Model model, HttpServletRequest request) {
-        List<MemberVO> memberList = memberSvc.findByNameLike(memberName); 
-        model.addAttribute("memberListData", memberList);
-        model.addAttribute("currentURI", request.getRequestURI());
-        model.addAttribute("mainFragment", "admin/fragments/member/listAllMember");
-        return "admin/index_admin";
-    }
-    
-    // === 會員新增 ===
-    @GetMapping("/addMember")
-    public String addMember(HttpServletRequest request,Model model) {
-    	String mainFragment = "admin/fragments/member/addMember";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-    	model.addAttribute("memberVO", new MemberVO());
-    	
-    	List<MemberVO> list = memberSvc.getAll();
-        model.addAttribute("memberListData", list);
-        
-    	return "admin/index_admin";
-    } 
-    
-    
-	@PostMapping("insert")
-	public String insert(@ModelAttribute("memberVO") @Valid MemberVO memberVO,
-	                     BindingResult result,
-	                     @RequestParam("uploadPic") MultipartFile file,
-	                     Model model) {
-	    if (result.hasErrors()) {
-	        model.addAttribute("memberVO", memberVO);
-	        return "admin/fragments/member/addMember";
-	    }
-
-	    try {
-	        if (!file.isEmpty()) {
-	            memberVO.setMemberPic(file.getBytes());
-	        }
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
-
-	    memberSvc.addMember(memberVO);
-	    return "redirect:/admin/listAllMember";
-	}
-    
-    // === 會員列表 ===
-    @GetMapping("/listAllMember")
-    public String listAllMember(HttpServletRequest request,Model model) {
-    	String mainFragment = "admin/fragments/member/listAllMember";
-    	model.addAttribute("mainFragment", mainFragment);
-    	model.addAttribute("currentURI", request.getRequestURI());
-    	
-    	List<MemberVO> list = memberSvc.getAll();
-        model.addAttribute("memberListData", list);
-        
-    	return "admin/index_admin";
-    } 
-    
-    @GetMapping("/updateMember/{memberId}")
-	public String getUpdateMemberPage(@PathVariable("memberId") Integer memberId,
-	                                  Model model, HttpServletRequest request) {
-	    MemberVO memberVO = memberSvc.getOneMember(memberId);
-	    model.addAttribute("memberVO", memberVO);
-	    model.addAttribute("currentURI", request.getRequestURI());
-	    model.addAttribute("mainFragment", "admin/fragments/member/update_member_input");
-	    return "admin/index_admin";
-	}
+	 // === 會員管理 ===
 	
-    @PostMapping("/update")
-    public String update(@Valid @ModelAttribute("memberVO") MemberVO memberVO,
-                         BindingResult result,
-                         @RequestParam("uploadPic") MultipartFile uploadPic,
-                         ModelMap model, HttpServletRequest request) {
-
-        if (result.hasErrors()) {
-        	System.out.println("error");
-        	result.getAllErrors().forEach(err -> System.out.println(err.toString()));
-            model.addAttribute("memberVO", memberVO);
-            model.addAttribute("currentURI", request.getRequestURI());
-            model.addAttribute("mainFragment", "admin/fragments/member/update_member_input");
-            return "admin/index_admin";
-        }
-
-        try {
-            MemberVO existingMember = memberSvc.getOneMember(memberVO.getMemberId());
-
-            if (uploadPic != null && !uploadPic.isEmpty()) {
-                memberVO.setMemberPic(uploadPic.getBytes());
-            } else {
-                memberVO.setMemberPic(existingMember.getMemberPic());
-            }
-
-            memberSvc.updateMember(memberVO);
-
-        } catch (IOException e) {
-            model.addAttribute("errorMessage", "圖片上傳失敗：" + e.getMessage());
-            model.addAttribute("memberVO", memberVO);
-            model.addAttribute("currentURI", request.getRequestURI());
-            model.addAttribute("mainFragment", "admin/fragments/member/update_member_input");
-            return "admin/index_admin";
-        }
-
-        List<MemberVO> memberList = memberSvc.getAll();
-        model.addAttribute("memberListData", memberList);
-        model.addAttribute("currentURI", request.getRequestURI());
-        model.addAttribute("mainFragment", "admin/fragments/member/listAllMember");
-        return "redirect:/admin/listAllMember";
-    }
-    
-    @PostMapping("/delete")
-    public String delete(@RequestParam("memberId") String memberId,
-                         ModelMap model) {
-        memberSvc.deleteMember(Integer.valueOf(memberId));
-        model.addAttribute("success", "- (刪除成功)");
-        return "redirect:/admin/listAllMember";
-    }
+	 // 查詢頁面
+	 @GetMapping("/select_page")
+	 public String showSelectPage(Model model, HttpServletRequest request) {
+	     List<MemberVO> memberList = memberSvc.getAll();
+	     model.addAttribute("memberListData", memberList);
+	     model.addAttribute("currentURI", request.getRequestURI());
+	     model.addAttribute("mainFragment", "admin/fragments/member/select_page");
+	     return "admin/index_admin";
+	 }
+	
+	 // 查詢 by ID
+	 @PostMapping("/searchById")
+	 public String searchById(@RequestParam("memberId") String memberId,
+	                          Model model, HttpServletRequest request) {
+	     List<MemberVO> memberList = new ArrayList<>();
+	     try {
+	         MemberVO memberVO = memberSvc.getOneMember(Integer.valueOf(memberId));
+	         if (memberVO != null) memberList.add(memberVO);
+	     } catch (NumberFormatException e) {
+	         model.addAttribute("error", "會員編號格式錯誤");
+	     }
+	     model.addAttribute("memberListData", memberList);
+	     model.addAttribute("currentURI", request.getRequestURI());
+	     model.addAttribute("mainFragment", "admin/fragments/member/listAllMember");
+	     return "admin/index_admin";
+	 }
+	
+	 // 查詢 by 姓名
+	 @PostMapping("/searchByName")
+	 public String searchByName(@RequestParam("memberName") String memberName,
+	                            Model model, HttpServletRequest request) {
+	     List<MemberVO> memberList = memberSvc.findByNameLike(memberName);
+	     model.addAttribute("memberListData", memberList);
+	     model.addAttribute("currentURI", request.getRequestURI());
+	     model.addAttribute("mainFragment", "admin/fragments/member/listAllMember");
+	     return "admin/index_admin";
+	 }
+	
+	 // 新增會員畫面
+	 @GetMapping("/addMember")
+	 public String addMember(Model model, HttpServletRequest request) {
+	     model.addAttribute("memberVO", new MemberVO());
+	     model.addAttribute("memberListData", memberSvc.getAll());
+	     model.addAttribute("currentURI", request.getRequestURI());
+	     model.addAttribute("mainFragment", "admin/fragments/member/addMember");
+	     return "admin/index_admin";
+	 }
+	
+	 // 新增會員功能
+	 @PostMapping("/insert")
+	 public String insert(@ModelAttribute("memberVO") @Valid MemberVO memberVO,
+	                      BindingResult result,
+	                      @RequestParam("uploadPic") MultipartFile file,
+	                      Model model) {
+	     if (result.hasErrors()) {
+	         model.addAttribute("memberVO", memberVO);
+	         return "admin/fragments/member/addMember";
+	     }
+	
+	     try {
+	         if (!file.isEmpty()) {
+	             memberVO.setMemberPic(file.getBytes());
+	         }
+	     } catch (IOException e) {
+	         e.printStackTrace();
+	     }
+	
+	     memberSvc.addMember(memberVO);
+	     return "redirect:/admin/listAllMember";
+	 }
+	
+	 // 會員列表
+	 @GetMapping("/listAllMember")
+	 public String listAllMember(Model model, HttpServletRequest request) {
+	     model.addAttribute("memberListData", memberSvc.getAll());
+	     model.addAttribute("currentURI", request.getRequestURI());
+	     model.addAttribute("mainFragment", "admin/fragments/member/listAllMember");
+	     return "admin/index_admin";
+	 }
+	
+	 // 修改會員畫面
+	 @GetMapping("/updateMember/{memberId}")
+	 public String getUpdateMemberPage(@PathVariable("memberId") Integer memberId,
+	                                   Model model, HttpServletRequest request) {
+	     model.addAttribute("memberVO", memberSvc.getOneMember(memberId));
+	     model.addAttribute("currentURI", request.getRequestURI());
+	     model.addAttribute("mainFragment", "admin/fragments/member/update_member_input");
+	     return "admin/index_admin";
+	 }
+	
+	 // 更新會員功能
+	 @PostMapping("/update")
+	 public String update(@Valid @ModelAttribute("memberVO") MemberVO memberVO,
+	                      BindingResult result,
+	                      @RequestParam("uploadPic") MultipartFile uploadPic,
+	                      Model model, HttpServletRequest request) {
+	     if (result.hasErrors()) {
+	         model.addAttribute("memberVO", memberVO);
+	         model.addAttribute("currentURI", request.getRequestURI());
+	         model.addAttribute("mainFragment", "admin/fragments/member/update_member_input");
+	         return "admin/index_admin";
+	     }
+	
+	     try {
+	         MemberVO existingMember = memberSvc.getOneMember(memberVO.getMemberId());
+	
+	         if (uploadPic != null && !uploadPic.isEmpty()) {
+	             memberVO.setMemberPic(uploadPic.getBytes());
+	         } else {
+	             memberVO.setMemberPic(existingMember.getMemberPic());
+	         }
+	
+	         memberSvc.updateMember(memberVO);
+	
+	     } catch (IOException e) {
+	         model.addAttribute("errorMessage", "圖片上傳失敗：" + e.getMessage());
+	         model.addAttribute("memberVO", memberVO);
+	         model.addAttribute("currentURI", request.getRequestURI());
+	         model.addAttribute("mainFragment", "admin/fragments/member/update_member_input");
+	         return "admin/index_admin";
+	     }
+	
+	     return "redirect:/admin/listAllMember";
+	 }
+	
+	 // 刪除會員功能
+	 @PostMapping("/delete")
+	 public String delete(@RequestParam("memberId") String memberId,
+	                      Model model) {
+	     memberSvc.deleteMember(Integer.valueOf(memberId));
+	     model.addAttribute("success", "- (刪除成功)");
+	     return "redirect:/admin/listAllMember";
+	 }
     
     // === 員工管理 ===
     @GetMapping("/staff1")
@@ -744,6 +734,34 @@ public class AdminIndexController {
     	// 添加訂單明細資料到 model 中
     	List<com.shopOrdDet.model.ShopOrdDetVO> list = shopOrdDetSvc.getAll();
     	model.addAttribute("shopOrdDetListData", list);
+    	
+    	// 添加唯一訂單編號清單
+    	Set<Integer> uniqueProdOrdIdList = list.stream()
+    		.map(vo -> vo.getShopOrdVO().getProdOrdId())
+    		.collect(Collectors.toCollection(LinkedHashSet::new));
+    	model.addAttribute("uniqueProdOrdIdList", uniqueProdOrdIdList);
+    	// 添加唯一商品編號清單
+    	Set<Integer> uniqueProductIdList = list.stream()
+    		.map(vo -> vo.getProdVO().getProductId())
+    		.collect(Collectors.toCollection(LinkedHashSet::new));
+    	model.addAttribute("uniqueProductIdList", uniqueProductIdList);
+    	
+    	// 構建 orderToProducts Map
+    	Map<Integer, List<Map<String, Object>>> orderToProducts = new LinkedHashMap<>();
+    	for (com.shopOrdDet.model.ShopOrdDetVO vo : list) {
+    		Integer orderId = vo.getShopOrdVO().getProdOrdId();
+    		Integer productId = vo.getProdVO().getProductId();
+    		String productName = vo.getProdVO().getProductName();
+    		orderToProducts.computeIfAbsent(orderId, k -> new ArrayList<>())
+    			.add(Map.of("productId", productId, "productName", productName));
+    	}
+    	try {
+    		ObjectMapper objectMapper = new ObjectMapper();
+    		String orderToProductsJson = objectMapper.writeValueAsString(orderToProducts);
+    		model.addAttribute("orderToProductsJson", orderToProductsJson);
+    	} catch (Exception e) {
+    		model.addAttribute("orderToProductsJson", "{}");
+    	}
     	
     	// 添加商品資料到 model 中
     	List<com.prod.model.ProdVO> prodList = prodSvc.getAll();

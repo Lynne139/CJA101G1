@@ -283,7 +283,7 @@ function onDateSelected(dateStr) {
 		});
 }
 
-
+//多日區間剩餘間數
 function checkInventoryRange() {
 	if (!selectedCheckIn || !selectedCheckOut) {
 		console.log("尚未選擇完整區間");
@@ -318,5 +318,26 @@ function checkInventoryRange() {
 			console.error("多日查庫存錯誤", error);
 		});
 }
+
+//跳轉到多房型頁面
+document.querySelectorAll('.multi-book-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        goToMultiBooking(roomTypeId);
+    });
+});
+function goToMultiBooking(roomTypeId) {
+    const checkinEl = document.getElementById('checkInDate');
+    const checkoutEl = document.getElementById('checkOutDate');
+    const guests = parseInt(document.getElementById('guestCount').value) || 1;
+    const rooms = parseInt(document.getElementById('roomCount').value) || 1; // 單一房型頁的房間數 input
+    const packagePrice = selectedPackagePrice || 0;  
+
+    const checkin = checkinEl ? checkinEl.textContent.trim() : "";
+    const checkout = checkoutEl ? checkoutEl.textContent.trim() : "";
+
+    let url = `/bookMulti?checkin=${checkin}&checkout=${checkout}&guests=${guests}&package=${packagePrice}&rooms_${roomTypeId}=${rooms}&guests_${roomTypeId}=${guests}`;
+    window.location.href = url;
+}
+
 
 

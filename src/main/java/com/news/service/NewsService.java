@@ -32,4 +32,8 @@ public class NewsService {
     public List<News> findByIsDisplayTrue() {
         return repo.findByIsDisplayTrue();
     }
+
+    public Optional<News> findLatestDisplay() {
+        return repo.findFirstByIsDisplayTrueOrderByPublishedDateDesc();
+    }
 } 

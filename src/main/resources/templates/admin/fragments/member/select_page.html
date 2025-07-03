@@ -39,12 +39,12 @@
       </div>
     </form>
 
-    <!-- 查詢會員姓名（下拉式選單） -->
+    <!-- 查詢會員名稱（下拉式選單） -->
     <form th:action="@{/admin/searchByName}" method="post">
       <div class="mb-3">
-        <label for="selectMemberName" class="form-label">會員姓名（下拉）</label>
+        <label for="selectMemberName" class="form-label">會員名稱（下拉）</label>
         <select class="form-select" id="selectMemberName" name="memberName">
-          <option value="">請選擇會員姓名</option>
+          <option value="">請選擇會員名稱</option>
           <option th:each="m : ${memberListData}" th:value="${m.memberName}" th:text="${m.memberName}"></option>
         </select>
       </div>
@@ -53,11 +53,11 @@
       </div>
     </form>
 
-    <!-- 查詢會員姓名（手動輸入） -->
+    <!-- 查詢會員名稱（手動輸入） -->
     <form th:action="@{/admin/searchByName}" method="post">
       <div class="mb-3">
-        <label for="inputMemberName" class="form-label">會員姓名（手動輸入）</label>
-        <input type="text" class="form-control" id="inputMemberName" name="memberName" placeholder="請輸入會員姓名">
+        <label for="inputMemberName" class="form-label">會員名稱（手動輸入）</label>
+        <input type="text" class="form-control" id="inputMemberName" name="memberName" placeholder="請輸入會員名稱">
       </div>
       <div class="d-grid mb-3">
         <button type="submit" class="btn btn-success">查詢</button>
