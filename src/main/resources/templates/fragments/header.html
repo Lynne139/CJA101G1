@@ -6,7 +6,15 @@
     <div class="d-flex">
       <div class="d-flex align-items-center gap-3">
         <a href="#" id="menu-Toggle" class="ml-lg-3">☰ MENU</a>
-        <span class="mx-3"></span>
+        <span class="mx-2"></span>
+
+		<!-- 通知鈴鐺 -->
+		<div class="notification-bell position-relative" id="notificationBell">
+		    <i class="fa-solid fa-bell fa-lg text-warning"></i>
+		    <span class="notification-badge" id="notificationBadge">3</span>
+		</div>
+
+		<span class="mx-2"></span>
         <img th:src="@{/images/icon/member.svg}" alt="member" class="logo-header" />
 
 <!-- 登入/登出切換區 -->
@@ -17,6 +25,7 @@
 </div>
 
 <div th:if="${loggedInMember != null}">
+	<span class="mx-1"></span>
     <span th:text="'歡迎，' + ${loggedInMember.memberName} + '！'" class="me-2"></span>
     <a th:href="@{/member/logout}" class="btn btn-link p-0 m-0 text-dark text-decoration-none">
         會員登出
@@ -73,17 +82,13 @@
 						</div>
 					</form>
 		
-		
 		        </div>
 		      </div>
 
 		    </div>
 		  </div>
 		</div>
-		
-		
-			
-			
+				
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -281,5 +286,30 @@
             max-width: 50%;
           }
         }
+        
+		/* 給小鈴鐺的CSS */
+        .notification-bell {
+		    position: relative;
+		    cursor: pointer;
+		    transition: all 0.3s ease;
+		}
+		
+		.notification-badge {
+		    position: absolute;
+		    top: -8px;
+		    right: -8px;
+		    background-color: #dc3545;
+		    color: white;
+		    border-radius: 4px; /* 圓形的話用50% */
+		    padding: 2px 6px;
+		    font-size: 12px;
+		    font-weight: bold;
+		    min-width: 18px;
+		    height: 18px;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    animation: pulse 2s infinite;
+		}
     </style>
 </header>
