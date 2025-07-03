@@ -363,3 +363,50 @@ document.querySelectorAll('.room-select').forEach(select => {
 		updateTotalGuests();
 	});
 });
+
+document.getElementById('bookBtn').addEventListener('click', function() {
+	if (!selectedCheckIn || !selectedCheckOut) {
+	        alert('請選擇入住和退房日期');
+	        return;
+	    }
+
+	    alert('預訂成功！接下來將導向填寫入住資料頁面。');
+	
+    const form = document.getElementById('confirmForm');
+    
+    // 設定日期與總人數
+    form.querySelector('input[name="checkin"]').value = document.getElementById('checkin').value;
+    form.querySelector('input[name="checkout"]').value = document.getElementById('checkout').value;
+    form.querySelector('input[name="guests"]').value = document.getElementById('guestCount').value;
+
+    // 多房型 - 房數
+    document.querySelectorAll('.room-select').forEach(select => {
+        const id = select.dataset.id;
+        let input = document.createElement("input");
+        input.type = "hidden";
+        input.name = `rooms_${id}`;
+        input.value = select.value;
+        form.appendChild(input);
+    });
+
+    // 多房型 - 各別人數
+    document.querySelectorAll('.guest-select').forEach(select => {
+        const id = select.dataset.id;
+        let input = document.createElement("input");
+        input.type = "hidden";
+        input.name = `guests_${id}`;
+        input.value = select.value;
+        form.appendChild(input);
+    });
+
+    // 加購專案
+    if (selectedPackagePrice > 0) {
+        let input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "package";
+        input.value = selectedPackagePrice;
+        form.appendChild(input);
+    }
+
+    form.submit();
+});

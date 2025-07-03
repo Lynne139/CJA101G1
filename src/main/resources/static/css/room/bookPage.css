@@ -1,0 +1,320 @@
+body {
+	font-family: "Helvetica Neue", sans-serif;
+	background-color: #F4EDE1 !important;
+	margin: 0;
+	padding: 0;
+}
+
+.container-fluid {
+	background-color: #F4EDE1;
+	min-height: 100vh;
+	padding: 40px 20px;
+}
+
+.booking-header {
+	text-align: center;
+	margin-bottom: 40px;
+	padding: 20px 0;
+	border-bottom: 3px solid #7E4E24;
+}
+
+.booking-title {
+	font-size: 2.5rem;
+	font-weight: bold;
+	color: #7E4E24;
+	margin-bottom: 10px;
+	letter-spacing: 0.1em;
+}
+
+.booking-subtitle {
+	font-size: 1.1rem;
+	color: #7E4E24;
+	opacity: 0.8;
+}
+
+.main-content {
+	max-width: 1400px;
+	margin: 0 auto;
+}
+
+/* 左側房型資訊卡片 */
+.booking-summary {
+	background: #fff;
+	border-radius: 15px;
+	box-shadow: 0 4px 15px rgba(126, 78, 36, 0.1);
+	padding: 30px;
+	margin-top: 0;
+	margin-bottom: 30px;
+	border: 2px solid #E8DCC8;
+}
+
+.summary-header {
+	font-size: 1.4rem;
+	font-weight: bold;
+	color: #7E4E24;
+	margin-bottom: 25px;
+	padding-bottom: 15px;
+	border-bottom: 2px solid #F4EDE1;
+	display: flex;
+	align-items: center;
+}
+
+.summary-icon {
+	width: 24px;
+	height: 24px;
+	margin-right: 10px;
+	background: #7E4E24;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+.room-card {
+	background: #F4EDE1;
+	border-radius: 10px;
+	padding: 20px;
+	margin-bottom: 20px;
+	border-left: 4px solid #7E4E24;
+}
+
+.room-name {
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: #7E4E24;
+	margin-bottom: 10px;
+}
+
+.room-details {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	text-align: left;
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+.room-info {
+	color: #7E4E24;
+	opacity: 0.9;
+}
+
+.room-price {
+	font-size: 1.1rem;
+	font-weight: bold;
+	color: #B88D67;
+}
+
+.booking-dates {
+	background: #fff;
+	border-radius: 10px;
+	padding: 20px;
+	margin-bottom: 20px;
+	border: 1px solid #E8DCC8;
+}
+
+.date-info {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 10px;
+	color: #7E4E24;
+}
+
+.total-section {
+	background: #7E4E24;
+	color: #fff;
+	border-radius: 10px;
+	padding: 20px;
+	text-align: center;
+}
+
+.total-amount {
+	font-size: 1.8rem;
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+/* 右側表單 */
+.booking-form {
+	background: #fff;
+	border-radius: 15px;
+	box-shadow: 0 4px 15px rgba(126, 78, 36, 0.1);
+	padding: 30px;
+	border: 2px solid #E8DCC8;
+}
+
+.form-section {
+	margin-bottom: 30px;
+}
+
+.section-title {
+	font-size: 1.3rem;
+	font-weight: bold;
+	color: #7E4E24;
+	margin-bottom: 20px;
+	padding-bottom: 10px;
+	border-bottom: 2px solid #F4EDE1;
+}
+
+.form-label {
+	color: #7E4E24;
+	font-weight: 600;
+	margin-bottom: 8px;
+}
+
+.form-control, .form-select {
+	border: 2px solid #E8DCC8;
+	border-radius: 8px;
+	padding: 12px 15px;
+	font-size: 1rem;
+	transition: border-color 0.3s;
+}
+
+.form-control:focus, .form-select:focus {
+	border-color: #7E4E24;
+	box-shadow: 0 0 0 0.2rem rgba(126, 78, 36, 0.2);
+}
+
+.required {
+	color: #d32f2f;
+}
+
+.form-check {
+	margin: 15px 0;
+}
+
+.form-check-input:checked {
+	background-color: #7E4E24;
+	border-color: #7E4E24;
+}
+
+.form-check-label {
+	color: #7E4E24;
+	margin-left: 8px;
+}
+
+.btn-primary {
+	background-color: #7E4E24;
+	border-color: #7E4E24;
+	padding: 15px 40px;
+	font-size: 1.1rem;
+	font-weight: bold;
+	border-radius: 8px;
+	letter-spacing: 0.1em;
+	transition: all 0.3s;
+}
+
+.btn-primary:hover {
+	background-color: #5a3c1a;
+	border-color: #5a3c1a;
+	transform: translateY(-2px);
+}
+
+.btn-secondary {
+	background-color: transparent;
+	border: 2px solid #7E4E24;
+	color: #7E4E24;
+	padding: 15px 40px;
+	font-size: 1.1rem;
+	font-weight: bold;
+	border-radius: 8px;
+	letter-spacing: 0.1em;
+	transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+	background-color: #7E4E24;
+	color: #fff;
+}
+
+.button-group {
+	display: flex;
+	gap: 15px;
+	justify-content: center;
+	margin-top: 30px;
+}
+
+/* 響應式設計 */
+@media ( max-width : 991px) {
+	.booking-title {
+		font-size: 1.8rem;
+	}
+	.main-content {
+		padding: 0 10px;
+	}
+	.booking-summary, .booking-form {
+		padding: 20px;
+		margin-bottom: 20px;
+	}
+	.button-group {
+		flex-direction: column;
+	}
+	.btn-primary, .btn-secondary {
+		width: 100%;
+		margin-bottom: 10px;
+	}
+}
+
+/* 步驟指示器 */
+.progress-steps {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 30px;
+}
+
+.step {
+	display: flex;
+	align-items: center;
+	color: #B88D67;
+	font-weight: 600;
+}
+
+.step.active {
+	color: #7E4E24;
+}
+
+.step-number {
+	width: 35px;
+	height: 35px;
+	border-radius: 50%;
+	background: #E8DCC8;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 10px;
+	font-weight: bold;
+}
+
+.step.active .step-number {
+	background: #7E4E24;
+	color: #fff;
+}
+
+.step-divider {
+	width: 50px;
+	height: 2px;
+	background: #E8DCC8;
+	margin: 0 20px;
+}
+
+.captcha-section {
+	background: #F4EDE1;
+	border-radius: 8px;
+	padding: 15px;
+	text-align: center;
+	margin: 20px 0;
+}
+
+.captcha-input {
+	display: inline-block;
+	width: 120px;
+	margin-right: 10px;
+}
+
+.captcha-code {
+	background: #7E4E24;
+	color: #fff;
+	padding: 8px 15px;
+	border-radius: 5px;
+	font-weight: bold;
+	letter-spacing: 2px;
+	cursor: pointer;
+}

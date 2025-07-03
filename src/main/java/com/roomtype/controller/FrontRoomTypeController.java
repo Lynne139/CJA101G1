@@ -126,7 +126,7 @@ public class FrontRoomTypeController {
 	        return "redirect:/roomtypes/list"; // 或首頁
 	    }
 	    model.addAttribute("roomType", roomType);
-	    return "front-end/room/roomTypeCalendar";
+	    return "front-end/room/bookSingle";
 	}
 //  ====剩餘間數顯示於小日曆上=====	
 	@GetMapping("/roomtype/{roomTypeId}/inventory-map")

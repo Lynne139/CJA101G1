@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Maison d’Yuko - 訂房</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://npmcdn.com/flatpickr/dist/l10n/zh_tw.js"></script>
 <link
@@ -13,7 +14,7 @@
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
-<link rel="stylesheet" th:href="@{/css/room/roomtypeorder.css}">
+<link rel="stylesheet" th:href="@{/css/room/bookSingle.css}">
 <link rel="stylesheet" th:href="@{/css/room/bookMulti.css}">
 
 </head>
@@ -130,6 +131,11 @@
 					</div>
 				</div>
 
+				<form id="confirmForm" action="/orderInfo" method="post">
+					<input type="hidden" name="checkin">
+					<input type="hidden" name="checkout">
+					<input type="hidden" name="guests">
+				</form>
 				<button class="btn-book" id="bookBtn" disabled>確認預訂</button>
 			</div>
 		</div>

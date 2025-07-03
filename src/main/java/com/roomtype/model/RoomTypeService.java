@@ -88,6 +88,7 @@ public class RoomTypeService {
 			newData.setRoomTypeName(roomTypeVO.getRoomTypeName());
 			newData.setRoomTypeAmount(roomTypeVO.getRoomTypeAmount());
 			newData.setRoomTypeContent(roomTypeVO.getRoomTypeContent());
+			newData.setGuestNum(roomTypeVO.getGuestNum());
 			newData.setRoomSaleStatus(roomTypeVO.getRoomSaleStatus());
 			newData.setRoomTypePrice(roomTypeVO.getRoomTypePrice());
 		}
