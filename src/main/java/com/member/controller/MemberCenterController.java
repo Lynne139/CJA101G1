@@ -9,7 +9,7 @@ import com.member.model.MemberService;
 import com.member.model.MemberVO;
 
 import jakarta.servlet.http.HttpSession;
-
+ 
 @Controller
 @RequestMapping("/member")
 public class MemberCenterController {
