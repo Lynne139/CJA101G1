@@ -283,8 +283,8 @@ public class ProdCartController {
 		// 檢查登入狀態，session key 改為 loggedInMember
 		com.member.model.MemberVO member = (com.member.model.MemberVO) session.getAttribute("loggedInMember");
 		if (member == null) {
-			// 未登入，導向登入頁
-			return "redirect:/login";
+			// 未登入，導向商城頁並彈出登入 modal
+			return "redirect:/front-end/shop#loginModal";
 		}
 		ProdCartVO cart = new ProdCartVO();
 		ProdMemberIdVO pmid = new ProdMemberIdVO();
