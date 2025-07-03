@@ -269,8 +269,10 @@ document.addEventListener("DOMContentLoaded", function () {
 			  // 依 新增/編輯 決定 placeholder
 			  const initialSeats = seatsInput.getAttribute('data-initial') || 0;
 			  // 判斷是否是編輯模式（有初始值且不為空）
-			  const isEditMode = !isNaN(initialSeats) && initialSeats > 0;
-
+			  const isEditMode = !Number.isNaN(initialSeats)
+			                     && initialSeats > 0
+			                     && !!document.getElementById("btnSubmitEditSave");
+								 
 			  if (isEditMode) {
 			        seatsInput.placeholder =
 			          `請輸入人數 (扣除您已預定的 ${initialSeats} 位，剩餘 ${remaining} 位)`;
