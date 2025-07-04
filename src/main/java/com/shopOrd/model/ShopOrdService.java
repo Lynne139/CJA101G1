@@ -26,6 +26,7 @@ import com.shopOrdDet.model.ShopOrdDetIdVO;
 import com.shopOrdDet.model.ShopOrdDetRepository;
 import com.shopOrdDet.model.ShopOrdDetVO;
 import com.member.model.MemberService;
+import com.notification.service.NotificationService;
 
 @Service("shopOrdService")
 public class ShopOrdService {
@@ -50,6 +51,9 @@ public class ShopOrdService {
 
 	@Autowired
 	private MemberService memberService;
+	
+	@Autowired
+	private NotificationService notificationService;
 
 	public void updateShopOrd(ShopOrdVO shopOrdVO) {
 		ShopOrdVO dbOrder = repository.findById(shopOrdVO.getProdOrdId()).orElse(null);
@@ -232,6 +236,12 @@ public class ShopOrdService {
 		if (memberId != null && (total - discount) > 0) {
 			memberService.updateConsumptionAndLevelAndPoints(memberId, total - discount);
 		}
+		
+		// 7. 建立訂單通知
+		String notificationTitle = "訂單建立成功";
+		String notificationContent = String.format("您的訂單 #%d 已成功建立，總金額：NT$ %d", 
+			savedOrder.getProdOrdId(), total - discount);
+		notificationService.createNotification(memberId, notificationTitle, notificationContent);
 	}
 
 	/**
@@ -303,6 +313,14 @@ public class ShopOrdService {
 		if (memberId != null && actualAmount > 0) {
 			memberService.updateConsumptionAndLevelAndPoints(memberId, actualAmount);
 		}
+		
+		// 8. 建立訂單通知
+		if (memberId != null) {
+			String notificationTitle = "訂單建立成功";
+			String notificationContent = String.format("您的訂單 #%d 已成功建立，總金額：NT$ %d", 
+				savedOrder.getProdOrdId(), actualAmount);
+			notificationService.createNotification(memberId, notificationTitle, notificationContent);
+		}
 	}
 
 	/**
@@ -337,11 +355,19 @@ public class ShopOrdService {
 		}
 
 		// 4. 儲存訂單主檔
-		repository.save(shopOrdVO);
+		ShopOrdVO savedOrder = repository.save(shopOrdVO);
 		// 新增：更新會員消費與點數
 		Integer memberId = shopOrdVO.getMemberVO() != null ? shopOrdVO.getMemberVO().getMemberId() : null;
 		if (memberId != null && shopOrdVO.getActualPaymentAmount() != null && shopOrdVO.getActualPaymentAmount() > 0) {
 			memberService.updateConsumptionAndLevelAndPoints(memberId, shopOrdVO.getActualPaymentAmount());
+		}
+		
+		// 5. 建立訂單通知
+		if (memberId != null && savedOrder.getProdOrdId() != null) {
+			String notificationTitle = "訂單建立成功";
+			String notificationContent = String.format("您的訂單 #%d 已成功建立，總金額：NT$ %d", 
+				savedOrder.getProdOrdId(), savedOrder.getActualPaymentAmount());
+			notificationService.createNotification(memberId, notificationTitle, notificationContent);
 		}
 	}
 
@@ -444,6 +470,12 @@ public class ShopOrdService {
 		if (memberId != null && (total - discount) > 0) {
 			memberService.updateConsumptionAndLevelAndPoints(memberId, total - discount);
 		}
+		
+		// 7. 建立訂單通知
+		String notificationTitle = "LINE Pay 付款成功";
+		String notificationContent = String.format("您的訂單 #%d 已透過 LINE Pay 付款成功，總金額：NT$ %d", 
+			savedOrder.getProdOrdId(), total - discount);
+		notificationService.createNotification(memberId, notificationTitle, notificationContent);
 	}
 
 }
