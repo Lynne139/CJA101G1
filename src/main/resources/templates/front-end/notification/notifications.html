@@ -287,7 +287,7 @@
         html += `
           <div id="notification-${n.notificationId}" 
                class="notification-item ${n.isRead ? 'read' : 'unread'}"
-               onclick="markAsRead(${n.notificationId})">
+            	   onclick="markAsRead(${n.notificationId}); UpdateUnreadCount();">
             <div class="notification-content">
               <div class="notification-title">
                 ${n.title}${unreadBadge}
@@ -375,7 +375,33 @@
           alert("設為已讀失敗，請稍後再試");
         });
     }
-
+    
+    // 更新小鈴鐺數字
+    function UpdateUnreadCount() {
+    	setTimeout(() => { // 為了先等DB改完數字，再去讀取
+	        // 呼叫 API 取得未讀訊息數量
+	        fetch(`/api/notifications/unread-count`)
+	            .then(response => {
+	                if (!response.ok) throw new Error('Network response was not ok');
+	                return response.json();  // 後端API回傳 long 型數字的話通常會是 JSON 格式
+	            })
+	            .then(unreadCount => {
+	                const badge = document.getElementById('notificationBadge');
+	                if (badge) {
+	                    if (unreadCount > 0) {
+	                        badge.textContent = unreadCount;
+	                        badge.style.display = 'flex';  // 顯示數字徽章
+	                    } else {
+	                        badge.style.display = 'none';  // 沒有未讀訊息就隱藏徽章
+	                    }
+	                }
+	            })
+	            .catch(error => {
+	                console.error('取得未讀訊息數量失敗:', error);
+	            });
+    	}, 500); // 延遲 500 毫秒
+    }
+    
     // 顯示載入動畫
     function showLoading() {
       $('#loadingContainer').show();

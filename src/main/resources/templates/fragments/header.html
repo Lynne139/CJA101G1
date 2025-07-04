@@ -1,4 +1,6 @@
 <header th:fragment="header" class="d-flex justify-content-between align-items-center p-3">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
      /* 讓 overlay-menu-col 橫向排列且寬度平均，且不換行 */
      .overlay-menu-row {
@@ -88,31 +90,33 @@
       <div class="d-flex align-items-center gap-3">
         <a href="#" id="menu-Toggle" class="ml-lg-3">☰ MENU</a>
         <span class="mx-2"></span>
-
 		<!-- 通知鈴鐺 -->
-		<div th:if="${loggedInMember != null}" class="notification-bell position-relative" id="notificationBell">
-		    <i class="fa-solid fa-bell fa-lg"></i>
-		    <span class="notification-badge" id="notificationBadge"></span>
+		<div th:if="${loggedInMember != null}">
+		    <div class="notification-bell position-relative" id="notificationBell"
+		         title="查看所有通知"
+		         onclick="window.location.href='/members/notifications'">
+		        <i class="fa-solid fa-bell fa-lg"></i>
+		        <span class="notification-badge" id="notificationBadge" style="display: none;"></span>
+		    </div>
 		</div>
-
 		<span class="mx-2"></span>
+		<!-- 半身人像 -->
         <img th:src="@{/images/icon/member.svg}" alt="member" class="logo-header" />
-
-<!-- 登入/登出切換區 -->
-<div th:if="${loggedInMember == null}">
-    <button type="button" class="btn btn-link p-0 m-0 text-dark text-decoration-none" style="color: #7E4E24 !important;" data-bs-toggle="modal" data-bs-target="#loginModal">
-        會員登入
-    </button>
-</div>
-
-<div th:if="${loggedInMember != null}">
-	<span class="mx-1"></span>
-    <span th:text="'歡迎，' + ${loggedInMember.memberName} + '！'" class="me-2" style="color: #7E4E24;"></span>
-    <a th:href="@{/member/center}" class="btn btn-outline-primary btn-sm me-2">會員中心</a>
-    <a th:href="@{/member/logout}" class="btn btn-link p-0 m-0 text-dark text-decoration-none" style="color: #7E4E24 !important;">
-        會員登出
-    </a>
-</div>
+		<!-- 登入前顯示 -->
+		<div th:if="${loggedInMember == null}">
+		    <button type="button" class="btn btn-link p-0 m-0 text-dark text-decoration-none" style="color: #7E4E24 !important;" data-bs-toggle="modal" data-bs-target="#loginModal">
+		        會員登入
+		    </button>
+		</div>
+		<!-- 登入後顯示 -->
+		<div th:if="${loggedInMember != null}">
+			<span class="mx-1"></span>
+		    <span th:text="'歡迎，' + ${loggedInMember.memberName} + '！'" class="me-2" style="color: #7E4E24;"></span>
+		    <a th:href="@{/member/center}" class="btn btn-outline-primary btn-sm me-2">會員中心</a>
+		    <a th:href="@{/member/logout}" class="btn btn-link p-0 m-0 text-dark text-decoration-none" style="color: #7E4E24 !important;">
+		        會員登出
+		    </a>
+		</div>
 
 		<!-- 登入Modal區塊 -->
 		<div th:class="'modal fade' + (${error} != null ? ' show d-block' : '')"
@@ -314,18 +318,17 @@
         });
       });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 	<script th:inline="javascript">
-		// 載入頁面時更新未讀通知數量
-	    var memberId = [[${loggedInMember != null} ? ${loggedInMember.memberId} : 'null']];
-	
+		// 載入頁面時更新未讀通知數量(會顯示在小鈴鐺旁)
 	    document.addEventListener('DOMContentLoaded', function () {
-	
+	    	var memberId = /*[[${loggedInMember != null} ? ${loggedInMember.memberId} : 'null']]*/ null;
 	        if (!memberId) {
 	            // 沒登入會員，不執行 API 呼叫
 	            console.log('未登入會員，不更新未讀數量');
 	            return;
 	        }
-	
 	        // 呼叫 API 取得未讀訊息數量
 	        fetch(`/api/notifications/unread-count`)
 	            .then(response => {
@@ -346,6 +349,37 @@
 	            .catch(error => {
 	                console.error('取得未讀訊息數量失敗:', error);
 	            });
+	    });
+		
+		// 建立 WebSocket 連線
+	    document.addEventListener('DOMContentLoaded', function () {
+	        var memberId = /*[[${loggedInMember != null} ? ${loggedInMember.memberId} : 'null']]*/ null;
+	        if (!memberId) {
+	            console.log('未登入會員，不建立 WebSocket');
+	            return;
+	        }
+	        var socket = new SockJS('/ws-notifications');
+	        var stompClient = Stomp.over(socket);
+	        stompClient.connect({}, function (frame) {
+	            console.log('WebSocket 連線成功：' + frame);
+	            // 訂閱該會員的通知推播路徑
+	            stompClient.subscribe('/user/queue/notifications', function (message) {
+	                if (message.body) {
+	                    const unreadCount = parseInt(message.body, 10);
+	                    const badge = document.getElementById('notificationBadge');
+	                    if (badge) {
+	                        if (unreadCount > 0) {
+	                            badge.textContent = unreadCount;
+	                            badge.style.display = 'flex';
+	                        } else {
+	                            badge.style.display = 'none';
+	                        }
+	                    }
+	                }
+	            });
+	        }, function (error) {
+	            console.error('WebSocket 錯誤：', error);
+	        });
 	    });
 	</script>
 </header>
