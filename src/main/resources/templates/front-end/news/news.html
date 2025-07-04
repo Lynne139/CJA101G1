@@ -22,6 +22,9 @@
             padding: 24px;
             gap: 32px;
         }
+        .news-card.no-image {
+            gap: 0;
+        }
         .news-img img {
             width: 200px;
             height: 140px;
@@ -30,6 +33,9 @@
             border: 1.5px solid #ccc;
             box-shadow: 0 2px 8px #0001;
             background: #f8f8f8;
+        }
+        .news-img.hidden {
+            display: none;
         }
         .news-content {
             flex: 1;
@@ -124,14 +130,13 @@
         </div>
         <h2>媒體報導</h2>
         <div class="news-list">
-            <div class="news-card" th:each="news : ${newsList}">
-                <div class="news-img">
+            <div class="news-card" th:each="news : ${newsList}"
+                 th:classappend="${news.newsPhoto == null or #arrays.length(news.newsPhoto) == 0} ? 'no-image' : ''">
+                <div class="news-img"
+                     th:classappend="${news.newsPhoto == null or #arrays.length(news.newsPhoto) == 0} ? 'hidden' : ''">
                     <img th:if="${news.newsPhoto != null and #arrays.length(news.newsPhoto) > 0}"
                          th:src="@{/admin/news/image/{id}(id=${news.newsNo})}"
                          alt="媒體圖片"/>
-                    <img th:if="${news.newsPhoto == null or #arrays.length(news.newsPhoto) == 0}"
-                         th:src="@{/images/no_img.svg}"
-                         alt="無圖片"/>
                 </div>
                 <div class="news-content">
                     <div class="news-title" th:text="${news.title}"></div>
