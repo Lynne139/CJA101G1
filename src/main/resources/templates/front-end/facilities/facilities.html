@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>設施介紹 - Maison d'Yuko</title>
+
+  <!-- ✅ global CSS -->
+  <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- ✅ 設施介紹專用 CSS -->
+  <style>
+    .facilities-section {
+      background: #F4EDE1;
+      padding: 60px 0;
+    }
+
+    .facilities-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .facilities-title {
+      font-size: 2.8rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: #7E4E24;
+      text-align: center;
+    }
+
+    .facilities-subtitle {
+      font-size: 1.2rem;
+      color: #7E4E24;
+      text-align: center;
+      margin-bottom: 3rem;
+      opacity: 0.8;
+    }
+
+    .facility-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 3rem;
+      box-shadow: 0 8px 30px rgba(126, 78, 36, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .facility-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(126, 78, 36, 0.2);
+    }
+
+    .facility-image {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .facility-card:hover .facility-image {
+      transform: scale(1.05);
+    }
+
+    .facility-content {
+      padding: 2rem;
+    }
+
+    .facility-name {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #7E4E24;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .facility-icon {
+      font-size: 1.5rem;
+      color: #B88D67;
+      margin-right: 0.8rem;
+    }
+
+    .facility-description {
+      color: #666;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .facility-features {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .facility-features li {
+      color: #7E4E24;
+      margin-bottom: 0.5rem;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+
+    .facility-features li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #B88D67;
+      font-weight: bold;
+    }
+
+    .facility-hours {
+      background: #faf8f5;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      border-left: 4px solid #B88D67;
+    }
+
+    .hours-title {
+      font-weight: bold;
+      color: #7E4E24;
+      margin-bottom: 0.5rem;
+    }
+
+    .hours-info {
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .special-card {
+      background: linear-gradient(135deg, #7E4E24, #B88D67);
+      color: white;
+    }
+
+    .special-card .facility-name {
+      color: white;
+    }
+
+    .special-card .facility-description {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .special-card .facility-features li {
+      color: white;
+    }
+
+    .special-card .facility-features li:before {
+      color: #ffcc99;
+    }
+
+    .special-card .facility-hours {
+      background: rgba(255, 255, 255, 0.1);
+      border-left-color: #ffcc99;
+    }
+
+    .special-card .hours-title {
+      color: white;
+    }
+
+    .special-card .hours-info {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .booking-section {
+      background: #7E4E24;
+      color: white;
+      padding: 3rem;
+      border-radius: 20px;
+      margin-top: 3rem;
+      text-align: center;
+    }
+
+    .booking-title {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .booking-description {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+
+    .booking-contact {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .contact-item i {
+      font-size: 1.2rem;
+    }
+
+    @media (max-width: 768px) {
+      .facilities-title {
+        font-size: 2rem;
+      }
+
+      .facility-content {
+        padding: 1.5rem;
+      }
+
+      .facility-name {
+        font-size: 1.5rem;
+      }
+
+      .booking-contact {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ header -->
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <!-- ✅ 子選單 Navbar -->
+  <nav class="sub-navbar d-flex justify-content-center align-items-center">
+    <ul class="nav">
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">關於嶼蔻</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" th:href="@{/front-end/about/brand-story}">品牌故事</a></li>
+          <li><a class="dropdown-item" th:href="@{/front-end/about/environment}">環境簡介</a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">最新消息</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" th:href="@{/news/notice}">最新公告</a></li>
+          <li><a class="dropdown-item" th:href="@{/news/promotion}">活動通知</a></li>
+          <li><a class="dropdown-item" th:href="@{/news/news}">媒體報導</a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle active" href="javascript:void(0);" tabindex="0">探索嶼蔻</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">珍饈美饌</a></li>
+          <li><a class="dropdown-item active" th:href="@{/facilities}">多元設施</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a class="nav-link" href="#rooms">精緻客房</a></li>
+      <li class="nav-item"><a class="nav-link" th:href="@{/traffic}">交通資訊</a></li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">聯絡我們</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" th:href="@{/contact}">聯絡客服</a></li>
+          <li><a class="dropdown-item" th:href="@{/chatbot}">智慧客服</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a class="nav-link" href="#faq">常見問題</a></li>
+    </ul>
+  </nav>
+
+  <!-- ✅ Main Content -->
+  <section class="facilities-section">
+    <div class="container facilities-container">
+      <h1 class="facilities-title">多元設施</h1>
+      <p class="facilities-subtitle">享受頂級度假體驗，放鬆身心靈的完美空間</p>
+
+      <!-- 健身房 -->
+      <div class="facility-card">
+        <div class="row g-0">
+          <div class="col-md-6">
+            <img th:src="@{/images/健身房.png}" alt="健身房" class="facility-image">
+          </div>
+          <div class="col-md-6">
+            <div class="facility-content">
+              <h2 class="facility-name">
+                <i class="fas fa-dumbbell facility-icon"></i>
+                健身房
+              </h2>
+              <p class="facility-description">
+                配備國際級健身器材，提供完整的重量訓練與有氧運動設備。寬敞明亮的空間設計，讓您在度假期間也能維持最佳體態。
+              </p>
+              <ul class="facility-features">
+                <li>專業重量訓練設備</li>
+                <li>跑步機、橢圓機等有氧器材</li>
+                <li>免費毛巾及飲用水服務</li>
+                <li>專業健身教練諮詢</li>
+                <li>更衣室及置物櫃</li>
+              </ul>
+              <div class="facility-hours">
+                <div class="hours-title">開放時間</div>
+                <div class="hours-info">每日 06:00 - 22:00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 瑜珈室 -->
+      <div class="facility-card">
+        <div class="row g-0">
+          <div class="col-md-6 order-md-2">
+            <img th:src="@{/images/瑜珈室.png}" alt="瑜珈室" class="facility-image">
+          </div>
+          <div class="col-md-6 order-md-1">
+            <div class="facility-content">
+              <h2 class="facility-name">
+                <i class="fas fa-leaf facility-icon"></i>
+                瑜珈室
+              </h2>
+              <p class="facility-description">
+                寧靜舒適的瑜珈空間，配備專業瑜珈墊與道具。透過落地窗欣賞海景，在呼吸吐納間找到內心平靜。
+              </p>
+              <ul class="facility-features">
+                <li>專業瑜珈墊及輔助道具</li>
+                <li>海景落地窗設計</li>
+                <li>定期瑜珈課程</li>
+                <li>冥想靜心空間</li>
+                <li>淨化空氣系統</li>
+              </ul>
+              <div class="facility-hours">
+                <div class="hours-title">開放時間</div>
+                <div class="hours-info">每日 07:00 - 21:00<br>團體課程：週一至週日 08:00 & 18:00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPA (特殊卡片) -->
+      <div class="facility-card special-card">
+        <div class="row g-0">
+          <div class="col-md-6">
+            <img th:src="@{/images/SPA.png}" alt="SPA" class="facility-image">
+          </div>
+          <div class="col-md-6">
+            <div class="facility-content">
+              <h2 class="facility-name">
+                <i class="fas fa-spa facility-icon"></i>
+                頂級 SPA
+              </h2>
+              <p class="facility-description">
+                奢華的 SPA 體驗空間，提供專業芳療服務與按摩療程。在輕柔的音樂與香氛中，讓專業芳療師為您釋放疲憊，重獲活力。
+              </p>
+              <ul class="facility-features">
+                <li>頂級芳療精油按摩</li>
+                <li>熱石療法與深層放鬆</li>
+                <li>臉部美容護理</li>
+                <li>夫妻雙人 SPA 套房</li>
+                <li>私人專屬服務</li>
+              </ul>
+              <div class="facility-hours">
+                <div class="hours-title">營業時間</div>
+                <div class="hours-info">每日 10:00 - 20:00<br>需提前預約</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 多媒體影音室 -->
+      <div class="facility-card">
+        <div class="row g-0">
+          <div class="col-md-6 order-md-2">
+            <img th:src="@{/images/多媒體影音室.png}" alt="多媒體影音室" class="facility-image">
+          </div>
+          <div class="col-md-6 order-md-1">
+            <div class="facility-content">
+              <h2 class="facility-name">
+                <i class="fas fa-film facility-icon"></i>
+                多媒體影音室
+              </h2>
+              <p class="facility-description">
+                私人電影院級的觀影體驗，配備 4K 投影設備與環繞音響系統。舒適的座椅配置，適合家庭聚會或情侶約會。
+              </p>
+              <ul class="facility-features">
+                <li>4K 超高清投影設備</li>
+                <li>杜比環繞音響系統</li>
+                <li>豪華皮質沙發座椅</li>
+                <li>Netflix、HBO 等串流平台</li>
+                <li>免費爆米花與飲品</li>
+              </ul>
+              <div class="facility-hours">
+                <div class="hours-title">開放時間</div>
+                <div class="hours-info">每日 09:00 - 23:00<br>需預約使用</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 游泳池 -->
+      <div class="facility-card">
+        <div class="row g-0">
+          <div class="col-md-6">
+            <img th:src="@{/images/游泳池.png}" alt="游泳池" class="facility-image">
+          </div>
+          <div class="col-md-6">
+            <div class="facility-content">
+              <h2 class="facility-name">
+                <i class="fas fa-swimming-pool facility-icon"></i>
+                無邊際游泳池
+              </h2>
+              <p class="facility-description">
+                絕美的無邊際泳池設計，與湛藍海洋融為一體。池畔配備舒適的躺椅與遮陽設施，是放鬆身心的絕佳場所。
+              </p>
+              <ul class="facility-features">
+                <li>25 公尺無邊際泳池</li>
+                <li>兒童戲水區</li>
+                <li>池畔躺椅與遮陽傘</li>
+                <li>救生員全天候駐守</li>
+                <li>泳池酒吧服務</li>
+              </ul>
+              <div class="facility-hours">
+                <div class="hours-title">開放時間</div>
+                <div class="hours-info">每日 06:00 - 22:00<br>兒童使用需成人陪同</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 預約服務 -->
+      <div class="booking-section">
+        <h3 class="booking-title">設施預約服務</h3>
+        <p class="booking-description">
+          為確保您享有最佳的使用體驗，部分設施提供預約服務<br>
+          歡迎隨時聯繫我們安排您的專屬時光
+        </p>
+        <div class="booking-contact">
+          <div class="contact-item">
+            <i class="fas fa-phone"></i>
+            <span>+886-7-123-4567</span>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            <span>spa@maisondyuko.com</span>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-clock"></i>
+            <span>服務時間：24 小時</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✅ footer -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
+  
+  <!-- ✅ 右側功能按鈕 -->
+  <div th:replace="fragments/mainfunction :: stickyIcons"></div>
+
+  <!-- ✅ Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script th:src="@{/homepage/js/script.js}"></script>
+</body>
+</html> 

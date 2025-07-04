@@ -1,7 +1,7 @@
 <!-- index.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
-
+ 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -58,11 +58,11 @@
         <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">探索嶼蔻</a>
         <ul class="dropdown-menu">
           <li><a class="dropdown-item" href="#">珍饈美饌</a></li>
-          <li><a class="dropdown-item" href="#">多元設施</a></li>
+          <li><a class="dropdown-item" th:href="@{/facilities}">多元設施</a></li>
         </ul>
       </li>
       <li class="nav-item"><a class="nav-link" href="#rooms">精緻客房</a></li>
-      <li class="nav-item"><a class="nav-link" href="#faq">交通資訊</a></li>
+      <li class="nav-item"><a class="nav-link" th:href="@{/traffic}">交通資訊</a></li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">聯絡我們</a>
         <ul class="dropdown-menu">
@@ -123,8 +123,8 @@
         </div>
         <div class="overlay-menu-col">
           <h5>探索嶼蔻</h5>
-          <a href="#">珍饌美饌</a>
-          <a href="#">豐富設施</a>
+          <a href="#">珍饈美饌</a>
+          <a th:href="@{/facilities}">豐富設施</a>
         </div>
         <div class="overlay-menu-col">
           <h5>精緻客房</h5>
@@ -260,7 +260,7 @@
   <section class="section dining-section" id="dining">
     <div class="dining-container" style="text-align:center;">
       <div id="diningCarousel" class="owl-carousel owl-theme">
-        <div class="item">
+        <div class="item" onclick="window.location.href='/facilities'" style="cursor: pointer;">
           <h3 class="dining-en-title">Facilities</h3>
           <h2 class="dining-title">豐富設施</h2>
           <p>放慢腳步，享受每一刻的自在與療癒</p>
@@ -402,6 +402,16 @@
       }
     });
   </script>
+  <script th:inline="javascript">
+	  /*<![CDATA[*/
+	  const forceLogin = /*[[${forceLogin}]]*/ false;
+	  if (forceLogin) {
+	      const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+	      loginModal.show();
+	  }
+	  /*]]>*/
+	</script>
+
   
   
 </body>

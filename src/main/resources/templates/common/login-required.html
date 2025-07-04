@@ -1,0 +1,42 @@
+<!-- templates/common/login-required.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <meta charset="UTF-8">
+    <title>請先登入</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: #f2f2f2;
+            font-family: "微軟正黑體", sans-serif;
+        }
+        .login-reminder-box {
+            max-width: 480px;
+            margin: 100px auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .login-reminder-box h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .login-reminder-box p {
+            margin-bottom: 30px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-reminder-box">
+    <h2>⚠️ 請先登入會員</h2>
+    <p>此功能僅提供已登入會員使用，請先登入以繼續操作。</p>
+    <a href="/login.html" class="btn btn-primary">立即登入</a>
+    <a href="/" class="btn btn-outline-secondary ms-2">返回首頁</a>
+</div>
+
+</body>
+</html>
