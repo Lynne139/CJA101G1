@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
+<head> 
   <meta charset="UTF-8">
   <meta name="viewport"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -63,8 +63,6 @@
     <div class="mb-3">
 	  <label for="memberStatus" class="form-label">會員狀態</label>
 	  <select class="form-select" id="memberStatus" th:field="*{memberStatus}">
-	    <option th:value="0" th:text="'0: 尚未認證'" 
-	            th:selected="${memberVO.memberStatus == 0}">尚未認證</option>
 	    <option th:value="1" th:text="'1: 啟用'" 
 	            th:selected="${memberVO.memberStatus == 1}">啟用</option>
 	    <option th:value="2" th:text="'2: 停權'" 

@@ -59,7 +59,7 @@ import jakarta.validation.Valid;
 @Controller
 @RequestMapping("/admin")
 public class AdminIndexController {
-	
+	 
 	@Autowired
 	RestoService restoService;
 	@Autowired

@@ -19,7 +19,7 @@ import com.news.service.NewsService;
 import com.news.service.PromotionNewsService;
 
 import jakarta.servlet.http.HttpSession;
-
+ 
 @Controller
 @RequestMapping("/")
 public class FrontIndexController {

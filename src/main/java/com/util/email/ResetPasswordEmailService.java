@@ -1,5 +1,5 @@
 package com.util.email;
-
+ 
 import com.member.model.MemberService;
 import com.member.model.MemberVO;
 import jakarta.mail.MessagingException;
