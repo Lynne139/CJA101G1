@@ -35,6 +35,6 @@ public class ForgotPasswordController {
             model.addAttribute("error", "Email 未註冊或發送失敗。");
         }
 
-        return "front-end/member/forgot-password";
+        return "redirect:/home";
     }
 }

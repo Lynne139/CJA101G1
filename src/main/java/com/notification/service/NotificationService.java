@@ -1,11 +1,13 @@
 package com.notification.service;
 
-import com.notification.entity.Notification;
-import com.notification.repository.NotificationRepository;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.notification.entity.Notification;
+import com.notification.repository.NotificationRepository;
 
 @Service
 public class NotificationService {
@@ -31,6 +33,7 @@ public class NotificationService {
         notification.setIsRead(false); // 預設未讀
         return notificationRepository.save(notification);
     }
+     
 
     // 取得某會員所有通知
     public List<Notification> getNotificationsByMemberId(Integer memberId) {

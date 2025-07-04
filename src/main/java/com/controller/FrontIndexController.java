@@ -1,5 +1,6 @@
 package com.controller;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import com.member.model.MemberVO;
 import com.news.service.HotNewsService;
 import com.news.service.NewsService;
 import com.news.service.PromotionNewsService;
+import com.notification.service.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
  
@@ -32,6 +34,9 @@ public class FrontIndexController {
     
     @Autowired
     private MemberService memberSvc;
+    
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/home")
     public String showHomepage(Model model, HttpSession session) {
@@ -85,6 +90,9 @@ public class FrontIndexController {
         } else {
             session.setAttribute("loggedInMember", dbMember);
             result.put("success", true);
+            // 登入成功後新增通知
+            String content = "親愛的 " + dbMember.getMemberName() + "，您已於 " + LocalDateTime.now() + " 成功登入。";
+            notificationService.createNotification(dbMember.getMemberId(), "登入成功通知", content);
         }
 
         return result;
