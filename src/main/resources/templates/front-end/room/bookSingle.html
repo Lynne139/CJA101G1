@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="roomTypePrice" th:content="${roomType.roomTypePrice}">
 <meta name="roomTypeId" th:content="${roomType.roomTypeId}">
+<meta name="roomTypeGuestNum" th:content="${roomType.guestNum}">
 <title>Maison d’Yuko - 訂房</title>
 <link
 	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
@@ -83,7 +84,7 @@
 
 					<div class="mb-3">
 						<label class="form-label">房間數量</label> <select class="form-select"
-							id="roomCount" onchange="updateSummary()">
+							id="roomCount" onchange="updateGuestOptions()">
 							<option disabled selected>請選擇入住日期</option>
 							<!-- option 將由 JavaScript 動態生成 -->
 						</select>
@@ -91,9 +92,9 @@
 
 					<div class="mb-3">
 						<label class="form-label">入住人數</label> <select class="form-select"
-							id="guestCount" onchange="updateSummary()">
-							<option th:each="i : ${#numbers.sequence(1, roomType.guestNum)}"
-          					th:value="${i}" th:text="${i} + ' 位'"></option>
+							id="guestCount" th:data-max-guests="${roomType.guestNum}" onchange="updateSummary()">
+							<option disabled selected>請先選擇房間數量</option>
+							<!-- 選項將由 JavaScript 動態生成 -->
 						</select>
 					</div>
 					

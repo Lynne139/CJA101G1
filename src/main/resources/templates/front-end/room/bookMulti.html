@@ -69,7 +69,7 @@
 								<option selected>選擇房數</option>
 							</select> <label class="section-title">選擇入住人數</label> <select
 								class="form-select guest-select"
-								th:attr="data-id=${roomType.roomTypeId}" disabled>
+								th:attr="data-id=${roomType.roomTypeId}, data-max-guests=${roomType.guestNum}" disabled>
 								<option value="0" selected>選擇人數</option>
 								<option th:each="i : ${#numbers.sequence(1, roomType.guestNum)}"
 									th:value="${i}" th:text="${i} + ' 位'"></option>
