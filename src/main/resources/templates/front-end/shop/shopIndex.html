@@ -13,6 +13,8 @@
   <!-- 共用Header（含登入彈窗） -->
   <div th:replace="~{fragments/header :: header}"></div>
   <input type="hidden" name="memberId" th:value="${loggedInMember != null ? loggedInMember.memberId : ''}" />
+  <br>
+
 
   <!-- 付款狀態顯示區域 -->
   <div th:if="${paymentStatus}" class="payment-status-alert" th:classappend="${paymentStatus == 'success' ? 'alert-success' : 'alert-danger'}">
@@ -25,20 +27,11 @@
     </div>
   </div>
 
-  <!-- 子選單 Navbar -->
-  <nav class="sub-navbar d-flex justify-content-center align-items-center">
-    <ul class="nav">
-      <li class="nav-item"><a class="nav-link" href="/">首頁</a></li>
-      <li class="nav-item"><a class="nav-link" href="#rooms">精緻客房</a></li>
-      <li class="nav-item"><a class="nav-link" href="#dining">特色餐廳</a></li>
-      <li class="nav-item"><a class="nav-link active" href="/front-end/shop">嶼蔻商城</a></li>
-      <li class="nav-item"><a class="nav-link" href="#contact">聯絡我們</a></li>
-    </ul>
-  </nav>
+
 
   <!-- Sticky 右側按鈕 -->
   <div class="sticky-icons d-none d-lg-block">
-    <a th:href="@{/bookMulti><img src="/shoppage/image/icon/bed.svg" alt="bed" class="icon"/><br>線上訂房</a>
+    <a th:href="@{/bookMulti}"><img src="/shoppage/image/icon/bed.svg" alt="bed" class="icon"/><br>線上訂房</a>
     <a href="#" class="cart-icon" id="cartToggle"><img src="/shoppage/image/icon/bag.svg" alt="bag" class="icon"/><br>購物車</a>
     <a href="#"><img src="/shoppage/image/icon/dish.svg" alt="dish" class="icon"/><br>餐廳訂位</a>
   </div>
