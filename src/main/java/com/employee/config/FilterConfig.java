@@ -20,12 +20,12 @@ public class FilterConfig implements WebMvcConfigurer {
                 .addPathPatterns("/admin/**");
     }
 
-//    @Bean
-//    public FilterRegistrationBean<AdminPermissionFilter> adminPermissionFilterRegistration(AdminPermissionFilter filter) {
-//        FilterRegistrationBean<AdminPermissionFilter> registration = new FilterRegistrationBean<>();
-//        registration.setFilter(filter);
-//        registration.addUrlPatterns("/admin/*", "/employees/*");
-//        registration.setOrder(1);
-//        return registration;
-//    }
+    @Bean
+    public FilterRegistrationBean<AdminPermissionFilter> adminPermissionFilterRegistration(AdminPermissionFilter filter) {
+        FilterRegistrationBean<AdminPermissionFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(filter);
+        registration.addUrlPatterns("/admin/*", "/employees/*");
+        registration.setOrder(1);
+        return registration;
+    }
 } 

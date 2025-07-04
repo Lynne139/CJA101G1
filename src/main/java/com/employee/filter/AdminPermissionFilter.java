@@ -8,11 +8,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
 
-// @Component
+@Component
 public class AdminPermissionFilter implements Filter {
 
     @Autowired
@@ -21,7 +22,6 @@ public class AdminPermissionFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        /*
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         HttpSession session = httpRequest.getSession();
@@ -82,26 +82,28 @@ public class AdminPermissionFilter implements Filter {
         session.setAttribute("employeeJobTitle", jobTitleName);
         // 根據員工 ID 給不同的權限
         List<String> employeePermissions;
-        if (currentEmployee.getEmployeeId() == 1 || currentEmployee.getEmployeeId() == 2) {
+        Integer employeeId = currentEmployee.getEmployeeId();
+        
+        if (employeeId != null && (employeeId == 1 || employeeId == 2)) {
             // 員工1（SYSTEM）和員工2（吳永志）- 所有權限
             employeePermissions = List.of(
                 "會員管理權限", "員工管理權限", "住宿管理權限", 
                 "餐廳管理權限", "商店管理權限", "優惠管理權限", 
                 "客服管理權限", "消息管理權限"
             );
-        } else if (currentEmployee.getEmployeeId() == 3) {
+        } else if (employeeId != null && employeeId == 3) {
             // 員工3（吳冠宏）- 只有客服相關權限
             employeePermissions = List.of(
                 "客服管理權限"
             );
         } else {
-            // 其他員工 - 預設權限
+            // 其他員工或employeeId為null - 預設權限
             employeePermissions = List.of(
                 "客服管理權限"
             );
         }
         session.setAttribute("employeePermissions", employeePermissions);
-        */
-        chain.doFilter(request, response); // 直接放行
+        
+        chain.doFilter(request, response);
     }
 } 

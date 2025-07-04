@@ -44,7 +44,7 @@
 			
 			    <nav class="sidebar_nav mt-4">
 					<!-- 會員管理 -->
-					<div class="sidebar_section"
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '會員管理權限')}"
 						th:classappend="${currentURI.startsWith('/admin/member')} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-user"></i> 會員管理
@@ -72,7 +72,7 @@
 			    	</div>
 			
 					<!-- 員工管理 -->
-					<div class="sidebar_section"
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '員工管理權限')}"
 						th:classappend="${currentURI.startsWith('/admin/staff')} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-user-tie"></i> 員工管理
@@ -86,7 +86,7 @@
 					</div>
 			
 					<!-- 住宿管理 -->
-					<div class="sidebar_section"
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '住宿管理權限')}"
 						th:classappend="${currentURI.startsWith('/admin/room')} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-bed"></i> 住宿管理
@@ -101,7 +101,7 @@
 					</div>
 			
 					<!-- 餐廳管理 -->
-			    	<div class="sidebar_section"
+			    	<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '餐廳管理權限')}"
 			    		th:classappend="${currentURI.startsWith('/admin/resto')} ? '-active'">
 			      		<a class="sidebar_link">
 			        		<i class="fa-solid fa-utensils"></i> 餐廳管理
@@ -118,7 +118,7 @@
 			    	</div>
 			
 					<!-- 商店管理 -->
-					<div class="sidebar_section"
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '商店管理權限')}"
 						th:classappend="${currentURI.startsWith('/admin/shop')} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-bag-shopping"></i> 商店管理
@@ -135,7 +135,7 @@
 					</div>
 			
 					<!-- 優惠管理 -->
-					<div class="sidebar_section"
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '優惠管理權限')}"
 						th:classappend="${currentURI.startsWith('/admin/coupon')} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-ticket"></i> 優惠管理
@@ -147,7 +147,7 @@
 					</div>
 			
 					<!-- 客服管理 -->
-					<div class="sidebar_section"
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '客服管理權限')}"
 						th:classappend="${currentURI.startsWith('/admin/cs')} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-bell-concierge"></i> 客服管理
@@ -159,7 +159,7 @@
 					</div>
 			
 					<!-- 消息管理 -->
-					<div class="sidebar_section"
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '消息管理權限')}"
 						th:classappend="${currentURI.startsWith('/admin/news')} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-bullhorn"></i> 消息管理
