@@ -14,18 +14,14 @@ import jakarta.servlet.http.HttpServletRequest;
 public class FrontCouponPageController {
 
 	// 會員查詢持有的折價券頁面
-    @GetMapping("/{memberId}/select")
-    public String memberCouponSelectPage(@PathVariable Integer memberId, Model model) {
-        model.addAttribute("memberId", memberId); // 給前端 JavaScript 用來發 AJAX
+    @GetMapping("/select")
+    public String memberCouponSelectPage() {
         return "front-end/coupon/member-select-coupon";
     }
     
 	// 會員領取折價券頁面
-    @GetMapping("/{memberId}/claim")
-    public String memberCouponClaimPage(
-    		@PathVariable Integer memberId, 
-    		Model model) {
-        model.addAttribute("memberId", memberId); // 給前端 JavaScript 用來發 AJAX
+    @GetMapping("/claim")
+    public String memberCouponClaimPage() {
         return "front-end/coupon/claim-coupon";
     }
     
