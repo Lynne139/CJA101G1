@@ -1,3 +1,19 @@
+// 中文字符驗證函數
+function validateChinese(value, allowEmpty = false) {
+    const chineseRegex = /^[\u4e00-\u9fff\s]*$/;
+    const trimmedValue = value ? value.trim() : '';
+    
+    if (!allowEmpty && trimmedValue === '') {
+        return false;
+    }
+    
+    if (trimmedValue !== '' && !chineseRegex.test(trimmedValue)) {
+        return false;
+    }
+    
+    return true;
+}
+
 // 載入員工資料
 function loadEmployees(searchTerm = '') {
     fetch("/employees/with-details")
@@ -321,6 +337,13 @@ function saveEmployeeEdit() {
     const jobTitleId = document.getElementById("editEmployeeJobTitleId").value;
     const status = document.getElementById("editEmployeeStatus").value === 'true';
     const photoFile = document.getElementById("editEmployeePhoto").files[0];
+
+    // 驗證姓名
+    if (!validateChinese(name, false)) {
+        alert('姓名只能包含中文字符且不能為空');
+        document.getElementById("editEmployeeName").classList.add('is-invalid');
+        return;
+    }
 
     const employeeData = {
         name: name,
