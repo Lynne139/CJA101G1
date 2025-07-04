@@ -227,44 +227,7 @@
   <!-- ✅ header -->
   <div th:replace="~{fragments/header :: header}"></div>
 
-  <!-- ✅ 子選單 Navbar -->
-  <nav class="sub-navbar d-flex justify-content-center align-items-center">
-    <ul class="nav">
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">關於嶼蔻</a>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" th:href="@{/front-end/about/brand-story}">品牌故事</a></li>
-          <li><a class="dropdown-item" th:href="@{/front-end/about/environment}">環境簡介</a></li>
-        </ul>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">最新消息</a>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" th:href="@{/news/notice}">最新公告</a></li>
-          <li><a class="dropdown-item" th:href="@{/news/promotion}">活動通知</a></li>
-          <li><a class="dropdown-item" th:href="@{/news/news}">媒體報導</a></li>
-        </ul>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle active" href="javascript:void(0);" tabindex="0">探索嶼蔻</a>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#">珍饈美饌</a></li>
-          <li><a class="dropdown-item active" th:href="@{/facilities}">多元設施</a></li>
-        </ul>
-      </li>
-      <li class="nav-item"><a class="nav-link" href="#rooms">精緻客房</a></li>
-      <li class="nav-item"><a class="nav-link" th:href="@{/traffic}">交通資訊</a></li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">聯絡我們</a>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" th:href="@{/contact}">聯絡客服</a></li>
-          <li><a class="dropdown-item" th:href="@{/chatbot}">智慧客服</a></li>
-        </ul>
-      </li>
-      <li class="nav-item"><a class="nav-link" href="#faq">常見問題</a></li>
-    </ul>
-  </nav>
-
+  
   <!-- ✅ Main Content -->
   <section class="facilities-section">
     <div class="container facilities-container">

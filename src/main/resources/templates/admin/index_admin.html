@@ -44,13 +44,13 @@
 			
 			    <nav class="sidebar_nav mt-4">
 					<!-- 會員管理 -->
-					<div class="sidebar_section"
-						th:classappend="${currentURI.startsWith('/admin/member')} ? '-active'">
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '會員管理權限')}"
+						th:classappend="${currentURI == '/admin/select_page' or currentURI == '/admin/addMember' or currentURI == '/admin/listAllMember'} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-user"></i> 會員管理
 						</a>
 						<div class="submenu_block ps-4"
-							th:classappend="${currentURI.startsWith('/admin/member')} ? 'show'">
+							th:classappend="${currentURI == '/admin/select_page' or currentURI == '/admin/addMember' or currentURI == '/admin/listAllMember'} ? 'show'">
 			        		<a th:href="@{/admin/select_page}" th:classappend="${currentURI == '/admin/select_page'} ? '-active'" class="sidebar_sub_link">會員查詢</a>
 			        		<a th:href="@{/admin/addMember}" th:classappend="${currentURI == '/admin/addMember'} ? '-active'" class="sidebar_sub_link">會員新增</a>
 			        		<a th:href="@{/admin/listAllMember}" th:classappend="${currentURI == '/admin/listAllMember'} ? '-active'" class="sidebar_sub_link">會員列表</a>			      			
@@ -59,20 +59,20 @@
 			    	</div>
 					
 					<!-- 會員等級 -->
-					<div class="sidebar_section"
-						th:classappend="${currentURI.startsWith('/admin/memberLevelType')} ? '-active'">
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '會員管理權限')}"
+						th:classappend="${currentURI == '/admin/listAllMemberLevelType' or currentURI == '/admin/addMemberLevelType'} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-user"></i> 會員等級
 						</a>
 						<div class="submenu_block ps-4"
-							th:classappend="${currentURI.startsWith('/admin/memberLevelType')} ? 'show'">
+							th:classappend="${currentURI == '/admin/listAllMemberLevelType' or currentURI == '/admin/addMemberLevelType'} ? 'show'">
 			        		<a th:href="@{/admin/listAllMemberLevelType}" th:classappend="${currentURI == '/admin/listAllMemberLevelType'} ? '-active'" class="sidebar_sub_link">等級列表</a>
-			        		<a th:href="@{/admin/addAllMemberLevelType}" th:classappend="${currentURI == '/admin/addAllMemberLevelType'} ? '-active'" class="sidebar_sub_link">等級新增</a>
+			        		<a th:href="@{/admin/addMemberLevelType}" th:classappend="${currentURI == '/admin/addMemberLevelType'} ? '-active'" class="sidebar_sub_link">等級新增</a>
 			      		</div>
 			    	</div>
 			
 					<!-- 員工管理 -->
-					<div class="sidebar_section"
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '員工管理權限')}"
 						th:classappend="${currentURI.startsWith('/admin/staff')} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-user-tie"></i> 員工管理
@@ -86,13 +86,13 @@
 					</div>
 			
 					<!-- 住宿管理 -->
-					<div class="sidebar_section"
-						th:classappend="${currentURI.startsWith('/admin/room')} ? '-active'">
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '住宿管理權限')}"
+						th:classappend="${currentURI == '/admin/roomo_info' or currentURI == '/admin/listAllRoomType' or currentURI == '/admin/listAllRoomTypeSchedule' or currentURI == '/admin/listAllRoom'} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-bed"></i> 住宿管理
 						</a>
 						<div class="submenu_block ps-4"
-							th:classappend="${currentURI.startsWith('/admin/room')} ? 'show'">
+							th:classappend="${currentURI == '/admin/roomo_info' or currentURI == '/admin/listAllRoomType' or currentURI == '/admin/listAllRoomTypeSchedule' or currentURI == '/admin/listAllRoom'} ? 'show'">
 							<a th:href="@{/admin/roomo_info}" th:classappend="${currentURI == '/admin/roomo_info'} ? '-active'" class="sidebar_sub_link">訂單資訊</a>
 							<a th:href="@{/admin/listAllRoomType}" th:classappend="${currentURI == '/admin/listAllRoomType'} ? '-active'" class="sidebar_sub_link">房型資訊</a>
 							<a th:href="@{/admin/listAllRoomTypeSchedule}" th:classappend="${currentURI == '/admin/listAllRoomTypeSchedule'} ? '-active'" class="sidebar_sub_link">房型預定表資訊</a>
@@ -101,7 +101,7 @@
 					</div>
 			
 					<!-- 餐廳管理 -->
-			    	<div class="sidebar_section"
+			    	<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '餐廳管理權限')}"
 			    		th:classappend="${currentURI.startsWith('/admin/resto')} ? '-active'">
 			      		<a class="sidebar_link">
 			        		<i class="fa-solid fa-utensils"></i> 餐廳管理
@@ -113,18 +113,18 @@
 					        <a th:href="@{/admin/resto_timeslot}" th:classappend="${currentURI == '/admin/resto_timeslot'} ? '-active'" class="sidebar_sub_link">時段管理</a>
 					        <a th:href="@{/admin/resto_order}" th:classappend="${currentURI == '/admin/resto_order'} ? '-active'" class="sidebar_sub_link">訂單管理</a>
 					        <a th:href="@{/admin/resto_reservation}" th:classappend="${currentURI == '/admin/resto_reservation'} ? '-active'" class="sidebar_sub_link">預約統計</a>
-					        <a th:href="@{/admin/resto_order_today}" th:classappend="${currentURI == '/admin/resto_order_Today'} ? '-active'" class="sidebar_sub_link">今日訂位</a>
+					        <a th:href="@{/admin/resto_order_today}" th:classappend="${currentURI == '/admin/resto_order_today'} ? '-active'" class="sidebar_sub_link">今日訂位</a>
 			      		</div>
 			    	</div>
 			
 					<!-- 商店管理 -->
-					<div class="sidebar_section"
-						th:classappend="${currentURI.startsWith('/admin/shop')} ? '-active'">
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '商店管理權限')}"
+						th:classappend="${currentURI == '/admin/prod/select_page' or currentURI == '/admin/prodCart/select_page' or currentURI == '/admin/prodCate/select_page' or currentURI == '/admin/prodPhoto/select_page' or currentURI == '/admin/shopOrd/select_page' or currentURI == '/admin/shopOrdDet/select_page'} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-bag-shopping"></i> 商店管理
 						</a>
 						<div class="submenu_block ps-4"
-							th:classappend="${currentURI.startsWith('/admin/shop')} ? 'show'">
+							th:classappend="${currentURI == '/admin/prod/select_page' or currentURI == '/admin/prodCart/select_page' or currentURI == '/admin/prodCate/select_page' or currentURI == '/admin/prodPhoto/select_page' or currentURI == '/admin/shopOrd/select_page' or currentURI == '/admin/shopOrdDet/select_page'} ? 'show'">
 							<a th:href="@{/admin/prod/select_page}" th:classappend="${currentURI == '/admin/prod/select_page'} ? '-active'" class="sidebar_sub_link">商品管理</a>
 							<a th:href="@{/admin/prodCart/select_page}" th:classappend="${currentURI == '/admin/prodCart/select_page'} ? '-active'" class="sidebar_sub_link">購物車項目</a>
 							<a th:href="@{/admin/prodCate/select_page}" th:classappend="${currentURI == '/admin/prodCate/select_page'} ? '-active'" class="sidebar_sub_link">商品類別管理</a>
@@ -135,7 +135,7 @@
 					</div>
 			
 					<!-- 優惠管理 -->
-					<div class="sidebar_section"
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '優惠管理權限')}"
 						th:classappend="${currentURI.startsWith('/admin/coupon')} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-ticket"></i> 優惠管理
@@ -147,7 +147,7 @@
 					</div>
 			
 					<!-- 客服管理 -->
-					<div class="sidebar_section"
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '客服管理權限')}"
 						th:classappend="${currentURI.startsWith('/admin/cs')} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-bell-concierge"></i> 客服管理
@@ -159,7 +159,7 @@
 					</div>
 			
 					<!-- 消息管理 -->
-					<div class="sidebar_section"
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '消息管理權限')}"
 						th:classappend="${currentURI.startsWith('/admin/news')} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-bullhorn"></i> 消息管理

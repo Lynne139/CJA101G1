@@ -1,8 +1,35 @@
-
 /* 展開與active效果已透過URI在thymeleaf判斷，但首次/首頁無對應url時仍須透過此JS來提供主項收合邏輯 */
 	
 document.addEventListener("DOMContentLoaded", function () {	
 	const sidebarLinks = document.querySelectorAll(".sidebar_link"); //所點主項
+	const sidebar = document.querySelector(".sidebar");
+	
+	// 保存和恢復sidebar滾動位置
+	function saveSidebarPosition() {
+		if (sidebar) {
+			sessionStorage.setItem('sidebarScrollTop', sidebar.scrollTop);
+		}
+	}
+	
+	function restoreSidebarPosition() {
+		if (sidebar) {
+			const savedPosition = sessionStorage.getItem('sidebarScrollTop');
+			if (savedPosition) {
+				sidebar.scrollTop = parseInt(savedPosition);
+			}
+		}
+	}
+	
+	// 頁面載入時恢復滾動位置
+	restoreSidebarPosition();
+	
+	// 點擊子項目時保存滾動位置
+	const subLinks = document.querySelectorAll(".sidebar_sub_link");
+	subLinks.forEach(link => {
+		link.addEventListener("click", function() {
+			saveSidebarPosition();
+		});
+	});
 
 	sidebarLinks.forEach(link => {
 		link.addEventListener("click", function (e) {
@@ -32,28 +59,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	
 	const hamburgerBtn = document.querySelector(".btn_hamburger");
-	  const sidebar = document.querySelector(".sidebar");
-	  const closeBtn = document.querySelector(".btn_sidebar_close");
+	const closeBtn = document.querySelector(".btn_sidebar_close");
 
-	  if (hamburgerBtn) {
+	if (hamburgerBtn) {
 		hamburgerBtn.addEventListener("click", function () {
-	    sidebar.classList.toggle("-on");
-	    closeBtn.classList.add("-on");
-	  	});
-	  }
+			sidebar.classList.toggle("-on");
+			closeBtn.classList.add("-on");
+		});
+	}
 
-	  if (closeBtn) {
-	    closeBtn.addEventListener("click", function () {
-	      sidebar.classList.remove("-on");
-	    });
-	  }
+	if (closeBtn) {
+		closeBtn.addEventListener("click", function () {
+			sidebar.classList.remove("-on");
+		});
+	}
 
-	  window.addEventListener("resize", function () {
-	    if (window.innerWidth >= 768) {
-	      sidebar.classList.remove("-on");
-	      closeBtn.classList.remove("-on");
-	    }
-	  });
+	window.addEventListener("resize", function () {
+		if (window.innerWidth >= 768) {
+			sidebar.classList.remove("-on");
+			closeBtn.classList.remove("-on");
+		}
+	});
 
 });
 

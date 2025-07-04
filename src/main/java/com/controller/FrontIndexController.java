@@ -34,11 +34,18 @@ public class FrontIndexController {
     private MemberService memberSvc;
 
     @GetMapping("/home")
-    public String showHomepage(Model model, HttpSession session) {
+    public String showHomepage(Model model, HttpSession session, 
+                              @RequestParam(required = false) String loginRequired) {
         model.addAttribute("memberVO", new MemberVO());
 
         MemberVO loggedInMember = (MemberVO) session.getAttribute("loggedInMember");
         model.addAttribute("loggedInMember", loggedInMember);
+
+        // 處理登入要求參數
+        if ("true".equals(loginRequired)) {
+            model.addAttribute("forceLogin", true);
+            model.addAttribute("loginMessage", "請先登入會員才能使用此功能");
+        }
 
         // 新增：查詢三種最新消息
         hotNewsService.findLatestDisplay().ifPresent(hotNews -> model.addAttribute("latestHotNews", hotNews));
@@ -50,10 +57,17 @@ public class FrontIndexController {
     
     
     @GetMapping("/")
-    public String rootRedirect(Model model, HttpSession session) {
+    public String rootRedirect(Model model, HttpSession session,
+                              @RequestParam(required = false) String loginRequired) {
         model.addAttribute("memberVO", new MemberVO());
         MemberVO loggedInMember = (MemberVO) session.getAttribute("loggedInMember");
         model.addAttribute("loggedInMember", loggedInMember);
+
+        // 處理登入要求參數
+        if ("true".equals(loginRequired)) {
+            model.addAttribute("forceLogin", true);
+            model.addAttribute("loginMessage", "請先登入會員才能使用此功能");
+        }
 
         // 新增：查詢三種最新消息
         hotNewsService.findLatestDisplay().ifPresent(hotNews -> model.addAttribute("latestHotNews", hotNews));
