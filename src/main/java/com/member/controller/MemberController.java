@@ -1,5 +1,5 @@
 package com.member.controller;
-
+ 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -31,7 +30,7 @@ public class MemberController {
 	MemberService memberSvc;
 	
 	// 查詢頁面
-	 @GetMapping("/select_page")
+	 @GetMapping("/member_select_page")
 	 public String showSelectPage(Model model, HttpServletRequest request) {
 	     List<MemberVO> memberList = memberSvc.getAll();
 	     model.addAttribute("memberListData", memberList);

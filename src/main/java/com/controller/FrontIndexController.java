@@ -19,7 +19,7 @@ import com.news.service.NewsService;
 import com.news.service.PromotionNewsService;
 
 import jakarta.servlet.http.HttpSession;
-
+ 
 @Controller
 @RequestMapping("/")
 public class FrontIndexController {
@@ -79,6 +79,9 @@ public class FrontIndexController {
         if (dbMember == null || !dbMember.getMemberPassword().equals(memberPassword)) {
             result.put("success", false);
             result.put("message", "帳號或密碼錯誤");
+        } else if (dbMember.getMemberStatus() == 2) {
+            result.put("success", false);
+            result.put("message", "此帳號已被停權，請聯絡客服");
         } else {
             session.setAttribute("loggedInMember", dbMember);
             result.put("success", true);

@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,9 +25,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.coupon.entity.Coupon;
 import com.coupon.service.CouponService;
+import com.employee.entity.Employee;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.member.model.MemberService;
 import com.member.model.MemberVO;
+import com.memberLevelType.model.MemberLevelType;
+import com.memberLevelType.model.MemberLevelTypeService;
+import com.news.service.HotNewsService;
+import com.news.service.NewsService;
+import com.news.service.PromotionNewsService;
 import com.prod.model.ProdService;
 import com.prodCart.model.ProdCartService;
 import com.prodCart.model.ProdCartVO;
@@ -52,20 +57,17 @@ import com.roomOrder.model.RoomOrderService;
 import com.shopOrd.model.ShopOrdService;
 import com.shopOrd.model.ShopOrdVO;
 import com.shopOrdDet.model.ShopOrdDetService;
-import com.news.service.HotNewsService;
-import com.news.service.PromotionNewsService;
-import com.news.service.NewsService;
-import com.employee.entity.Employee;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 
 @Controller
 @RequestMapping("/admin")
 public class AdminIndexController {
-	
+	 
 	@Autowired
 	RestoService restoService;
 	@Autowired
@@ -89,6 +91,9 @@ public class AdminIndexController {
 	
 	@Autowired
 	MemberService memberSvc;
+	
+	@Autowired
+    private MemberLevelTypeService memberLevelTypeSvc;
 	
 	@Autowired
 	ShopOrdService shopOrdSvc;
@@ -265,7 +270,76 @@ public class AdminIndexController {
 	     model.addAttribute("success", "- (刪除成功)");
 	     return "redirect:/admin/listAllMember";
 	 }
-    
+	// === 會員等級 ===
+	// 顯示新增表單
+	    @GetMapping("/addMemberLevelType")
+	    public String addMemberLevelType(Model model, HttpServletRequest request) {
+	    	model.addAttribute("memberLevelType", new MemberLevelType());
+	    	model.addAttribute("memberLevelTypeList", memberLevelTypeSvc.getAll());
+		    model.addAttribute("currentURI", request.getRequestURI());
+		    model.addAttribute("mainFragment", "admin/fragments/memberLevelType/addMemberLevelType");
+		    return "admin/index_admin";
+	    }
+
+	    // 處理新增
+	    @PostMapping("/insertL")
+	    public String insertMemberLevelType(@ModelAttribute("memberLevelType") @Valid MemberLevelType memberLevelType,
+	    					BindingResult result,
+	    					Model model) {
+	        if (result.hasErrors()) {
+	        	model.addAttribute("memberLevelType", memberLevelType);
+	            return "back-end/memberLevelType/addMemberLevelType";
+	        }
+	        memberLevelTypeSvc.addMemberLevelType(memberLevelType);
+	        return "redirect:/admin/listAllMemberLevelType";
+	    }
+
+	    // 顯示全部資料
+	    @GetMapping("/listAllMemberLevelType")
+	    public String listAllMemberLevelType(Model model, HttpServletRequest request) {
+	    	model.addAttribute("memberLevelTypeList", memberLevelTypeSvc.getAll());
+		    model.addAttribute("currentURI", request.getRequestURI());
+		    model.addAttribute("mainFragment", "admin/fragments/memberLevelType/listAllMemberLevelType");
+		    return "admin/index_admin";
+	    }
+
+	    // 修改資料畫面
+	    @GetMapping("/updateMemberLevelType/{memberLevel}")
+	    public String getUpdateMemberLevelTypePage(@PathVariable("memberLevel") String memberLevel,
+	                                               Model model,
+	                                               HttpServletRequest request) {
+	        MemberLevelType memberLevelTypeList = memberLevelTypeSvc.getOneMemberLevelType(memberLevel);
+	        model.addAttribute("memberLevelType", memberLevelTypeList);
+	        model.addAttribute("currentURI", request.getRequestURI());
+	        model.addAttribute("mainFragment", "admin/fragments/memberLevelType/update_memberLevelType_input");
+	        return "admin/index_admin";
+	    }
+
+	    
+	    // 更新資料
+	    @PostMapping("/updateL")
+	    public String updateMmemberLevel(@Valid @ModelAttribute("memberLevelType") MemberLevelType memberLevelType, 
+	    					BindingResult result,
+	    					Model model, HttpServletRequest request) {
+	        if (result.hasErrors()) {
+	        	model.addAttribute("memberLevelType", memberLevelType);
+	    	    model.addAttribute("currentURI", request.getRequestURI());
+	    	    model.addAttribute("mainFragment", "admin/fragments/memberLevelType/update_memberLevelType_input");
+	    	    return "admin/index_admin";
+	        }
+	        
+	        return "redirect:/admin/listAllMemberLevelType";
+	    }
+
+	    // 處理刪除
+	    @PostMapping("/deleteL")
+	    public String deleteMmemberLevel(@RequestParam("memberLevel") String memberLevel, 
+	    									Model model) {
+	        memberLevelTypeSvc.deleteMemberLevelType(memberLevel);
+	        model.addAttribute("success", "- (刪除成功)");
+	        return "redirect:/admin/listAllMemberLevelType";
+	    }
+	 
     // === 員工管理 ===
     @GetMapping("/staff1")
     public String staff1(HttpServletRequest request,Model model) {

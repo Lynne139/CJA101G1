@@ -9,7 +9,7 @@
 <body>
 <div class="container mt-5" th:fragment="addMember">
   <h3>會員新增</h3>
-
+ 
   <form th:action="@{/admin/insert}" method="post" th:object="${memberVO}" enctype="multipart/form-data">
     
     <div th:if="${#fields.hasErrors()}">

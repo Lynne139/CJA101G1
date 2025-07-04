@@ -1,0 +1,97 @@
+<!DOCTYPE html> 
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head> 
+  <meta charset="UTF-8">
+  <title>修改會員資料</title>
+  <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+  <style>
+    .form-wrapper {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .preview-img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container mt-5">
+    <div class="form-wrapper">
+      <h2 class="mb-4">修改會員資料</h2>
+      <form th:action="@{/member/center/update}" method="post" enctype="multipart/form-data">
+        <div class="row align-items-center mb-4">
+          <div class="col-md-9">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="memberName" class="form-label">會員名稱</label>
+                <input type="text" class="form-control" id="memberName" name="memberName" th:value="${memberVO.memberName}" required>
+              </div>
+              <div class="col-md-6">
+                <label for="memberPhone" class="form-label">電話</label>
+                <input type="text" class="form-control" id="memberPhone" name="memberPhone" th:value="${memberVO.memberPhone}" required>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 text-end">
+            <img th:src="@{/member/ImageReader(memberId=${memberVO.memberId})}" id="preview" alt="會員照片" class="img-thumbnail preview-img shadow">
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label for="memberBirthday" class="form-label">生日</label>
+            <input type="date" class="form-control" id="memberBirthday" name="memberBirthday" th:value="${memberVO.memberBirthday}" required>
+          </div>
+          <div class="col-md-6">
+            <label for="memberPassword" class="form-label">密碼</label>
+            <input type="password" class="form-control" id="memberPassword" name="memberPassword" th:value="${memberVO.memberPassword}" required>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="memberAddress" class="form-label">地址</label>
+          <input type="text" class="form-control" id="memberAddress" name="memberAddress" th:value="${memberVO.memberAddress}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="uploadPic" class="form-label">上傳會員照片</label>
+          <input type="file" class="form-control" id="uploadPic" name="uploadPic" accept="image/*" onchange="previewImage(event)">
+        </div>
+
+        <input type="hidden" name="memberId" th:value="${memberVO.memberId}" />
+        <input type="hidden" name="memberEmail" th:value="${memberVO.memberEmail}" />
+        <input type="hidden" name="memberLevel" th:value="${memberVO.memberLevel}" />
+        <input type="hidden" name="memberStatus" th:value="${memberVO.memberStatus}" />
+        <input type="hidden" name="memberPoints" th:value="${memberVO.memberPoints}" />
+        <input type="hidden" name="memberAccumulativeConsumption" th:value="${memberVO.memberAccumulativeConsumption}" />
+
+        <div class="text-end mt-4">
+          <button type="submit" class="btn btn-primary">儲存修改</button>
+          <a th:href="@{/member/center}" class="btn btn-secondary">取消</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function previewImage(event) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        const preview = document.getElementById('preview');
+        preview.src = reader.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  </script>
+</body>
+</html>
