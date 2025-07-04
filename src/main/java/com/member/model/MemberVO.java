@@ -105,7 +105,7 @@ public class MemberVO implements java.io.Serializable {
 	
 	@Column(name = "member_phone")
 	@NotEmpty(message="電話: 請勿空白")
-	@Pattern(regexp = "^\\d{6,12}$", message = "電話: 只能是數字")
+	@Pattern(regexp = "^\\d{6,12}$", message = "電話: 只能是數字,長度需在6到12之間")
 	public String getMemberPhone() {
 		return memberPhone;
 	}
