@@ -1,6 +1,7 @@
 
 package com.resto.entity;
 
+import java.time.LocalTime;
 import java.util.Objects;
 
 import com.resto.utils.ValidationGroups;
@@ -14,7 +15,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 @Entity
@@ -44,6 +44,7 @@ public class TimeslotVO{
 	
 	
 	public TimeslotVO() {
+		super();
 	}
 
 
@@ -52,6 +53,14 @@ public class TimeslotVO{
 		this.timeslotId = timeslotId;
 	}
 
+	
+	
+	// 計算開始時間
+	public LocalTime getLocalTime() {
+	    return LocalTime.parse(this.timeslotName);
+	}
+
+	
 
 
 	public Integer getTimeslotId() {

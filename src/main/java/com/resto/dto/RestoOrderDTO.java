@@ -25,12 +25,11 @@ public class RestoOrderDTO {
 	private RestoOrderStatus orderStatus = RestoOrderStatus.CREATED;
 	
 	
-	public RestoOrderDTO() {}
-
+	public RestoOrderDTO() {
+		super();
+	}
 
 	
-
-
 	public RestoOrderDTO(Integer restoOrderId, String snapshotRestoName, RestoOrderSource orderSource, Integer memberId,
 			Integer roomOrderId, String orderGuestName, String orderGuestEmail, String orderGuestPhone,
 			LocalDate regiDate, String snapshotPeriodName, String snapshotTimeslotName, Integer regiSeats,

@@ -427,13 +427,18 @@ public class AdminIndexController {
     								@RequestParam(value = "restoId", required = false) Integer restoId,
     								Model model
     	) {
-    		
+
 		// 把所有餐廳都傳給下拉選單使用
         List<RestoVO> restoList = restoService.getAll();
         model.addAttribute("restoList", restoList);
 
         // 若選定某餐廳，才撈出該餐廳的區段與時段
         if (restoId != null) {
+        	
+            RestoVO Urlresto = restoService.getById(restoId);
+        	boolean readonly = Urlresto.getIsDeleted();  // 軟刪除的餐廳只讀
+            model.addAttribute("readonly", readonly);
+        	
         	// 把選到的餐廳的詳細資訊放進 model 以顯示餐廳名稱
             RestoVO selectedResto = restoService.getById(restoId);
             model.addAttribute("selectedResto", selectedResto);
@@ -458,6 +463,7 @@ public class AdminIndexController {
             model.addAttribute("selectedResto", null);
             model.addAttribute("periodList", new ArrayList<>());
             model.addAttribute("timeslotList", new ArrayList<>());
+            model.addAttribute("readonly", false);
         }
         
         String mainFragment = "admin/fragments/resto/restoTimeslot";

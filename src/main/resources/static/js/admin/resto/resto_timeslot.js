@@ -22,10 +22,18 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!periodId || !restoId) return;
 
       if (confirm("項目一旦刪除將無法復原，是否確定刪除？")) {
+		
+		const params = new URLSearchParams();
+		params.append("periodId",  periodId);
+		params.append("restoId",  restoId);
+		
         // 存卷軸位置
         sessionStorage.setItem("scrollY", window.scrollY);
-        fetch(`/admin/resto_timeslot/period/delete?periodId=${periodId}&restoId=${restoId}`, {
-          method: 'GET'
+        
+		fetch(`/admin/resto_timeslot/period/delete`, {
+			method: 'POST',
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: params
         })
           .then(res => {
             if (res.redirected) {
@@ -386,11 +394,86 @@ document.addEventListener("DOMContentLoaded", () => {
 	  });
 	}
 
+	
+	
+	// ===== 設置住宿方案用code =====
+	document.querySelectorAll('.period-code-select').forEach(sel => {
+	  
+	  // 使select 的 value 一開始不是空字串，就記成 prevId
+	  sel.dataset.prevPeriodId = sel.value || "";
+		
+	  sel.addEventListener('change', async (e) => {
+	    const periodId = e.target.value;
+	    const code     = e.target.dataset.code;
+	    const restoId  = document.getElementById('restoSelect').value;
+		const prevId   = sel.dataset.prevPeriodId;     // 可能 undefined
+
+//		console.table({ periodId, code, restoId, prevId });
+
+		if (!restoId) return;                        // 防呆
+
+		try{
+			let success = false;
+
+			
+		// 有選period 
+		if (periodId !== '') {                     // 選了新 period
+		        await fetch('/admin/resto_timeslot/period/setCode', {
+		          method : 'POST',
+		          headers: {'Content-Type':'application/x-www-form-urlencoded'},
+		          body   : new URLSearchParams({ periodId, code, restoId })
+		        });
+		        sel.dataset.prevPeriodId = periodId;     // 更新備份
+				success = true;
+
+		      }
+			  
+		// 不開放
+		else if (prevId !== '') {   // 必須先有舊綁定
+			await fetch('/admin/resto_timeslot/period/clearCode', {
+		          method : 'POST',
+		          headers: {'Content-Type':'application/x-www-form-urlencoded'},
+		          body   : new URLSearchParams({ periodId: prevId, restoId })
+		        });
+
+		        sel.dataset.prevPeriodId = '';           // 清掉備份
+				success = true;
+
+		      }
+
+			  location.reload();  
+			  sessionStorage.setItem("toastMessage", "編輯成功！");
+
+			  
+//				if (success) {
+//				  showToast("操作成功！");
+//				}
+			  
+			                         // 重新載入頁面
+			      } catch (err) {
+			        console.error(err);
+			        alert('操作失敗，請稍後再試');
+			      }
+		
+	  });
+	});
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 
   // ===== 時段 ========================================================
 
-  // ===== 刪除時段 =====
+  // ===== (軟)刪除時段 =====
   document.addEventListener("click", function (e) {
 
     if (e.target.closest(".btn_timeslot_del")) {
@@ -401,11 +484,18 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!timeslotId || !restoId) return;
 
       if (confirm("項目一旦刪除將無法復原，是否確定刪除？")) {
+		
+		const params = new URLSearchParams();
+		params.append("timeslotId",  timeslotId);
+		params.append("restoId",  restoId);
+		
         // 存卷軸位置
         sessionStorage.setItem("scrollY", window.scrollY);
 
-        fetch(`/admin/resto_timeslot/timeslot/delete?timeslotId=${timeslotId}&restoId=${restoId}`, {
-          method: 'GET'
+        fetch(`/admin/resto_timeslot/timeslot/delete`, {
+			method: 'POST',
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: params
         })
           .then(res => {
             if (res.redirected) {
@@ -722,6 +812,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===== 拖曳時段改變所屬區段 =====
   
   function initTimeslotDnD() {
+	
+	if (window.readonly) {
+	    console.log("只讀模式，不可拖動");
+	    return; // 或根本不要初始化拖動元件
+	}
+	
     // 把每個 period 裡的 .timeslot_group 都變成 Sortable 清單
     document.querySelectorAll('.timeslot_group').forEach(groupEl => {
 

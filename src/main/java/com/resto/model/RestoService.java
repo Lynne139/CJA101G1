@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,11 +24,8 @@ public class RestoService {
 	@PersistenceContext
     private EntityManager em;
 
-    private final RestoRepository restoRepository;
-    
-    public RestoService(RestoRepository restoRepository) {
-        this.restoRepository = restoRepository;
-    }
+	@Autowired
+    RestoRepository restoRepository;
 
     
     // 複合查詢（Criteria 結構）

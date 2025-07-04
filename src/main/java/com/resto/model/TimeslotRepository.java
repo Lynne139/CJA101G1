@@ -6,9 +6,11 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import com.resto.entity.TimeslotVO;
 
+@Repository
 public interface TimeslotRepository  extends JpaRepository<TimeslotVO, Integer>{
 	
 	// 取未刪除時段，順便抓period

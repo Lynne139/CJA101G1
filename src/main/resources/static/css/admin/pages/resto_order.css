@@ -27,3 +27,32 @@
 	border-bottom:1px solid var(--color-primary);
 	color:var(--color-primary);
 }
+
+
+/* ===== edit modal ===== */
+#restoOrderViewModal .modal_section{
+	margin-bottom:1rem;
+}
+#restoOrderViewModal .view_sec_title{
+	padding:0.5rem 0;
+	border-bottom:1px solid var(--color-primary);
+	color:var(--color-primary);
+}
+
+#restoOrderAddModal .modal_section{
+	margin-bottom:1rem;
+}
+#restoOrderAddModal .view_sec_title{
+	padding:0.5rem 0;
+	border-bottom:1px solid var(--color-primary);
+	color:var(--color-primary);
+}
+
+#restoOrderEditModal .modal_section{
+	margin-bottom:1rem;
+}
+#restoOrderEditModal .view_sec_title{
+	padding:0.5rem 0;
+	border-bottom:1px solid var(--color-primary);
+	color:var(--color-primary);
+}

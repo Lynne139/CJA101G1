@@ -4,6 +4,11 @@ document.addEventListener("DOMContentLoaded", function () {
   //modal載入位置
   const container = document.getElementById("restoInfoModalContainer");
 
+  const savedScrollY = sessionStorage.getItem("scrollY");
+      if (savedScrollY !== null) {
+        window.scrollTo(0, parseInt(savedScrollY, 10));
+        sessionStorage.removeItem("scrollY");
+      }
 
   initRestoTable(); // 初次載入表格
 
@@ -62,8 +67,17 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!restoId) return;
 
       if (confirm("項目一旦封存將無法復原，僅作為訂單紀錄對應，是否確定封存？")) {
-        fetch(`/admin/resto_info/delete?restoId=${restoId}`, {
-          method: 'GET'
+        
+		const params = new URLSearchParams();
+	    params.append("restoId",  restoId);
+				
+		// 存卷軸位置
+		sessionStorage.setItem("scrollY", window.scrollY);        
+		
+		fetch(`/admin/resto_info/delete`, {
+			method: 'POST',
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: params
         })
           .then(res => {
             if (res.redirected) {
@@ -323,6 +337,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const content = tinymce.get("restoContent")?.getContent();
     formData.set("restoContent", content || "");
 
+	// 存卷軸位置
+	sessionStorage.setItem("scrollY", window.scrollY);        
+			
     fetch("/admin/resto_info/insert", {
       method: "POST",
       body: formData
@@ -475,6 +492,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const content = tinymce.get("restoContent")?.getContent();
     formData.set("restoContent", content || "");
 
+	// 存卷軸位置
+	sessionStorage.setItem("scrollY", window.scrollY);        
+			
+	
     fetch("/admin/resto_info/update", {
       method: "POST",
       body: formData

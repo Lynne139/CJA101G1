@@ -40,7 +40,7 @@ public class TimeslotController {
 	// ===== restoTimeslot.html ====================================================== //
 	
 	// === 軟刪除 ===
-    @GetMapping("/resto_timeslot/timeslot/delete")
+    @PostMapping("/resto_timeslot/timeslot/delete")
     public String softDelete(@RequestParam Integer timeslotId, 
 					         @RequestParam Integer restoId, 
 					    	 RedirectAttributes redirectAttributes,

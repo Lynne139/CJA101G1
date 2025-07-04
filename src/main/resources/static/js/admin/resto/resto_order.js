@@ -26,22 +26,22 @@ document.addEventListener("DOMContentLoaded", function () {
       paging: true,
       pageLength: 10,
       lengthMenu: [10, 20, 50],
-      order: [[0, 'desc']],
+      order: [[1, 'desc'],[4,'desc']],
       autoWidth: false,
       columnDefs: [
         { targets: [0], width: "5%"}, //ID
-        { targets: [1], width: "8%"}, //餐廳
-        { targets: [2], width: "5%"}, //來源
-        { targets: [3], width: "5%"}, //會員ID
-        { targets: [4], width: "5%"}, //住宿ID
-        { targets: [5], width: "7%"}, //姓名
-        { targets: [6], width: "10%"}, //信箱
-        { targets: [7], width: "10%"}, //定位日期
-        { targets: [8], width: "7%"}, //區段
-        { targets: [9], width: "7%"}, //時段
-        { targets: [10], width: "4%"}, //人數
-        { targets: [11], width: "10%"}, //下單時間
-        { targets: [12], width: "10%", orderable: false}, //狀態
+        { targets: [1], width: "10%"}, //訂位日期
+        { targets: [2], width: "10%"}, //餐廳
+        { targets: [3], width: "7%"}, //區段
+        { targets: [4], width: "7%"}, //時段
+        { targets: [5], width: "4%"}, //人數
+        { targets: [6], width: "6%", orderable: false}, //狀態
+        { targets: [7], width: "7%"}, //姓名
+        { targets: [8], width: "12%"}, //信箱
+        { targets: [9], width: "5%"}, //來源
+        { targets: [10], width: "5%"}, //會員ID
+        { targets: [11], width: "5%"}, //住宿ID
+        { targets: [12], width: "10%"}, //下單時間
         { targets: [13], width: "7%", orderable: false} //操作
       ],
 	  scrollX:true,
@@ -119,6 +119,45 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 	
 	
+	// ===== 刪除訂單 =====
+	  document.addEventListener("click", function (e) {
+	    if (e.target.closest(".btn_delete")) {
+	      const btn = e.target.closest(".btn_delete");
+	      const restoOrderId = btn.getAttribute("data-id");
+		  
+		  if (!btn) return;
+	      if (!restoOrderId) return;
+
+	      if (confirm("確定要永久刪除這筆訂單？")) {
+			
+			const params = new URLSearchParams();
+		    params.append("restoOrderId",  restoOrderId);
+			
+	        // 存卷軸位置
+	        sessionStorage.setItem("scrollY", window.scrollY);
+	        
+			fetch(`/admin/resto_order/delete`, {
+	          method: 'POST',
+			  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			  body: params
+	        })
+	          .then(res => {
+	            if (res.redirected) {
+	              sessionStorage.setItem("toastMessage", "刪除成功！");
+	              window.location.href = res.url; // 讓DataTables因為整頁刷新而重載資料
+	              return;
+	            }
+	            return res.text(); // 若失敗沒redirect，才繼續處理
+	          })
+	          .catch(err => {
+	            alert("封存失敗：" + err.message);
+	          });
+	      }
+	    }
+	  });
+	
+	
+	  
 	
 	// === Add modal中，要先選好resto才顯示對應timeslot選擇欄位 ===
 		  function bindRestoTimeslotSelect() {
@@ -127,13 +166,21 @@ document.addEventListener("DOMContentLoaded", function () {
 		    const dateInput      = document.getElementById('regiDate');
 
 		    if (!restoSelect || !timeslotSelect || !dateInput) return;
+			
+			// 判斷是否為編輯模式（有 hidden id）
+			  const isEditMode = !!document.getElementById('restoOrderId');
 
 		    restoSelect.addEventListener('change', () => {
 		      filterTimeslot();
 		      filterTimeslotByDate(); // 餐廳變了，再跑一次時間判斷
 		    });
-		    dateInput.addEventListener('change', filterTimeslotByDate);
-
+			
+			restoSelect.addEventListener('change', () => {
+			    filterTimeslot();
+			    filterTimeslotByDate();   // 餐廳變了再重新跑一次時段判斷
+			  });
+			  dateInput.addEventListener('change', filterTimeslotByDate);
+			  
 		    // 首次載入（含回填）
 		    filterTimeslot();
 		    filterTimeslotByDate();
@@ -179,13 +226,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		        const [h, m] = timeStr.split(':').map(Number);
 		        const optMin = h * 60 + m;
+				
+				const isPast = (selectedDate === today && optMin <= currMin);
 
-		        if (selectedDate === today && optMin <= currMin) {
-		          opt.disabled   = true;
+		        if (isPast) {
 		          opt.textContent = label + '（已過）';
+		          opt.disabled   = !isEditMode; // Add: true ；Edit: false
 		        } else {
-		          opt.disabled   = false;
 		          opt.textContent = label;
+		          opt.disabled   = false;
 		        }
 		      });
 
@@ -216,16 +265,30 @@ document.addEventListener("DOMContentLoaded", function () {
 		    try {
 		      const res   = await fetch(`/admin/api/reservation/remaining?restoId=${restoId}&timeslotId=${timeslotId}&date=${date}`);
 		      const { remaining } = await res.json();   // { "remaining": 18 }
-
-		      seatsInput.placeholder = `請輸入人數 (剩餘 ${remaining} 位)`;
-		      seatsInput.max = remaining;
+			  
+			  // 依 新增/編輯 決定 placeholder
+			  const initialSeats = seatsInput.getAttribute('data-initial') || 0;
+			  // 判斷是否是編輯模式（有初始值且不為空）
+			  const isEditMode = !Number.isNaN(initialSeats)
+			                     && initialSeats > 0
+			                     && !!document.getElementById("btnSubmitEditSave");
+								 
+			  if (isEditMode) {
+			        seatsInput.placeholder =
+			          `請輸入人數 (扣除您已預定的 ${initialSeats} 位，剩餘 ${remaining} 位)`;
+			  } else {
+			        seatsInput.placeholder = `請輸入人數 (剩餘 ${remaining} 位)`;
+			  }
+			  seatsInput.max = remaining;
+			  
 
 		      // 如果使用者已經填人數
+			  // editmodal情況:初始值 vs 現在值不同，才代表使用者有改過
 		      const currentSeats = parseInt(seatsInput.value || 0, 10);
-		      if (currentSeats > remaining) {
-		        seatsInput.value = '';
-		        alert(`選擇人數超過剩餘名額 (僅剩 ${remaining} 位)，請重新輸入！`);
-		      }
+			  if (seatsInput.value !== initialSeats && currentSeats > remaining) {
+			    seatsInput.value = '';
+			    alert(`選擇人數超過剩餘名額 (僅剩 ${remaining} 位)，請重新輸入！`);
+			  }
 
 		    } catch (err) {
 		      seatsInput.placeholder = '剩餘名額載入失敗';
@@ -235,9 +298,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		  // 綁定三個欄位的 change & modal 開啟後立即跑一次
 		  function bindRemainingListener () {
-		    ['restoId', 'timeslotId', 'regiDate'].forEach(id => {
+			const initialSeats = document.getElementById('regiSeats')?.value || 0;
+			document.getElementById('regiSeats')?.setAttribute('data-initial', document.getElementById('regiSeats')?.value || '');
+
+					    ['restoId', 'timeslotId', 'regiDate'].forEach(id => {
 		      document.getElementById(id)?.addEventListener('change', refreshRemaining);
 		    });
+			
 
 		    // 初次顯示 modal 時也跑一次（處理回填情況）
 		    refreshRemaining();

@@ -79,13 +79,13 @@ public class RestoVO{
 	@Column(name = "is_deleted") //軟刪除
 	private Boolean isDeleted = false;
 	
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="restoVO")
-	@OrderBy("timeslot_id asc")
-	private Set<TimeslotVO> timeslots = new HashSet<TimeslotVO>();
-
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="restoVO")
-	@OrderBy("period_id asc")
-	private Set<PeriodVO> periods = new HashSet<PeriodVO>();
+//	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="restoVO")
+//	@OrderBy("timeslot_id asc")
+//	private Set<TimeslotVO> timeslots = new HashSet<TimeslotVO>();
+//
+//	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="restoVO")
+//	@OrderBy("period_id asc")
+//	private Set<PeriodVO> periods = new HashSet<PeriodVO>();
 
 	public RestoVO() {
 		super();
@@ -183,13 +183,13 @@ public class RestoVO{
 		this.isDeleted = isDeleted;
 	}
 
-	public Set<TimeslotVO> getTimeslots() {
-		return timeslots;
-	}
-
-	public void setTimeslots(Set<TimeslotVO> timeslots) {
-		this.timeslots = timeslots;
-	}
+//	public Set<TimeslotVO> getTimeslots() {
+//		return timeslots;
+//	}
+//
+//	public void setTimeslots(Set<TimeslotVO> timeslots) {
+//		this.timeslots = timeslots;
+//	}
 
 	@Override
 	public int hashCode() {

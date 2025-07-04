@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.resto.integration.room.RestoPeriodCode;
+import com.resto.integration.room.RestoPeriodCodeConverter;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -43,6 +47,16 @@ public class PeriodVO{
 	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="periodVO", orphanRemoval = true)
 	@OrderBy("timeslot_id asc")
 	private List<TimeslotVO> timeslots = new ArrayList<>();
+
+	
+	@Convert(converter = RestoPeriodCodeConverter.class)
+	@Column(name = "period_code")
+	private RestoPeriodCode periodCode;
+	
+	
+	public PeriodVO() {
+		super();
+	}
 
 	public Integer getPeriodId() {
 		return periodId;
@@ -84,6 +98,16 @@ public class PeriodVO{
 		this.restoVO = restoVO;
 	}
 
+	
+	
+	public RestoPeriodCode getPeriodCode() {
+		return periodCode;
+	}
+
+	public void setPeriodCode(RestoPeriodCode periodCode) {
+		this.periodCode = periodCode;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(periodId);
@@ -105,7 +129,7 @@ public class PeriodVO{
 	@Override
 	public String toString() {
 		return "PeriodVO [periodId=" + periodId + ", periodName=" + periodName + ", sortOrder=" + sortOrder
-				+ ", restoVO=" + restoVO + ", timeslots=" + timeslots + "]";
+				+ ", restoVO=" + restoVO + ", timeslots=" + timeslots + ", periodCode=" + periodCode + "]";
 	}
 
 	

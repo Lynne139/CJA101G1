@@ -46,7 +46,7 @@ public class RestoController {
 	// ===== restoInfo.html ====================================================== //
 	
 	// ===== 刪除 =====
-	@GetMapping("/resto_info/delete")
+	@PostMapping("/resto_info/delete")
 	public String deleteResto(@RequestParam("restoId") Integer id, RedirectAttributes redirectAttributes) {
 	    restoService.softDelete(id); // isDeleted = true
 	    return "redirect:/admin/resto_info";
