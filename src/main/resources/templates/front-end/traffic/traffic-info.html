@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>交通資訊 - Maison d'Yuko</title>
+
+  <!-- ✅ global CSS -->
+  <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- ✅ 交通資訊專用 CSS -->
+  <style>
+    .traffic-section {
+      background: #F4EDE1;
+      padding: 60px 0;
+    }
+
+    .traffic-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .traffic-title {
+      font-size: 2.8rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: #7E4E24;
+      text-align: center;
+    }
+
+    .traffic-subtitle {
+      font-size: 1.2rem;
+      color: #7E4E24;
+      text-align: center;
+      margin-bottom: 3rem;
+      opacity: 0.8;
+    }
+
+    .traffic-method {
+      background: white;
+      border-radius: 15px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(126, 78, 36, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .traffic-method:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(126, 78, 36, 0.15);
+    }
+
+    .method-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #F4EDE1;
+      padding-bottom: 1rem;
+    }
+
+    .method-icon {
+      font-size: 2.5rem;
+      color: #7E4E24;
+      margin-right: 1rem;
+      width: 60px;
+      text-align: center;
+    }
+
+    .method-title {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #7E4E24;
+      margin: 0;
+    }
+
+    .route-item {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: #faf8f5;
+      border-radius: 10px;
+      border-left: 4px solid #B88D67;
+    }
+
+    .route-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #7E4E24;
+      margin-bottom: 0.5rem;
+    }
+
+    .route-details {
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+
+    .route-schedule {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 0.5rem;
+    }
+
+    .time-slot {
+      background: #7E4E24;
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .contact-section {
+      background: #7E4E24;
+      color: white;
+      padding: 2rem;
+      border-radius: 15px;
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .contact-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .contact-item {
+      margin-bottom: 0.8rem;
+    }
+
+    .contact-item i {
+      margin-right: 0.5rem;
+      width: 20px;
+    }
+
+    .notice-section {
+      background: #fff3e6;
+      border: 2px solid #ffcc99;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .notice-title {
+      color: #cc6600;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .notice-title i {
+      margin-right: 0.5rem;
+    }
+
+    .notice-list {
+      color: #994d00;
+      list-style: none;
+      padding: 0;
+    }
+
+    .notice-list li {
+      margin-bottom: 0.5rem;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+
+    .notice-list li:before {
+      content: "•";
+      color: #cc6600;
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+    }
+
+    @media (max-width: 768px) {
+      .traffic-title {
+        font-size: 2rem;
+      }
+
+      .method-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .method-icon {
+        margin-bottom: 0.5rem;
+      }
+
+      .traffic-method {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ header -->
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <!-- ✅ 子選單 Navbar -->
+  <nav class="sub-navbar d-flex justify-content-center align-items-center">
+    <ul class="nav">
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">關於嶼蔻</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" th:href="@{/front-end/about/brand-story}">品牌故事</a></li>
+          <li><a class="dropdown-item" th:href="@{/front-end/about/environment}">環境簡介</a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">最新消息</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" th:href="@{/news/notice}">最新公告</a></li>
+          <li><a class="dropdown-item" th:href="@{/news/promotion}">活動通知</a></li>
+          <li><a class="dropdown-item" th:href="@{/news/news}">媒體報導</a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">探索嶼蔻</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">珍饈美饌</a></li>
+          <li><a class="dropdown-item" href="#">多元設施</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a class="nav-link" href="#rooms">精緻客房</a></li>
+      <li class="nav-item"><a class="nav-link active" th:href="@{/traffic}">交通資訊</a></li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">聯絡我們</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" th:href="@{/contact}">聯絡客服</a></li>
+          <li><a class="dropdown-item" th:href="@{/chatbot}">智慧客服</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a class="nav-link" href="#faq">常見問題</a></li>
+    </ul>
+  </nav>
+
+  <!-- ✅ Main Content -->
+  <section class="traffic-section">
+    <div class="container traffic-container">
+      <h1 class="traffic-title">交通資訊</h1>
+      <p class="traffic-subtitle">多種交通方式，輕鬆抵達嶼蔻渡假村</p>
+
+      <!-- 航空交通 -->
+      <div class="traffic-method">
+        <div class="method-header">
+          <i class="fas fa-plane method-icon"></i>
+          <h2 class="method-title">航空交通</h2>
+        </div>
+
+        <div class="route-item">
+          <div class="route-name">高雄小港機場 → 映灣嶼</div>
+          <div class="route-details">搭乘嶼蔻專屬接駁船班，航程約 45 分鐘</div>
+          <div class="route-details">需提前 24 小時預約接駁船班</div>
+          <div class="route-schedule">
+            <span class="time-slot">09:00</span>
+            <span class="time-slot">14:00</span>
+            <span class="time-slot">18:00</span>
+          </div>
+        </div>
+
+        <div class="route-item">
+          <div class="route-name">台北松山機場 → 映灣嶼</div>
+          <div class="route-details">轉乘高雄小港機場，再搭接駁船班</div>
+          <div class="route-details">建議預留 3-4 小時轉乘時間</div>
+        </div>
+      </div>
+
+      <!-- 海上交通 -->
+      <div class="traffic-method">
+        <div class="method-header">
+          <i class="fas fa-ship method-icon"></i>
+          <h2 class="method-title">海上交通</h2>
+        </div>
+
+        <div class="route-item">
+          <div class="route-name">高雄港 → 映灣嶼</div>
+          <div class="route-details">嶼蔻專屬豪華遊艇，航程約 1.5 小時</div>
+          <div class="route-details">提供輕食與迎賓飲品服務</div>
+          <div class="route-schedule">
+            <span class="time-slot">08:30</span>
+            <span class="time-slot">13:30</span>
+            <span class="time-slot">17:30</span>
+          </div>
+        </div>
+
+        <div class="route-item">
+          <div class="route-name">東港漁港 → 映灣嶼</div>
+          <div class="route-details">快艇接駁服務，航程約 1 小時</div>
+          <div class="route-details">需提前預約</div>
+          <div class="route-schedule">
+            <span class="time-slot">10:00</span>
+            <span class="time-slot">15:00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 陸路轉乘 -->
+      <div class="traffic-method">
+        <div class="method-header">
+          <i class="fas fa-car method-icon"></i>
+          <h2 class="method-title">陸路轉乘</h2>
+        </div>
+
+        <div class="route-item">
+          <div class="route-name">自行開車</div>
+          <div class="route-details">可將車輛停放於高雄港或東港漁港的合作停車場</div>
+          <div class="route-details">提供免費停車服務（住宿期間）</div>
+          <div class="route-details">停車場有 24 小時保全</div>
+        </div>
+      </div>
+
+      <!-- 私人交通 -->
+      <div class="traffic-method">
+        <div class="method-header">
+          <i class="fas fa-helicopter method-icon"></i>
+          <h2 class="method-title">私人交通</h2>
+        </div>
+
+        <div class="route-item">
+          <div class="route-name">私人遊艇</div>
+          <div class="route-details">映灣嶼設有私人碼頭，可停泊 30 呎以下遊艇</div>
+          <div class="route-details">需提前申請停泊許可</div>
+        </div>
+
+        <div class="route-item">
+          <div class="route-name">直升機</div>
+          <div class="route-details">渡假村設有直升機停機坪</div>
+          <div class="route-details">提供台北、台中、高雄直飛服務</div>
+          <div class="route-details">需提前 48 小時預約</div>
+        </div>
+      </div>
+
+      <!-- 行李服務 -->
+      <div class="traffic-method">
+        <div class="method-header">
+          <i class="fas fa-suitcase method-icon"></i>
+          <h2 class="method-title">行李服務</h2>
+        </div>
+
+        <div class="route-item">
+          <div class="route-name">行李直送服務</div>
+          <div class="route-details">機場/港口 → 客房直接配送</div>
+          <div class="route-details">退房日行李可暫存至離島前</div>
+          <div class="route-details">大型行李請提前告知</div>
+        </div>
+      </div>
+
+      <!-- 交通預約聯絡 -->
+      <div class="contact-section">
+        <h3 class="contact-title">交通預約與聯絡</h3>
+        <div class="contact-item">
+          <i class="fas fa-phone"></i>
+          客服專線：+886-7-123-4567
+        </div>
+        <div class="contact-item">
+          <i class="fas fa-envelope"></i>
+          線上預約：service@maisondyuko.com
+        </div>
+        <div class="contact-item">
+          <i class="fas fa-exclamation-triangle"></i>
+          緊急聯絡：+886-912-345-678
+        </div>
+      </div>
+
+      <!-- 貼心提醒 -->
+      <div class="notice-section">
+        <div class="notice-title">
+          <i class="fas fa-info-circle"></i>
+          貼心提醒
+        </div>
+        <ul class="notice-list">
+          <li>海象不佳時，船班可能延誤或取消，敬請見諒</li>
+          <li>建議攜帶防暈船藥品</li>
+          <li>島上備有緊急醫療設備與專業醫護人員</li>
+          <li>所有船班均提供救生設備，請配合安全規定</li>
+          <li>建議提前確認天候狀況，避免行程受影響</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✅ footer -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
+  
+  <!-- ✅ 右側功能按鈕 -->
+  <div th:replace="fragments/mainfunction :: stickyIcons"></div>
+
+  <!-- ✅ Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script th:src="@{/homepage/js/script.js}"></script>
+</body>
+</html> 
