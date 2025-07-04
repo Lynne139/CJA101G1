@@ -2,6 +2,8 @@ package com.notification.service;
 
 import com.notification.entity.Notification;
 import com.notification.repository.NotificationRepository;
+import com.notification.websocket.NotificationWebSocketService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +13,13 @@ import java.util.List;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private NotificationWebSocketService notificationWebSocketService;
 
     @Autowired
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository,
+    		NotificationWebSocketService notificationWebSocketService) {
         this.notificationRepository = notificationRepository;
+        this.notificationWebSocketService = notificationWebSocketService;
     }
 
     // 新增通知
@@ -29,7 +34,13 @@ public class NotificationService {
         notification.setTitle(title);
         notification.setContent(content);
         notification.setIsRead(false); // 預設未讀
-        return notificationRepository.save(notification);
+        Notification saved = notificationRepository.save(notification);
+        // 計算最新未讀數量
+        long unreadCount = notificationRepository.countUnreadByMemberId(memberId);
+        // 推播給該會員
+        notificationWebSocketService.sendUnreadCountToMember(memberId, unreadCount);
+        
+        return saved;
     }
 
     // 取得某會員所有通知
