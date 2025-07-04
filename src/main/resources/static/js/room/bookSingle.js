@@ -10,18 +10,30 @@ const roomTypeId = document.querySelector("meta[name='roomTypeId']").content;
 //日曆顯示庫存
 document.addEventListener("DOMContentLoaded", function() {
 	loadInventoryMap();
+	// 初始化時不調用 updateGuestOptions()，讓下拉選單保持初始狀態
+	initializeDropdowns();
 });
+
+function initializeDropdowns() {
+	// 初始化間數下拉選單
+	const roomSelect = document.getElementById("roomCount");
+	roomSelect.innerHTML = '<option disabled selected>請選擇入住日期</option>';
+	
+	// 初始化人數下拉選單
+	const guestSelect = document.getElementById("guestCount");
+	guestSelect.innerHTML = '<option disabled selected>請先選擇房間數量</option>';
+}
 
 function loadInventoryMap() {
 	// 取得當月庫存
 
 	const startDate = new Date();
 	const end = `2099-12-31`;
-//	const endDate = new Date();
-//	endDate.setDate(startDate.getDate() + 30); // 往後30天
+	//	const endDate = new Date();
+	//	endDate.setDate(startDate.getDate() + 30); // 往後30天
 
 	const start = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`;
-//	const end = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+	//	const end = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
 
 	fetch(`/roomtype/${roomTypeId}/inventory-map?start=${start}&end=${end}`)
 		.then(res => res.json())
@@ -29,11 +41,11 @@ function loadInventoryMap() {
 			//			console.log("取得庫存地圖:", data);
 			inventoryMap = data;
 			// 找出最大日期
-//			const dates = Object.keys(inventoryMap).sort();
-//			if (dates.length > 0) {
-//				const maxDate = new Date(dates[dates.length - 1]);
-//				currentDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1); // 把日曆移到最大月份
-//			}
+			//			const dates = Object.keys(inventoryMap).sort();
+			//			if (dates.length > 0) {
+			//				const maxDate = new Date(dates[dates.length - 1]);
+			//				currentDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1); // 把日曆移到最大月份
+			//			}
 			generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
 		})
 		.catch(e => console.error("取庫存失敗", e));
@@ -207,28 +219,56 @@ function selectPackage(element, price) {
 }
 
 function updateGuestOptions() {
-    const roomCount = parseInt(document.getElementById("roomCount").value);
-    const guestSelect = document.getElementById("guestCount");
-    const maxGuestsPerRoom = parseInt(guestSelect.dataset.maxGuests);
+	const roomCount = parseInt(document.getElementById("roomCount").value) || 1;
+	const guestSelect = document.getElementById("guestCount");
+	const maxGuestsPerRoom = parseInt(guestSelect.dataset.maxGuests) ||
+		parseInt(document.querySelector("meta[name='roomTypeGuestNum']")?.content) || 4;
 
-    console.log("間數:", roomCount, "最大可住人數:", maxGuestsPerRoom);
+	console.log("間數:", roomCount, "最大可住人數:", maxGuestsPerRoom);
 
-    // 總最大人數
-    const totalMaxGuests = roomCount * maxGuestsPerRoom;
+	// 如果沒有選擇房間數，重置人數選單
+	if (roomCount === 0) {
+		guestSelect.innerHTML = '<option disabled selected>請先選擇房間數量</option>';
+		updateSummary();
+		return;
+	}
+	// 總最大人數= 房間數量 × 每間房最大人數
+	const totalMaxGuests = roomCount * maxGuestsPerRoom;
 
-    // 清空後重建
-    guestSelect.innerHTML = "";
-    for (let i = 1; i <= totalMaxGuests; i++) {
-        const option = document.createElement("option");
-        option.value = i;
-        option.text = `${i} 人`;
-        guestSelect.appendChild(option);
-    }
+	// 保存目前選擇的人數
+	const currentGuestCount = parseInt(guestSelect.value) || totalMaxGuests;
+
+	// 清空後重建
+	guestSelect.innerHTML = "";
+	// 添加預設選項
+	const defaultOption = document.createElement("option");
+	defaultOption.value = "0";
+	defaultOption.text = "選擇人數";
+	defaultOption.disabled = true;
+	defaultOption.selected = true;
+	guestSelect.appendChild(defaultOption);
+	
+	for (let i = 1; i <= totalMaxGuests; i++) {
+		const option = document.createElement("option");
+		option.value = i;
+		option.text = `${i} 人`;
+		guestSelect.appendChild(option);
+	}
+
+	// 保持原本的選擇，如果超過新的最大值則設為最大值
+	if (currentGuestCount <= totalMaxGuests) {
+		guestSelect.value = currentGuestCount;
+	} else {
+		guestSelect.value = totalMaxGuests; // 重置為預設值
+	}
+
+	// 更新摘要
+	updateSummary();
 }
 
 function updateSummary() {
-	const roomCount = parseInt(document.getElementById('roomCount').value);
-	const guestCount = parseInt(document.getElementById('guestCount').value);
+	const roomCount = parseInt(document.getElementById('roomCount').value) || 1;
+	const guestCount = parseInt(document.getElementById('guestCount').value) || 1;
 
 	document.getElementById('summaryRooms').textContent = `${roomCount} 間`;
 
@@ -271,6 +311,8 @@ function onDateSelected(dateStr) {
 		.then(remaining => {
 			console.log("該日剩餘房間數:", remaining);
 			const select = document.getElementById("roomCount");
+			// 記錄當前選擇的房間數
+			const currentRoomCount = parseInt(select.value) || 0;
 			select.innerHTML = "";
 
 			if (remaining <= 0) {
@@ -278,16 +320,38 @@ function onDateSelected(dateStr) {
 				option.text = "已售完";
 				option.disabled = true;
 				select.appendChild(option);
+				// 重置人數選單
+				const guestSelect = document.getElementById("guestCount");
+				guestSelect.innerHTML = '<option disabled selected>請先選擇房間數量</option>';
 			} else {
+				// 添加預設選項
+				const defaultOption = document.createElement("option");
+				defaultOption.value = "0";
+				defaultOption.text = "選擇間數";
+				defaultOption.disabled = true;
+				defaultOption.selected = true;
+				select.appendChild(defaultOption);
+				
 				for (let i = 1; i <= remaining; i++) {
 					const option = document.createElement("option");
 					option.value = i;
 					option.text = `${i} 間房`;
 					select.appendChild(option);
 				}
+				// 重新選擇日期時，重置為1間房
+//				select.value = 1;
+							
+
+				// 保持原本的選擇，如果超過可用數量則設為最大值
+				if (currentRoomCount > 0 && currentRoomCount <= remaining) {
+					select.value = currentRoomCount;
+				} else {
+					select.value = 1;
+				}
 			}
 
-			updateSummary();
+			// 更新人數選項
+			updateGuestOptions();
 		})
 		.catch(error => {
 			console.error("單日查庫存錯誤", error);
@@ -307,6 +371,8 @@ function checkInventoryRange() {
 		.then(minRemaining => {
 			console.log("多日最少庫存:", minRemaining);
 			const select = document.getElementById("roomCount");
+			// 記錄當前選擇的房間數
+			const currentRoomCount = parseInt(select.value) || 0;
 			select.innerHTML = "";
 
 			if (minRemaining <= 0) {
@@ -314,16 +380,33 @@ function checkInventoryRange() {
 				option.text = "已售完";
 				option.disabled = true;
 				select.appendChild(option);
+				// 重置人數選單
+				const guestSelect = document.getElementById("guestCount");
+				guestSelect.innerHTML = '<option disabled selected>請先選擇房間數量</option>';
 			} else {
+				// 添加預設選項
+				const defaultOption = document.createElement("option");
+				defaultOption.value = "0";
+				defaultOption.text = "選擇間數";
+				defaultOption.disabled = true;
+				select.appendChild(defaultOption);
+				
 				for (let i = 1; i <= minRemaining; i++) {
 					const option = document.createElement("option");
 					option.value = i;
 					option.text = `${i} 間房`;
 					select.appendChild(option);
 				}
+				// 保持原本的選擇，如果超過可用數量則設為最大值
+				if (currentRoomCount > 0 && currentRoomCount <= minRemaining) {
+					select.value = currentRoomCount;
+				} else {
+					select.value = "1"; // 預設選擇1間房
+				}
 			}
 
-			updateSummary();
+			// 更新人數選項
+			updateGuestOptions();
 		})
 		.catch(error => {
 			console.error("多日查庫存錯誤", error);
@@ -332,51 +415,63 @@ function checkInventoryRange() {
 
 //跳轉到多房型頁面
 document.querySelectorAll('.multi-book-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        goToMultiBooking(roomTypeId);
-    });
+	btn.addEventListener('click', function() {
+		goToMultiBooking(roomTypeId);
+	});
 });
 function goToMultiBooking(roomTypeId) {
-    const checkinEl = document.getElementById('checkInDate');
-    const checkoutEl = document.getElementById('checkOutDate');
-    const guests = parseInt(document.getElementById('guestCount').value) || 1;
-    const rooms = parseInt(document.getElementById('roomCount').value) || 1; // 單一房型頁的房間數 input
-    const packagePrice = selectedPackagePrice || 0;  
+	const checkinEl = document.getElementById('checkInDate');
+	const checkoutEl = document.getElementById('checkOutDate');
+	const guests = parseInt(document.getElementById('guestCount').value) || 1;
+	const rooms = parseInt(document.getElementById('roomCount').value) || 1; // 單一房型頁的房間數 input
+	const packagePrice = selectedPackagePrice || 0;
 
-    const checkin = checkinEl ? checkinEl.textContent.trim() : "";
-    const checkout = checkoutEl ? checkoutEl.textContent.trim() : "";
+	const checkin = checkinEl ? checkinEl.textContent.trim() : "";
+	const checkout = checkoutEl ? checkoutEl.textContent.trim() : "";
 
-    let url = `/bookMulti?checkin=${checkin}&checkout=${checkout}&guests=${guests}&package=${packagePrice}&rooms_${roomTypeId}=${rooms}&guests_${roomTypeId}=${guests}`;
-    window.location.href = url;
+	let url = `/bookMulti?checkin=${checkin}&checkout=${checkout}&guests=${guests}&package=${packagePrice}&rooms_${roomTypeId}=${rooms}&guests_${roomTypeId}=${guests}`;
+	window.location.href = url;
 }
 
 document.getElementById('bookBtn').addEventListener('click', function() {
 	if (!selectedCheckIn || !selectedCheckOut) {
-	        alert('請選擇入住和退房日期');
-	        return;
-	    }
-
-	    alert('預訂成功！接下來將導向填寫入住資料頁面。');
-		
-		// 抓到原本 input 元素
-		const checkinText = document.getElementById('checkInDate').textContent.trim();
-		const checkoutText = document.getElementById('checkOutDate').textContent.trim();
-		
-		// 格式轉 yyyy-MM-dd
-		function formatDateString(str) {
-			if (!str.includes('/')) return str;
-			const parts = str.split('/');
-			if (parts.length !== 3) return "";
-			let [year, month, day] = parts;
-			month = month.padStart(2, '0');
-			day = day.padStart(2, '0');
-			return `${year}-${month}-${day}`;
-		}
-
+		alert('請選擇入住和退房日期');
+		return;
+	}
 	
-    const form = document.getElementById('singleRoomForm');
+	const roomCount = parseInt(document.getElementById('roomCount').value) || 0;
+	const guestCount = parseInt(document.getElementById('guestCount').value) || 0;
+	
+	if (roomCount === 0) {
+		alert('請選擇房間數量');
+		return;
+	}
+	
+	if (guestCount === 0) {
+		alert('請選擇入住人數');
+		return;
+	}
+	alert('接下來將導向填寫入住資料頁面。');
+
+	// 抓到原本 input 元素
+	const checkinText = document.getElementById('checkInDate').textContent.trim();
+	const checkoutText = document.getElementById('checkOutDate').textContent.trim();
+
+	// 格式轉 yyyy-MM-dd
+	function formatDateString(str) {
+		if (!str.includes('/')) return str;
+		const parts = str.split('/');
+		if (parts.length !== 3) return "";
+		let [year, month, day] = parts;
+		month = month.padStart(2, '0');
+		day = day.padStart(2, '0');
+		return `${year}-${month}-${day}`;
+	}
+
+
+	const form = document.getElementById('singleRoomForm');
 	const roomTypeId = document.querySelector("meta[name='roomTypeId']").content;
-    // 日期是從日曆顯示的文字
+	// 日期是從日曆顯示的文字
 	form.querySelector('input[name="checkin"]').value = formatDateString(checkinText);
 	form.querySelector('input[name="checkout"]').value = formatDateString(checkoutText);
 	form.querySelector('input[name="guests"]').value = document.getElementById('guestCount').value;
@@ -388,7 +483,7 @@ document.getElementById('bookBtn').addEventListener('click', function() {
 	inputRoom.value = document.getElementById('roomCount').value;
 	form.appendChild(inputRoom);
 
-    // 人數
+	// 人數
 	let inputGuests = document.createElement("input");
 	inputGuests.type = "hidden";
 	inputGuests.name = `guests_${roomTypeId}`;
@@ -396,15 +491,15 @@ document.getElementById('bookBtn').addEventListener('click', function() {
 	form.appendChild(inputGuests);
 
 	// 加購專案
-    if (selectedPackagePrice > 0) {
-        let input = document.createElement("input");
-        input.type = "hidden";
-        input.name = "package";
-        input.value = selectedPackagePrice;
-        form.appendChild(input);
-    }
+	if (selectedPackagePrice > 0) {
+		let input = document.createElement("input");
+		input.type = "hidden";
+		input.name = "package";
+		input.value = selectedPackagePrice;
+		form.appendChild(input);
+	}
 
-    form.submit();
+	form.submit();
 });
 
 

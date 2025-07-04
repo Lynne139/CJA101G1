@@ -6,6 +6,7 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,10 +121,15 @@ public class RoomTypeScheduleService {
 		String startDate = roomOList.getRoomOrder().getCheckInDate();
 		String endDate = roomOList.getRoomOrder().getCheckOutDate();
 		int bookedAmount = roomOList.getRoomAmount();
-
-		List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository.findByRoomTypeVOAndRoomOrderDateBetween(
-				roomType, java.sql.Date.valueOf(startDate), java.sql.Date.valueOf(endDate));
-
+		
+		Date checkInDate = java.sql.Date.valueOf(startDate);
+	    Date checkOutDate = java.sql.Date.valueOf(endDate);
+	 // 使用 findByRoomTypeVOAndRoomOrderDateBetween，但要排除退房日期
+		List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository
+				.findByRoomTypeVOAndRoomOrderDateBetween(roomType, checkInDate, checkOutDate)
+				.stream()
+	            .filter(schedule -> schedule.getRoomOrderDate().before(checkOutDate))
+	            .collect(Collectors.toList());
 		// 先檢查所有天庫存
 		for (RoomTypeScheduleVO schedule : schedules) {
 			int remaining = schedule.getRoomAmount() - schedule.getRoomRSVBooked();
@@ -146,12 +152,15 @@ public class RoomTypeScheduleService {
         String startDate = roomOList.getRoomOrder().getCheckInDate();
 		String endDate = roomOList.getRoomOrder().getCheckOutDate();
         int quantity = roomOList.getRoomAmount();
+        
+        Date checkInDate = java.sql.Date.valueOf(startDate);
+        Date checkOutDate = java.sql.Date.valueOf(endDate);
 
-        List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository.findByRoomTypeVOAndRoomOrderDateBetween(
-            roomType,
-            java.sql.Date.valueOf(startDate),
-            java.sql.Date.valueOf(endDate)
-        );
+        List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository
+        		.findByRoomTypeVOAndRoomOrderDateBetween(roomType, checkInDate, checkOutDate)
+	            .stream()
+	            .filter(schedule -> schedule.getRoomOrderDate().before(checkOutDate))
+	            .collect(Collectors.toList());
 
         for (RoomTypeScheduleVO schedule : schedules) {
             int updatedBooked = schedule.getRoomRSVBooked() - quantity;
@@ -169,6 +178,15 @@ public class RoomTypeScheduleService {
         RoomTypeVO roomType = oldRoomOList.getRoomType();
         String startDate = oldRoomOList.getRoomOrder().getCheckInDate();
         String endDate = oldRoomOList.getRoomOrder().getCheckOutDate();
+        
+        Date checkInDate = java.sql.Date.valueOf(startDate);
+        Date checkOutDate = java.sql.Date.valueOf(endDate);
+
+        List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository
+        		.findByRoomTypeVOAndRoomOrderDateBetween(roomType, checkInDate, checkOutDate)
+	            .stream()
+	            .filter(schedule -> schedule.getRoomOrderDate().before(checkOutDate))
+	            .collect(Collectors.toList());
 
         int oldQty = oldRoomOList.getRoomAmount();
         int newQty = newRoomOList.getRoomAmount();
@@ -176,12 +194,6 @@ public class RoomTypeScheduleService {
 
         if (diff > 0) {
             // 要多訂房 ➜ 檢查並預約
-            List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository
-                .findByRoomTypeVOAndRoomOrderDateBetween(
-                    roomType,
-                    java.sql.Date.valueOf(startDate),
-                    java.sql.Date.valueOf(endDate)
-                );
 
             for (RoomTypeScheduleVO schedule : schedules) {
                 int remaining = schedule.getRoomAmount() - schedule.getRoomRSVBooked();
@@ -200,12 +212,6 @@ public class RoomTypeScheduleService {
 
         } else if (diff < 0) {
             // 減少預約 ➜ 釋放庫存
-            List<RoomTypeScheduleVO> schedules = roomTypeScheduleRepository
-                .findByRoomTypeVOAndRoomOrderDateBetween(
-                    roomType,
-                    java.sql.Date.valueOf(startDate),
-                    java.sql.Date.valueOf(endDate)
-                );
 
             for (RoomTypeScheduleVO schedule : schedules) {
                 int newBooked = schedule.getRoomRSVBooked() + diff; // diff 是負數
