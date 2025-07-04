@@ -5,7 +5,10 @@ import java.util.Optional;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+
 
 @Service("memberService")
 public class MemberService {
@@ -15,6 +18,10 @@ public class MemberService {
 	
 	@Autowired
     private SessionFactory sessionFactory;
+	
+	@Autowired
+	@Lazy
+	private com.util.email.ResetPasswordEmailService resetPasswordEmailService;
 
 	public void addMember(MemberVO memberVO) {
 		repository.save(memberVO);
@@ -56,8 +63,14 @@ public class MemberService {
 	public Integer getMemberPointsById(Integer memberId) {
 	    Optional<MemberVO> optional = repository.findById(memberId);
 	    return optional.map(MemberVO::getMemberPoints).orElse(null);
-	    
-//	public boolean sendResetPasswordEmail(String email);
+	}
+
+	public MemberVO getByEmail(String email) {
+	    Optional<MemberVO> optional = Optional.ofNullable(repository.findByMemberEmail(email));
+	    return optional.orElse(null);
+	}
 	
+	public boolean sendResetPasswordEmail(String email) {
+	    return resetPasswordEmailService.sendResetPasswordEmail(email);
 	}
 }

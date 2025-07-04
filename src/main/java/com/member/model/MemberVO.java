@@ -1,6 +1,5 @@
 package com.member.model;
 
-import java.sql.Date;
 import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -139,8 +138,8 @@ public class MemberVO implements java.io.Serializable {
 	
 	@Column(name = "member_status")
 	@NotNull(message="會員狀態: 請勿空白")
-	@Max(value = 2, message = "會員狀態Default:0  0:尚未認證 1:啟用 2:停權")
-	@Min(value = 0, message = "會員狀態Default:0  0:尚未認證 1:啟用 2:停權")
+	@Max(value = 2, message = "會員狀態 1:啟用 2:停權")
+	@Min(value = 1, message = "會員狀態 1:啟用 2:停權")
 	public Integer getMemberStatus() {
 		return memberStatus;
 	}

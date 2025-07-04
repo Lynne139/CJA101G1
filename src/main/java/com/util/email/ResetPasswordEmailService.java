@@ -1,6 +1,7 @@
 package com.util.email;
 
-
+import com.member.model.MemberService;
+import com.member.model.MemberVO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,76 +10,94 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.security.SecureRandom;
 
 @Service
 public class ResetPasswordEmailService {
 
     @Autowired
     private JavaMailSender mailSender;
-    // Example改成自己的e.g.RoomBooking，參數可自訂(e.g.加入RoomOrder roomOrder)
-    public void sendResetPasswordEmail(String toMemberEmail) throws MessagingException, IOException {
 
-    	toMemberEmail = "cja101g1@gmail.com"; // 收件者電郵，這行僅供測試，實際應是傳入的參數
-        String subject = "【嶼蔻渡假村】密碼變更通知信"; 
-        
-        MimeMessage message = mailSender.createMimeMessage();
-        
-        // true = multipart message
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");   
-        helper.setFrom("maisonyukog1@gmail.com"); // 這行不要動
-        helper.setTo(toMemberEmail);
-        helper.setSubject(subject);
+    @Autowired
+    private MemberService memberSvc;
 
-        String newPassword = "Pw123456"; 
-        
+    public boolean sendResetPasswordEmail(String toMemberEmail) {
+        // 1. 取得會員資料
+        MemberVO member = memberSvc.getByEmail(toMemberEmail);
+        if (member == null) return false;
 
-        // htmlContent改成自己要的內容
-        String htmlContent = """
-        	    <div style='font-family: Arial, sans-serif; color: #333333; max-width: 650px; margin: auto; font-size: 1.35em;'>
-        	        <!-- 飯店橫幅圖片 -->
-        	        <img src='cid:headerImage' alt='飯店橫幅圖' style='width: 95%; max-width: 675px; height: auto; display: block; border: none; margin: 0 auto;'>
+        // 2. 產生新密碼
+        String newPassword = generateRandomPassword(8);
 
-        	        <!-- 正文內容 -->
-        	        <div style='padding: 25px;'>
-        	            <h2 style='color: #c06014; font-size: 1.8em; margin-top: 5px;'>密碼變更通知！</h2>"""
-        	            + "<p style='font-size: 1.05em;'>親愛的貴賓您好，</p>"
-        	            + """
-        	            <p style='font-size: 1.05em;'>這是您的新密碼：+ newPassword</p>     	  
-        	        </div>
+        // 3. 更新密碼
+        member.setMemberPassword(newPassword); // 可加密
+        memberSvc.updateMember(member);
 
-        	        <!-- 底部區塊 -->
-        	        <div style='background-color: #fff4e6; padding: 10px 15px;'>
-        	            <div style='display: table; width: 100%;'>
-        	                <!-- Logo -->
-        	                <div style='display: table-cell; width: 165px; text-align: center; vertical-align: top; padding-right: 20px;'>
-        	                    <img src='cid:footerImage' alt='Logo照片' style='width: 150px; height: 150px; object-fit: contain; border-radius: 12px;'>
-        	                </div>
+        try {
+            // 4. 準備 Email
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-        	                <!-- 聯絡資訊 -->
-        	                <div style='display: table-cell; vertical-align: top; font-size: 1.1em;'>
-        	                    <p style='margin: 10px 0 0 0; line-height: 1.6;'>
-        	                        <strong>嶼蔻渡假村 Maison d’Yuko</strong><br>
-        	                        南海群島．映濤嶼 9 號，珊瑚灣 2025<br>
-        	                        Tel：+886-7-123-4567<br>
-        	                        Email：service@maisondyuko.com
-        	                    </p>
-        	                </div>
-        	            </div>
-        	        </div>
-        	    </div>
-        	""";
+            helper.setFrom("maisonyukog1@gmail.com");
+            helper.setTo(toMemberEmail);
+            helper.setSubject("【嶼蔻渡假村】密碼變更通知信");
 
-        helper.setText(htmlContent, true); // true代表html格式
-        
-        // 加入 header 圖片 (橫幅)
-        ClassPathResource headerImage = new ClassPathResource("static/images/email/emailHeader.png");
-        helper.addInline("headerImage", headerImage);
+            // 5. HTML 內容（用 replace 插入密碼）
+            String htmlContent = """
+                <div style='font-family: Arial, sans-serif; color: #333333; max-width: 650px; margin: auto; font-size: 1.35em;'>
+                    <img src='cid:headerImage' alt='飯店橫幅圖' style='width: 95%%; max-width: 675px; height: auto; display: block; border: none; margin: 0 auto;'>
 
-        // 加入 footer 圖片 (Logo)
-        ClassPathResource footerImage = new ClassPathResource("static/images/email/emailLogo.png");
-        helper.addInline("footerImage", footerImage);
+                    <div style='padding: 25px;'>
+                        <h2 style='color: #c06014; font-size: 1.8em; margin-top: 5px;'>密碼變更通知！</h2>
+                        <p style='font-size: 1.05em;'>親愛的貴賓您好，</p>
+                        <p style='font-size: 1.05em;'>這是您的新密碼：<strong>{{password}}</strong></p>
+                        <p style='font-size: 1.05em;'>請儘快登入並變更您的密碼，以保障帳戶安全。</p>
+                    </div>
 
-        mailSender.send(message);
+                    <div style='background-color: #fff4e6; padding: 10px 15px;'>
+                        <div style='display: table; width: 100%%;'>
+                            <div style='display: table-cell; width: 165px; text-align: center; vertical-align: top; padding-right: 20px;'>
+                                <img src='cid:footerImage' alt='Logo照片' style='width: 150px; height: 150px; object-fit: contain; border-radius: 12px;'>
+                            </div>
+                            <div style='display: table-cell; vertical-align: top; font-size: 1.1em;'>
+                                <p style='margin: 10px 0 0 0; line-height: 1.6;'>
+                                    <strong>嶼蔻渡假村 Maison d’Yuko</strong><br>
+                                    南海群島．映濤嶼 9 號，珊瑚灣 2025<br>
+                                    Tel：+886-7-123-4567<br>
+                                    Email：service@maisondyuko.com
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                """.replace("{{password}}", newPassword);
+
+            helper.setText(htmlContent, true);
+
+            // 6. 加入圖片
+            ClassPathResource headerImage = new ClassPathResource("static/images/email/emailHeader.png");
+            helper.addInline("headerImage", headerImage);
+
+            ClassPathResource footerImage = new ClassPathResource("static/images/email/emailLogo.png");
+            helper.addInline("footerImage", footerImage);
+
+            // 7. 發送
+            mailSender.send(message);
+            return true;
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private String generateRandomPassword(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder sb = new StringBuilder();
+        SecureRandom random = new SecureRandom();
+        for (int i = 0; i < length; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 }
