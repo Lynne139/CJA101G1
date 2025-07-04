@@ -7,57 +7,7 @@ let availableCoupons = []; // 可用的折價券列表
 let selectedCoupon = null; // 選擇的折價券
 let productPhotos = {}; // 儲存每個商品的照片資訊
 
-// 購物車數據
-let products = [
-  {
-    id: 1,
-    name: '嶼蔻特製蜂蜜',
-    price: 350,
-    category: 'food',
-    description: '精選在地野生蜂蜜，純天然無添加',
-    image: '/images/shop/product1.jpg'
-  },
-  {
-    id: 2,
-    name: '手工編織包',
-    price: 1200,
-    category: 'craft',
-    description: '當地藝術家手工製作，獨特設計',
-    image: '/images/shop/product2.jpg'
-  },
-  {
-    id: 3,
-    name: '海藻保濕面膜',
-    price: 680,
-    category: 'beauty',
-    description: '富含海洋精華，深層保濕修護',
-    image: '/images/shop/product3.jpg'
-  },
-  {
-    id: 4,
-    name: '海島香氛蠟燭',
-    price: 850,
-    category: 'home',
-    description: '天然椰子蠟，海風清新香調',
-    image: '/images/shop/product4.jpg'
-  },
-  {
-    id: 5,
-    name: '手工椰子餅乾',
-    price: 420,
-    category: 'food',
-    description: '新鮮椰子製作，香脆可口',
-    image: '/images/shop/product5.jpg'
-  },
-  {
-    id: 6,
-    name: '貝殼珍珠項鍊',
-    price: 1500,
-    category: 'craft',
-    description: '天然貝殼與珍珠，優雅設計',
-    image: '/images/shop/product6.jpg'
-  }
-];
+
 
 // DOM 載入完成後初始化
 document.addEventListener('DOMContentLoaded', function() {
@@ -395,9 +345,15 @@ function removeFromCart(productId) {
 
 // 快速查看商品詳情 Modal
 function showProductModal(productId) {
-  // 取得商品資料（可根據實際需求擴充）
-  const product = products.find(p => p.id == productId);
-  if (!product) return;
+  const card = document.querySelector(`.product-card[data-product-id='${productId}']`);
+  if (!card) return;
+  const product = {
+    productId: card.getAttribute('data-product-id'),
+    productName: card.getAttribute('data-product-name'),
+    prodDesc: card.getAttribute('data-product-desc'),
+    productPrice: card.getAttribute('data-product-price'),
+    prodCateName: card.getAttribute('data-product-cate')
+  };
 
   // 載入商品所有照片
   $.ajax({
@@ -978,7 +934,7 @@ function loadAvailableCoupons(cartTotal = 0) {
         availableCoupons = response.coupons || [];
         populateCouponSelect();
       } else {
-        showNotification('載入折價券失敗: ' + response.message, 'error');
+        showNotification(response.message, 'error');
       }
     },
     error: function(xhr, status, error) {

@@ -45,21 +45,8 @@ public class ShopIndexController {
     /**
      * 商城首頁（原本版本，已註解）
      */
-    /*
-    @GetMapping("/shop")
-    public String shopIndex(Model model) {
-        // 獲取所有商品
-        List<ProdVO> products = prodService.getAll();
-        model.addAttribute("products", products);
-        // 獲取所有商品照片
-        List<ProdPhotoVO> productPhotos = prodPhotoService.getAll();
-        model.addAttribute("productPhotos", productPhotos);
-        // 獲取所有商品分類
-        List<ProdCateVO> categories = prodCateService.getAll();
-        model.addAttribute("categories", categories);
-        return "front-end/shop/shopIndex";
-    }
-    */
+    
+    
 
     /**
      * 商城首頁（本地測試用，含假登入）
@@ -68,14 +55,8 @@ public class ShopIndexController {
     public String shopIndex(HttpSession session, Model model, 
                            @RequestParam(required = false) String payment,
                            @RequestParam(required = false) String orderId) {
-        // 假登入：本地測試用，直接查詢會員編號1號的資料
-        if (session.getAttribute("memberVO") == null) {
-            MemberVO member = memberService.getOneMember(1);
-            if (member != null) {
-                session.setAttribute("memberVO", member);
-            }
-        }
-        
+        // 讓 header 能正確顯示會員名稱
+        model.addAttribute("loggedInMember", session.getAttribute("loggedInMember"));
         // 處理付款狀態參數
         if (payment != null) {
             if ("success".equals(payment)) {
@@ -86,7 +67,6 @@ public class ShopIndexController {
                 model.addAttribute("paymentStatus", "failed");
             }
         }
-        
         // 獲取所有商品
         List<ProdVO> products = prodService.getAll();
         model.addAttribute("products", products);

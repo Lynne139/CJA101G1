@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>活動通知</title>
+    <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+    <style>
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            margin-top: 32px;
+        }
+        .news-card {
+            display: flex;
+            background: #f6efe4;
+            border-radius: 16px;
+            border: 1.5px solid #e0d6c3;
+            box-shadow: 0 2px 12px #0001;
+            overflow: hidden;
+            align-items: center;
+            padding: 24px;
+            gap: 32px;
+        }
+        .news-img img {
+            width: 200px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1.5px solid #ccc;
+            box-shadow: 0 2px 8px #0001;
+            background: #f8f8f8;
+        }
+        .news-content {
+            flex: 1;
+        }
+        .news-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #5a3c1a;
+            margin-bottom: 10px;
+        }
+        .news-text {
+            color: #444;
+            margin-bottom: 14px;
+            font-size: 1.05rem;
+        }
+        .news-date {
+            font-size: 0.98rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+    
+    <!-- Overlay Full Menu -->
+    <div class="overlay-menu" id="overlayMenu">
+        <div class="overlay-menu-header d-flex justify-content-between align-items-start">
+            <div class="overlay-mobile-menu d-flex justify-content-between align-items-center p-3">
+                <div class="mb-menu-header">Maison d'Yuko</div>
+            </div>
+            <div class="overlay-logo-contact mb-5">
+                <img th:src="@{/images/logo/logo_hp.png}" alt="logo" class="overlay-logo mb-3" />
+                <div class="overlay-title">嶼蔻渡假村 Maison d'Yuko</div>
+                <div class="overlay-contact">
+                    <div>+886-7-123-4567</div>
+                    <div>service@maisondyuko.com</div>
+                </div>
+            </div>
+            <div class="close-btn" id="menuClose">&times;</div>
+        </div>
+        <div class="overlay-center">
+            <div class="overlay-menu-member px-5 mb-5 d-flex justify-content-center">
+                <img th:src="@{/images/icon/member.svg}" alt="member" class="text-center" style="padding:0 5px" />
+                <a href="#" class="text-center">會員登入</a>
+            </div>
+            <div class="px-5 mb-5 d-flex justify-content-between">
+                <a href="#" class="text-center"><img th:src="@{/images/icon/menu_bed.svg}" alt="bed" class="menu-icon"/><br>線上訂房</a>
+                <a th:href="@{/front-end/shop}" class="text-center"><img th:src="@{/images/icon/menu_bag.svg}" alt="bag" class="menu-icon"/><br>帳號選物</a>
+                <a href="#" class="text-center"><img th:src="@{/images/icon/menu_dish.svg}" alt="dish" class="menu-icon"/><br>餐廳訂位</a>
+            </div>
+            <div class="overlay-menu-row d-flex justify-content-center">
+                <div class="overlay-menu-col">
+                    <h5>關於嶼蔻</h5>
+                    <a href="#">品牌故事</a>
+                    <a href="#">環境簡介</a>
+                </div>
+                <div class="overlay-menu-col">
+                    <h5>最新消息</h5>
+                    <a th:href="@{/news/notice}">最新公告</a>
+                    <a th:href="@{/news/promotion}">活動通知</a>
+                    <a th:href="@{/news/news}">媒體報導</a>
+                </div>
+                <div class="overlay-menu-col">
+                    <h5>探索嶼蔻</h5>
+                    <a href="#">珍饌美饌</a>
+                    <a href="#">豐富設施</a>
+                </div>
+                <div class="overlay-menu-col">
+                    <h5>精緻客房</h5>
+                    <a href="#">蔻香居</a>
+                    <a href="#">海音居</a>
+                    <a href="#">晨曦之庭</a>
+                    <a href="#">月影行館</a>
+                </div>
+                <div class="overlay-menu-col">
+                    <h5>其他</h5>
+                    <a href="#">交通資訊</a>
+                    <a href="#">聯絡我們</a>
+                    <a href="#">常見問題</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="news-tabs-container" style="margin-top:32px;">
+      <ul class="news-tabs">
+        <li class="news-tab"><a th:href="@{/news/notice}">最新公告</a></li>
+        <li class="news-tab active"><a href="#">活動通知</a></li>
+        <li class="news-tab"><a th:href="@{/news/news}">媒體報導</a></li>
+      </ul>
+    </div>
+    
+    <div class="container mt-4">
+        <h2>最新活動</h2>
+        <div class="news-list">
+            <div class="news-card" th:each="promotion : ${promotionNewsList}">
+                <div class="news-img">
+                    <img th:if="${promotion.promoPhoto != null and #arrays.length(promotion.promoPhoto) > 0}"
+                         th:src="@{/admin/promotionNews/image/{id}(id=${promotion.promoNo})}"
+                         alt="活動圖片"/>
+                    <img th:if="${promotion.promoPhoto == null or #arrays.length(promotion.promoPhoto) == 0}"
+                         th:src="@{/images/no_img.svg}"
+                         alt="無圖片"/>
+                </div>
+                <div class="news-content">
+                    <div class="news-title" th:text="${promotion.title}"></div>
+                    <div class="news-text" th:text="${promotion.content}"></div>
+                    <div class="news-date">活動期間：<span th:text="${promotion.startDate}"></span> ~ <span th:text="${promotion.endDate}"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/mainfunction :: stickyIcons"></div>
+</body>
+</html> 

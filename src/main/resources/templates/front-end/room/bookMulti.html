@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maison d’Yuko - 訂房</title>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/zh_tw.js"></script>
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+<link rel="stylesheet" th:href="@{/css/room/bookSingle.css}">
+<link rel="stylesheet" th:href="@{/css/room/bookMulti.css}">
+
+</head>
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+	<div class="booking-container">
+		<h1 class="booking-title">線上訂房</h1>
+
+		<!-- 日期選擇區域 -->
+		<div class="date-section">
+			<div class="row">
+				<div class="col-md-6">
+					<label for="checkin" class="form-label section-title">入住日期</label>
+					<input type="text" id="checkin" placeholder="入住日期"
+						class="date-input form-control" required>
+					<!-- 					<input type="date" id="checkin" class="date-input form-control" -->
+					<!-- 						required> -->
+				</div>
+				<div class="col-md-6">
+					<label for="checkout" class="form-label section-title">退房日期</label>
+					<input type="text" id="checkout" placeholder="退房日期"
+						class="date-input form-control" required>
+					<!-- 					<input type="date" id="checkout" class="date-input form-control" -->
+					<!-- 						required> -->
+				</div>
+			</div>
+		</div>
+
+		<div class="main-content">
+			<!-- 房型卡片區域 -->
+			<div class="room-cards">
+				<div class="room-card" th:each="roomType : ${roomTypes}">
+					<div class="room-card-content">
+						<img th:src="@{'/roomtypes/img/' + ${roomType.roomTypeId}}"
+							th:alt="${roomType.roomTypeName}" class="room-image">
+						<div class="room-info">
+							<h3 th:text="${roomType.roomTypeName}"></h3>
+							<p class="room-description"
+								th:utext="${roomType.roomTypeContent}"></p>
+							<div class="room-capacity">
+								<i class="fas fa-users me-2" style="color: #7E4E24;"></i> <strong>可入住人數：</strong>
+								<span th:text="${roomType.guestNum} + ' 人'"></span>
+							</div>
+							<div class="room-price"
+								th:text="'NT$ ' + ${roomType.roomTypePrice} + ' 起 / 晚'"></div>
+						</div>
+						<div class="room-controls">
+							<label class="section-title">選擇房間數</label> <select
+								class="form-select room-select"
+								th:attr="data-id=${roomType.roomTypeId}, data-room=${roomType.roomTypeName}, data-price=${roomType.roomTypePrice}"
+								disabled>
+								<option selected>選擇房數</option>
+							</select> <label class="section-title">選擇入住人數</label> <select
+								class="form-select guest-select"
+								th:attr="data-id=${roomType.roomTypeId}" disabled>
+								<option value="0" selected>選擇人數</option>
+								<option th:each="i : ${#numbers.sequence(1, roomType.guestNum)}"
+									th:value="${i}" th:text="${i} + ' 位'"></option>
+							</select>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<!-- 預訂摘要面板 -->
+			<div class="summary-panel">
+				<h2 class="summary-title">預訂詳情</h2>
+
+				<div class="guest-section">
+					<div class="section-title">房客總人數</div>
+					<input type="number" class="guest-input" id="guestCount"
+						placeholder="請輸入人數" min="1" value="1" readonly>
+				</div>
+
+				<div class="package-section">
+					<div class="section-title">加購專案</div>
+					<div class="package-option" data-package="0"
+						onclick="selectPackage(this, 0)">
+						<div class="package-name">無加購專案</div>
+						<div class="package-desc">僅房間住宿</div>
+						<div class="package-price">+NT$ 0</div>
+					</div>
+
+					<div class="package-option" data-package="800"
+						onclick="selectPackage(this, 800)">
+						<div class="package-name">南島晨光專案</div>
+						<div class="package-desc">含豐盛自助早餐</div>
+						<div class="package-price">+NT$ 800 / 人</div>
+					</div>
+
+					<div class="package-option" data-package="1800"
+						onclick="selectPackage(this, 1800)">
+						<div class="package-name">蔚藍晨夕專案</div>
+						<div class="package-desc">含早餐 + 晚餐</div>
+						<div class="package-price">+NT$ 1,800 / 人</div>
+					</div>
+
+					<div class="package-option" data-package="2800"
+						onclick="selectPackage(this, 2800)">
+						<div class="package-name">悠日饗茶專案</div>
+						<div class="package-desc">含早餐 + 午茶 + 晚餐</div>
+						<div class="package-price">+NT$ 2,800 / 人</div>
+					</div>
+				</div>
+
+				<div class="booking-summary">
+					<div class="summary-title">預訂摘要</div>
+					<div id="room-summary"></div>
+					<div id="package-summary"></div>
+					<div class="summary-total">
+						<span>總計金額：</span> <span id="total-price">NT$ 0</span>
+					</div>
+				</div>
+
+				<form id="confirmForm" action="/orderInfo" method="post">
+					<input type="hidden" name="checkin">
+					<input type="hidden" name="checkout">
+					<input type="hidden" name="guests">
+				</form>
+				<button class="btn-book" id="bookBtn" disabled>確認預訂</button>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+
+	<script th:src="@{/js/room/bookMulti.js}"></script>
+</body>
+</html>

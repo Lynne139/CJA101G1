@@ -211,7 +211,7 @@ public class ShopOrdController {
 			
 			// 如果沒有提供會員ID，從session獲取
 			if (memberId == null) {
-				MemberVO memberVO = (MemberVO) request.getSession().getAttribute("memberVO");
+				MemberVO memberVO = (MemberVO) request.getSession().getAttribute("loggedInMember");
 				if (memberVO != null) {
 					memberId = memberVO.getMemberId();
 				} else {
@@ -247,7 +247,7 @@ public class ShopOrdController {
 	public String addShopOrd(Model model, HttpServletRequest request) {
 		model.addAttribute("shopOrdVO", new ShopOrdVO());
 		// 從session獲取當前登入的會員資訊
-		MemberVO memberVO = (MemberVO) request.getSession().getAttribute("memberVO");
+		MemberVO memberVO = (MemberVO) request.getSession().getAttribute("loggedInMember");
 		if (memberVO != null) {
 			Integer memberId = memberVO.getMemberId();
 			int memberPoints = memberVO.getMemberPoints() != null ? memberVO.getMemberPoints() : 0;
@@ -375,7 +375,7 @@ public class ShopOrdController {
 			System.out.println("Session ID: " + request.getSession().getId());
 			
 			// 從session獲取當前登入的會員資訊
-			MemberVO memberVO = (MemberVO) request.getSession().getAttribute("memberVO");
+			MemberVO memberVO = (MemberVO) request.getSession().getAttribute("loggedInMember");
 			if (memberVO == null) {
 				System.out.println("會員未登入 - session中沒有memberVO");
 				response.put("success", false);

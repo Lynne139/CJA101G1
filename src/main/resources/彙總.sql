@@ -1,3 +1,4 @@
+
 DROP DATABASE IF EXISTS maison;
 CREATE DATABASE IF NOT EXISTS maison;
 USE maison;
@@ -19,7 +20,7 @@ CREATE TABLE member (
     member_phone VARCHAR(10) NOT NULL,
 	member_address VARCHAR(255) NOT NULL,
 	member_pic LONGBLOB,
-	member_status TINYINT(1) default 0,
+	member_status TINYINT(1) default 1,
 	member_email VARCHAR(50) NOT NULL,
 	member_points INT NOT NULL,
 	member_accumulative_consumption INT NOT NULL,
@@ -29,10 +30,10 @@ CREATE TABLE member (
 
 INSERT INTO MEMBER_LEVEL_TYPE (member_level, level_rank)
 VALUES 
-('白金卡會員', 1),
-('金卡會員', 2),
-('銀卡會員', 3),
-('普通會員', 4);
+('白金卡會員', 4),
+('金卡會員', 3),
+('銀卡會員', 2),
+('普通會員', 1);
 
 
 INSERT INTO MEMBER (
@@ -87,9 +88,21 @@ CREATE TABLE member_coupon
 );
 
 INSERT INTO coupon (coupon_code, coupon_name, order_type, discount_value, min_purchase, claim_start_date, claim_end_date, expiry_date)
-VALUES('A2505AAA', '第一款測試折價券', 1, 100, 0, '2025-05-16', '2025-05-31', '2025-07-31'),
-	('B2505AAA', '第二款測試折價券', 2, 150, 0, '2025-05-16', '2025-05-31', '2025-07-31'),
-	('C2505AAA', '第三款測試折價券', 3, 200, 0, '2025-05-16', '2025-05-31', '2025-07-31');
+VALUES('A2501AAA', '乙巳新春折價券A', 1, 200, 300, '2025-01-01', '2025-06-30', '2025-07-31'),
+	('B2501AAA', '乙巳新春折價券B', 2, 150, 300, '2025-01-01', '2025-06-30', '2025-07-31'),
+	('C2501AAA', '乙巳新春折價券C', 3, 300, 500, '2025-01-01', '2025-06-30', '2025-07-31'),
+    ('A2504AAA', '乙巳夏日折價券A', 1, 200, 300, '2025-04-01', '2025-09-30', '2025-10-31'),
+	('B2504AAA', '乙巳夏日折價券B', 2, 150, 300, '2025-04-01', '2025-09-30', '2025-10-31'),
+	('C2504AAA', '乙巳夏日折價券C', 3, 300, 500, '2025-04-01', '2025-09-30', '2025-10-31'),
+    ('A2505AAA', '乙巳端午折價券A', 1, 100, 100, '2025-05-01', '2025-06-30', '2025-07-31'),
+	('B2505AAA', '乙巳端午折價券B', 2, 150, 150, '2025-05-01', '2025-06-30', '2025-07-31'),
+	('C2505AAA', '乙巳端午折價券C', 3, 200, 200, '2025-05-01', '2025-06-30', '2025-07-31'),
+	('A2507AAA', '乙巳中秋折價券A', 1, 200, 300, '2025-07-01', '2025-09-30', '2025-10-31'),
+	('B2507AAA', '乙巳中秋折價券B', 2, 150, 300, '2025-07-01', '2025-09-30', '2025-10-31'),
+	('C2507AAA', '乙巳中秋折價券C', 3, 300, 500, '2025-07-01', '2025-09-30', '2025-10-31'),
+	('A2507AAB', '乙巳秋季折價券A', 1, 200, 300, '2025-07-01', '2025-12-31', '2026-01-31'),
+	('B2507AAB', '乙巳秋季折價券B', 2, 150, 300, '2025-07-01', '2025-12-31', '2026-01-31'),
+	('C2507AAB', '乙巳秋季折價券C', 3, 300, 500, '2025-07-01', '2025-12-31', '2026-01-31');
 
 INSERT INTO member_coupon (coupon_code, member_id, used_time)
 VALUES('A2505AAA', 1, NULL),
@@ -116,8 +129,11 @@ CREATE TABLE notification
 
 INSERT INTO notification (member_id, title, content)
 VALUES (1, '測試通知標題一', '測試通知內容一'),
-	(2, '測試通知標題二', '測試通知內容二'),
-	(3, '測試通知標題三', '測試通知內容三');
+	(1, '測試通知標題二', '測試通知內容二'),
+	(2, '測試通知標題三', '測試通知內容三'),
+    (2, '測試通知標題四', '測試通知內容四'),
+	(3, '測試通知標題五', '測試通知內容五'),
+	(3, '測試通知標題六', '測試通知內容六');
 
 -- 職稱
 CREATE TABLE job_title (
@@ -153,7 +169,6 @@ VALUES
   (1, 1, 7, 'SYSTEM', TRUE, '2025-01-01', '1234', NULL),
   (2, 1, 1, '吳永志', TRUE, '2025-01-01', '1234', NULL),
   (3, 2, 5, '吳冠宏', TRUE, '2025-02-15', '1234', NULL);
-
 
 -- 權限
 create table function_access_right (
@@ -215,9 +230,9 @@ CREATE TABLE customer_service_message
 
 INSERT INTO customer_service_message (member_id, customer_name, email, message)
 VALUES
-    (1, '林冠宇', 'guanyu.lin@example.com', '訂房有哪些優惠?'),
-    (2, NULL, 'shuhan.chang@example.com', '早上幾點check out?'),
-    (NULL, '杜宥瑄', 'yousyuan.tu@example.com', '住宿有公共洗衣機嗎?');
+    (1, '林冠宇', 'guanyu.lin@example.com', '請問洗衣間有提供柔軟精嗎?'),
+    (2, NULL, 'shuhan.chang@example.com', '我非常想帶我的狗一同入住可以嗎?'),
+    (NULL, '杜宥瑄', 'yousyuan.tu@example.com', '請問有接駁專車嗎?');
 
 -- 商品類別 
 create table product_category(
@@ -436,19 +451,20 @@ CREATE TABLE ROOM_ORDER (
     ROOM_ORDER_ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     MEMBER_ID INT NOT NULL,
     ORDER_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 自動抓訂單進入時間
-                            ROOM_ORDER_STATUS TINYINT(1) NOT NULL DEFAULT 1,  -- 0:取消, 1:成立, 2:完成
+    ROOM_ORDER_STATUS TINYINT(1) NOT NULL DEFAULT 1,  -- 0:取消, 1:成立, 2:完成
+    TOTAL_AMOUNT INT NOT NULL,
     ROOM_AMOUNT INT NOT NULL,
-                            ROOM_COUNT INT NOT NULL,
-                            CHECK_IN_DATE DATE NOT NULL,
-                            CHECK_OUT_DATE DATE NOT NULL,
+    CHECK_IN_DATE DATE NOT NULL,
+    CHECK_OUT_DATE DATE NOT NULL,
     COUPON_CODE CHAR(8),
     DISCOUNT_AMOUNT INT,
     ACTUAL_AMOUNT INT NOT NULL,
-                            PAY_STATUS TINYINT(1) NOT NULL DEFAULT 0, -- 0:未付款 1:已付款
-                            PAY_METHOD TINYINT(1) NOT NULL DEFAULT 0, -- 0:現金 1:信用卡
+    PAY_STATUS TINYINT(1) NOT NULL DEFAULT 0, -- 0:未付款 1:已付款
+    PAY_METHOD TINYINT(1) NOT NULL DEFAULT 0, -- 0:現金 1:信用卡
     PROJECT_ADD_ON BOOLEAN NOT NULL DEFAULT 0,
-                            UPDATE_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, /* 新增修改都自動寫入 */
-                            UPDATE_EMP INT NOT NULL DEFAULT 1, -- 系統id=1
+    UPDATE_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, /* 新增修改都自動寫入 */
+    UPDATE_EMP INT NOT NULL DEFAULT 1, -- 系統id=1
+     
     FOREIGN KEY (MEMBER_ID) REFERENCES MEMBER(MEMBER_ID),
                             FOREIGN KEY (COUPON_CODE) REFERENCES COUPON(COUPON_CODE),
                             FOREIGN KEY (UPDATE_EMP) REFERENCES EMPLOYEE(EMPLOYEE_ID)
@@ -457,7 +473,7 @@ CREATE TABLE ROOM_ORDER (
 ALTER TABLE room_order AUTO_INCREMENT = 1000;
 
 
-INSERT INTO ROOM_ORDER (MEMBER_ID, ROOM_ORDER_STATUS, ROOM_AMOUNT, ROOM_COUNT, CHECK_IN_DATE, CHECK_OUT_DATE, COUPON_CODE, DISCOUNT_AMOUNT, ACTUAL_AMOUNT, PROJECT_ADD_ON,UPDATE_EMP)
+INSERT INTO ROOM_ORDER (MEMBER_ID, ROOM_ORDER_STATUS, TOTAL_AMOUNT, ROOM_AMOUNT, CHECK_IN_DATE, CHECK_OUT_DATE, COUPON_CODE, DISCOUNT_AMOUNT, ACTUAL_AMOUNT, PROJECT_ADD_ON,UPDATE_EMP)
 VALUES 
     (1, 1, 50000,1, '2025-06-01', '2025-06-03', 'A2505AAA', 100, 49900, 0 ,1),
     (2, 2, 60000,2, '2025-06-05', '2025-06-07', 'B2505AAA', 150, 59850, 1 ,1);
@@ -467,18 +483,19 @@ VALUES
 CREATE TABLE room_type (
 	room_type_id	INT AUTO_INCREMENT NOT NULL,
 	room_type_name	  VARCHAR(50) NOT NULL,
-	room_type_amount	INT NOT NULL,	  
+		  
     room_type_content	VARCHAR(1000) NOT NULL,
     room_sale_status	BOOLEAN,
     room_type_pic	MEDIUMBLOB,
     room_type_price	INT NOT NULL,
+    guest_num INT NOT NULL,
 	CONSTRAINT room_type_pk PRIMARY KEY (room_type_id)
 ) AUTO_INCREMENT = 1;
 
-INSERT INTO room_type (room_type_id, room_type_name, room_type_amount, room_type_content, room_sale_status, room_type_pic, room_type_price) VALUES (null, '月影行館', 10, '房間介紹一', 1, null, 50000);
-INSERT INTO room_type (room_type_id, room_type_name, room_type_amount, room_type_content, room_sale_status, room_type_pic, room_type_price) VALUES (null, '晨曦之庭', 10, '房間介紹二', 1, null, 30000);
-INSERT INTO room_type (room_type_id, room_type_name, room_type_amount, room_type_content, room_sale_status, room_type_pic, room_type_price) VALUES (null, '海音居', 10, '房間介紹三', 1, null, 20000);
-INSERT INTO room_type (room_type_id, room_type_name, room_type_amount, room_type_content, room_sale_status, room_type_pic, room_type_price) VALUES (null, '蔻香居', 10, '房間介紹四', 1, null, 15000);
+INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '月影行館', '房間介紹一', 1, null, 50000, 6);
+INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '晨曦之庭', '房間介紹二', 1, null, 30000, 4);
+INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '海音居', '房間介紹三', 1, null, 20000, 2);
+INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '蔻香居', '房間介紹四', 1, null, 15000, 2);
 
 -- 房間 
 CREATE TABLE room (
@@ -501,26 +518,24 @@ INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room
 CREATE TABLE ROOM_ORDER_LIST (
     ROOM_ORDER_LIST_ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     ROOM_TYPE_ID INT NOT NULL,
-    ROOM_ID INT,
     ROOM_ORDER_ID INT NOT NULL,
     NUMBER_OF_PEOPLE INT NOT NULL,
     SPECIAL_REQ VARCHAR(50),
     ROOM_PRICE INT NOT NULL,
     ROOM_AMOUNT INT NOT NULL,
-                                 ROOM_GUEST_NAME VARCHAR(50),
-                                 CREATE_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 自動抓訂單進入時間
-                                 LIST_STATUS INT NOT NULL DEFAULT 1,
-                                 FOREIGN KEY (ROOM_ORDER_ID) REFERENCES room_order(ROOM_ORDER_ID) ON DELETE CASCADE,
-    FOREIGN KEY (ROOM_ID) REFERENCES ROOM(ROOM_ID),
+	ROOM_GUEST_NAME VARCHAR(50),
+	CREATE_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 自動抓訂單進入時間
+	LIST_STATUS INT NOT NULL DEFAULT 1,
+	FOREIGN KEY (ROOM_ORDER_ID) REFERENCES room_order(ROOM_ORDER_ID) ON DELETE CASCADE,
     FOREIGN KEY (ROOM_TYPE_ID) REFERENCES ROOM_TYPE(ROOM_TYPE_ID)
 );
 
 
-INSERT INTO ROOM_ORDER_LIST (ROOM_TYPE_ID, ROOM_ID, ROOM_ORDER_ID, NUMBER_OF_PEOPLE, SPECIAL_REQ, ROOM_PRICE, ROOM_AMOUNT,ROOM_GUEST_NAME,LIST_STATUS)
+INSERT INTO ROOM_ORDER_LIST (ROOM_TYPE_ID,  ROOM_ORDER_ID, NUMBER_OF_PEOPLE, SPECIAL_REQ, ROOM_PRICE, ROOM_AMOUNT,ROOM_GUEST_NAME,LIST_STATUS)
 VALUES
-    (1, 1101, 1000, 2, 'No smoking', 50000, 1,'王大明',1),
-    (2, 2101, 1001, 3, 'No smoking', 30000, 1,'周牛牛',1),
-    (3, 3101, 1001, 3, 'Extra bed', 20000, 1,'楊大胖',1);
+    (1, 1000, 2, 'No smoking', 50000, 1,'王大明',1),
+    (2, 1001, 3, 'No smoking', 30000, 1,'周牛牛',1),
+    (3, 1001, 3, 'Extra bed', 20000, 1,'楊大胖',1);
 
 -- 以下設定: 自增主鍵的起點值，也就是初始值，取值範圍是1 .. 655355 --
 set auto_increment_offset=1;
@@ -547,8 +562,8 @@ CREATE TABLE room_type_schedule (
 ) AUTO_INCREMENT = 1;
 
 
-INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 1, 10, 1, '2025-05-18');
-INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 2, 10, 2, '2025-05-17');
+-- INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 3, 10, 6, '2025-05-13');
+-- INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 4, 10, 2, '2025-05-14');
 
 
 -- 餐廳 

@@ -206,6 +206,26 @@ function selectPackage(element, price) {
 	updateSummary();
 }
 
+function updateGuestOptions() {
+    const roomCount = parseInt(document.getElementById("roomCount").value);
+    const guestSelect = document.getElementById("guestCount");
+    const maxGuestsPerRoom = parseInt(guestSelect.dataset.maxGuests);
+
+    console.log("間數:", roomCount, "最大可住人數:", maxGuestsPerRoom);
+
+    // 總最大人數
+    const totalMaxGuests = roomCount * maxGuestsPerRoom;
+
+    // 清空後重建
+    guestSelect.innerHTML = "";
+    for (let i = 1; i <= totalMaxGuests; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.text = `${i} 人`;
+        guestSelect.appendChild(option);
+    }
+}
+
 function updateSummary() {
 	const roomCount = parseInt(document.getElementById('roomCount').value);
 	const guestCount = parseInt(document.getElementById('guestCount').value);
@@ -234,15 +254,6 @@ function updateSummary() {
 	}
 }
 
-function proceedBooking() {
-	if (!selectedCheckIn || !selectedCheckOut) {
-		alert('請選擇入住和退房日期');
-		return;
-	}
-
-	alert('預訂成功！接下來將導向填寫入住資料頁面。');
-	// 這裡可以導向下一個頁面或提交表單
-}
 
 // 初始化日曆
 generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
@@ -283,7 +294,7 @@ function onDateSelected(dateStr) {
 		});
 }
 
-
+//多日區間剩餘間數
 function checkInventoryRange() {
 	if (!selectedCheckIn || !selectedCheckOut) {
 		console.log("尚未選擇完整區間");
@@ -318,5 +329,83 @@ function checkInventoryRange() {
 			console.error("多日查庫存錯誤", error);
 		});
 }
+
+//跳轉到多房型頁面
+document.querySelectorAll('.multi-book-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        goToMultiBooking(roomTypeId);
+    });
+});
+function goToMultiBooking(roomTypeId) {
+    const checkinEl = document.getElementById('checkInDate');
+    const checkoutEl = document.getElementById('checkOutDate');
+    const guests = parseInt(document.getElementById('guestCount').value) || 1;
+    const rooms = parseInt(document.getElementById('roomCount').value) || 1; // 單一房型頁的房間數 input
+    const packagePrice = selectedPackagePrice || 0;  
+
+    const checkin = checkinEl ? checkinEl.textContent.trim() : "";
+    const checkout = checkoutEl ? checkoutEl.textContent.trim() : "";
+
+    let url = `/bookMulti?checkin=${checkin}&checkout=${checkout}&guests=${guests}&package=${packagePrice}&rooms_${roomTypeId}=${rooms}&guests_${roomTypeId}=${guests}`;
+    window.location.href = url;
+}
+
+document.getElementById('bookBtn').addEventListener('click', function() {
+	if (!selectedCheckIn || !selectedCheckOut) {
+	        alert('請選擇入住和退房日期');
+	        return;
+	    }
+
+	    alert('預訂成功！接下來將導向填寫入住資料頁面。');
+		
+		// 抓到原本 input 元素
+		const checkinText = document.getElementById('checkInDate').textContent.trim();
+		const checkoutText = document.getElementById('checkOutDate').textContent.trim();
+		
+		// 格式轉 yyyy-MM-dd
+		function formatDateString(str) {
+			if (!str.includes('/')) return str;
+			const parts = str.split('/');
+			if (parts.length !== 3) return "";
+			let [year, month, day] = parts;
+			month = month.padStart(2, '0');
+			day = day.padStart(2, '0');
+			return `${year}-${month}-${day}`;
+		}
+
+	
+    const form = document.getElementById('singleRoomForm');
+	const roomTypeId = document.querySelector("meta[name='roomTypeId']").content;
+    // 日期是從日曆顯示的文字
+	form.querySelector('input[name="checkin"]').value = formatDateString(checkinText);
+	form.querySelector('input[name="checkout"]').value = formatDateString(checkoutText);
+	form.querySelector('input[name="guests"]').value = document.getElementById('guestCount').value;
+
+	// 房數
+	let inputRoom = document.createElement("input");
+	inputRoom.type = "hidden";
+	inputRoom.name = `rooms_${roomTypeId}`;
+	inputRoom.value = document.getElementById('roomCount').value;
+	form.appendChild(inputRoom);
+
+    // 人數
+	let inputGuests = document.createElement("input");
+	inputGuests.type = "hidden";
+	inputGuests.name = `guests_${roomTypeId}`;
+	inputGuests.value = document.getElementById('guestCount').value;
+	form.appendChild(inputGuests);
+
+	// 加購專案
+    if (selectedPackagePrice > 0) {
+        let input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "package";
+        input.value = selectedPackagePrice;
+        form.appendChild(input);
+    }
+
+    form.submit();
+});
+
 
 

@@ -239,4 +239,22 @@ public class ShopOrdDetController {
 		return "redirect:/admin/shopOrdDet/select_page?errorMessage=" + java.net.URLEncoder.encode(message, java.nio.charset.StandardCharsets.UTF_8);
 	}
 
+	// 唯一訂單編號清單
+	@ModelAttribute("uniqueProdOrdIdList")
+	public Set<Integer> getUniqueProdOrdIdList() {
+		return shopOrdDetSvc.getAll().stream()
+				.map(vo -> vo.getShopOrdVO().getProdOrdId())
+				.collect(Collectors.toCollection(LinkedHashSet::new));
+	}
+
+	// 唯一商品編號清單
+	@ModelAttribute("uniqueProductIdList")
+	public Set<Integer> getUniqueProductIdList() {
+		return shopOrdDetSvc.getAll().stream()
+				.map(vo -> vo.getProdVO().getProductId())
+				.collect(Collectors.toCollection(LinkedHashSet::new));
+	}
+
+	
+
 }

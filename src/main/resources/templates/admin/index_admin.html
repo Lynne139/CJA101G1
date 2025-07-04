@@ -10,7 +10,10 @@
 	  	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 	  	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 	  	<link rel="stylesheet" th:href="@{/css/all_admin.css}">
-	  	
+	    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    	<link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.3.0/css/fixedColumns.dataTables.min.css">
+      
+      
 	</head>
 
 	<body>
@@ -98,18 +101,21 @@
 					</div>
 			
 					<!-- 餐廳管理 -->
-					<div class="sidebar_section"
-						th:classappend="${currentURI.startsWith('/admin/resto')} ? '-active'">
-						<a class="sidebar_link">
-							<i class="fa-solid fa-utensils"></i> 餐廳管理
-						</a>
-						<div class="submenu_block ps-4"
+			    	<div class="sidebar_section"
+			    		th:classappend="${currentURI.startsWith('/admin/resto')} ? '-active'">
+			      		<a class="sidebar_link">
+			        		<i class="fa-solid fa-utensils"></i> 餐廳管理
+			      		</a>
+                
+			      		<div class="submenu_block ps-4"
 							th:classappend="${currentURI.startsWith('/admin/resto')} ? 'show'">
-							<a th:href="@{/admin/resto_info}" th:classappend="${currentURI == '/admin/resto_info'} ? '-active'" class="sidebar_sub_link">餐廳資訊</a>
-							<a th:href="@{/admin/resto_timeslot}" th:classappend="${currentURI == '/admin/resto_timeslot'} ? '-active'" class="sidebar_sub_link">時段管理</a>
-							<a th:href="@{/admin/resto_order}" th:classappend="${currentURI == '/admin/resto_order'} ? '-active'" class="sidebar_sub_link">訂單管理</a>
-						</div>
-					</div>
+					        <a th:href="@{/admin/resto_info}" th:classappend="${currentURI == '/admin/resto_info'} ? '-active'" class="sidebar_sub_link">餐廳資訊</a>
+					        <a th:href="@{/admin/resto_timeslot}" th:classappend="${currentURI == '/admin/resto_timeslot'} ? '-active'" class="sidebar_sub_link">時段管理</a>
+					        <a th:href="@{/admin/resto_order}" th:classappend="${currentURI == '/admin/resto_order'} ? '-active'" class="sidebar_sub_link">訂單管理</a>
+					        <a th:href="@{/admin/resto_reservation}" th:classappend="${currentURI == '/admin/resto_reservation'} ? '-active'" class="sidebar_sub_link">預約統計</a>
+					        <a th:href="@{/admin/resto_order_today}" th:classappend="${currentURI == '/admin/resto_order_Today'} ? '-active'" class="sidebar_sub_link">今日訂位</a>
+			      		</div>
+			    	</div>
 			
 					<!-- 商店管理 -->
 					<div class="sidebar_section"
@@ -173,7 +179,6 @@
 			<main class="main_content" th:insert="~{${mainFragment}}"></main>				
 			  
       
-      
 	  </div>
 	
 	
@@ -181,6 +186,8 @@
 		<script th:src="@{/js/admin/sidebar.js}"></script>
 		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 		<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+		<script src="https://cdn.datatables.net/fixedcolumns/4.3.0/js/dataTables.fixedColumns.min.js"></script>
+        
         <script th:src="@{/js/admin/zh-HANT.js}"></script>
         <script th:src="@{/js/admin/loading_overlay.js}"></script>
         <script th:src="@{/js/admin/toast.js}"></script>
@@ -202,9 +209,15 @@
         <script th:if="${mainFragment == 'admin/fragments/resto/restoTimeslot'}"
         src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
         
-
 		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrder'}"
         th:src="@{/js/admin/resto/resto_order.js}"></script>
+		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrder'}"
+        src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrder'}"
+        src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh.js"></script>
+		
+        
+        
         <!-- 房間 -->
         <script th:if="${mainFragment == 'admin/fragments/room/listAllRoom'}"
         th:src="@{/js/admin/room/listAllRoom.js}"></script>

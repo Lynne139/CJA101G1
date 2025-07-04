@@ -71,6 +71,11 @@ public class RoomTypeScheduleService {
         return roomTypeScheduleRepository.findByRoomTypeVOAndRoomOrderDateBetween(roomTypeVO, start, end);
     }
 	
+	//查詢今天之後可預定之日期(多房型頁面使用)
+	public List<RoomTypeScheduleVO> getEnabledDates() {
+	    return roomTypeScheduleRepository.findByRoomOrderDateGreaterThanEqual(java.sql.Date.valueOf(LocalDate.now()));
+	}
+	
 	// 複合查詢（Criteria 結構）
     public List<RoomTypeScheduleVO> compositeQuery(Map<String, String[]> map) {
         return RoomTypeScheduleCriteriaHelper.getRoomTypeScheduleCriteria(map, em);

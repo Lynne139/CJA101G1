@@ -112,11 +112,76 @@ section {
 
 .sub-navbar .dropdown-menu {
   background-color: #f8f1e8;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-top: 0;
+}
+
+.sub-navbar .dropdown-item {
+  color: #6c4c2f;
+  padding: 0.5rem 1rem;
+}
+
+.sub-navbar .dropdown-item:hover {
+  background-color: #e8dcc8;
+  color: #5a3c1a;
 }
 
 /* 不顯示子選單中的下拉選單箭頭 */
 .sub-navbar .dropdown-toggle::after {
   display: none;
+}
+
+/* 確保下拉選單在hover時顯示 */
+.sub-navbar .dropdown:hover .dropdown-menu {
+  display: block !important;
+}
+
+/* 確保下拉選單在點擊時顯示 */
+.sub-navbar .dropdown-menu.show {
+  display: block !important;
+}
+
+/* 確保下拉選單有正確的z-index */
+.sub-navbar .dropdown-menu {
+  z-index: 1050;
+}
+
+/* 純CSS下拉選單備用方案 */
+.sub-navbar .dropdown {
+  position: relative;
+}
+
+.sub-navbar .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 200px;
+  display: none;
+}
+
+.sub-navbar .dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+/* 確保下拉選單項目有正確的樣式 */
+.sub-navbar .dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  clear: both;
+  font-weight: 400;
+  color: #6c4c2f;
+  text-align: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+}
+
+.sub-navbar .dropdown-item:hover {
+  color: #5a3c1a;
+  background-color: #e8dcc8;
 }
 
 .sticky-icons {
@@ -1402,6 +1467,10 @@ section {
 
   }
 
+  .d-flex.align-items-center.gap-3{
+    display: none !important;
+  }
+
 
   header .me-3 a {
     margin-right: 0;
@@ -1476,4 +1545,46 @@ section {
   }
 
 
+}
+
+/* 新聞頁籤區塊樣式 */
+.news-tabs-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.news-tabs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 16px;
+}
+.news-tab {
+  display: inline-block;
+}
+.news-tab a {
+  display: block;
+  padding: 10px 32px;
+  border-radius: 24px 24px 0 0;
+  background: #f8f1e8;
+  color: #7E4E24;
+  font-weight: bold;
+  font-size: 1.1rem;
+  text-decoration: none;
+  border: 1px solid #e0d6c3;
+  border-bottom: none;
+  transition: background 0.2s, color 0.2s;
+}
+.news-tab a:hover {
+  background: #e0d6c3;
+  color: #5a3c1a;
+}
+.news-tab.active a {
+  background: #7E4E24;
+  color: #fff;
+  border-color: #7E4E24 #7E4E24 #f8f1e8 #7E4E24;
+  z-index: 2;
+  position: relative;
 }

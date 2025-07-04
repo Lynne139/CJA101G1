@@ -4,13 +4,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,12 +42,16 @@ import com.prodCate.model.ProdCateVO;
 import com.prodPhoto.model.ProdPhotoService;
 import com.prodPhoto.model.ProdPhotoVO;
 import com.resto.dto.RestoDTO;
+import com.resto.dto.RestoOrderDTO;
 import com.resto.entity.PeriodVO;
 import com.resto.entity.RestoVO;
 import com.resto.entity.TimeslotVO;
 import com.resto.model.PeriodService;
+import com.resto.model.RestoOrderService;
 import com.resto.model.RestoService;
 import com.resto.model.TimeslotService;
+import com.resto.utils.RestoOrderSource;
+import com.resto.utils.RestoOrderStatus;
 import com.roomOrder.model.RoomOrder;
 import com.roomOrder.model.RoomOrderService;
 import com.shopOrd.model.ShopOrdService;
@@ -66,6 +74,8 @@ public class AdminIndexController {
 	PeriodService periodService;
 	@Autowired
 	TimeslotService timeslotService;
+	@Autowired
+	RestoOrderService restoOrderService;
 	
 	@Autowired
 	ProdService prodSvc;
@@ -465,9 +475,63 @@ public class AdminIndexController {
     	String mainFragment = "admin/fragments/resto/restoOrder";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	// 複合查詢 + Datatables
+    	Map<String, String[]> paramMap = request.getParameterMap();
+        List<RestoOrderDTO> orderList = restoOrderService.compositeQueryAsDTO(paramMap);
+        model.addAttribute("orderList", orderList);
+        
+    	// 給下拉選單用
+        model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
+        model.addAttribute("orderStatusOptions", List.of(RestoOrderStatus.values()));
+        
+        // 下拉選單保持原值(因為param取得的字串與enum物件無法比較會抓不到select)
+        String srcParam = request.getParameter("orderSource");
+        if (StringUtils.hasText(srcParam)) {
+            model.addAttribute("orderSource", RestoOrderSource.valueOf(srcParam));
+        }
+        String stParam  = request.getParameter("orderStatus");
+        if (StringUtils.hasText(stParam)) {
+            model.addAttribute("orderStatus", RestoOrderStatus.valueOf(stParam));
+        }
+        
+    	// 讓複合查詢欄位保持原值（th:value）
+        Set<String> enumKeys = Set.of("orderSource", "orderStatus");
+        for (String key : paramMap.keySet()) {
+            if (enumKeys.contains(key)) continue;
+
+            String[] values = paramMap.get(key);
+            if (values != null && values.length > 0 && StringUtils.hasText(values[0])) {
+                model.addAttribute(key, values[0]);
+            }
+        }
 
     	return "admin/index_admin";
     } 
+    
+    @GetMapping("/resto_reservation")
+    public String restoReservation(HttpServletRequest request,Model model) {
+
+    	String mainFragment = "admin/fragments/resto/restoReservation";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+
+    	return "admin/index_admin";
+
+    } 
+
+    @GetMapping("/resto_order_today")
+    public String restoOrderToday(HttpServletRequest request,Model model) {
+    	
+    	String mainFragment = "admin/fragments/resto/restoOrderToday";
+    	model.addAttribute("mainFragment", mainFragment);
+    	model.addAttribute("currentURI", request.getRequestURI());
+    	
+    	return "admin/index_admin";
+    	
+    } 
+    
+    
     
     // === 商店管理 ===
     @GetMapping("/prod/select_page")
@@ -653,7 +717,7 @@ public class AdminIndexController {
     	model.addAttribute("memberVO", new MemberVO());
     	
     	// 從session獲取當前登入的會員資訊
-    	MemberVO memberVO = (MemberVO) request.getSession().getAttribute("memberVO");
+    	MemberVO memberVO = (MemberVO) request.getSession().getAttribute("loggedInMember");
     	if (memberVO != null) {
     		Integer memberId = memberVO.getMemberId();
     		int memberPoints = memberVO.getMemberPoints() != null ? memberVO.getMemberPoints() : 0;
@@ -709,7 +773,7 @@ public class AdminIndexController {
     	model.addAttribute("shopOrdVO", new com.shopOrd.model.ShopOrdVO());
     	
     	// 從session獲取當前登入的會員資訊
-    	MemberVO memberVO = (MemberVO) request.getSession().getAttribute("memberVO");
+    	MemberVO memberVO = (MemberVO) request.getSession().getAttribute("loggedInMember");
     	if (memberVO != null) {
     		Integer memberId = memberVO.getMemberId();
     		int memberPoints = memberVO.getMemberPoints() != null ? memberVO.getMemberPoints() : 0;
@@ -744,6 +808,34 @@ public class AdminIndexController {
     	// 添加訂單明細資料到 model 中
     	List<com.shopOrdDet.model.ShopOrdDetVO> list = shopOrdDetSvc.getAll();
     	model.addAttribute("shopOrdDetListData", list);
+    	
+    	// 添加唯一訂單編號清單
+    	Set<Integer> uniqueProdOrdIdList = list.stream()
+    		.map(vo -> vo.getShopOrdVO().getProdOrdId())
+    		.collect(Collectors.toCollection(LinkedHashSet::new));
+    	model.addAttribute("uniqueProdOrdIdList", uniqueProdOrdIdList);
+    	// 添加唯一商品編號清單
+    	Set<Integer> uniqueProductIdList = list.stream()
+    		.map(vo -> vo.getProdVO().getProductId())
+    		.collect(Collectors.toCollection(LinkedHashSet::new));
+    	model.addAttribute("uniqueProductIdList", uniqueProductIdList);
+    	
+    	// 構建 orderToProducts Map
+    	Map<Integer, List<Map<String, Object>>> orderToProducts = new LinkedHashMap<>();
+    	for (com.shopOrdDet.model.ShopOrdDetVO vo : list) {
+    		Integer orderId = vo.getShopOrdVO().getProdOrdId();
+    		Integer productId = vo.getProdVO().getProductId();
+    		String productName = vo.getProdVO().getProductName();
+    		orderToProducts.computeIfAbsent(orderId, k -> new ArrayList<>())
+    			.add(Map.of("productId", productId, "productName", productName));
+    	}
+    	try {
+    		ObjectMapper objectMapper = new ObjectMapper();
+    		String orderToProductsJson = objectMapper.writeValueAsString(orderToProducts);
+    		model.addAttribute("orderToProductsJson", orderToProductsJson);
+    	} catch (Exception e) {
+    		model.addAttribute("orderToProductsJson", "{}");
+    	}
     	
     	// 添加商品資料到 model 中
     	List<com.prod.model.ProdVO> prodList = prodSvc.getAll();

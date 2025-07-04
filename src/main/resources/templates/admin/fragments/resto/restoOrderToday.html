@@ -1,0 +1,191 @@
+		<!-- 複合查詢 -->
+		<form class="filter panel p-4 mb-4" method="get" th:action="@{/admin/resto_order}">
+			<div class="row g-3">
+				<div class="col-3">        
+					<label class="form-label">訂單來源</label>
+                        <select class="form-select" name="orderSource">
+                          <option value="">全部</option>
+                          <option th:each="srcOpt : ${orderSourceOptions}"
+                                  th:value="${srcOpt}"
+                                  th:text="${srcOpt.label}"
+                                  th:selected="${orderSource} == ${srcOpt}">
+                          </option>
+                        </select>
+				</div>
+        
+                <div class="col-3">        
+                  <label class="form-label">訂單狀態</label>
+                      <select class="form-select" name="orderStatus">
+                        <option value="">全部</option>
+                        <option th:each="stOpt : ${orderStatusOptions}"
+                                th:value="${stOpt}"
+                                th:text="${stOpt.label}"
+                                th:selected="${orderStatus} == ${stOpt}">
+                        </option>
+                      </select>
+                </div>
+
+
+				<div class="col-2">
+					<label class="form-label">訂單ID</label>
+					<input type="text" class="form-control" name="restoOrderId" th:value="${restoOrderId}">
+				</div>
+
+				<div class="col-2">
+					<label class="form-label">會員ID</label>
+					<input type="text" class="form-control" name="memberId" th:value="${memberId}">
+				</div>
+
+				<div class="col-2">
+					<label class="form-label">住宿ID</label>
+					<input type="text" class="form-control" name="roomOrderId" th:value="${roomOrderId}">
+				</div>
+        
+        
+                <div class="col-2">
+                  <label class="form-label">餐廳</label>
+                  <input type="text" class="form-control" name="snapshotRestoName" th:value="${snapshotRestoName}">
+                </div>
+
+                <div class="col-2">
+                  <label class="form-label">區段</label>
+                  <input type="text" class="form-control" name="snapshotPeriodName" th:value="${snapshotPeriodName}">
+                </div>
+
+                <div class="col-2">
+                  <label class="form-label">時段</label>
+                  <input type="text" class="form-control" name="snapshotTimeslotName" th:value="${snapshotTimeslotName}">
+                </div>
+
+        
+                <div class="col-3">
+                  <label class="form-label">訂位日期</label>
+                  <input id="regiDateRange" name="regiDateRange" type="text" class="form-control"
+                         th:value="${regiDateRange}">
+                </div>
+                
+                <input type="hidden" id="regiDateFrom" name="regiDateFrom">
+                <input type="hidden" id="regiDateTo" name="regiDateTo">
+                
+                <div class="col-3">
+                  <label class="form-label">下單時間</label>
+                  <input id="orderTimeRange" name="orderTimeRange" type="text" class="form-control"
+                         th:value="${orderTimeRange}">
+                </div>
+                
+                <input type="hidden" id="orderTimeFrom" name="orderTimeFrom">
+                <input type="hidden" id="orderTimeTo" name="orderTimeTo">
+                
+                   
+                <div class="d-flex justify-content-start align-items-center gap-4">
+
+                <div class="col-3">
+                  <label class="form-label">訂位者搜索</label>
+                  <input type="text" class="form-control" name="keyword" th:value="${keyword}">
+                </div>
+                
+                  <div class="col-auto form-check mt-4">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="chkRegiReq"
+                           name="hasRegiReq"
+                           value="true"
+                           th:checked="${hasRegiReq == 'true'}">
+                    <label class="form-check-label" for="chkRegiReq">
+                        有備註需求
+                    </label>
+                  </div>
+                  
+                  <div class="col-auto form-check mt-4">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="chkAdminNote"
+                           name="hasAdminNote"
+                           value="true"
+                           th:checked="${hasAdminNote == 'true'}">
+                    <label class="form-check-label" for="chkAdminNote">
+                        有管理員註記
+                    </label>
+                  </div>
+                </div>
+                
+
+
+				<div class="search_btns col-12 d-flex justify-content-end align-items-end gap-2">
+					<button type="button" class="btn btn_secondary btn_search_clear">清空</button>
+					<button type="submit" class="btn btn_primary">搜尋</button>
+				</div>        
+        
+			</div>
+		</form>
+
+		<!-- 資料表 -->
+		<div class="table panel p-4 mb-5">
+			<div class="table_header d-flex justify-content-between align-items-end mb-4">
+				<h4 class="table_title">訂位訂單列表</h4>
+				<!-- 新增訂單 -->
+				<button class="btn btn_accent btn_add" id="btnAddRestoOrder">新增訂單</button>
+			</div>
+      
+            
+			<div class="table-responsive" >
+				<table id="restoOrderTable" class="table table-bordered">
+					<thead class="table_head align-top">
+						<tr>
+							<th>ID</th>
+							<th>餐廳</th>
+							<th>來源</th>
+							<th>會員ID</th>
+							<th>住宿ID</th>
+							<th>姓名</th>
+							<th>信箱</th>
+							<th>訂位日期</th>
+							<th class="text-center">區段</th>
+							<th class="text-center">時段</th>
+							<th class="text-center">人數</th>
+							<th>下單時間</th>
+							<th class="text-center">狀態</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="order : ${orderList}">
+							<td th:text="${order.restoOrderId}"></td>
+							<td th:text="${order.snapshotRestoName}"></td>
+							<td>
+                              <span th:text="${order.orderSource.label}"
+                                    th:class="'text-center badge bg-' + ${order.orderSource.cssClass}">來源</span>
+                            </td>
+							<td th:text="${order.memberId}"></td>
+							<td th:text="${order.roomOrderId}"></td>
+							<td th:text="${order.orderGuestName}"></td>
+							<td th:text="${order.orderGuestEmail}"></td>
+							<td th:text="${order.regiDate}"></td>
+							<td class="text-center" th:text="${order.snapshotPeriodName}"></td>
+							<td class="text-center" th:text="${order.snapshotTimeslotName}"></td>
+							<td class="text-center" th:text="${order.regiSeats}"></td>
+							<td th:text="${#temporals.format(order.orderTime,'yyyy-MM-dd HH:mm')}"></td>
+							<td>
+                                <span th:text="${order.orderStatus.label}"
+                                    th:class="'text-center badge bg-' + ${order.orderStatus.cssClass}">狀態</span>
+                                
+							</td>
+              
+							<td>
+								<div class="table_row_actions d-flex justify-content-center align-items-start">
+									<button class="btn_icon btn_view" th:data-id="${order.restoOrderId}"><i class="fas fa-eye"></i></button>
+									<button class="btn_icon btn_edit" th:data-id="${order.restoOrderId}"><i class="fas fa-edit"></i></button>
+<!-- 									<button class="btn_icon btn_delete" th:data-id="${order.restoOrderId}"><i -->
+<!-- 											class="fas fa-trash"></i></button> -->
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+      
+
+
+
+			<!-- Modal -->
+			<div id="restoOrderModalContainer"></div>

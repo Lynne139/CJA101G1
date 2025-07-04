@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>隱私政策 - Maison d'Yuko</title>
+    <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+    <style>
+        .policy-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .policy-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #5a3c1a;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .policy-section {
+            margin-bottom: 2rem;
+        }
+        .policy-section h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #5a3c1a;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e0d6c3;
+            padding-bottom: 0.5rem;
+        }
+        .policy-section h3 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #7E4E24;
+            margin-bottom: 0.8rem;
+            margin-top: 1.5rem;
+        }
+        .policy-section p {
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        .policy-section ul {
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+        .policy-section li {
+            margin-bottom: 0.5rem;
+        }
+        .last-updated {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0d6c3;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+    
+    <!-- Overlay Full Menu -->
+    <div class="overlay-menu" id="overlayMenu">
+        <div class="overlay-menu-header d-flex justify-content-between align-items-start">
+            <div class="overlay-mobile-menu d-flex justify-content-between align-items-center p-3">
+                <div class="mb-menu-header">Maison d'Yuko</div>
+            </div>
+            <div class="overlay-logo-contact mb-5">
+                <img th:src="@{/images/logo/logo_hp.png}" alt="logo" class="overlay-logo mb-3" />
+                <div class="overlay-title">嶼蔻渡假村 Maison d'Yuko</div>
+                <div class="overlay-contact">
+                    <div>+886-7-123-4567</div>
+                    <div>service@maisondyuko.com</div>
+                </div>
+            </div>
+            <div class="close-btn" id="menuClose">&times;</div>
+        </div>
+        <div class="overlay-center">
+            <div class="overlay-menu-member px-5 mb-5 d-flex justify-content-center">
+                <img th:src="@{/images/icon/member.svg}" alt="member" class="text-center" style="padding:0 5px" />
+                <a href="#" class="text-center">會員登入</a>
+            </div>
+            <div class="px-5 mb-5 d-flex justify-content-between">
+                <a href="#" class="text-center"><img th:src="@{/images/icon/menu_bed.svg}" alt="bed" class="menu-icon"/><br>線上訂房</a>
+                <a th:href="@{/front-end/shop}" class="text-center"><img th:src="@{/images/icon/menu_bag.svg}" alt="bag" class="menu-icon"/><br>帳號選物</a>
+                <a href="#" class="text-center"><img th:src="@{/images/icon/menu_dish.svg}" alt="dish" class="menu-icon"/><br>餐廳訂位</a>
+            </div>
+            <div class="overlay-menu-row d-flex justify-content-center">
+                <div class="overlay-menu-col">
+                    <h5>關於嶼蔻</h5>
+                    <a href="#">品牌故事</a>
+                    <a href="#">環境簡介</a>
+                </div>
+                <div class="overlay-menu-col">
+                    <h5>最新消息</h5>
+                    <a th:href="@{/news/notice}">最新公告</a>
+                    <a th:href="@{/news/promotion}">活動通知</a>
+                    <a th:href="@{/news/news}">媒體報導</a>
+                </div>
+                <div class="overlay-menu-col">
+                    <h5>探索嶼蔻</h5>
+                    <a href="#">珍饌美饌</a>
+                    <a href="#">豐富設施</a>
+                </div>
+                <div class="overlay-menu-col">
+                    <h5>精緻客房</h5>
+                    <a href="#">蔻香居</a>
+                    <a href="#">海音居</a>
+                    <a href="#">晨曦之庭</a>
+                    <a href="#">月影行館</a>
+                </div>
+                <div class="overlay-menu-col">
+                    <h5>其他</h5>
+                    <a href="#">交通資訊</a>
+                    <a href="#">聯絡我們</a>
+                    <a href="#">常見問題</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="policy-container">
+        <h1 class="policy-title">隱私政策</h1>
+        
+        <div class="policy-section">
+            <h2>1. 資訊收集</h2>
+            <p>嶼蔻渡假村（Maison d'Yuko）致力於保護您的隱私權。本政策說明我們如何收集、使用、儲存和保護您的個人資訊。</p>
+            
+            <h3>1.1 我們收集的資訊類型</h3>
+            <ul>
+                <li><strong>個人識別資訊：</strong>姓名、電子郵件地址、電話號碼、地址</li>
+                <li><strong>預訂資訊：</strong>入住日期、退房日期、房型偏好、特殊需求</li>
+                <li><strong>付款資訊：</strong>信用卡號碼、帳單地址（透過安全的第三方支付處理器）</li>
+                <li><strong>使用資訊：</strong>網站瀏覽記錄、設備資訊、IP位址</li>
+                <li><strong>通訊記錄：</strong>與我們的客服團隊的對話記錄</li>
+            </ul>
+        </div>
+        
+        <div class="policy-section">
+            <h2>2. 資訊使用目的</h2>
+            <p>我們收集的資訊將用於以下目的：</p>
+            <ul>
+                <li>處理您的預訂和付款</li>
+                <li>提供客戶服務和支援</li>
+                <li>發送確認信和重要通知</li>
+                <li>改善我們的服務和網站體驗</li>
+                <li>發送行銷資訊（僅在您同意的情況下）</li>
+                <li>遵守法律義務</li>
+            </ul>
+        </div>
+        
+        <div class="policy-section">
+            <h2>3. 資訊分享</h2>
+            <p>我們不會出售、出租或交易您的個人資訊。在以下情況下，我們可能會分享您的資訊：</p>
+            <ul>
+                <li><strong>服務提供者：</strong>與協助我們提供服務的第三方合作夥伴</li>
+                <li><strong>法律要求：</strong>當法律要求或為保護我們的權利時</li>
+                <li><strong>業務轉讓：</strong>在企業合併或資產出售的情況下</li>
+                <li><strong>安全目的：</strong>為防止詐騙或安全威脅</li>
+            </ul>
+        </div>
+        
+        <div class="policy-section">
+            <h2>4. 資訊安全</h2>
+            <p>我們採用適當的技術和組織措施來保護您的個人資訊：</p>
+            <ul>
+                <li>使用SSL加密技術保護資料傳輸</li>
+                <li>定期更新安全措施和系統</li>
+                <li>限制員工對個人資訊的存取權限</li>
+                <li>定期進行安全審查和評估</li>
+            </ul>
+        </div>
+        
+        <div class="policy-section">
+            <h2>5. 您的權利</h2>
+            <p>根據適用法律，您有權：</p>
+            <ul>
+                <li>存取您的個人資訊</li>
+                <li>更正不準確的資訊</li>
+                <li>要求刪除您的資訊</li>
+                <li>限制資訊處理</li>
+                <li>反對資訊處理</li>
+                <li>資料可攜性</li>
+                <li>撤回同意</li>
+            </ul>
+        </div>
+        
+        <div class="policy-section">
+            <h2>6. Cookie 使用</h2>
+            <p>我們使用 Cookie 和類似技術來改善您的網站體驗。詳細資訊請參閱我們的 <a th:href="@{/policies/cookies}" class="text-decoration-none">Cookies 政策</a>。</p>
+        </div>
+        
+        <div class="policy-section">
+            <h2>7. 兒童隱私</h2>
+            <p>我們的服務不針對13歲以下的兒童。我們不會故意收集13歲以下兒童的個人資訊。如果您認為我們可能收集了兒童的資訊，請立即聯絡我們。</p>
+        </div>
+        
+        <div class="policy-section">
+            <h2>8. 國際資料傳輸</h2>
+            <p>您的資訊可能會被傳輸到台灣以外的國家進行處理。我們確保所有國際資料傳輸都符合適用的隱私法律和法規。</p>
+        </div>
+        
+        <div class="policy-section">
+            <h2>9. 政策更新</h2>
+            <p>我們可能會不時更新本隱私政策。重大變更將透過電子郵件或網站公告通知您。建議您定期查看本政策以了解最新資訊。</p>
+        </div>
+        
+        <div class="policy-section">
+            <h2>10. 聯絡我們</h2>
+            <p>如果您對本隱私政策有任何疑問或需要行使您的權利，請透過以下方式聯絡我們：</p>
+            <ul>
+                <li>電子郵件：service@maisondyuko.com</li>
+                <li>電話：+886-7-123-4567</li>
+                <li>地址：南海群島．映灣嶼 9 號．珊瑚灣 2025</li>
+            </ul>
+        </div>
+        
+        <div class="last-updated">
+            <p>最後更新日期：2025年1月15日</p>
+        </div>
+    </div>
+    
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/mainfunction :: stickyIcons"></div>
+</body>
+</html> 

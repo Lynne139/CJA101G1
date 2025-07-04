@@ -1,6 +1,9 @@
+
 package com.resto.entity;
 
 import java.util.Objects;
+
+import com.resto.utils.ValidationGroups;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,8 +26,8 @@ public class TimeslotVO{
 	@Column(name = "timeslot_id", updatable = false)
 	private Integer timeslotId;
 
-	@NotBlank
-	@Pattern(regexp = "^([01]\\d|2[0-3]):[0-5]\\d$", message = "請輸入有效的時間格式（HH:mm）")
+	@NotBlank(groups = ValidationGroups.First.class)
+	@Pattern(regexp = "^([01]\\d|2[0-3]):[0-5]\\d$", message = "請輸入有效的時間格式（HH:mm）",groups = ValidationGroups.Second.class)
 	@Column(name = "timeslot_name")
 	private String timeslotName;
 	
@@ -32,8 +35,7 @@ public class TimeslotVO{
 	private Boolean isDeleted = false;
 	
 	@ManyToOne
-	@NotNull
-	@JoinColumn(name="resto_id")
+	@JoinColumn(name="resto_id", nullable = false)
 	private RestoVO restoVO;
 	
 	@ManyToOne
@@ -42,8 +44,15 @@ public class TimeslotVO{
 	
 	
 	public TimeslotVO() {
-		super();
 	}
+
+
+	public TimeslotVO(Integer timeslotId) {
+		super();
+		this.timeslotId = timeslotId;
+	}
+
+
 
 	public Integer getTimeslotId() {
 		return timeslotId;

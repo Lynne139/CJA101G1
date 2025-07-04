@@ -90,7 +90,8 @@
 							<tr>
 								<th class="text-center">房型編號</th>
 								<th class="text-center">房型名稱</th>
-								<th class="text-center">房型數量</th>
+								<th class="text-center">房型人數</th>
+<!-- 								<th class="text-center">房型數量</th> -->
 <!-- 								<th class="text-center">房型介紹</th> -->
 								<th class="text-center">上下架狀態</th>
 								<!-- 								<th class="text-center">房型照片</th> -->
@@ -103,6 +104,7 @@
 							<tr th:each="roomTypeVO : ${roomTypeVOList}">
 								<td class="text-center" th:text="${roomTypeVO.roomTypeId}"></td>
 								<td class="text-center" th:text="${roomTypeVO.roomTypeName}"></td>
+<!-- 								<td class="text-center" th:text="${roomTypeVO.guestNum}"></td> -->
 								<td class="text-center" th:text="${roomTypeVO.roomTypeAmount}"></td>
 <!-- 								<td th:text="${roomTypeVO.roomTypeContent}"></td> -->
 								<td class="text-center"><span

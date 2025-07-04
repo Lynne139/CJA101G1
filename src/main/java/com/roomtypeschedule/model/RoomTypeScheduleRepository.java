@@ -29,4 +29,7 @@ public interface RoomTypeScheduleRepository extends JpaRepository<RoomTypeSchedu
 	
 	//批次查詢
 	List<RoomTypeScheduleVO> findByRoomTypeVOAndRoomOrderDateBetween(RoomTypeVO roomTypeVO, java.sql.Date start, java.sql.Date end);
+	
+	//查詢今天之後可預定之日期
+	List<RoomTypeScheduleVO> findByRoomOrderDateGreaterThanEqual(java.sql.Date date);
 }

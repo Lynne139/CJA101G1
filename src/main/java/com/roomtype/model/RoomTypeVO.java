@@ -61,9 +61,15 @@ public class RoomTypeVO implements java.io.Serializable {
 
 	@Column(name = "room_type_price")
 	@NotNull(message = "房型價格: 請勿空白", groups = Save.class)
-	@DecimalMin(value = "1000", message = "房型價格: 不能小於{value}", groups = Save.class)
-	@DecimalMax(value = "1000000", message = "房型價格: 不能超過{value}", groups = Save.class)
+	@Min(value = 1000, message = "房型價格: 不能小於{value}", groups = Save.class)
+	@Max(value = 1000000, message = "房型價格: 不能超過{value}", groups = Save.class)
 	private Integer roomTypePrice;
+	
+	@Column(name="guest_num")
+	@NotNull(message = "房型人數: 請勿空白", groups = Save.class)
+	@Min(value = 1, message = "房型人數: 不能小於{value}", groups = Save.class)
+	@Max(value = 12, message = "房型人數: 不能超過{value}", groups = Save.class)
+	private Integer guestNum;
 
 	@OneToMany(mappedBy = "roomTypeVO", cascade = CascadeType.ALL)
 	private Set<RoomVO> roomVOs;
@@ -132,6 +138,13 @@ public class RoomTypeVO implements java.io.Serializable {
 		this.roomVOs = roomVOs;
 	}
 
+	public Integer getGuestNum() {
+		return guestNum;
+	}
+
+	public void setGuestNum(Integer guestNum) {
+		this.guestNum = guestNum;
+	}
 
 	public RoomTypeVO() {
 		this.roomSaleStatus = 1; // 預設上架

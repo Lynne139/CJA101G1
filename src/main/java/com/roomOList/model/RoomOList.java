@@ -23,10 +23,6 @@ public class RoomOList {
     private RoomTypeVO roomType;
 
     @ManyToOne
-    @JoinColumn(name="ROOM_ID",referencedColumnName = "ROOM_ID")
-    private RoomVO room;
-
-    @ManyToOne
     @JoinColumn(name="ROOM_ORDER_ID",referencedColumnName = "ROOM_ORDER_ID")
     private RoomOrder roomOrder;
 
@@ -74,14 +70,6 @@ public class RoomOList {
 
     public void setRoomType(RoomTypeVO roomType) {
         this.roomType = roomType;
-    }
-
-    public RoomVO getRoom() {
-        return room;
-    }
-
-    public void setRoom(RoomVO room) {
-        this.room = room;
     }
 
     public RoomOrder getRoomOrder() {

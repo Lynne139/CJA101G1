@@ -1,0 +1,6 @@
+.toast{
+  z-index: 2000 !important; /* 比 .dtfc-fixed-right 的預設高即可 */
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}

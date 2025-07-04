@@ -27,6 +27,7 @@
 					        <p><strong>房型名稱：</strong> <span th:text="${roomTypeVO.roomTypeName}"></span></p>
 					        <p><strong>房型數量：</strong> <span th:text="${roomTypeVO.roomTypeAmount}"></span></p>
 					        <p><strong>房型價格：</strong> <span th:text="${roomTypeVO.roomTypePrice}"></span> </p>
+					        <p><strong>房型人數：</strong> <span th:text="${roomTypeVO.guestNum}"></span> </p>
 					        <p><strong>上下架狀態：</strong> <span th:text="${roomTypeVO.roomSaleStatus == 1}? '上架' : '下架'"></span></p>
 					        <p><strong>房型介紹：</strong> <div th:utext="${roomTypeVO.roomTypeContent}"></div></p>
 	    				</div>

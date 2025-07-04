@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>使用條款 - Maison d'Yuko</title>
+    <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+    <style>
+        .policy-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .policy-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #5a3c1a;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .policy-section {
+            margin-bottom: 2rem;
+        }
+        .policy-section h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #5a3c1a;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e0d6c3;
+            padding-bottom: 0.5rem;
+        }
+        .policy-section h3 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #7E4E24;
+            margin-bottom: 0.8rem;
+            margin-top: 1.5rem;
+        }
+        .policy-section p {
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        .policy-section ul {
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+        .policy-section li {
+            margin-bottom: 0.5rem;
+        }
+        .last-updated {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0d6c3;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+    
+    <!-- Overlay Full Menu -->
+    <div class="overlay-menu" id="overlayMenu">
+        <div class="overlay-menu-header d-flex justify-content-between align-items-start">
+            <div class="overlay-mobile-menu d-flex justify-content-between align-items-center p-3">
+                <div class="mb-menu-header">Maison d'Yuko</div>
+            </div>
+            <div class="overlay-logo-contact mb-5">
+                <img th:src="@{/images/logo/logo_hp.png}" alt="logo" class="overlay-logo mb-3" />
+                <div class="overlay-title">嶼蔻渡假村 Maison d'Yuko</div>
+                <div class="overlay-contact">
+                    <div>+886-7-123-4567</div>
+                    <div>service@maisondyuko.com</div>
+                </div>
+            </div>
+            <div class="close-btn" id="menuClose">&times;</div>
+        </div>
+        <div class="overlay-center">
+            <div class="overlay-menu-member px-5 mb-5 d-flex justify-content-center">
+                <img th:src="@{/images/icon/member.svg}" alt="member" class="text-center" style="padding:0 5px" />
+                <a href="#" class="text-center">會員登入</a>
+            </div>
+            <div class="px-5 mb-5 d-flex justify-content-between">
+                <a href="#" class="text-center"><img th:src="@{/images/icon/menu_bed.svg}" alt="bed" class="menu-icon"/><br>線上訂房</a>
+                <a th:href="@{/front-end/shop}" class="text-center"><img th:src="@{/images/icon/menu_bag.svg}" alt="bag" class="menu-icon"/><br>帳號選物</a>
+                <a href="#" class="text-center"><img th:src="@{/images/icon/menu_dish.svg}" alt="dish" class="menu-icon"/><br>餐廳訂位</a>
+            </div>
+            <div class="overlay-menu-row d-flex justify-content-center">
+                <div class="overlay-menu-col">
+                    <h5>關於嶼蔻</h5>
+                    <a href="#">品牌故事</a>
+                    <a href="#">環境簡介</a>
+                </div>
+                <div class="overlay-menu-col">
+                    <h5>最新消息</h5>
+                    <a th:href="@{/news/notice}">最新公告</a>
+                    <a th:href="@{/news/promotion}">活動通知</a>
+                    <a th:href="@{/news/news}">媒體報導</a>
+                </div>
+                <div class="overlay-menu-col">
+                    <h5>探索嶼蔻</h5>
+                    <a href="#">珍饌美饌</a>
+                    <a href="#">豐富設施</a>
+                </div>
+                <div class="overlay-menu-col">
+                    <h5>精緻客房</h5>
+                    <a href="#">蔻香居</a>
+                    <a href="#">海音居</a>
+                    <a href="#">晨曦之庭</a>
+                    <a href="#">月影行館</a>
+                </div>
+                <div class="overlay-menu-col">
+                    <h5>其他</h5>
+                    <a href="#">交通資訊</a>
+                    <a href="#">聯絡我們</a>
+                    <a href="#">常見問題</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="policy-container">
+        <h1 class="policy-title">使用條款</h1>
+        
+        <div class="policy-section">
+            <h2>1. 接受條款</h2>
+            <p>歡迎使用嶼蔻渡假村（Maison d'Yuko）的服務。透過使用我們的網站、應用程式或服務，您同意遵守這些使用條款。如果您不同意這些條款，請不要使用我們的服務。</p>
+        </div>
+        
+        <div class="policy-section">
+            <h2>2. 服務說明</h2>
+            <p>嶼蔻渡假村提供以下服務：</p>
+            <ul>
+                <li>線上客房預訂</li>
+                <li>餐廳訂位服務</li>
+                <li>商品購買</li>
+                <li>會員服務</li>
+                <li>客戶支援</li>
+            </ul>
+        </div>
+        
+        <div class="policy-section">
+            <h2>3. 帳戶註冊</h2>
+            <h3>3.1 註冊要求</h3>
+            <ul>
+                <li>您必須年滿18歲才能註冊帳戶</li>
+                <li>提供準確、完整和最新的個人資訊</li>
+                <li>保護您的帳戶密碼和登入資訊</li>
+                <li>對您帳戶下的所有活動負責</li>
+            </ul>
+            
+            <h3>3.2 帳戶安全</h3>
+            <p>您有責任維護帳戶的安全性，包括：</p>
+            <ul>
+                <li>定期更改密碼</li>
+                <li>不在公共設備上登入</li>
+                <li>立即報告任何未授權的使用</li>
+            </ul>
+        </div>
+        
+        <div class="policy-section">
+            <h2>4. 預訂和付款</h2>
+            <h3>4.1 預訂政策</h3>
+            <ul>
+                <li>預訂需提供有效的付款方式</li>
+                <li>房價以預訂時顯示的價格為準</li>
+                <li>入住時間為下午3:00，退房時間為上午11:00</li>
+                <li>如需提前入住或延後退房，請提前聯繫我們</li>
+            </ul>
+            
+            <h3>4.2 取消政策</h3>
+            <ul>
+                <li>入住前24小時內取消，將收取一晚房費</li>
+                <li>入住當天取消或未到，將收取全額房費</li>
+                <li>特殊活動期間可能有不同的取消政策</li>
+            </ul>
+            
+            <h3>4.3 付款方式</h3>
+            <ul>
+                <li>接受信用卡、LinePay等付款方式</li>
+                <li>所有付款都透過安全的第三方處理器處理</li>
+                <li>房費將在預訂時或入住時收取</li>
+            </ul>
+        </div>
+        
+        <div class="policy-section">
+            <h2>5. 使用限制</h2>
+            <p>您同意不會：</p>
+            <ul>
+                <li>使用我們的服務進行任何非法活動</li>
+                <li>干擾或破壞我們的系統或服務</li>
+                <li>嘗試未授權存取我們的系統</li>
+                <li>傳輸病毒、惡意軟體或其他有害程式</li>
+                <li>侵犯他人的智慧財產權</li>
+                <li>發布虛假、誤導或有害的資訊</li>
+            </ul>
+        </div>
+        
+        <div class="policy-section">
+            <h2>6. 智慧財產權</h2>
+            <p>我們的網站、應用程式和服務中的所有內容，包括但不限於文字、圖像、標誌、設計、軟體等，均受智慧財產權法保護。未經我們明確許可，您不得複製、分發或使用這些內容。</p>
+        </div>
+        
+        <div class="policy-section">
+            <h2>7. 免責聲明</h2>
+            <p>在法律允許的最大範圍內，我們不對以下情況承擔責任：</p>
+            <ul>
+                <li>服務中斷或技術問題</li>
+                <li>第三方服務提供者的行為</li>
+                <li>不可抗力事件</li>
+                <li>間接或附帶損失</li>
+            </ul>
+        </div>
+        
+        <div class="policy-section">
+            <h2>8. 責任限制</h2>
+            <p>我們的最大責任限額為您支付的服務費用總額。這不適用於因我們的重大過失或故意行為造成的損失。</p>
+        </div>
+        
+        <div class="policy-section">
+            <h2>9. 爭議解決</h2>
+            <p>任何與這些條款相關的爭議，應優先透過友好協商解決。如果無法解決，將提交至台灣法院管轄。</p>
+        </div>
+        
+        <div class="policy-section">
+            <h2>10. 條款修改</h2>
+            <p>我們保留隨時修改這些條款的權利。重大變更將透過電子郵件或網站公告通知您。繼續使用服務即表示您接受修改後的條款。</p>
+        </div>
+        
+        <div class="policy-section">
+            <h2>11. 聯絡我們</h2>
+            <p>如果您對這些使用條款有任何疑問，請透過以下方式聯絡我們：</p>
+            <ul>
+                <li>電子郵件：service@maisondyuko.com</li>
+                <li>電話：+886-7-123-4567</li>
+                <li>地址：南海群島．映灣嶼 9 號．珊瑚灣 2025</li>
+            </ul>
+        </div>
+        
+        <div class="last-updated">
+            <p>最後更新日期：2025年1月15日</p>
+        </div>
+    </div>
+    
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/mainfunction :: stickyIcons"></div>
+</body>
+</html> 

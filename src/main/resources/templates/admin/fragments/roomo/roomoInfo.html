@@ -45,13 +45,13 @@
                     <tr>
                         <th>訂單編號</th>
                         <th>會員名稱</th>
-                        <th>訂單成立日期</th>
                         <th class="text-center">訂單狀態</th>
                         <th>付款狀態</th>
                         <th>訂單總金額</th>
                         <th>實際支付金額</th>
                         <th class="text-center">入住日期</th>
                         <th class="text-center">退房日期</th>
+                        <th>訂單成立日期</th>
 
                         <!-- <th>使用折價券</th>
                         <th>折扣金額</th>
@@ -67,16 +67,17 @@
                     <tr th:each="roomo : ${roomoList}">
                         <td th:text="${roomo.roomOrderId}"></td>
                         <td th:text="${roomo.member.memberName}"></td>
-                        <td th:text="${roomo.orderDate}"></td>
+                        
                         <td class="text-center">
                             <span th:classappend="${roomo.orderStatus} == 2 ? 'badge bg-success' : (${roomo.orderStatus} == 1 ? 'badge bg-primary' : 'badge bg-secondary')"
                                   th:text="${roomo.orderStatus} == 2 ? '完成' : (${roomo.orderStatus} == 1 ? '成立' : '取消')"></span>
                         </td>
                         <td th:text="${roomo.payStatus} == 1 ? '已付款' : '未付款'"></td>
-                        <td th:text="${roomo.roomAmount}"></td>
+                        <td th:text="${roomo.totalAmount}"></td>
                         <td th:text="${roomo.actualAmount}"></td>
                         <td style="white-space: nowrap;" th:text="${roomo.checkInDate}"></td>
                         <td style="white-space: nowrap;" th:text="${roomo.checkOutDate}"></td>
+                        <td th:text="${roomo.orderDate}"></td>
 
                         
                         
@@ -90,8 +91,8 @@
                             <div class="table_row_actions d-flex justify-content-center align-items-start">
                                 <!-- <button class="btn_icon btn_detail" th:data-id="${roomo.roomOrderId}"><i class="fas fa-info-circle"></i></button> -->
                                 <button class="btn_icon btn_view" th:data-id="${roomo.roomOrderId}" title="檢視明細"><i class="fas fa-eye"></i></button>
-                                <button class="btn_icon btn_edit" th:data-id="${roomo.roomOrderId}" title="編輯資料"><i class="fas fa-edit"></i></button>
-                                <button class="btn_icon btn_delete" th:data-id="${roomo.roomOrderId}" title="刪除資料"><i class="fas fa-trash"></i></button>
+                                <button class="btn_icon btn_edit" th:data-id="${roomo.roomOrderId}" title="編輯資料" th:disabled="${roomo.orderStatus} == 0"><i class="fas fa-edit"></i></button>
+                                <button class="btn_icon btn_delete" th:data-id="${roomo.roomOrderId}" title="刪除資料" th:disabled="${roomo.orderStatus} == 0"><i class="fas fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>
@@ -118,3 +119,5 @@
     </div>
 
 </div>
+
+<script th:src="@{/js/roomo_edit.js}"></script>
