@@ -223,21 +223,28 @@ public class RestoOrderService {
     
    
     // 今日訂單切換訂單狀態
-//    @Transactional
-//    public void changeStatus(Integer id, RestoOrderStatus newStatus){
-//        RestoOrderVO order = restoOrderRepository.findById(id).orElseThrow();
-//        RestoOrderVO snapshot = new RestoOrderVO();   // 只放需要比對的欄位
-//        snapshot.setRegiSeats(order.getRegiSeats());
-//        snapshot.setOrderStatus(order.getOrderStatus());
-//        snapshot.setRestoVO(order.getRestoVO());
-//        snapshot.setTimeslotVO(order.getTimeslotVO());
-//        snapshot.setRegiDate(order.getRegiDate());
-//
-//        order.setOrderStatus(newStatus);
-//        // 同步更新預約佔位
-//        syncReservationSeats(snapshot, order);
-//    }
+    @Transactional
+    public RestoOrderStatus toggleStatus(Integer id, RestoOrderStatus newStatus){
+        RestoOrderVO order = restoOrderRepository.findById(id).orElseThrow();
 
+        RestoOrderVO snapshot = new RestoOrderVO();   // 只放需要比對的欄位
+        snapshot.setRegiSeats(order.getRegiSeats());
+        snapshot.setOrderStatus(order.getOrderStatus());
+        snapshot.setRestoVO(order.getRestoVO());
+        snapshot.setTimeslotVO(order.getTimeslotVO());
+        snapshot.setRegiDate(order.getRegiDate());
+
+        order.setOrderStatus(newStatus);
+        // 同步更新預約佔位
+        syncReservationSeats(snapshot, order);
+        return newStatus;
+    }
+    
+    
+    // 找出今日訂單
+    public List<RestoOrderVO> findTodayOrders(Integer restoId) {
+        return restoOrderRepository.findTodayOrders(restoId);
+    }
     
     
 

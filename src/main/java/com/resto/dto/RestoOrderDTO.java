@@ -17,6 +17,7 @@ public class RestoOrderDTO {
 	private Integer roomOrderId;
 	private String orderGuestName;
 	private String orderGuestEmail;
+	private String orderGuestPhone;
 	private LocalDate regiDate;
 	private String snapshotPeriodName;
 	private String snapshotTimeslotName;
@@ -31,6 +32,26 @@ public class RestoOrderDTO {
 
 	
 	public RestoOrderDTO(Integer restoOrderId, String snapshotRestoName, RestoOrderSource orderSource, Integer memberId,
+			Integer roomOrderId, String orderGuestName, String orderGuestEmail,
+			LocalDate regiDate, String snapshotPeriodName, String snapshotTimeslotName, Integer regiSeats,
+			LocalDateTime orderTime, RestoOrderStatus orderStatus) {
+		super();
+		this.restoOrderId = restoOrderId;
+		this.snapshotRestoName = snapshotRestoName;
+		this.orderSource = orderSource;
+		this.memberId = memberId;
+		this.roomOrderId = roomOrderId;
+		this.orderGuestName = orderGuestName;
+		this.orderGuestEmail = orderGuestEmail;
+		this.regiDate = regiDate;
+		this.snapshotPeriodName = snapshotPeriodName;
+		this.snapshotTimeslotName = snapshotTimeslotName;
+		this.regiSeats = regiSeats;
+		this.orderTime = orderTime;
+		this.orderStatus = orderStatus;
+	}
+	
+	public RestoOrderDTO(Integer restoOrderId, String snapshotRestoName, RestoOrderSource orderSource, Integer memberId,
 			Integer roomOrderId, String orderGuestName, String orderGuestEmail, String orderGuestPhone,
 			LocalDate regiDate, String snapshotPeriodName, String snapshotTimeslotName, Integer regiSeats,
 			LocalDateTime orderTime, RestoOrderStatus orderStatus) {
@@ -42,6 +63,7 @@ public class RestoOrderDTO {
 		this.roomOrderId = roomOrderId;
 		this.orderGuestName = orderGuestName;
 		this.orderGuestEmail = orderGuestEmail;
+		this.orderGuestPhone = orderGuestPhone;
 		this.regiDate = regiDate;
 		this.snapshotPeriodName = snapshotPeriodName;
 		this.snapshotTimeslotName = snapshotTimeslotName;
@@ -153,6 +175,17 @@ public class RestoOrderDTO {
 		this.snapshotTimeslotName = snapshotTimeslotName;
 	}
 
+	
+
+	public String getOrderGuestPhone() {
+		return orderGuestPhone;
+	}
+
+
+	public void setOrderGuestPhone(String orderGuestPhone) {
+		this.orderGuestPhone = orderGuestPhone;
+	}
+
 
 	public Integer getRegiSeats() {
 		return regiSeats;
@@ -183,15 +216,6 @@ public class RestoOrderDTO {
 		this.orderStatus = orderStatus;
 	}
 
-
-	@Override
-	public String toString() {
-		return "RestoOrderDTO [restoOrderId=" + restoOrderId + ", restoName=" + snapshotRestoName + ", orderSource="
-				+ orderSource + ", memberId=" + memberId + ", roomOrderId=" + roomOrderId + ", orderGuestName="
-				+ orderGuestName + ", orderGuestEmail=" + orderGuestEmail + ", orderGuestPhone="
-				+ ", regiDate=" + regiDate + ", periodName=" + snapshotPeriodName + ", timeslotName=" + snapshotTimeslotName
-				+ ", regiSeats=" + regiSeats + ", orderTime=" + orderTime + ", orderStatus=" + orderStatus + "]";
-	}
 
 
 	

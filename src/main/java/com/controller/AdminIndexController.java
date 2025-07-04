@@ -447,8 +447,9 @@ public class AdminIndexController {
         // 若選定某餐廳，才撈出該餐廳的區段與時段
         if (restoId != null) {
         	
+        	// 軟刪除的餐廳只讀
             RestoVO Urlresto = restoService.getById(restoId);
-        	boolean readonly = Urlresto.getIsDeleted();  // 軟刪除的餐廳只讀
+        	boolean readonly = Urlresto.getIsDeleted();  
             model.addAttribute("readonly", readonly);
         	
         	// 把選到的餐廳的詳細資訊放進 model 以顯示餐廳名稱
@@ -530,6 +531,9 @@ public class AdminIndexController {
     @GetMapping("/resto_reservation")
     public String restoReservation(HttpServletRequest request,Model model) {
 
+    	
+    	
+    	
     	String mainFragment = "admin/fragments/resto/restoReservation";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
@@ -539,7 +543,37 @@ public class AdminIndexController {
     } 
 
     @GetMapping("/resto_order_today")
-    public String restoOrderToday(HttpServletRequest request,Model model) {
+    public String restoOrderToday(HttpServletRequest request,
+    							  @RequestParam(value = "restoId", required = false) Integer restoId,
+								  Model model) {
+    	
+    	// 把所有餐廳都傳給下拉選單使用
+        List<RestoVO> restoList = restoService.getAll();
+        model.addAttribute("restoList", restoList);
+
+        // 若選定某餐廳，才撈出該餐廳的區段與時段
+        if (restoId != null) {
+        	
+        	// 軟刪除的餐廳只讀
+            RestoVO Urlresto = restoService.getById(restoId);
+        	boolean readonly = Urlresto.getIsDeleted();  
+            model.addAttribute("readonly", readonly);
+        	
+        	// 把選到的餐廳的詳細資訊放進 model 以顯示餐廳名稱
+            RestoVO selectedResto = restoService.getById(restoId);
+            model.addAttribute("selectedResto", selectedResto);
+            model.addAttribute("selectedRestoId", restoId);
+            
+           // 該餐廳的所有今日訂單
+            model.addAttribute("orderList", restoOrderService.findTodayOrders(restoId));
+            
+        } else {
+        	// 若沒選餐廳，仍補空值避免渲染錯誤
+            model.addAttribute("selectedResto", null);
+            model.addAttribute("readonly", false);
+        }
+    	
+    	
     	
     	String mainFragment = "admin/fragments/resto/restoOrderToday";
     	model.addAttribute("mainFragment", mainFragment);

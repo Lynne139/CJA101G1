@@ -1,6 +1,182 @@
 <div class="main_order_today">
 
+  <div class="mt-5 mb-5">
+    <h2 class="page_title">今日訂位</h2>
+  </div>
 
+  <div class="summary_card panel">總預約：20（早餐店 12、晚餐館 8）</div>
+
+
+  <!-- 餐廳選擇器 -->
+  <form class="select_resto filter panel p-4 mb-4" 
+        method="get" 
+        th:action="@{/admin/resto_order_today}">
+    <div class="row mb-3">
+      <div class="col-12">
+        <label class="form-label fs-5 mt-2">選擇餐廳</label>
+        <select id="restoSelect" class="form-select w-100" name="restoId" onchange="this.form.submit()">
+          <option disabled th:selected="${selectedRestoId == null}">--- 餐廳 ---</option>
+          <option th:each="resto : ${restoList}" th:value="${resto.restoId}" th:text="${resto.restoName}"
+            th:selected="${resto.restoId == selectedRestoId}"></option>
+        </select>
+
+      </div>
+    </div>
+  </form>
+  
+        <div th:if="${readonly}" class="alert alert-warning">
+          <i class="fa-solid fa-lock me-2"></i> 本餐廳已封存，目前為只讀模式，無法編輯資料。
+        </div>
+
+    <!-- 區段與時段 Panel -->
+    <div class="panel panel_periodntimeslot p-4 mb-5">
+    
+        
+        <!-- readonly 狀態時顯示的遮罩 -->
+        <div th:if="${readonly}" class="block-overlay"></div>        
+
+        <!-- 若無選餐廳提示 -->
+        <div th:if="${selectedResto == null}" class="text-center">請先選擇餐廳，以載入今日訂單</div>
+        
+        <h4 class="resto_name mb-4" th:if="${selectedResto != null}" th:text="${selectedResto.restoName}"></h4>
+ 
+        <!-- 若餐廳無訂單內容提示 -->
+        <div class="text-center mb-4" th:if="${selectedResto != null and #lists.isEmpty(orderList)}">本餐廳今日暫無訂單</div>
+                
+        
+        
+        <!-- ====== 今日訂單卡片群 ====== -->
+        <div class="order_cards" th:if="${selectedResto != null and !#lists.isEmpty(orderList)}">
+          
+          <!-- 迴圈繪卡片 -->
+          <div th:each="order : ${orderList}"
+               class="order-card panel position-relative mb-4">
+        
+            <!-- 狀態色條 -->
+            <div class="status-bar"
+                 th:class="'status-bar bg-' + ${order.orderStatus.cssClass}">
+              <!-- 狀態 badge -->
+              <div th:text="${order.orderStatus.label}"
+                            th:class="'badge fs-6 bg-' + ${order.orderStatus.cssClass}">
+                        已成立
+              </div>      
+            </div>
+        
+            <!-- 卡片正文 -->
+            <div class="card-body">
+        
+              <!-- 卡片標題 -->
+              <div class="card_title d-flex flex-column">
+                  <!-- 基本欄位 -->
+                  <div class="col-12 mt-4">
+                    <div class="d-flex justify-content-between align-items-center py-1 mb-3">
+                      <h5 class="fw-bold mb-0">
+                  <!--                     <i class="fa-solid fa-utensils me-2"></i> -->
+                        訂單編號 # <span th:text="${order.restoOrderId}">ID</span>
+                      </h5>
+                      <!-- 操作 -->
+                      <div class=" flex-shrink-0">
+                        <!-- 操作按鈕 -->
+      
+                        <!-- 取消 -->
+                        <button class="btn btn_danger btn_cancel ms-1"
+                          th:data-id="${order.restoOrderId}"><i class="fa-solid fa-xmark me-2"></i>取消訂單</button>
+      
+                        <!-- 完成 -->
+                        <button class="btn btn_success btn_done ms-1"
+                          th:data-id="${order.restoOrderId}"><i class="fa-solid fa-check me-2"></i>報到完成</button>
+      
+                      </div>
+                   </div>
+                  </div>
+          
+                  <!-- 定位基本資訊 -->
+                  <div class="order_info mb-2">
+                    <span class="me-3">
+                      <i class="fa-solid fa-calendar-days me-1"></i>
+                      <span th:text="${#temporals.format(order.regiDate,'yyyy/MM/dd')}">YYYY/MM/DD</span>
+                    </span>
+                    <span class="me-2">
+                      <i class="fa-solid fa-clock me-1"></i>
+                      <span th:text="${order.snapshotPeriodName}">分類</span>
+                      <span th:text="${order.snapshotTimeslotName}">HH:MM</span>
+                    </span>
+                    <span class="me-5">
+                      <i class="fa-solid fa-user-group me-1"></i>
+                      <span th:text="${order.regiSeats}">N</span> 位
+                    </span>
+                  </div>
+                  
+                  <!-- 訂位者資訊 -->
+                  <div class="mb-1 mt-2"><strong><span th:text="${order.orderGuestName}"></span></strong>                               
+                      <span th:if="${order.orderSource?.name() == 'MEMBER' }" th:text="${'( 會員ID-'+order.memberVO.memberId+' )'}"></span>
+                  </div>
+                  <div class="">
+                        <p><strong></strong> <span th:text="${order.orderGuestEmail}"></span></p>
+                        <p><strong></strong> <span th:text="${order.orderGuestPhone}"></span></p>
+                    </div>
+          
+                </div>
+                
+                <div class="d-flex justify-content-end mx-3"><i class="fa-solid fa-caret-up"></i></div>
+                
+                
+                <!-- 可收合範圍 -->
+                <hr>
+                <div class="guest_detail mb-0 mt-4">                          
+
+                    <div class="mb-4">
+                        <p ><strong>兒童座椅數：</strong> <span th:text="${order.highChairs}"></span></p>
+                        <p><strong>備註：</strong> <span th:text="${order.regiReq}"></span></p>                        
+                        <p><strong>管理員備註：</strong> <span th:text="${order.adminNote}"></span></p>                        
+                    </div>
+<!--                     <div class="detail_title fw-bold">訂單資訊</div> -->
+                      <p ><strong>訂單來源：</strong> 
+                         <span th:text="${order.orderSource.label+'訂單'}"
+                               th:class="'text-center badge bg-' + ${order.orderSource.cssClass}">來源</span>
+                               <span th:if="${order.orderSource?.name() == 'MEMBER' }" th:text="${'( 會員ID-'+order.memberVO.memberId+' )'}"></span>
+                               <span th:if="${order.orderSource?.name() == 'ROOM' }" th:text="${'( 會員ID-'+order.memberVO.memberId+' 、 住宿訂單ID-'+order.roomOrderVO.roomOrderId+' )'}"></span>
+                      </p>
+                    </div>
+                    <p class=""><strong>訂單建立日期：</strong> <span th:text="${order.orderTime}"></span></p>
+                    
+
+                  </div>
+                
+                
+                
+          
+                            
+              </div><!-- /.card-body -->
+          
+            </div><!-- /.order-card -->
+          
+          </div><!-- /.order_cards -->
+          
+              </div>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+      
+        
+    </div>
+    
+    
+    <!-- Modal -->
+      <div id="restoOrderModalContainer"></div>
+
+  
 
 
 
