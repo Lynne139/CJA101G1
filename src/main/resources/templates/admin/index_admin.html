@@ -59,7 +59,7 @@
 			    	</div>
 					
 					<!-- 會員等級 -->
-					<div class="sidebar_section"
+					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '會員管理權限')}"
 						th:classappend="${currentURI.startsWith('/admin/memberLevelType')} ? '-active'">
 						<a class="sidebar_link">
 							<i class="fa-solid fa-user"></i> 會員等級
