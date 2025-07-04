@@ -9,9 +9,9 @@
         <span class="mx-2"></span>
 
 		<!-- 通知鈴鐺 -->
-		<div class="notification-bell position-relative" id="notificationBell">
+		<div th:if="${loggedInMember != null}" class="notification-bell position-relative" id="notificationBell">
 		    <i class="fa-solid fa-bell fa-lg text-warning"></i>
-		    <span class="notification-badge" id="notificationBadge">3</span>
+		    <span class="notification-badge" id="notificationBadge"></span>
 		</div>
 
 		<span class="mx-2"></span>
@@ -233,6 +233,40 @@
         });
       });
     </script>
+	<script th:inline="javascript">
+		// 載入頁面時更新未讀通知數量
+	    var memberId = [[${loggedInMember != null} ? ${loggedInMember.memberId} : 'null']];
+	
+	    document.addEventListener('DOMContentLoaded', function () {
+	
+	        if (!memberId) {
+	            // 沒登入會員，不執行 API 呼叫
+	            console.log('未登入會員，不更新未讀數量');
+	            return;
+	        }
+	
+	        // 呼叫 API 取得未讀訊息數量
+	        fetch(`/api/notifications/unread-count`)
+	            .then(response => {
+	                if (!response.ok) throw new Error('Network response was not ok');
+	                return response.json();  // 後端API回傳 long 型數字的話通常會是 JSON 格式
+	            })
+	            .then(unreadCount => {
+	                const badge = document.getElementById('notificationBadge');
+	                if (badge) {
+	                    if (unreadCount > 0) {
+	                        badge.textContent = unreadCount;
+	                        badge.style.display = 'flex';  // 顯示數字徽章
+	                    } else {
+	                        badge.style.display = 'none';  // 沒有未讀訊息就隱藏徽章
+	                    }
+	                }
+	            })
+	            .catch(error => {
+	                console.error('取得未讀訊息數量失敗:', error);
+	            });
+	    });
+	</script>
     <style>
         /* 讓 overlay-menu-col 橫向排列且寬度平均，且不換行 */
         .overlay-menu-row {

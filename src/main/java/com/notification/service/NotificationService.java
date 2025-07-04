@@ -37,6 +37,11 @@ public class NotificationService {
         return notificationRepository.findByMemberIdOrderByCreatedAtDesc(memberId);
     }
     
+    // 根據會員編號查詢未讀通知數量
+    public long getUnreadNotificationCount(Integer memberId) {
+        return notificationRepository.countUnreadByMemberId(memberId);
+    }
+    
     // 更新通知為已讀狀態
     public boolean markAsRead(Integer notificationId, Integer memberId) {
         Notification notification = notificationRepository.findByNotificationIdAndMemberId(notificationId, memberId);

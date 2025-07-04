@@ -223,8 +223,8 @@
   
   <!-- ✅ Main JS -->
   <script th:inline="javascript">
-    // 從 Thymeleaf 獲取資料
-    const memberId = /*[[${memberId}]]*/ '0';
+
+    var memberId = [[${loggedInMember != null} ? ${loggedInMember.memberId} : 'null']];
     let notifications = [];
     let pageSize = 10;
     let currentPage = 1;
@@ -253,7 +253,7 @@
     function fetchNotifications() {
       showLoading();
       
-      $.get(`/api/notifications/member/${memberId}`)
+      $.get(`/api/notifications/member`)
         .done(function (data) {
           hideLoading();
           notifications = data || [];
@@ -360,7 +360,7 @@
       const notificationDiv = $(`#notification-${notificationId}`);
       if (notificationDiv.hasClass("read")) return;
 
-      $.post(`/api/notifications/${memberId}/${notificationId}/read`)
+      $.post(`/api/notifications/${notificationId}/read`)
         .done(function (response) {
           if (response === "success") {
             notificationDiv.removeClass("unread").addClass("read");
