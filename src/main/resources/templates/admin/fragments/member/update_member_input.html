@@ -12,64 +12,88 @@
   <h3>修改會員資料</h3>
 
   <form th:action="@{/admin/update}" method="post" enctype="multipart/form-data" th:object="${memberVO}">
+    
+    <!-- 表單錯誤提示 -->
+    <div th:if="${#fields.hasErrors()}">
+      <div class="alert alert-danger">請修正以下錯誤後再送出表單。</div>
+    </div>
 
     <input type="hidden" th:field="*{memberId}" />
 
+    <!-- 會員名稱 -->
     <div class="mb-3">
       <label for="memberName" class="form-label">會員名稱</label>
-      <input type="text" class="form-control" id="memberName" th:field="*{memberName}" required>
+      <input type="text" class="form-control" id="memberName" th:field="*{memberName}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberName')}" th:errors="*{memberName}"></div>
     </div>
 
+    <!-- 電子信箱 -->
     <div class="mb-3">
       <label for="memberEmail" class="form-label">電子信箱</label>
-      <input type="email" class="form-control" id="memberEmail" th:field="*{memberEmail}" required>
+      <input type="email" class="form-control" id="memberEmail" th:field="*{memberEmail}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberEmail')}" th:errors="*{memberEmail}"></div>
     </div>
 
+    <!-- 密碼 -->
     <div class="mb-3">
       <label for="memberPassword" class="form-label">密碼</label>
-      <input type="text" class="form-control" id="memberPassword" th:field="*{memberPassword}" required>
+      <input type="text" class="form-control" id="memberPassword" th:field="*{memberPassword}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberPassword')}" th:errors="*{memberPassword}"></div>
     </div>
 
+    <!-- 電話 -->
     <div class="mb-3">
       <label for="memberPhone" class="form-label">電話</label>
       <input type="text" class="form-control" id="memberPhone" th:field="*{memberPhone}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberPhone')}" th:errors="*{memberPhone}"></div>
     </div>
 
+    <!-- 生日 -->
     <div class="mb-3">
       <label for="memberBirthday" class="form-label">生日</label>
       <input type="date" class="form-control" id="memberBirthday" th:field="*{memberBirthday}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberBirthday')}" th:errors="*{memberBirthday}"></div>
     </div>
 
+    <!-- 地址 -->
     <div class="mb-3">
       <label for="memberAddress" class="form-label">地址</label>
       <input type="text" class="form-control" id="memberAddress" th:field="*{memberAddress}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberAddress')}" th:errors="*{memberAddress}"></div>
     </div>
 
+    <!-- 會員等級 -->
     <div class="mb-3">
       <label for="memberLevel" class="form-label">會員等級</label>
       <input type="text" class="form-control" id="memberLevel" th:field="*{memberLevel}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberLevel')}" th:errors="*{memberLevel}"></div>
     </div>
 
+    <!-- 會員積分 -->
     <div class="mb-3">
       <label for="memberPoints" class="form-label">會員積分</label>
       <input type="number" class="form-control" id="memberPoints" th:field="*{memberPoints}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberPoints')}" th:errors="*{memberPoints}"></div>
     </div>
 
+    <!-- 會員累積消費金額 -->
     <div class="mb-3">
       <label for="memberAccumulativeConsumption" class="form-label">會員累積消費金額</label>
       <input type="number" class="form-control" id="memberAccumulativeConsumption" th:field="*{memberAccumulativeConsumption}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberAccumulativeConsumption')}" th:errors="*{memberAccumulativeConsumption}"></div>
     </div>
 
+    <!-- 會員狀態 -->
     <div class="mb-3">
-	  <label for="memberStatus" class="form-label">會員狀態</label>
-	  <select class="form-select" id="memberStatus" th:field="*{memberStatus}">
-	    <option th:value="1" th:text="'1: 啟用'" 
-	            th:selected="${memberVO.memberStatus == 1}">啟用</option>
-	    <option th:value="2" th:text="'2: 停權'" 
-	            th:selected="${memberVO.memberStatus == 2}">停權</option>
-	  </select>
-	</div>
+      <label for="memberStatus" class="form-label">會員狀態</label>
+      <select class="form-select" id="memberStatus" th:field="*{memberStatus}">
+        <option th:value="1" th:selected="${memberVO.memberStatus == 1}">1: 啟用</option>
+        <option th:value="2" th:selected="${memberVO.memberStatus == 2}">2: 停權</option>
+      </select>
+      <div class="text-danger" th:if="${#fields.hasErrors('memberStatus')}" th:errors="*{memberStatus}"></div>
+    </div>
 
+    <!-- 會員圖片 -->
     <div class="mb-3">
       <label class="form-label">會員圖片</label><br>
       <img th:src="@{/member/ImageReader(memberId=${memberVO.memberId})}" width="120" height="120" class="mb-2" />

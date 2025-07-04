@@ -12,14 +12,53 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.jqueryui.min.css" /><!-- ●●css for jquery datatables 用 -->
 
 <style>
-body {
-	margin: 1rem 12rem 2rem 12rem;
-}
+
+    body {
+      margin: 0;
+      font-family: sans-serif;
+    }
+
+    .container {
+      display: flex;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background-color: #fff;
+      z-index: 1000;
+      padding: 1rem;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .main_content {
+      margin-left: 240px;
+      padding: 20px;
+      width: calc(100% - 240px);
+      overflow-x: auto;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table {
+      min-width: 1800px;
+    }
+    
+    .text-center {
+	  text-align: center;
+	}
+  </style>
 </style>
 </head>
 <body>
 	<h2>所有會員資料:</h2>
-	
+	<div class="table-wrapper">
 	<table id="listAllMember" class="display" style="width: 1800px">
 		<thead>
 			<tr style="background-color: #F4EDE1">
@@ -35,45 +74,36 @@ body {
 				<th>電子信箱</th>
 				<th>會員積分</th>
 				<th>會員累積消費金額</th>
-				<th>修改</th>
-    			<th>刪除</th>
+				<th>修改</th>	
 			</tr>
 		</thead>
 		
 		<tbody>
 			<th:block th:each="memberVO : ${memberListData}">
 			<tr>
-			<td th:text="${memberVO.memberId}"></td>
-			<td th:text="${memberVO.memberLevel}"></td>
+			<td class="text-center" th:text="${memberVO.memberId}"></td>
+			<td class="text-center" th:text="${memberVO.memberLevel}"></td>
 			<td th:text="${memberVO.memberPassword}"></td>
-			<td th:text="${memberVO.memberName}"></td>
+			<td class="text-center" th:text="${memberVO.memberName}"></td>
 			<td th:text="${memberVO.memberBirthday}"></td>
 			<td th:text="${memberVO.memberPhone}"></td> 
 			<td th:text="${memberVO.memberAddress}"></td>
 			<td><img th:src="@{/member/ImageReader(memberId=${memberVO.memberId})}" width="100" height="100"></td>
-			<td th:text="${memberVO.memberStatus}"></td>
+			<td class="text-center" th:text="${memberVO.memberStatus}"></td>
 			<td th:text="${memberVO.memberEmail}"></td>
-			<td th:text="${memberVO.memberPoints}"></td>
-			<td th:text="${memberVO.memberAccumulativeConsumption}"></td>
+			<td class="text-center" th:text="${memberVO.memberPoints}"></td>
+			<td class="text-center" th:text="${memberVO.memberAccumulativeConsumption}"></td>
 			<!-- 修改按鈕 -->
 		  	<td>
 			    <a th:href="@{'/admin/updateMember/' + ${memberVO.memberId}}"
 			       class="btn btn-primary btn-sm">修改</a>
-		 	</td>
-		  	<!-- 刪除按鈕 -->
-		 	<td>
-		    	<form th:action="@{/admin/delete}" method="post"
-				      onsubmit="return confirm('確定要刪除此會員嗎？');">
-				    <input type="hidden" name="memberId" th:value="${memberVO.memberId}" />
-				    <button type="submit" class="btn btn-danger btn-sm">刪除</button>
-				</form>
-			</td>
+		 	</td>	
 			</tr>
 			</th:block>
 		</tbody>
 
 </table>
-
+</div>
 <script>
 	$(document).ready(function() {
 		$('#listAllMember').DataTable({

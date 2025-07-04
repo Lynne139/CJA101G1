@@ -28,10 +28,10 @@ public class MemberImageUploader {
                     ps.setBytes(1, imageBytes);
                     ps.setInt(2, i);
                     ps.executeUpdate();
-                    System.out.println("✅ 成功：member_id=" + i + " 圖片上傳完成");
+                    
                 }
             } catch (Exception e) {
-                System.err.println("❌ 失敗：圖片 " + fileName + " 上傳錯誤：" + e.getMessage());
+                System.err.println(" 圖片 " + fileName + " 上傳錯誤：" + e.getMessage());
             }
         }
     }
