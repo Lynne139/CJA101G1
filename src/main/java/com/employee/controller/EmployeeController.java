@@ -13,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.format.annotation.DateTimeFormat;
+import jakarta.validation.Valid;
 import java.util.Date;
+import java.util.Calendar;
 import java.io.IOException;
 
 import java.util.List;
@@ -48,13 +50,13 @@ public class EmployeeController {
 
     // 新增員工
     @PostMapping
-    public Employee createEmployee(@RequestBody Employee employee) {
+    public Employee createEmployee(@Valid @RequestBody Employee employee) {
         return employeeService.createEmployee(employee);
     }
 
     // 更新員工
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateEmployee(@PathVariable Integer id, @RequestBody Employee employeeDetails) {
+    public ResponseEntity<String> updateEmployee(@PathVariable Integer id, @Valid @RequestBody Employee employeeDetails) {
         try {
             Employee updated = employeeService.updateEmployee(id, employeeDetails);
             return ResponseEntity.ok("員工資料更新成功");
@@ -118,13 +120,13 @@ public class EmployeeController {
 
     // 新增部門
     @PostMapping("/roles")
-    public Role addRole(@RequestBody Role role) {
+    public Role addRole(@Valid @RequestBody Role role) {
         return employeeService.addRole(role);
     }
 
     // 更新部門
     @PutMapping("/roles/{id}")
-    public ResponseEntity<Role> updateRole(@PathVariable Integer id, @RequestBody Role roleDetails) {
+    public ResponseEntity<Role> updateRole(@PathVariable Integer id, @Valid @RequestBody Role roleDetails) {
         try {
             Role updated = employeeService.updateRole(id, roleDetails);
             return ResponseEntity.ok(updated);
@@ -143,13 +145,13 @@ public class EmployeeController {
 
     // 新增職稱
     @PostMapping("/job-titles")
-    public JobTitle addJobTitle(@RequestBody JobTitle jobTitle) {
+    public JobTitle addJobTitle(@Valid @RequestBody JobTitle jobTitle) {
         return employeeService.addJobTitle(jobTitle);
     }
 
     // 更新職稱
     @PutMapping("/job-titles/{id}")
-    public ResponseEntity<JobTitle> updateJobTitle(@PathVariable Integer id, @RequestBody JobTitle jobTitleDetails) {
+    public ResponseEntity<JobTitle> updateJobTitle(@PathVariable Integer id, @Valid @RequestBody JobTitle jobTitleDetails) {
         try {
             JobTitle updated = employeeService.updateJobTitle(id, jobTitleDetails);
             return ResponseEntity.ok(updated);
@@ -169,6 +171,35 @@ public class EmployeeController {
         @RequestParam("createdDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date createdDate,
         @RequestParam(value = "employeePhoto", required = false) MultipartFile employeePhoto
     ) throws IOException {
+        
+        // 後端驗證
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("姓名不能為空");
+        }
+        if (!name.matches("^[\u4e00-\u9fff]+$")) {
+            throw new IllegalArgumentException("姓名只能包含中文字符");
+        }
+        if (password == null || password.length() < 4 || password.length() > 12) {
+            throw new IllegalArgumentException("密碼長度須為4-12個字符");
+        }
+        // 獲取今天的日期（只考慮日期，不考慮時間）
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+        
+        Calendar inputDate = Calendar.getInstance();
+        inputDate.setTime(createdDate);
+        inputDate.set(Calendar.HOUR_OF_DAY, 0);
+        inputDate.set(Calendar.MINUTE, 0);
+        inputDate.set(Calendar.SECOND, 0);
+        inputDate.set(Calendar.MILLISECOND, 0);
+        
+        if (inputDate.before(today)) {
+            throw new IllegalArgumentException("建立日期不能早於今日");
+        }
+        
         Employee employee = new Employee();
         employee.setName(name);
         employee.setPassword(password);
@@ -182,5 +213,49 @@ public class EmployeeController {
         employeeService.createEmployee(employee);
         // 新增成功後導回員工管理頁
         return "redirect:/admin/staff1";
+    }
+    
+    // 新增部門表單處理
+    @PostMapping("/roles/form")
+    public String createRoleForm(
+        @RequestParam("roleName") String roleName,
+        @RequestParam(value = "roleNotes", required = false) String roleNotes
+    ) {
+        // 後端驗證
+        if (roleName == null || roleName.trim().isEmpty()) {
+            throw new IllegalArgumentException("部門名稱不能為空");
+        }
+        if (!roleName.matches("^[\u4e00-\u9fff]+$")) {
+            throw new IllegalArgumentException("部門名稱只能包含中文字符");
+        }
+        
+        Role role = new Role();
+        role.setRoleName(roleName);
+        role.setRemark(roleNotes);  // 修正：使用正確的setter方法名稱
+        employeeService.addRole(role);
+        // 新增成功後導回部門管理頁
+        return "redirect:/admin/staff2";
+    }
+    
+    // 新增職稱表單處理
+    @PostMapping("/job-titles/form")
+    public String createJobTitleForm(
+        @RequestParam("jobTitleName") String jobTitleName,
+        @RequestParam(value = "description", required = false) String description
+    ) {
+        // 後端驗證
+        if (jobTitleName == null || jobTitleName.trim().isEmpty()) {
+            throw new IllegalArgumentException("職稱名稱不能為空");
+        }
+        if (!jobTitleName.matches("^[\u4e00-\u9fff]+$")) {
+            throw new IllegalArgumentException("職稱名稱只能包含中文字符");
+        }
+        
+        JobTitle jobTitle = new JobTitle();
+        jobTitle.setJobTitleName(jobTitleName);
+        jobTitle.setDescription(description);
+        employeeService.addJobTitle(jobTitle);
+        // 新增成功後導回職稱管理頁
+        return "redirect:/admin/staff2";
     }
 } 

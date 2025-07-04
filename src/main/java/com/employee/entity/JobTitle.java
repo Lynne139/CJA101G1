@@ -1,6 +1,7 @@
 package com.employee.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "job_title")
@@ -10,9 +11,13 @@ public class JobTitle {
     @Column(name = "job_title_id")
     private Integer jobTitleId;
 
+    @NotBlank(message = "職稱名稱不能為空")
+    @Pattern(regexp = "^[\u4e00-\u9fff\\s]+$", message = "職稱名稱只能包含中文字符")
+    @Size(max = 50, message = "職稱名稱長度不能超過50個字符")
     @Column(name = "job_title_name", nullable = false, length = 50)
     private String jobTitleName;
 
+    @Size(max = 200, message = "職稱說明長度不能超過200個字符")
     @Column(name = "description", length = 200)
     private String description;
 

@@ -3,21 +3,33 @@
 		<h4>新增員工</h4>
 		<form id="addEmployeeForm" method="post" th:action="@{/employees/form}" enctype="multipart/form-data">
 			<div class="mb-2">
-				<label>姓名</label>
-				<input type="text" name="name" class="form-control" required />
+				<label>姓名 <span class="text-danger">*</span></label>
+				<input type="text" name="name" class="form-control" required 
+					   pattern="[\u4e00-\u9fff]+" 
+					   title="姓名只能包含中文字符"
+					   placeholder="請輸入中文姓名" />
+				<div class="invalid-feedback">
+					姓名只能包含中文字符
+				</div>
 			</div>
 			<div class="mb-2">
-				<label>密碼</label>
-				<input type="password" name="password" class="form-control" required />
+				<label>密碼 <span class="text-danger">*</span></label>
+				<input type="password" name="password" class="form-control" required 
+					   minlength="4" maxlength="12"
+					   title="密碼長度須為4-12個字符"
+					   placeholder="請輸入4-12個字符的密碼" />
+				<div class="invalid-feedback">
+					密碼長度須為4-12個字符
+				</div>
 			</div>
 			<div class="mb-2">
 				<label>部門</label>
 				<select name="roleId" class="form-select" id="roleSelect">
-					<option value="">部門</option>
+					<option value="">請選擇部門</option>
 				</select>
 			</div>
 			<div class="mb-2">
-				<label>職稱</label>
+				<label>職稱 <span class="text-danger">*</span></label>
 				<select name="jobTitleId" class="form-select" id="jobTitleSelect" required>
 					<option value="">請選擇職稱</option>
 				</select>
@@ -30,12 +42,8 @@
 				</select>
 			</div>
 			<div class="mb-2">
-				<label>建立日期</label>
-				<input type="date" name="createdDate" class="form-control" required />
-			</div>
-			<div class="mb-2">
 				<label>照片</label>
-				<input type="file" name="employeePhoto" class="form-control" />
+				<input type="file" name="employeePhoto" class="form-control" accept="image/*" />
 			</div>
 			<button type="submit" class="btn btn-primary">新增員工</button>
 		</form>
@@ -44,12 +52,19 @@
 		<h4>新增職稱</h4>
 		<form id="addJobTitleForm">
 			<div class="mb-2">
-				<label>職稱名稱</label>
-				<input type="text" name="jobTitleName" class="form-control" required />
+				<label>職稱名稱 <span class="text-danger">*</span></label>
+				<input type="text" name="jobTitleName" class="form-control" required 
+					   pattern="[\u4e00-\u9fff\s]+" 
+					   title="職稱名稱只能包含中文字符"
+					   placeholder="請輸入中文職稱名稱" />
+				<div class="invalid-feedback">
+					職稱名稱只能包含中文字符
+				</div>
 			</div>
 			<div class="mb-2">
 				<label>職稱說明</label>
-				<input type="text" name="description" class="form-control" />
+				<input type="text" name="description" class="form-control" 
+					   placeholder="請輸入說明（選填）" />
 			</div>
 			<button type="submit" class="btn btn-info">新增職稱</button>
 		</form>
@@ -58,12 +73,19 @@
 		<h4>新增部門</h4>
 		<form id="addRoleForm">
 			<div class="mb-2">
-				<label>部門名稱</label>
-				<input type="text" name="roleName" class="form-control" required />
+				<label>部門名稱 <span class="text-danger">*</span></label>
+				<input type="text" name="roleName" class="form-control" required 
+					   pattern="[\u4e00-\u9fff\s]+" 
+					   title="部門名稱只能包含中文字符"
+					   placeholder="請輸入中文部門名稱" />
+				<div class="invalid-feedback">
+					部門名稱只能包含中文字符
+				</div>
 			</div>
 			<div class="mb-2">
 				<label>備註</label>
-				<input type="text" name="remark" class="form-control" />
+				<input type="text" name="remark" class="form-control" 
+					   placeholder="請輸入備註（選填）" />
 			</div>
 			<button type="submit" class="btn btn-secondary">新增部門</button>
 		</form>

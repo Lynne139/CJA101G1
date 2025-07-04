@@ -2,6 +2,7 @@ package com.employee.entity;
 
 import java.util.Date;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "employee")
@@ -17,16 +18,22 @@ public class Employee {
 	@Column(name = "job_title_id", nullable = true)
 	private Integer jobTitleId;
 
+	@NotBlank(message = "姓名不能為空")
+	@Pattern(regexp = "^[\u4e00-\u9fff]+$", message = "姓名只能包含中文字符")
+	@Size(max = 50, message = "姓名長度不能超過50個字符")
 	@Column(name = "Name", nullable = false, length = 50)
 	private String name;
 
 	@Column(name = "Status", nullable = false)
 	private Boolean status = true;
 
+	@NotNull(message = "建立日期不能為空")
 	@Column(name = "Created_date", nullable = false)
 	@Temporal(TemporalType.DATE)
 	private Date createdDate;
 
+	@NotBlank(message = "密碼不能為空")
+	@Size(min = 4, max = 12, message = "密碼長度須為4-12個字符")
 	@Column(name = "Password", nullable = false, length = 50)
 	private String password;
 

@@ -75,8 +75,14 @@
 					<form id="editEmployeeForm">
 						<input type="hidden" id="editEmployeeId" name="employeeId">
 						<div class="mb-3">
-							<label class="form-label">姓名</label>
-							<input type="text" class="form-control" id="editEmployeeName" name="name" required>
+							<label class="form-label">姓名 <span class="text-danger">*</span></label>
+							<input type="text" class="form-control" id="editEmployeeName" name="name" required 
+								   pattern="[\u4e00-\u9fff]+" 
+								   title="姓名只能包含中文字符"
+								   placeholder="請輸入中文姓名">
+							<div class="invalid-feedback">
+								姓名只能包含中文字符
+							</div>
 						</div>
 						<div class="mb-3">
 							<label class="form-label">部門</label>
@@ -129,12 +135,19 @@
 					<form id="editRoleForm">
 						<input type="hidden" id="editRoleId" name="roleId">
 						<div class="mb-3">
-							<label class="form-label">部門名稱</label>
-							<input type="text" class="form-control" id="editRoleName" name="roleName" required>
+							<label class="form-label">部門名稱 <span class="text-danger">*</span></label>
+							<input type="text" class="form-control" id="editRoleName" name="roleName" required 
+								   pattern="[\u4e00-\u9fff\s]+" 
+								   title="部門名稱只能包含中文字符"
+								   placeholder="請輸入中文部門名稱">
+							<div class="invalid-feedback">
+								部門名稱只能包含中文字符
+							</div>
 						</div>
 						<div class="mb-3">
 							<label class="form-label">備註</label>
-							<input type="text" class="form-control" id="editRoleRemark" name="remark">
+							<input type="text" class="form-control" id="editRoleRemark" name="remark" 
+								   placeholder="請輸入備註（選填）">
 						</div>
 					</form>
 				</div>
@@ -158,12 +171,19 @@
 					<form id="editJobTitleForm">
 						<input type="hidden" id="editJobTitleId" name="jobTitleId">
 						<div class="mb-3">
-							<label class="form-label">職稱名稱</label>
-							<input type="text" class="form-control" id="editJobTitleName" name="jobTitleName" required>
+							<label class="form-label">職稱名稱 <span class="text-danger">*</span></label>
+							<input type="text" class="form-control" id="editJobTitleName" name="jobTitleName" required 
+								   pattern="[\u4e00-\u9fff\s]+" 
+								   title="職稱名稱只能包含中文字符"
+								   placeholder="請輸入中文職稱名稱">
+							<div class="invalid-feedback">
+								職稱名稱只能包含中文字符
+							</div>
 						</div>
 						<div class="mb-3">
 							<label class="form-label">職稱說明</label>
-							<input type="text" class="form-control" id="editJobTitleDescription" name="description">
+							<input type="text" class="form-control" id="editJobTitleDescription" name="description" 
+								   placeholder="請輸入說明（選填）">
 						</div>
 					</form>
 				</div>
