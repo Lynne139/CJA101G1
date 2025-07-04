@@ -1,0 +1,28 @@
+/* order today card status-bar */
+.main_order_today .order-card { 
+	position: relative; 
+	}
+.main_order_today .status-bar { 
+	
+	position: absolute; 
+	top: 0; 
+	left: 0; 
+	width: 100%; 
+	
+	padding:0.5rem 1rem;
+	height:auto; 
+	border-top-left-radius:.5rem;
+	border-top-right-radius:.5rem;
+	}
+
+.main_order_today p{
+	font-size:0.9rem;
+	margin-bottom:0;
+}
+
+.main_order_today .detail_title{
+	font-size:1rem;
+/* 	border-bottom:1px solid var(--color-secondary); */
+	padding: 0.5rem 0;
+	margin-bottom:0.25rem;
+}

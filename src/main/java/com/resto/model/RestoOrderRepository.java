@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.resto.dto.RestoOrderDTO;
 import com.resto.entity.RestoOrderVO;
 import com.resto.utils.RestoOrderStatus;
 
@@ -25,6 +26,21 @@ public interface RestoOrderRepository extends JpaRepository<RestoOrderVO, Intege
 //		""")
 //		List<Object[]> findBookedSeatsPerDate(@Param("restoId") Integer restoId);
 
+	
+	// 只抓「今天」＋「指定餐廳（可選）」並排序
+	@Query("""
+		    FROM RestoOrderVO ro
+		    WHERE ro.regiDate = CURRENT_DATE
+		      AND (:restoId IS NULL OR ro.restoVO.restoId = :restoId)
+		    ORDER BY ro.regiDate,
+		             ro.snapshotTimeslotName,
+		             ro.restoVO.restoId
+		""")
+		List<RestoOrderVO> findTodayOrders(@Param("restoId") Integer restoId);
+
+
+	
+	
 	
 	
 	// 抓特定狀態的訂單

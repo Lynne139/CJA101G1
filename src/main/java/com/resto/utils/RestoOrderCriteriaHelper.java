@@ -201,7 +201,6 @@ public class RestoOrderCriteriaHelper {
             root.get("roomOrder").get("roomOrderId"),
             root.get("orderGuestName"),
             root.get("orderGuestEmail"),
-            root.get("orderGuestPhone"),
             root.get("regiDate"),
             root.get("snapshotPeriodName"),
             root.get("snapshotTimeslotName"),

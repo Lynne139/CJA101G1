@@ -32,9 +32,9 @@
         <!-- readonly 狀態時顯示的遮罩 -->
         <div th:if="${readonly}" class="block-overlay"></div>        
 
+        <!-- 若無選餐廳提示 -->
         <div th:if="${selectedResto == null}" class="text-center">請先選擇餐廳，以載入開放時段</div>
         
-        <!-- 若無選餐廳提示 -->
         <h4 class="resto_name mb-4" th:if="${selectedResto != null}" th:text="${selectedResto.restoName}"></h4>
 
 
