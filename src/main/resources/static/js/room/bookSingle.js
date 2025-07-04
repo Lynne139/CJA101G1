@@ -107,6 +107,7 @@ function generateCalendar(year, month) {
 			} else if (remaining === 0) {
 				infoText = '已售完';
 				infoColor = 'red';
+				classes.push('disabled');
 			} else {
 				infoText = `剩 ${remaining} 間`;
 				infoColor = '#7E4E24';
