@@ -229,8 +229,15 @@ public class OrderController {
 	        return "admin/fragments/common/error_modal";
 	    }
 	    
+	    
+	    // 顯示人預約人數判斷
 	    // 把舊預約人數值拷貝出來（純 int，永遠不變）
-	    int originalSeats = restoOrder.getRegiSeats();   
+	    int originalSeats = restoOrder.getRegiSeats(); 
+	    int remainingSeats = reservationService.getRemaining(
+	    		restoOrder.getRestoVO().getRestoId(),
+	    		restoOrder.getTimeslotVO().getTimeslotId(),
+	    		restoOrder.getRegiDate());      
+	    
 	    
 	    List<RestoVO> restoVOList = restoService.getAll();   // 只抓啟用的餐廳
 	    List<TimeslotVO> timeslotVOList = timeslotService.getAllEnabled();
@@ -242,8 +249,9 @@ public class OrderController {
 	    model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
 	    // 抓當日日期，避免過往日期可預約
 //	    model.addAttribute("today", LocalDate.now());
-	    addSeatQuota(model, restoOrder);
 	    model.addAttribute("originalSeats", originalSeats);
+	    model.addAttribute("remainingSeats", remainingSeats);
+
 	    
 	    return "admin/fragments/resto/modals/order_resto_edit";
 	}
@@ -264,8 +272,13 @@ public class OrderController {
 	    }
 	    
 	    
-	 // 把舊預約人數值拷貝出來（純 int，永遠不變）
-	    int originalSeats = original.getRegiSeats();   
+	    // 顯示人預約人數判斷
+	    // 把舊預約人數值拷貝出來（純 int，永遠不變）
+	    int originalSeats = original.getRegiSeats(); 
+	    int remainingSeats = reservationService.getRemaining(
+	    		restoOrder.getRestoVO().getRestoId(),
+	    		restoOrder.getTimeslotVO().getTimeslotId(),
+	    		restoOrder.getRegiDate()); 
 
 
 	    // 錯誤 flag（初始 false）
@@ -313,8 +326,9 @@ public class OrderController {
 		    model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
 //		    model.addAttribute("today", LocalDate.now());     // 加回 today，避免 JS 抓不到 min 值
 	        model.addAttribute("restoOrder", restoOrder);
-		    addSeatQuota(model, restoOrder);
 		    model.addAttribute("originalSeats", originalSeats);
+		    model.addAttribute("remainingSeats", remainingSeats);
+
 
 
 
@@ -335,8 +349,9 @@ public class OrderController {
 		    model.addAttribute("orderStatusOptions", List.of(RestoOrderStatus.values()));
 		    model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
 	        model.addAttribute("restoOrder", restoOrder);
-		    addSeatQuota(model, restoOrder);
 		    model.addAttribute("originalSeats", originalSeats);
+		    model.addAttribute("remainingSeats", remainingSeats);
+
 
 
 	        
@@ -345,22 +360,6 @@ public class OrderController {
 	    
 	    return "redirect:/admin/resto_order";
 	}
-
-	
-	// 編輯時重新計算可用名額(剩餘總人數+自己已預約佔有)
-	private void addSeatQuota(Model model, RestoOrderVO order) {
-	    Integer restoId    = order.getRestoVO().getRestoId();
-	    Integer timeslotId = order.getTimeslotVO().getTimeslotId();
-	    LocalDate date     = order.getRegiDate();
-
-	    int currentSeats   = order.getRegiSeats();                     // 本筆佔位
-	    int remaining      = reservationService.getRemaining(          // 全場剩餘(不含本筆)
-	                            restoId, timeslotId, date);
-
-	    model.addAttribute("remainingSeats", remaining);               // 不含本筆
-	    model.addAttribute("originalSeats",  currentSeats);      
-	}
-
 
 	
 	
