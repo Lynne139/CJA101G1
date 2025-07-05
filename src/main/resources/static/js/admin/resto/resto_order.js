@@ -184,19 +184,37 @@ document.addEventListener("DOMContentLoaded", function () {
 		    // 只顯示所選餐廳的時段
 		    function filterTimeslot () {
 		      const selectedRestoId = restoSelect.value;      // "" 代表未選
-
+			  
+			  const orderSource = document.getElementById('orderSource')?.value;
+			  const periodCode      = document.querySelector('[name="snapshotPeriodCode"]')?.value;
+			  
+			  
 		      timeslotSelect.querySelectorAll('option').forEach(opt => {
-		        const restoId = opt.getAttribute('data-resto-id');
-
+				const restoId  = opt.dataset.restoId;        // data-resto-id
+				const slotCode = opt.dataset.periodCode;     // data-period-code
+				
+				let show = false;
+				
 		        // 未選餐廳(只留 placeholder，沒有 data-resto-id)
 		        if (!selectedRestoId) {
-		          opt.style.display = restoId ? 'none' : '';  // 有 restoId → 隱藏
-		          return;
+					show = !restoId;
+//		          opt.style.display = restoId ? 'none' : '';  // 有 restoId → 隱藏
+				   return;
 		        }
-
-		        // 已選餐廳(顯示對應時段，其餘隱藏)
-		        opt.style.display = (restoId === selectedRestoId) ? '' : 'none';
-		      });
+				
+				// 如果來自 ROOM 且 snapshotPeriodCode 存在，就限制只顯示該 code 的時段
+				    if (orderSource === 'ROOM' && periodCode) {
+				      show = (restoId === selectedRestoId) && (slotCode === periodCode);
+//				      opt.style.display = show ? '' : 'none';
+				    } else {
+				      // 一般狀況只看餐廳
+					  show = (restoId === selectedRestoId);
+//				      opt.style.display = (restoId === selectedRestoId) ? '' : 'none';
+				    }
+					
+					opt.hidden   = !show;
+					opt.disabled = !show;
+				  });
 
 		      // 若目前選到被隱藏的option，重設為 placeholder
 		      if (timeslotSelect.selectedOptions[0]?.style.display === 'none') {

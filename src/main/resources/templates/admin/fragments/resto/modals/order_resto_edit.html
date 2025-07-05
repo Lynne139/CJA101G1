@@ -105,7 +105,8 @@
 
             <div class="mb-3">
               <label for="regiDate" class="form-label">預約日期<span class="text-danger">*</span></label>
-              <input type="date" th:field="*{regiDate}" id="regiDate" class="form-control" required>
+              <input type="date" th:field="*{regiDate}" id="regiDate" class="form-control" required
+              th:attr="readonly=${restoOrder.orderSource?.name() == 'ROOM'}">
               
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('regiDate')}">
@@ -114,6 +115,10 @@
               </div>
             </div>
 
+
+            <input type="hidden" th:value="${restoOrder.timeslotVO.periodVO?.periodCode}" name="snapshotPeriodCode" />
+
+                   
             <div class="mb-3">
               <label for="timeslotId" class="form-label">時段<span class="text-danger">*</span></label>
               <select id="timeslotId" class="form-select" th:field="*{timeslotVO.timeslotId}" required>
@@ -123,7 +128,8 @@
                         th:text="${timeslot.timeslotName + ' (' + timeslot.periodVO.periodName + ')'}"
                         th:data-time="${timeslot.timeslotName}"
                         th:data-label="${timeslot.timeslotName + ' (' + timeslot.periodVO.periodName + ')'}"
-                        th:data-resto-id="${timeslot.restoVO.restoId}">
+                        th:data-resto-id="${timeslot.restoVO.restoId}"
+                        th:data-period-code="${timeslot.periodVO?.periodCode}">
                 </option>
               </select>
                         
@@ -138,15 +144,9 @@
               <label for="regiSeats" class="form-label">用餐人數<span class="text-danger">*</span><small class="text-muted"> 請輸入大於1且小於剩餘人數的正整數</small></label>
               <input type="number" th:field="*{regiSeats}" id="regiSeats" class="form-control" min="1" required
                      placeholder=""
-                     th:attr="data-original=${originalSeats}">
-              <div id="seatsInfoEdit">
-                0 / 0
-              </div>   
-                     
-                     
-                     
-                     
-              
+                     th:attr="data-original=${originalSeats}
+                     ,readonly=${restoOrder.orderSource?.name() == 'ROOM'}">
+       
               <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('regiSeats')}">
                 <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
