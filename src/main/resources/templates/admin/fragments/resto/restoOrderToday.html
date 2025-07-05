@@ -4,7 +4,7 @@
     <h2 class="page_title">今日訂位</h2>
   </div>
 
-  <div class="summary_card panel">總預約：20（早餐店 12、晚餐館 8）</div>
+  <div class="summary_card_all panel">總預約：20（早餐店 12、晚餐館 8）</div>
 
 
   <!-- 餐廳選擇器 -->
@@ -28,17 +28,54 @@
           <i class="fa-solid fa-lock me-2"></i> 本餐廳已封存，目前為只讀模式，無法編輯資料。
         </div>
 
-    <!-- 區段與時段 Panel -->
+    <!-- 訂單 Panel -->
     <div class="panel panel_periodntimeslot p-4 mb-5">
-    
-        
+            
         <!-- readonly 狀態時顯示的遮罩 -->
         <div th:if="${readonly}" class="block-overlay"></div>        
+
 
         <!-- 若無選餐廳提示 -->
         <div th:if="${selectedResto == null}" class="text-center">請先選擇餐廳，以載入今日訂單</div>
         
         <h4 class="resto_name mb-4" th:if="${selectedResto != null}" th:text="${selectedResto.restoName}"></h4>
+ 
+ 
+        <!-- 今日統計 Panel -->
+        <div class="panel panel_summaryStats p-4 mb-5" th:if="${summaryStats != null}">
+          <div class="row text-center">
+        
+            <!-- 總預約人數 -->
+            <div class="col-md-4 mb-3">
+              <div class="summary-card p-3 border rounded shadow-sm">
+                <div class="fs-5 mb-1">總預約數</div>
+                <div class="fs-2 fw-bold text-primary" th:text="${summaryStats['total']?.totalCount}">0</div>
+                <div class="small text-muted" th:text="'座位數：' + ${summaryStats['total']?.totalSeats}">座位數：0</div>
+              </div>
+            </div>
+        
+            <!-- 已完成訂單 -->
+            <div class="col-md-4 mb-3">
+              <div class="summary-card p-3 border rounded shadow-sm">
+                <div class="fs-5 mb-1">已完成</div>
+                <div class="fs-2 fw-bold text-success" th:text="${summaryStats['done']?.totalCount}">0</div>
+                <div class="small text-muted" th:text="'剩餘座位數：' + ${summaryStats['done']?.totalSeats}">座位數：0</div>
+              </div>
+            </div>
+        
+            <!-- No-show -->
+            <div class="col-md-4 mb-3">
+              <div class="summary-card p-3 border rounded shadow-sm">
+                <div class="fs-5 mb-1">No-show</div>
+                <div class="fs-2 fw-bold text-danger" th:text="${summaryStats['noshow']?.totalCount}">0</div>
+                <div class="small text-muted" th:text="'座位數：' + ${summaryStats['noshow']?.totalSeats}">座位數：0</div>
+              </div>
+            </div>
+        
+          </div>
+        </div>
+ 
+ 
  
         <!-- 若餐廳無訂單內容提示 -->
         <div class="text-center mb-4" th:if="${selectedResto != null and #lists.isEmpty(orderList)}">本餐廳今日暫無訂單</div>

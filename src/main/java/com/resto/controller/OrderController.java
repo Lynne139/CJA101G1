@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.resto.entity.RestoOrderVO;
@@ -29,6 +28,7 @@ import com.resto.model.TimeslotService;
 import com.resto.utils.RestoOrderSource;
 import com.resto.utils.RestoOrderStatus;
 import com.resto.utils.ValidationGroups;
+import com.resto.utils.exceptions.OverbookingException;
 
 import jakarta.validation.Valid;
 import jakarta.validation.groups.Default;
@@ -99,7 +99,8 @@ public class OrderController {
 	        RedirectAttributes redirectAttributes,
 	        Model model
 	) {
-		
+
+
 		// 錯誤 flag（初始 false）
 	    boolean hasAnyError = false;
 		
@@ -228,6 +229,8 @@ public class OrderController {
 	        return "admin/fragments/common/error_modal";
 	    }
 	    
+	    // 把舊預約人數值拷貝出來（純 int，永遠不變）
+	    int originalSeats = restoOrder.getRegiSeats();   
 	    
 	    List<RestoVO> restoVOList = restoService.getAll();   // 只抓啟用的餐廳
 	    List<TimeslotVO> timeslotVOList = timeslotService.getAllEnabled();
@@ -239,6 +242,9 @@ public class OrderController {
 	    model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
 	    // 抓當日日期，避免過往日期可預約
 //	    model.addAttribute("today", LocalDate.now());
+	    addSeatQuota(model, restoOrder);
+	    model.addAttribute("originalSeats", originalSeats);
+	    
 	    return "admin/fragments/resto/modals/order_resto_edit";
 	}
 	
@@ -256,9 +262,12 @@ public class OrderController {
 	    	result.reject("notfound", "資料不存在或已刪除");
 	        return "admin/fragments/common/error_modal";
 	    }
+	    
+	    
+	 // 把舊預約人數值拷貝出來（純 int，永遠不變）
+	    int originalSeats = original.getRegiSeats();   
 
-		
-		
+
 	    // 錯誤 flag（初始 false）
 	    boolean hasAnyError = false;
 		
@@ -291,6 +300,7 @@ public class OrderController {
 	                "此時段不屬於所選餐廳");
 	        hasAnyError = true;
 	    }
+	    
 
 	    
 	    // 管理員系統
@@ -303,15 +313,52 @@ public class OrderController {
 		    model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
 //		    model.addAttribute("today", LocalDate.now());     // 加回 today，避免 JS 抓不到 min 值
 	        model.addAttribute("restoOrder", restoOrder);
+		    addSeatQuota(model, restoOrder);
+		    model.addAttribute("originalSeats", originalSeats);
+
 
 
 	        return "admin/fragments/resto/modals/order_resto_edit";
 	    }
 	    
 
-	    // 寫入資料庫
-		restoOrderService.update(restoOrder);
+	    
+	    try {
+	    	// 寫入資料庫
+	        restoOrderService.update(restoOrder);
+	    } catch (OverbookingException e) {
+	        result.rejectValue("regiSeats","overbooked", e.getMessage());
+	        
+	        // 回填
+	        model.addAttribute("restoVOList", restoService.getAll());
+	        model.addAttribute("timeslotVOList", timeslotService.getAllEnabled());
+		    model.addAttribute("orderStatusOptions", List.of(RestoOrderStatus.values()));
+		    model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
+	        model.addAttribute("restoOrder", restoOrder);
+		    addSeatQuota(model, restoOrder);
+		    model.addAttribute("originalSeats", originalSeats);
+
+
+	        
+	        return "admin/fragments/resto/modals/order_resto_edit";
+	    }
+	    
 	    return "redirect:/admin/resto_order";
+	}
+
+	
+	// 編輯時重新計算可用名額(剩餘總人數+自己已預約佔有)
+	private void addSeatQuota(Model model, RestoOrderVO order) {
+	    Integer restoId    = order.getRestoVO().getRestoId();
+	    Integer timeslotId = order.getTimeslotVO().getTimeslotId();
+	    LocalDate date     = order.getRegiDate();
+
+	    int currentSeats   = order.getRegiSeats();                     // 本筆佔位
+	    int remaining      = reservationService.getRemaining(          // 全場剩餘(不含本筆)
+	                            restoId, timeslotId, date);
+
+	    model.addAttribute("remainingSeats", remaining);               // 不含本筆
+	    model.addAttribute("originalSeats",  currentSeats);      
 	}
 
 

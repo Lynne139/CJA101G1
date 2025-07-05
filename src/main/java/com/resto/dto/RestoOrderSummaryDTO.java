@@ -8,6 +8,21 @@ public class RestoOrderSummaryDTO {
     private Integer doneCount;
     private Integer noShowCount;
     private Map<String, Integer> restoBreakdown;
+    
+
+    
+	public RestoOrderSummaryDTO(Integer totalCount, Integer doneCount, Integer noShowCount,
+			Map<String, Integer> restoBreakdown) {
+		super();
+		this.totalCount = totalCount;
+		this.doneCount = doneCount;
+		this.noShowCount = noShowCount;
+		this.restoBreakdown = restoBreakdown;
+	}
+	public RestoOrderSummaryDTO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 	public Integer getTotalCount() {
 		return totalCount;
 	}

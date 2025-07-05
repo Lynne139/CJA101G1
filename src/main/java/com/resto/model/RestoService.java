@@ -26,27 +26,30 @@ public class RestoService {
 
 	@Autowired
     RestoRepository restoRepository;
+	@Autowired
+	private ReservationService reservationService;
 
     
     // 複合查詢（Criteria 結構）
 //    @Transactional(readOnly = true)
-//    public List<RestoVO> compositeQuery(Map<String, String[]> map) {
-//        return RestoCriteriaHelper.getAll(map, em);
+//    public List<RestoDTO> compositeQuery(Map<String, String[]> paramMap) {
+//		List<RestoVO> voList = RestoCriteriaHelper.getAll(paramMap, em);
+//	  return voList.stream()
+//	      .map(vo -> new RestoDTO(
+//	          vo.getRestoId(),
+//	          vo.getRestoName(),
+//	          vo.getRestoNameEn(),
+//	          vo.getRestoLoc(),
+//	          vo.getRestoSeatsTotal(),
+//	          vo.getIsEnabled()
+//	      ))
+//	      .collect(Collectors.toList());
+//        return RestoCriteriaHelper.getAll(paramMap, em);
 //    }
    
     @Transactional(readOnly = true)
     public List<RestoDTO> compositeQueryAsDTO(Map<String, String[]> paramMap) {
-        List<RestoDTO> voList = RestoCriteriaHelper.getAllDTO(paramMap, em);
-        return voList.stream()
-            .map(vo -> new RestoDTO(
-                vo.getRestoId(),
-                vo.getRestoName(),
-                vo.getRestoNameEn(),
-                vo.getRestoLoc(),
-                vo.getRestoSeatsTotal(),
-                vo.getIsEnabled()
-            ))
-            .collect(Collectors.toList());
+        return RestoCriteriaHelper.getAllDTO(paramMap, em);
     }
     
     // 多筆
@@ -85,6 +88,9 @@ public class RestoService {
     @Transactional
     public void saveWithImage(RestoVO vo, MultipartFile img, String clearImgFlag) {
         RestoVO target;
+        
+        // 記住舊值
+        Integer oldSeatsTotal = null;
 
         if (vo.getRestoId() == null) {
             // 新增
@@ -99,6 +105,9 @@ public class RestoService {
                 throw new OptimisticLockException("資料已被他人修改，請重新載入");
             }
             
+            oldSeatsTotal = target.getRestoSeatsTotal();
+            
+                        
             // 更新欄位
             target.setRestoName(vo.getRestoName());
             target.setRestoNameEn(vo.getRestoNameEn());
@@ -124,6 +133,15 @@ public class RestoService {
 
         // 儲存
         restoRepository.save(target);
+        
+        // 若座位量有改，同步 reservation 快照
+        if (oldSeatsTotal != null
+            && !oldSeatsTotal.equals(target.getRestoSeatsTotal())) {
+
+            reservationService.refreshSeatsTotal(target.getRestoId(),
+                                              target.getRestoSeatsTotal());
+        }
+        
     }
 
     

@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,6 +46,7 @@ import com.prodPhoto.model.ProdPhotoService;
 import com.prodPhoto.model.ProdPhotoVO;
 import com.resto.dto.RestoDTO;
 import com.resto.dto.RestoOrderDTO;
+import com.resto.dto.RestoOrderStatsDTO;
 import com.resto.entity.PeriodVO;
 import com.resto.entity.RestoVO;
 import com.resto.entity.TimeslotVO;
@@ -554,6 +554,10 @@ public class AdminIndexController {
         // 若選定某餐廳，才撈出該餐廳的區段與時段
         if (restoId != null) {
         	
+        	// 新增統計資料
+        	Map<String, RestoOrderStatsDTO> summaryStats = restoOrderService.getTodayStatsByResto(restoId);
+            model.addAttribute("summaryStats", summaryStats);
+        	
         	// 軟刪除的餐廳只讀
             RestoVO Urlresto = restoService.getById(restoId);
         	boolean readonly = Urlresto.getIsDeleted();  
@@ -566,6 +570,7 @@ public class AdminIndexController {
             
            // 該餐廳的所有今日訂單
             model.addAttribute("orderList", restoOrderService.findTodayOrders(restoId));
+            
             
         } else {
         	// 若沒選餐廳，仍補空值避免渲染錯誤

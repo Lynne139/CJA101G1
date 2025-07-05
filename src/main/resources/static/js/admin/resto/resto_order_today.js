@@ -6,7 +6,6 @@ document.addEventListener("click", async (e) => {
   // 完成／取消
   const btnDone   = e.target.closest(".btn_done");
   const btnCancel = e.target.closest(".btn_cancel");
-  
   if (btnDone || btnCancel) {
     const btn   = btnDone || btnCancel;
     const id    = btn.getAttribute("data-id");

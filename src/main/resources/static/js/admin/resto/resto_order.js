@@ -175,10 +175,6 @@ document.addEventListener("DOMContentLoaded", function () {
 		      filterTimeslotByDate(); // 餐廳變了，再跑一次時間判斷
 		    });
 			
-			restoSelect.addEventListener('change', () => {
-			    filterTimeslot();
-			    filterTimeslotByDate();   // 餐廳變了再重新跑一次時段判斷
-			  });
 			  dateInput.addEventListener('change', filterTimeslotByDate);
 			  
 		    // 首次載入（含回填）
@@ -267,11 +263,9 @@ document.addEventListener("DOMContentLoaded", function () {
 		      const { remaining } = await res.json();   // { "remaining": 18 }
 			  
 			  // 依 新增/編輯 決定 placeholder
-			  const initialSeats = seatsInput.getAttribute('data-initial') || 0;
+			  const initialSeats = parseInt(seatsInput.dataset.original || 0, 10);
 			  // 判斷是否是編輯模式（有初始值且不為空）
-			  const isEditMode = !Number.isNaN(initialSeats)
-			                     && initialSeats > 0
-			                     && !!document.getElementById("btnSubmitEditSave");
+			  const isEditMode = !!document.getElementById("btnSubmitEditSave");
 								 
 			  if (isEditMode) {
 			        seatsInput.placeholder =
@@ -285,7 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		      // 如果使用者已經填人數
 			  // editmodal情況:初始值 vs 現在值不同，才代表使用者有改過
 		      const currentSeats = parseInt(seatsInput.value || 0, 10);
-			  if (seatsInput.value !== initialSeats && currentSeats > remaining) {
+			  if (seatsInput.value !== initialSeats && currentSeats > remaining &&!isEditMode) {
 			    seatsInput.value = '';
 			    alert(`選擇人數超過剩餘名額 (僅剩 ${remaining} 位)，請重新輸入！`);
 			  }
@@ -429,6 +423,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	      });
 	  }
 	  
+	
+	  
 	  
 	  // ===== Edit Modal =====
 	    //按下編輯icon按鈕打開modal
@@ -557,25 +553,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	    }
 
-	  
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+		
   
   
   

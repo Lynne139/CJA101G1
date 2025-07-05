@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.resto.dto.RestoOrderDTO;
+import com.resto.dto.RestoOrderStatsDTO;
 import com.resto.entity.RestoOrderVO;
 import com.resto.utils.RestoOrderStatus;
 
@@ -27,21 +27,6 @@ public interface RestoOrderRepository extends JpaRepository<RestoOrderVO, Intege
 //		List<Object[]> findBookedSeatsPerDate(@Param("restoId") Integer restoId);
 
 	
-	// 只抓「今天」＋「指定餐廳（可選）」並排序
-	@Query("""
-		    FROM RestoOrderVO ro
-		    WHERE ro.regiDate = CURRENT_DATE
-		      AND (:restoId IS NULL OR ro.restoVO.restoId = :restoId)
-		    ORDER BY ro.regiDate,
-		             ro.snapshotTimeslotName,
-		             ro.restoVO.restoId
-		""")
-		List<RestoOrderVO> findTodayOrders(@Param("restoId") Integer restoId);
-
-
-	
-	
-	
 	
 	// 抓特定狀態的訂單
 //	List<RestoOrderVO> findByOrderStatus(RestoOrderStatus status);
@@ -56,6 +41,38 @@ public interface RestoOrderRepository extends JpaRepository<RestoOrderVO, Intege
 
 	
 	
+	// 只抓「今天」＋「指定餐廳（可選）」並排序
+	@Query("""
+		    FROM RestoOrderVO ro
+		    WHERE ro.regiDate = CURRENT_DATE
+		      AND (:restoId IS NULL OR ro.restoVO.restoId = :restoId)
+		    ORDER BY ro.regiDate,
+		             ro.snapshotTimeslotName,
+		             ro.restoVO.restoId
+		""")
+		List<RestoOrderVO> findTodayOrders(@Param("restoId") Integer restoId);
+
+	
+	
+	// 針對特定 restoId 和 regiDate = today 的訂單做分狀態統計
+	@Query("""
+		    SELECT new com.resto.dto.RestoOrderStatsDTO(COUNT(ro), COALESCE(SUM(ro.regiSeats), 0))
+		    FROM RestoOrderVO ro
+		    WHERE ro.regiDate = CURRENT_DATE
+		      AND ro.restoVO.restoId = :restoId
+		      AND ro.orderStatus = :status
+		""")
+		RestoOrderStatsDTO findTodayStatsByRestoAndStatus(@Param("restoId") Integer restoId,
+		                                                   @Param("status") RestoOrderStatus status);
+
+	// 統計特定 restoId 的所有狀態訂單 
+	@Query("""
+		    SELECT new com.resto.dto.RestoOrderStatsDTO(COUNT(ro), COALESCE(SUM(ro.regiSeats), 0))
+		    FROM RestoOrderVO ro
+		    WHERE ro.regiDate = CURRENT_DATE
+		      AND ro.restoVO.restoId = :restoId
+		""")
+		RestoOrderStatsDTO findTodayStatsByResto(@Param("restoId") Integer restoId);
 	
 	
 }

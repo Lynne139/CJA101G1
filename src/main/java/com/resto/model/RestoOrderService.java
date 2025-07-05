@@ -2,6 +2,7 @@ package com.resto.model;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.resto.dto.RestoOrderDTO;
+import com.resto.dto.RestoOrderStatsDTO;
 import com.resto.entity.PeriodVO;
 import com.resto.entity.RestoOrderVO;
 import com.resto.entity.RestoVO;
@@ -73,14 +75,15 @@ public class RestoOrderService {
         if (beforeCounts && afterCounts) {
 
             if (sameSlot) {
-                // 同一 slot 只需做 名額占用+/-
+                // 同一 timeslot 只需做 名額占用+/-
                 int diff = after.getRegiSeats() - before.getRegiSeats();
                 if (diff != 0) {
                     reservationService.adjustSeats(
                         after.getRestoVO().getRestoId(),
                         after.getTimeslotVO().getTimeslotId(),
                         after.getRegiDate(),
-                        diff);
+                        diff,
+                    	before.getRegiSeats()); // 本筆原始人數
                 }
             } else {
                 // 換了 slot，先釋放舊，再占用新
@@ -88,13 +91,15 @@ public class RestoOrderService {
                     before.getRestoVO().getRestoId(),
                     before.getTimeslotVO().getTimeslotId(),
                     before.getRegiDate(),
-                    -before.getRegiSeats());
+                    -before.getRegiSeats(),
+                    null); // 釋放不需 ownSeats
 
                 reservationService.adjustSeats(
                     after.getRestoVO().getRestoId(),
                     after.getTimeslotVO().getTimeslotId(),
                     after.getRegiDate(),
-                    after.getRegiSeats());
+                    after.getRegiSeats(),
+                    0); // 新增時原本佔位 0
             }
 
         // 從佔位 → 不佔位
@@ -208,6 +213,7 @@ public class RestoOrderService {
         
         // 同步更新預約佔位
         syncReservationSeats(before, original);
+        em.flush();
         
     }
 
@@ -246,6 +252,16 @@ public class RestoOrderService {
         return restoOrderRepository.findTodayOrders(restoId);
     }
     
+    
+    //  每日訂單的統計(總訂位+有完成+noshow)
+    public Map<String, RestoOrderStatsDTO> getTodayStatsByResto(Integer restoId) {
+        Map<String, RestoOrderStatsDTO> result = new HashMap<>();
+        result.put("total", restoOrderRepository.findTodayStatsByResto(restoId));
+        result.put("done", restoOrderRepository.findTodayStatsByRestoAndStatus(restoId, RestoOrderStatus.DONE));
+        result.put("noshow", restoOrderRepository.findTodayStatsByRestoAndStatus(restoId, RestoOrderStatus.NOSHOW));
+        result.put("ongoing", restoOrderRepository.findTodayStatsByRestoAndStatus(restoId, RestoOrderStatus.NOSHOW));
+        return result;
+    }
     
 
   
