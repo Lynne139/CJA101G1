@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.member.model.MemberService;
+import com.member.model.MemberVO;
+
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/api/member")
@@ -18,8 +21,10 @@ public class MemberRestController {
     MemberService memberSvc;
 
     @GetMapping("/points")
-    public ResponseEntity<?> getMemberPoints(@RequestParam("memberId") Integer memberId) {
-        Integer points = memberSvc.getMemberPointsById(memberId);
+    public ResponseEntity<?> getMemberPoints(HttpSession session) {
+    	MemberVO loggedInMember = (MemberVO) session.getAttribute("loggedInMember");
+    	Integer memberId = loggedInMember.getMemberId();
+    	Integer points = memberSvc.getMemberPointsById(memberId);
         if (points != null) {
             return ResponseEntity.ok().body(points);
         } else {

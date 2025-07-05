@@ -116,8 +116,6 @@
 
       <!-- 會員資訊 -->
       <div class="member-info">
-        <h5>會員資訊</h5>
-        <div>會員編號: <span th:text="${memberId}">0</span></div>
         <div class="points-display">可用點數: <span id="memberPoints">讀取中...</span> 點</div>
         <small class="text-muted">* 一點可抵一元使用</small>
       </div>
@@ -221,8 +219,7 @@
   
   <!-- ✅ main JS -->
   <script th:inline="javascript">
-    // 從 Thymeleaf 獲取資料
-    const memberId = /*[[${memberId}]]*/ 0; // Thymeleaf 解析成 JS 變數
+
     let memberPoints = 0;
     
     let currentOrderType = null;
@@ -232,7 +229,7 @@
     
     // 初始取得會員點數
     document.addEventListener('DOMContentLoaded', () => {
-        fetch(`/api/member/points?memberId=${memberId}`)
+        fetch(`/api/member/points`)
           .then(response => {
             if (!response.ok) {
               throw new Error('取得點數失敗');
@@ -295,7 +292,6 @@
         type: 'GET',
         data: {
           orderType: currentOrderType,
-          memberId: memberId,
           memberPoints: memberPoints
         },
         success: function(response) {
@@ -432,17 +428,17 @@
       clearAlerts();
       
       $.ajax({
-        url: `/api/member-coupons/${memberId}/claim/${couponCode}`,
+        url: `/api/member-coupons/claim/${couponCode}`,
         type: 'POST',
         success: function(response) {
           showAlert('優惠券領取成功！將重新查詢可領取的優惠券！', 'success');
           
-          // 5秒後自動清除成功訊息
+          // 3秒後自動清除成功訊息
           setTimeout(() => {
             clearAlerts();
          	// 領取成功後更新會員點數，並自動刷新列表
             refreshMemberPoints();
-          }, 5000);
+          }, 3000);
           
         },
         error: function(xhr, status, error) {
@@ -508,9 +504,9 @@
       });
     }
     
-    // 成功領取後更新和刷新點數
+    // 成功領取後刷新點數
     function refreshMemberPoints() {
-   	  fetch(`/api/member/points?memberId=${memberId}`)
+   	  fetch(`/api/member/points`)
    	    .then(res => res.json())
    	    .then(points => {
    	      memberPoints = points;

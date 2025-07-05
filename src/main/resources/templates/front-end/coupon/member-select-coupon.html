@@ -226,8 +226,6 @@
   
   <!-- ✅ main JS -->
   <script th:inline="javascript">
-    // 從 Thymeleaf 取得 memberId
-    const memberId = /*[[${memberId}]]*/ null;
     
     // 當前查詢的資料和狀態
     let currentData = [];
@@ -343,14 +341,14 @@
       // 設定 API URL
       let apiUrl;
       if (queryType === 'used') {
-        apiUrl = `/api/member-coupons/${memberId}/used`;
+        apiUrl = `/api/member-coupons/used`;
         $('#resultsTitle').text('已使用折價券');
       } else {
         if (!orderType) {
           alert('請選擇訂單類型');
           return;
         }
-        apiUrl = `/api/member-coupons/${memberId}/usable?orderType=${orderType}`;
+        apiUrl = `/api/member-coupons/usable?orderType=${orderType}`;
         $('#resultsTitle').text('可用折價券');
       }
       

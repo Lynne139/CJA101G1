@@ -3,6 +3,10 @@ package com.coupon.controller;
 import com.coupon.entity.Coupon;
 import com.coupon.enums.OrderType;
 import com.coupon.service.CouponService;
+import com.member.model.MemberVO;
+
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -76,8 +80,10 @@ public class CouponController {
     @GetMapping("/claimable")
     public ResponseEntity<List<Coupon>> getClaimableCouponsForMember(
             @RequestParam OrderType orderType,
-            @RequestParam Integer memberId,
-            @RequestParam Integer memberPoints) {
+            @RequestParam Integer memberPoints,
+            HttpSession session) {
+    	MemberVO loggedInMember = (MemberVO) session.getAttribute("loggedInMember");
+    	Integer memberId = loggedInMember.getMemberId();
         List<Coupon> coupons = couponService.getClaimableCouponsForMember(orderType, memberId, memberPoints);
         return ResponseEntity.ok(coupons);
     }
