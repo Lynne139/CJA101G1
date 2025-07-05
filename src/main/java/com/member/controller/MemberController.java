@@ -154,26 +154,5 @@ public class MemberController {
 	     return "redirect:/admin/listAllMember";
 	 }
 	
-	 // 刪除會員功能
-	 @PostMapping("/delete")
-	 public String delete(@RequestParam("memberId") String memberId,
-	                      Model model) {
-	     memberSvc.deleteMember(Integer.valueOf(memberId));
-	     model.addAttribute("success", "- (刪除成功)");
-	     return "redirect:/admin/listAllMember";
-	 }
-
-	 // getOne_For_Update
-	 @PostMapping("/getOne_For_Update")
-	 public String getOneForUpdate(@RequestParam("memberId") String memberId,
-	                               Model model, HttpServletRequest request) {
-	     MemberVO memberVO = memberSvc.getOneMember(Integer.valueOf(memberId));
-	     model.addAttribute("memberVO", memberVO);
-	     model.addAttribute("currentURI", request.getRequestURI());
-	     model.addAttribute("mainFragment", "admin/fragments/member/update_member_input");
-	     return "admin/index_admin";
-	 }
-    
-    
     
 }

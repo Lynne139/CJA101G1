@@ -28,17 +28,29 @@
   <div class="container mt-5">
     <div class="form-wrapper">
       <h2 class="mb-4">修改會員資料</h2>
-      <form th:action="@{/member/center/update}" method="post" enctype="multipart/form-data">
+      <form th:action="@{/member/center/update}" method="post" enctype="multipart/form-data" th:object="${memberVO}">
+
+        <div th:if="${#fields.hasErrors()}">
+          <div class="alert alert-danger">
+            <strong>請修正以下錯誤：</strong>
+            <ul>
+              <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
+            </ul>
+          </div>
+        </div>
+
         <div class="row align-items-center mb-4">
           <div class="col-md-9">
             <div class="row g-3">
               <div class="col-md-6">
                 <label for="memberName" class="form-label">會員名稱</label>
-                <input type="text" class="form-control" id="memberName" name="memberName" th:value="${memberVO.memberName}" required>
+                <input type="text" class="form-control" id="memberName" th:field="*{memberName}">
+                <div class="text-danger" th:if="${#fields.hasErrors('memberName')}" th:errors="*{memberName}"></div>
               </div>
               <div class="col-md-6">
                 <label for="memberPhone" class="form-label">電話</label>
-                <input type="text" class="form-control" id="memberPhone" name="memberPhone" th:value="${memberVO.memberPhone}" required>
+                <input type="text" class="form-control" id="memberPhone" th:field="*{memberPhone}">
+                <div class="text-danger" th:if="${#fields.hasErrors('memberPhone')}" th:errors="*{memberPhone}"></div>
               </div>
             </div>
           </div>
@@ -50,30 +62,34 @@
         <div class="row g-3 mb-3">
           <div class="col-md-6">
             <label for="memberBirthday" class="form-label">生日</label>
-            <input type="date" class="form-control" id="memberBirthday" name="memberBirthday" th:value="${memberVO.memberBirthday}" required>
+            <input type="date" class="form-control" id="memberBirthday" th:field="*{memberBirthday}">
+            <div class="text-danger" th:if="${#fields.hasErrors('memberBirthday')}" th:errors="*{memberBirthday}"></div>
           </div>
           <div class="col-md-6">
             <label for="memberPassword" class="form-label">密碼</label>
-            <input type="password" class="form-control" id="memberPassword" name="memberPassword" th:value="${memberVO.memberPassword}" required>
+            <input type="password" class="form-control" id="memberPassword" th:field="*{memberPassword}">
+            <div class="text-danger" th:if="${#fields.hasErrors('memberPassword')}" th:errors="*{memberPassword}"></div>
           </div>
         </div>
 
         <div class="mb-3">
           <label for="memberAddress" class="form-label">地址</label>
-          <input type="text" class="form-control" id="memberAddress" name="memberAddress" th:value="${memberVO.memberAddress}" required>
+          <input type="text" class="form-control" id="memberAddress" th:field="*{memberAddress}">
+          <div class="text-danger" th:if="${#fields.hasErrors('memberAddress')}" th:errors="*{memberAddress}"></div>
         </div>
 
         <div class="mb-3">
           <label for="uploadPic" class="form-label">上傳會員照片</label>
-          <input type="file" class="form-control" id="uploadPic" name="uploadPic" accept="image/*" onchange="previewImage(event)">
+          <input type="file" class="form-control" id="uploadPic" th:field="*{uploadPic}" accept="image/*" onchange="previewImage(event)">
         </div>
 
-        <input type="hidden" name="memberId" th:value="${memberVO.memberId}" />
-        <input type="hidden" name="memberEmail" th:value="${memberVO.memberEmail}" />
-        <input type="hidden" name="memberLevel" th:value="${memberVO.memberLevel}" />
-        <input type="hidden" name="memberStatus" th:value="${memberVO.memberStatus}" />
-        <input type="hidden" name="memberPoints" th:value="${memberVO.memberPoints}" />
-        <input type="hidden" name="memberAccumulativeConsumption" th:value="${memberVO.memberAccumulativeConsumption}" />
+        <!-- 隱藏欄位 -->
+        <input type="hidden" th:field="*{memberId}" />
+        <input type="hidden" th:field="*{memberEmail}" />
+        <input type="hidden" th:field="*{memberLevel}" />
+        <input type="hidden" th:field="*{memberStatus}" />
+        <input type="hidden" th:field="*{memberPoints}" />
+        <input type="hidden" th:field="*{memberAccumulativeConsumption}" />
 
         <div class="text-end mt-4">
           <button type="submit" class="btn btn-primary">儲存修改</button>
@@ -94,4 +110,5 @@
     }
   </script>
 </body>
+
 </html>
