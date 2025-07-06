@@ -5,12 +5,12 @@
 <meta charset="UTF-8">
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>所有會員資料</title>
+<title>會員列表</title>
 
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script><!-- ●●js  for jquery datatables 用 -->
 <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script><!-- ●●js  for jquery datatables 用 -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.jqueryui.min.css" /><!-- ●●css for jquery datatables 用 -->
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <style>
 
     body {
@@ -53,11 +53,10 @@
     .text-center {
 	  text-align: center;
 	}
-  </style>
 </style>
 </head>
 <body>
-	<h2>所有會員資料:</h2>
+	<h2>會員列表</h2>
 	<div class="table-wrapper">
 	<table id="listAllMember" class="display" style="width: 1800px">
 		<thead>
@@ -74,7 +73,7 @@
 				<th>電子信箱</th>
 				<th>會員積分</th>
 				<th>會員累積消費金額</th>
-				<th>修改</th>	
+				<th>操作</th>	
 			</tr>
 		</thead>
 		
@@ -89,14 +88,19 @@
 			<td th:text="${memberVO.memberPhone}"></td> 
 			<td th:text="${memberVO.memberAddress}"></td>
 			<td><img th:src="@{/member/ImageReader(memberId=${memberVO.memberId})}" width="100" height="100"></td>
-			<td class="text-center" th:text="${memberVO.memberStatus}"></td>
+			<td class="text-center">
+			  <span th:if="${memberVO.memberStatus == 1}" class="text-success">啟用</span>
+			  <span th:if="${memberVO.memberStatus == 2}" class="text-danger">停權</span>
+			</td>
 			<td th:text="${memberVO.memberEmail}"></td>
 			<td class="text-center" th:text="${memberVO.memberPoints}"></td>
 			<td class="text-center" th:text="${memberVO.memberAccumulativeConsumption}"></td>
 			<!-- 修改按鈕 -->
 		  	<td>
 			    <a th:href="@{'/admin/updateMember/' + ${memberVO.memberId}}"
-			       class="btn btn-primary btn-sm">修改</a>
+				   class="btn btn-sm btn-outline-primary" title="編輯">
+				   <i class="bi bi-pencil-square"></i>
+				</a>
 		 	</td>	
 			</tr>
 			</th:block>

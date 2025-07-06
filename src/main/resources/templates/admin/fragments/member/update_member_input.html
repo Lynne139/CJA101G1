@@ -6,10 +6,25 @@
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>修改會員資料</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+ <style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #F4EDE1;
+  }
+  input.form-control,
+  select.form-select,
+  textarea.form-control {
+    background-color: #F4EDE1;       
+    border: 1px solid #7E4E24;       
+    color: #333;                     
+    border-radius: 6px;            
+ }
+</style>
 </head>
 <body>
 <div class="container mt-5" th:fragment="update_member_input">
-  <h3>修改會員資料</h3>
+  <h3 style="color: #7E4E24;">修改會員資料</h3>
 
   <form th:action="@{/admin/update}" method="post" enctype="multipart/form-data" th:object="${memberVO}">
     
@@ -37,7 +52,7 @@
     <!-- 密碼 -->
     <div class="mb-3">
       <label for="memberPassword" class="form-label">密碼</label>
-      <input type="text" class="form-control" id="memberPassword" th:field="*{memberPassword}">
+      <input type="text" class="form-control" id="memberPassword" th:field="*{memberPassword}" placeholder="請輸入4-12個字符的密碼">
       <div class="text-danger" th:if="${#fields.hasErrors('memberPassword')}" th:errors="*{memberPassword}"></div>
     </div>
 
