@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.coupon.entity.Coupon;
 import com.coupon.service.CouponService;
-import com.employee.entity.Employee;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.member.model.MemberService;
 import com.member.model.MemberVO;
@@ -46,7 +46,7 @@ import com.prodPhoto.model.ProdPhotoService;
 import com.prodPhoto.model.ProdPhotoVO;
 import com.resto.dto.RestoDTO;
 import com.resto.dto.RestoOrderDTO;
-import com.resto.dto.RestoOrderStatsDTO;
+import com.resto.dto.RestoOrderSummaryDTO;
 import com.resto.entity.PeriodVO;
 import com.resto.entity.RestoVO;
 import com.resto.entity.TimeslotVO;
@@ -64,7 +64,6 @@ import com.shopOrdDet.model.ShopOrdDetService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 
@@ -550,13 +549,35 @@ public class AdminIndexController {
     	// 把所有餐廳都傳給下拉選單使用
         List<RestoVO> restoList = restoService.getAll();
         model.addAttribute("restoList", restoList);
+        
+        
+    	// 餐廳總統計
+    	List<RestoOrderSummaryDTO> summaryList = restoOrderService.getAllTodaySummaryPerResto();
+    	model.addAttribute("summaryList", summaryList);
+    	
+    	long allTotal = summaryList.stream()
+    		    .mapToLong(RestoOrderSummaryDTO::getTotal)
+    		    .sum();
+    		model.addAttribute("allTotal", allTotal);
+        
+        
 
         // 若選定某餐廳，才撈出該餐廳的區段與時段
         if (restoId != null) {
         	
-        	// 新增統計資料
-        	Map<String, RestoOrderStatsDTO> summaryStats = restoOrderService.getTodayStatsByResto(restoId);
-            model.addAttribute("summaryStats", summaryStats);
+        	// 各間餐廳統計
+        	if (restoId != null) {
+        	    RestoOrderSummaryDTO summary = restoOrderService.getTodaySummary(restoId);
+
+        	    if (summary == null) {
+        	        summary = new RestoOrderSummaryDTO(0L, 0L, 0L, 0L, 0L, 0L);
+        	    }
+
+        	    model.addAttribute("summary", summary);
+        	}
+        	
+
+
         	
         	// 軟刪除的餐廳只讀
             RestoVO Urlresto = restoService.getById(restoId);

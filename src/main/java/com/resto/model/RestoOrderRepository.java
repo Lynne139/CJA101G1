@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.resto.dto.RestoOrderStatsDTO;
+import com.resto.dto.RestoOrderSummaryDTO;
 import com.resto.entity.RestoOrderVO;
 import com.resto.utils.RestoOrderStatus;
 
@@ -53,26 +53,49 @@ public interface RestoOrderRepository extends JpaRepository<RestoOrderVO, Intege
 		List<RestoOrderVO> findTodayOrders(@Param("restoId") Integer restoId);
 
 	
-	
-	// 針對特定 restoId 和 regiDate = today 的訂單做分狀態統計
-	@Query("""
-		    SELECT new com.resto.dto.RestoOrderStatsDTO(COUNT(ro), COALESCE(SUM(ro.regiSeats), 0))
-		    FROM RestoOrderVO ro
-		    WHERE ro.regiDate = CURRENT_DATE
-		      AND ro.restoVO.restoId = :restoId
-		      AND ro.orderStatus = :status
-		""")
-		RestoOrderStatsDTO findTodayStatsByRestoAndStatus(@Param("restoId") Integer restoId,
-		                                                   @Param("status") RestoOrderStatus status);
 
 	// 統計特定 restoId 的所有狀態訂單 
 	@Query("""
-		    SELECT new com.resto.dto.RestoOrderStatsDTO(COUNT(ro), COALESCE(SUM(ro.regiSeats), 0))
-		    FROM RestoOrderVO ro
-		    WHERE ro.regiDate = CURRENT_DATE
-		      AND ro.restoVO.restoId = :restoId
-		""")
-		RestoOrderStatsDTO findTodayStatsByResto(@Param("restoId") Integer restoId);
+			SELECT new com.resto.dto.RestoOrderSummaryDTO(
+			    COUNT(ro),
+			    SUM( CASE WHEN ro.orderStatus = com.resto.utils.RestoOrderStatus.DONE       THEN 1 ELSE 0 END ),
+			    SUM( CASE WHEN ro.orderStatus = com.resto.utils.RestoOrderStatus.NOSHOW     THEN 1 ELSE 0 END ),
+			    SUM( CASE WHEN ro.orderStatus IN (
+			                  com.resto.utils.RestoOrderStatus.CREATED,
+			                  com.resto.utils.RestoOrderStatus.WITHHOLD )                   THEN 1 ELSE 0 END ),
+			    SUM( CASE WHEN ro.orderStatus = com.resto.utils.RestoOrderStatus.CANCELED   THEN 1 ELSE 0 END ),
+			    COALESCE(SUM(ro.regiSeats), 0)
+			)
+			FROM RestoOrderVO ro
+			WHERE ro.regiDate = CURRENT_DATE
+			  AND (:restoId IS NULL OR ro.restoVO.restoId = :restoId)
+			""")
+			RestoOrderSummaryDTO findTodaySummary(@Param("restoId") Integer restoId);
+
 	
+	// 餐廳總統計
+	@Query("""
+			SELECT new com.resto.dto.RestoOrderSummaryDTO(
+			    ro.restoVO.restoName,
+			    COUNT(ro),
+			    SUM( CASE WHEN ro.orderStatus = com.resto.utils.RestoOrderStatus.DONE       THEN 1 ELSE 0 END ),
+			    SUM( CASE WHEN ro.orderStatus = com.resto.utils.RestoOrderStatus.NOSHOW     THEN 1 ELSE 0 END ),
+			    SUM( CASE WHEN ro.orderStatus IN (
+			                  com.resto.utils.RestoOrderStatus.CREATED,
+			                  com.resto.utils.RestoOrderStatus.WITHHOLD )                   THEN 1 ELSE 0 END ),
+			    SUM( CASE WHEN ro.orderStatus = com.resto.utils.RestoOrderStatus.CANCELED   THEN 1 ELSE 0 END ),
+			    COALESCE(SUM(ro.regiSeats), 0)
+			)
+			FROM RestoOrderVO ro
+			WHERE ro.regiDate = CURRENT_DATE
+			GROUP BY ro.restoVO.restoName
+			ORDER BY ro.restoVO.restoName
+			""")
+			List<RestoOrderSummaryDTO> findAllTodaySummaryPerResto();
+
+
+
+
+
 	
 }

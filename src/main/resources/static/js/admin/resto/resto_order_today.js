@@ -1,45 +1,119 @@
-// ===== View Modal（沿用你現有邏輯，不用改） =====
+document.addEventListener('DOMContentLoaded', () => {
 
-// ===== 狀態切換 =====
-document.addEventListener("click", async (e) => {
+  // ===== 卡片收合 / 展開 =====
+  // 設定卡片點擊展開/收合
+  document.querySelectorAll(".order-card").forEach(card => {
+      // 同時抓 up 與 down，哪個有就用哪個
+      const caret  = card.querySelector(".fa-caret-up, .fa-caret-down");
+      const detail = card.querySelector(".guest_detail");
 
-  // 完成／取消
-  const btnDone   = e.target.closest(".btn_done");
-  const btnCancel = e.target.closest(".btn_cancel");
-  if (btnDone || btnCancel) {
-    const btn   = btnDone || btnCancel;
-    const id    = btn.getAttribute("data-id");
-    const newSt = btnDone ? "DONE" : "CANCELED";
+      // 若卡片少任何一塊，直接跳過這張卡，避免報錯
+      if (!caret || !detail) return;
 
-    try {
-      const res = await fetch(`/admin/resto_order/${id}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newSt })
+      // 預設收合
+      detail.style.display = "none";
+
+      card.addEventListener("click", e => {
+		// 若點到按鈕，此事件不處理
+		if (e.target.closest("button")) return;
+
+        const isOpen = detail.style.display !== "none";
+        detail.style.display = isOpen ? "none" : "block";
+
+        // caret 方向 toggle
+        caret.classList.toggle("fa-caret-up");
+        caret.classList.toggle("fa-caret-down");
       });
-      const json = await res.json();
+    });
 
-      // ===== 更新 UI =====
-      const card = btn.closest(".order-card");
-      // 換 badge
-      card.querySelector(".badge")
-          .textContent = json.label;
-      card.querySelector(".badge")
-          .className  = `badge fs-6 bg-${json.cssClass}`;
-      // 換色條
-      card.querySelector(".status-bar")
-          .className = `status-bar bg-${json.cssClass}`;
 
-      // ===== 捲動到下一張未完成卡片 =====
-      const next = [...document.querySelectorAll(".order-card")]
-                      .find(c => c.querySelector(".badge")
-                                   .textContent.trim() === "已成立"   // 未完成
-                               ||  c.querySelector(".badge")
-                                   .textContent.trim() === "保留");
-      if (next) next.scrollIntoView({ behavior: "smooth", block: "start" });
 
-    } catch (err) {
-      alert("更新失敗：" + err.message);
-    }
-  }
+	// ===== 完成 / 取消 按鈕 AJAX =====
+	// 抓統計6個欄位
+	const sField = (name) => document.querySelector(`[data-field='${name}']`);
+
+	// 點擊 DONE / CANCELED 按鈕 
+	document.addEventListener("click", async (e) => {
+
+	  const btn = e.target.closest(".btn_done, .btn_cancel");
+	  if (!btn) return;
+
+	  const card    = btn.closest(".order-card");
+	  const orderId = btn.dataset.id;
+	  const action  = btn.classList.contains("btn_done") ? "DONE" : "CANCELED";
+
+	  if (!orderId || card.classList.contains("updating")) return;
+
+		showPanelOverlay(card);
+	  try {
+	    const res = await fetch(`/admin/resto_order/${orderId}/status`, {
+	      method: "POST",
+		  headers: {
+		      "Content-Type": "application/json",
+		      "X-Requested-With": "fetch"
+		    },
+		    body: JSON.stringify({ status: action })
+	    });
+	    if (!res.ok) throw new Error(await res.text());
+
+	    const json = await res.json();     // {label, cssClass, summary}
+
+	    // ---- 1. 更新卡片顏色 & 標籤 ----
+	    const statusBar = card.querySelector(".status-bar");
+	    const badge     = statusBar.querySelector(".badge");
+	    statusBar.className = `status-bar bg-${json.cssClass}`;
+	    badge.className     = `badge fs-6 bg-${json.cssClass}`;
+	    badge.textContent   = json.label;
+
+	    // ---- 2. 收合 & 捲到下一張 ----
+	    const detail = card.querySelector(".guest_detail");
+	    const caret  = card.querySelector(".fa-caret-up, .fa-caret-down");
+	    detail.style.display = "none";
+	    caret.classList.remove("fa-caret-down");
+	    caret.classList.add("fa-caret-up");
+
+	    const next = card.nextElementSibling;
+	    if (next?.classList.contains("order-card")) {
+	      next.scrollIntoView({ behavior: "smooth", block: "center" });
+	    }
+
+	    // ---- 3. 刷新六個統計數字 ----
+	    if (json.summary) {
+	      const sum = json.summary;     // DTO 的欄位名稱
+	      sField("total").textContent      = sum.total;
+	      sField("done").textContent       = sum.done;
+	      sField("noshow").textContent     = sum.noshow;
+	      sField("ongoing").textContent    = sum.ongoing;
+	      sField("canceled").textContent   = sum.canceled;
+	      sField("totalSeats").textContent = sum.totalSeats;
+	    }
+
+	  } catch (err) {
+	    alert("更新失敗: " + err.message);
+	  } finally {
+		removePanelOverlay(card);
+	  }
+	});
+
+
+	
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 });

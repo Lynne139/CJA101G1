@@ -27,14 +27,29 @@
 	margin-bottom:0.25rem;
 }
 
-
-
-
-
-.summary-card {
-  background-color: var(--bs-light);
-  transition: box-shadow 0.3s ease;
+.main_order_today .today_summery_card{
+	height:100%;
+	
 }
-.summary-card:hover {
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+
+
+/* 卡片點擊 & hover 提示 */
+.order-card .card-body {
+	cursor: pointer; 
 }
+.order-card:hover {
+	box-shadow: 0 0 0.75rem rgba(0,0,0,.15); 
+}
+
+/* 讓展開箭頭旋轉 180° */
+.order-card .fa-caret-up,
+.order-card .fa-caret-down {
+  transition: transform 0.3s ease;
+}
+
+.order-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+

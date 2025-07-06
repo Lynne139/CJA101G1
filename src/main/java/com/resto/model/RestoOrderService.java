@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.resto.dto.RestoOrderDTO;
-import com.resto.dto.RestoOrderStatsDTO;
+import com.resto.dto.RestoOrderSummaryDTO;
 import com.resto.entity.PeriodVO;
 import com.resto.entity.RestoOrderVO;
 import com.resto.entity.RestoVO;
@@ -267,21 +267,32 @@ public class RestoOrderService {
    
     // 今日訂單切換訂單狀態
     @Transactional
-    public RestoOrderStatus toggleStatus(Integer id, RestoOrderStatus newStatus){
+    public Map<String, Object> toggleStatus(Integer id, RestoOrderStatus newStatus) {
         RestoOrderVO order = restoOrderRepository.findById(id).orElseThrow();
 
-        RestoOrderVO snapshot = new RestoOrderVO();   // 只放需要比對的欄位
+        // 備份必要欄位（用於座位釋出判斷）
+        RestoOrderVO snapshot = new RestoOrderVO();
         snapshot.setRegiSeats(order.getRegiSeats());
         snapshot.setOrderStatus(order.getOrderStatus());
         snapshot.setRestoVO(order.getRestoVO());
         snapshot.setTimeslotVO(order.getTimeslotVO());
         snapshot.setRegiDate(order.getRegiDate());
 
+        // 狀態更新
         order.setOrderStatus(newStatus);
-        // 同步更新預約佔位
-        syncReservationSeats(snapshot, order);
-        return newStatus;
+        syncReservationSeats(snapshot, order); // 自動釋出座位
+
+        // 查詢最新統計
+        RestoOrderSummaryDTO summary = restoOrderRepository.findTodaySummary(order.getRestoVO().getRestoId());
+
+        // 回傳資訊給 controller → JS
+        Map<String, Object> result = new HashMap<>();
+        result.put("label", newStatus.getLabel());
+        result.put("cssClass", newStatus.getCssClass());
+        result.put("summary", summary);
+        return result;
     }
+
     
     
     // 找出今日訂單
@@ -290,15 +301,19 @@ public class RestoOrderService {
     }
     
     
-    //  每日訂單的統計(總訂位+有完成+noshow)
-    public Map<String, RestoOrderStatsDTO> getTodayStatsByResto(Integer restoId) {
-        Map<String, RestoOrderStatsDTO> result = new HashMap<>();
-        result.put("total", restoOrderRepository.findTodayStatsByResto(restoId));
-        result.put("done", restoOrderRepository.findTodayStatsByRestoAndStatus(restoId, RestoOrderStatus.DONE));
-        result.put("noshow", restoOrderRepository.findTodayStatsByRestoAndStatus(restoId, RestoOrderStatus.NOSHOW));
-        result.put("ongoing", restoOrderRepository.findTodayStatsByRestoAndStatus(restoId, RestoOrderStatus.NOSHOW));
-        return result;
+    //  特定餐廳每日訂單的統計
+    public RestoOrderSummaryDTO getTodaySummary(Integer restoId) {
+        return restoOrderRepository.findTodaySummary(restoId);
     }
+    
+    //餐廳加總每日訂單統計
+    public List<RestoOrderSummaryDTO> getAllTodaySummaryPerResto() {
+        return restoOrderRepository.findAllTodaySummaryPerResto();
+    }
+
+
+
+
     
     
     

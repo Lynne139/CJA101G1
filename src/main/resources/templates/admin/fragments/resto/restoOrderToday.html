@@ -4,7 +4,17 @@
     <h2 class="page_title">今日訂位</h2>
   </div>
 
-  <div class="summary_card_all panel">總預約：20（早餐店 12、晚餐館 8）</div>
+  <!-- 顯示所有餐廳的總預約數 -->
+  <div class="summary_card_allresto panel mb-3" th:if="${summaryList != null}">
+    總預約：
+    <span class="fw-bold" th:text="${allTotal}">0</span>
+    (
+    <span th:each="s, iter : ${summaryList}">
+      <span th:text="${s.restoName + ' ' + s.total}">早餐店 12</span><span th:if="${!iter.last}">、</span>
+    </span>
+    )
+  </div>
+
 
 
   <!-- 餐廳選擇器 -->
@@ -41,39 +51,47 @@
         <h4 class="resto_name mb-4" th:if="${selectedResto != null}" th:text="${selectedResto.restoName}"></h4>
  
  
-        <!-- 今日統計 Panel -->
-        <div class="panel panel_summaryStats p-4 mb-5" th:if="${summaryStats != null}">
-          <div class="row text-center">
+        <!-- 今日統計 Panels -->
+        <div class="row g-3 mb-4" th:if="${summary}">
         
-            <!-- 總預約人數 -->
-            <div class="col-md-4 mb-3">
-              <div class="summary-card p-3 border rounded shadow-sm">
-                <div class="fs-5 mb-1">總預約數</div>
-                <div class="fs-2 fw-bold text-primary" th:text="${summaryStats['total']?.totalCount}">0</div>
-                <div class="small text-muted" th:text="'座位數：' + ${summaryStats['total']?.totalSeats}">座位數：0</div>
-              </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="today_summery_card panel text-center py-3">
+              <div class="small text-muted">總訂單筆數</div>
+              <div class="fs-4 fw-bold" data-field="total" th:text="${summary.total}">0</div>
             </div>
-        
-            <!-- 已完成訂單 -->
-            <div class="col-md-4 mb-3">
-              <div class="summary-card p-3 border rounded shadow-sm">
-                <div class="fs-5 mb-1">已完成</div>
-                <div class="fs-2 fw-bold text-success" th:text="${summaryStats['done']?.totalCount}">0</div>
-                <div class="small text-muted" th:text="'剩餘座位數：' + ${summaryStats['done']?.totalSeats}">座位數：0</div>
-              </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="today_summery_card panel text-center py-3 text-success">
+              <div class="small">已完成訂單</div>
+              <div class="fs-4 fw-bold" data-field="done" th:text="${summary.done}">0</div>
             </div>
-        
-            <!-- No-show -->
-            <div class="col-md-4 mb-3">
-              <div class="summary-card p-3 border rounded shadow-sm">
-                <div class="fs-5 mb-1">No-show</div>
-                <div class="fs-2 fw-bold text-danger" th:text="${summaryStats['noshow']?.totalCount}">0</div>
-                <div class="small text-muted" th:text="'座位數：' + ${summaryStats['noshow']?.totalSeats}">座位數：0</div>
-              </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="today_summery_card panel text-center py-3 text-danger">
+              <div class="small">未報到訂單</div>
+              <div class="fs-4 fw-bold" data-field="noshow" th:text="${summary.noshow}">0</div>
             </div>
-        
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="today_summery_card panel text-center py-3 text-warning">
+              <div class="small">進行中訂單</div>
+              <div class="fs-4 fw-bold" data-field="ongoing" th:text="${summary.ongoing}">0</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="today_summery_card panel text-center py-3 text-secondary">
+              <div class="small">已取消訂單</div>
+              <div class="fs-4 fw-bold" data-field="canceled" th:text="${summary.canceled}">0</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="today_summery_card panel text-center py-3">
+              <div class="small text-muted">總用餐人數</div>
+              <div class="fs-4 fw-bold" data-field="totalSeats" th:text="${summary.totalSeats}">0</div>
+            </div>
           </div>
         </div>
+        
  
  
  
@@ -87,7 +105,8 @@
           
           <!-- 迴圈繪卡片 -->
           <div th:each="order : ${orderList}"
-               class="order-card panel position-relative mb-4">
+               class="order-card panel position-relative mb-4"
+               th:data-id="${order.restoOrderId}">
         
             <!-- 狀態色條 -->
             <div class="status-bar"
@@ -127,7 +146,7 @@
                    </div>
                   </div>
           
-                  <!-- 定位基本資訊 -->
+                  <!-- 訂位基本資訊 -->
                   <div class="order_info mb-2">
                     <span class="me-3">
                       <i class="fa-solid fa-calendar-days me-1"></i>
@@ -155,12 +174,12 @@
           
                 </div>
                 
-                <div class="d-flex justify-content-end mx-3"><i class="fa-solid fa-caret-up"></i></div>
+                <div class="d-flex justify-content-end mx-3"><i class="fa-solid fa-caret-down caret-icon"></i></div>
                 
                 
                 <!-- 可收合範圍 -->
                 <hr>
-                <div class="guest_detail mb-0 mt-4">                          
+                <div class="guest_detail collapse mb-0 mt-4">                          
 
                     <div class="mb-4">
                         <p ><strong>兒童座椅數：</strong> <span th:text="${order.highChairs}"></span></p>
@@ -174,8 +193,8 @@
                                <span th:if="${order.orderSource?.name() == 'MEMBER' }" th:text="${'( 會員ID-'+order.memberVO.memberId+' )'}"></span>
                                <span th:if="${order.orderSource?.name() == 'ROOM' }" th:text="${'( 會員ID-'+order.memberVO.memberId+' 、 住宿訂單ID-'+order.roomOrderVO.roomOrderId+' )'}"></span>
                       </p>
+                      <p class=""><strong>訂單建立日期：</strong> <span th:text="${order.orderTime}"></span></p>
                     </div>
-                    <p class=""><strong>訂單建立日期：</strong> <span th:text="${order.orderTime}"></span></p>
                     
 
                   </div>

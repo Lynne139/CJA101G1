@@ -209,6 +209,9 @@
 		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrder'}"
         src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh.js"></script>
         
+		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrderToday'}"
+        th:src="@{/js/admin/resto/resto_order_today.js}"></script>
+ 
         
         <!-- 房間 -->
         <script th:if="${mainFragment == 'admin/fragments/room/listAllRoom'}"

@@ -1,54 +1,97 @@
 package com.resto.dto;
 
-import java.util.Map;
-
 public class RestoOrderSummaryDTO {
 	
-	private Integer totalCount;
-    private Integer doneCount;
-    private Integer noShowCount;
-    private Map<String, Integer> restoBreakdown;
+	private String restoName;
+
+    private Long total;
+    private Long done;
+    private Long noshow;
+    private Long ongoing;
+    private Long canceled;
+    private Long totalSeats;
+
+    public RestoOrderSummaryDTO() {
+    }
     
+    public RestoOrderSummaryDTO(String restoName, Long total, Long done, Long noshow,
+            Long ongoing, Long canceled, Long totalSeats) {
+	this.restoName = restoName;
+	this.total = total;
+	this.done = done;
+	this.noshow = noshow;
+	this.ongoing = ongoing;
+	this.canceled = canceled;
+	this.totalSeats = totalSeats;
+	}
+
+    public RestoOrderSummaryDTO(Long total, Long done, Long noshow, Long ongoing, Long canceled, Long totalSeats) {
+        this.total = total;
+        this.done = done;
+        this.noshow = noshow;
+        this.ongoing = ongoing;
+        this.canceled = canceled;
+        this.totalSeats = totalSeats;
+    }
 
     
-	public RestoOrderSummaryDTO(Integer totalCount, Integer doneCount, Integer noShowCount,
-			Map<String, Integer> restoBreakdown) {
-		super();
-		this.totalCount = totalCount;
-		this.doneCount = doneCount;
-		this.noShowCount = noShowCount;
-		this.restoBreakdown = restoBreakdown;
+	public String getRestoName() {
+		return restoName;
 	}
-	public RestoOrderSummaryDTO() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-	public Integer getTotalCount() {
-		return totalCount;
-	}
-	public void setTotalCount(Integer totalCount) {
-		this.totalCount = totalCount;
-	}
-	public Integer getDoneCount() {
-		return doneCount;
-	}
-	public void setDoneCount(Integer doneCount) {
-		this.doneCount = doneCount;
-	}
-	public Integer getNoShowCount() {
-		return noShowCount;
-	}
-	public void setNoShowCount(Integer noShowCount) {
-		this.noShowCount = noShowCount;
-	}
-	public Map<String, Integer> getRestoBreakdown() {
-		return restoBreakdown;
-	}
-	public void setRestoBreakdown(Map<String, Integer> restoBreakdown) {
-		this.restoBreakdown = restoBreakdown;
-	}
-    
-    
-    
 
+	public void setRestoName(String restoName) {
+		this.restoName = restoName;
+	}
+
+	public Long getTotal() {
+		return total;
+	}
+
+	public void setTotal(Long total) {
+		this.total = total;
+	}
+
+	public Long getDone() {
+		return done;
+	}
+
+	public void setDone(Long done) {
+		this.done = done;
+	}
+
+	public Long getNoshow() {
+		return noshow;
+	}
+
+	public void setNoshow(Long noshow) {
+		this.noshow = noshow;
+	}
+
+	public Long getOngoing() {
+		return ongoing;
+	}
+
+	public void setOngoing(Long ongoing) {
+		this.ongoing = ongoing;
+	}
+
+	public Long getCanceled() {
+		return canceled;
+	}
+
+	public void setCanceled(Long canceled) {
+		this.canceled = canceled;
+	}
+
+	public Long getTotalSeats() {
+		return totalSeats;
+	}
+
+	public void setTotalSeats(Long totalSeats) {
+		this.totalSeats = totalSeats;
+	}
+
+    
+    
+    
 }
