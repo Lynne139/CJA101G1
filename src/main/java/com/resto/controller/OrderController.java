@@ -4,9 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -370,9 +370,24 @@ public class OrderController {
 	}
 
 
+	// ===== 獲得今日訂單統計資訊 =====
+	@GetMapping("/resto_order/summary-json")
+	@ResponseBody
+	public RestoOrderSummaryDTO todaySummaryJson(@RequestParam Integer restoId) {
+	    return restoOrderService.getTodaySummary(restoId);
+	}
 
-
-	
+	// ===== 獲得每張訂單的最新狀態 =====
+	@GetMapping("/resto_order/statuses")
+	@ResponseBody
+	public Map<Integer, Map<String,String>> todayStatuses(@RequestParam Integer restoId) {
+	    return restoOrderService.findTodayOrders(restoId).stream()
+	            .collect(Collectors.toMap(
+	                RestoOrderVO::getRestoOrderId,
+	                o -> Map.of("cssClass", o.getOrderStatus().getCssClass(),
+	                            "label",    o.getOrderStatus().getLabel())
+	            ));
+	}
 	
 	
 	

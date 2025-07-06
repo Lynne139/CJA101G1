@@ -96,7 +96,61 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 
+	// ===== SSE推播註冊 =====
+	function setupSSE() {
+	  const eventSource = new EventSource("/sse/order-status");
+
+	  eventSource.addEventListener("order-status-update", (e) => {
+	    console.log("SSE 訊息：", e.data);
+	    if (e.data === "refresh") {
+	      refreshSummary();      // 更新統計數字
+	      refreshCardStatuses();   // 更新卡片
+	    }
+	  });
+
+	  eventSource.onerror = (err) => {
+	    console.error("SSE 錯誤", err);
+	  };
+	}
+
+	const RESTO_ID = parseInt(
+	  document.getElementById("orderTodayPage")?.dataset?.restoId || "-1", 10
+	);
 	
+	setupSSE();
+	
+	
+	async function refreshSummary() {
+	  const r = await fetch(`/admin/resto_order/summary-json?restoId=${RESTO_ID}`);
+	  if (!r.ok) return;
+	  const s = await r.json();
+
+	  sField("total").textContent      = s.total;
+	  sField("done").textContent       = s.done;
+	  sField("noshow").textContent     = s.noshow;
+	  sField("ongoing").textContent    = s.ongoing;
+	  sField("canceled").textContent   = s.canceled;
+	  sField("totalSeats").textContent = s.totalSeats;
+	}
+
+	async function refreshCardStatuses() {
+	  const r = await fetch(`/admin/resto_order/statuses?restoId=${RESTO_ID}`);
+	  if (!r.ok) return;
+	  const map = await r.json();          // { "9":{cssClass:"success",label:"已完成"}, ... }
+
+	  Object.entries(map).forEach(([id, st]) => {
+	    // 透過 data-id 找同一張卡
+	    const btn     = document.querySelector(`button[data-id='${id}']`);
+	    if (!btn) return;
+	    const card    = btn.closest(".order-card");
+	    const bar     = card.querySelector(".status-bar");
+	    const badge   = bar.querySelector(".badge");
+
+	    bar.className   = `status-bar bg-${st.cssClass}`;
+	    badge.className = `badge fs-6 bg-${st.cssClass}`;
+	    badge.textContent = st.label;
+	  });
+	}
 
 
 
