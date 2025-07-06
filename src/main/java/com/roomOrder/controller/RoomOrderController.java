@@ -78,10 +78,16 @@ public class RoomOrderController {
 	private RestoOrderService restoOrderService;
 
 	@Autowired
+	private ReservationService reservationService;
+
+	@Autowired
 	private NotificationService notificationService;
 
 	@Autowired
 	private EmployeeService employeeService;
+
+	@Autowired
+	private com.roomOrder.model.ResRoomOrderSvc resRoomOrderSvc;
 
 	// ===== 新增 =====
 
@@ -231,8 +237,10 @@ public class RoomOrderController {
 
 			// 更新訂單狀態
 			orderService.save(order);
-			// 餐廳訂單取消
-			restoOrderService.cancelByRoomOrderId(roomOrderId);
+			if (order.getProjectAddOn() == 1) {
+				// 取消餐廳訂單
+				restoOrderService.cancelByRoomOrderId(roomOrderId);
+			}
 			// 5. 更新會員累計金(扣除整筆actualAmount)
 			Integer memberId = order.getMember().getMemberId();
 			memberService.updateConsumptionAndLevelAndPoints(memberId, -order.getActualAmount());
@@ -265,9 +273,10 @@ public class RoomOrderController {
 		order.setTotalAmount(newTotal);
 		order.setActualAmount(newActualAmount);
 		order.setProjectAddOn(0);
+		System.out.println("更新訂單：" + order);
 		orderService.save(order);
 		// 取消餐廳訂單
-		restoOrderService.cancelByRoomOrderId(roomOrderId);
+		// restoOrderService.cancelByRoomOrderId(roomOrderId);
 		return Map.of("success", true);
 	}
 
@@ -482,6 +491,21 @@ public class RoomOrderController {
 				.collect(Collectors.toList());
 	}
 
+	 // 查詢餐廳時段剩餘名額（轉發 ReservationController 的 API）
+	 @GetMapping("/roomOrder/meal/remaining")
+	 @ResponseBody
+	 public Integer getMealRemaining(@RequestParam Integer restoId,
+									 @RequestParam Integer timeslotId,
+									 @RequestParam String date) {
+		 // 這裡直接呼叫 reservationService.getRemaining
+		 // 需將 date 轉為 LocalDate
+		 java.time.LocalDate localDate = java.time.LocalDate.parse(date);
+		 int remaining = reservationService.getRemaining(restoId, timeslotId, localDate);
+		 return remaining;
+	 }
+
+	 
+
 	// ===== 查詢餐廳專案 =====
 	@GetMapping("/roomo_info/resto_periods")
 	@ResponseBody
@@ -570,6 +594,19 @@ public class RoomOrderController {
 			i++;
 		}
 		return details;
+	}
+
+	/**
+	 * 前端查詢加購專案自動排餐廳時段
+	 */
+	@PostMapping("/roomo_info/auto_assign_meal")
+	@ResponseBody
+	public Map<String, Object> autoAssignMeal(@RequestParam Integer restoId,
+											  @RequestParam Integer numOfPeople,
+											  @RequestParam String checkInDate,
+											  @RequestParam String checkOutDate,
+											  @RequestParam Integer projectPlan) {
+		return resRoomOrderSvc.checkAndAutoAssignRestoTimeslots(restoId, numOfPeople, checkInDate, checkOutDate, projectPlan);
 	}
 
 }

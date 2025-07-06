@@ -48,7 +48,7 @@
             <div id="orderDetailList">
               <div class="order-detail-item mb-3 border rounded p-3">
                 <div class="row g-2 align-items-end" style="margin-bottom: 10px;">
-                  <div class="col-md-3">
+                  <div class="col-md-4">
                     <!-- 此處之後要改抓房型預定表 -->
                     <label class="form-label">房型 <span class="text-danger">*</span></label>
                     <select name="orderDetails[0].roomTypeId" class="form-select roomTypeSelect" required>
@@ -70,7 +70,7 @@
                     </select>
                     <div id="roomWarning" class="text-danger mt-1"></div>
                   </div>
-                  <div class="col-md-2">
+                  <div class="col-md-3">
                     <label class="form-label">房間價格 <span class="text-danger">*</span></label>
                     <input type="number" name="orderDetails[0].roomPrice" class="form-control roomPriceInput" min="0"
                       required readonly>

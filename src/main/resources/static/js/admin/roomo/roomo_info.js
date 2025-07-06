@@ -1218,103 +1218,91 @@ document.addEventListener("DOMContentLoaded", function () {
                 restoProjectArea.style.display = "none";
                 return;
             }
-            let blockCount = 0;
-            let periodTitles = [];
-            if (planValue == "1") {
-                blockCount = 1;
-                periodTitles = ["早餐/早午餐"];
-            } else if (planValue == "2") {
-                blockCount = 2;
-                periodTitles = ["早餐/早午餐", "晚餐"];
-            } else if (planValue == "3") {
-                blockCount = 3;
-                periodTitles = ["早餐/早午餐", "午茶", "晚餐"];
-            }
-            for (let i = 0; i < blockCount; i++) {
-                const block = document.createElement("div");
-                block.className = "project-block mb-3 p-3 border rounded";
-                block.innerHTML = `
-                    <div class="mb-2"><strong>請選擇${periodTitles[i]}</strong></div>
-                    <div class="row g-2 align-items-end">
-                      <div class="col-md-4">
-                        <label class="form-label">餐廳</label>
-                        <select class="form-select restoSelect" data-block-idx="${i}" required>
-                          <option value="">請選擇餐廳</option>
-                        </select>
-                      </div>
-                      <div class="col-md-4">
-                        <label class="form-label">用餐時段</label>
-                        <select class="form-select timeslotSelect" data-block-idx="${i}" required disabled>
-                          <option value="">請先選擇餐廳</option>
-                        </select>
-                      </div>
-                      <div class="col-md-4">
-                        <label class="form-label">人數</label>
-                        <input type="number" class="form-control projectPeopleInput" min="1" value="1" data-block-idx="${i}" required readonly>
-                      </div>
-                    </div>
-                `;
-                restoProjectArea.appendChild(block);
-            }
+            // 只產生一區
+            const block = document.createElement("div");
+            block.className = "project-block mb-3 p-3 border rounded";
+            block.innerHTML = `
+                <div class="mb-2"><strong>請選擇餐廳</strong></div>
+                <div class="row g-2 align-items-end">
+                  <div class="col-md-4">
+                    <label class="form-label">餐廳</label>
+                    <select class="form-select restoSelect" required>
+                      <option value="">請選擇餐廳</option>
+                    </select>
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">兒童座椅數</label>
+                    <input type="number" class="form-control highChairsInput" min="0" value="0">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">餐廳需求備註</label>
+                    <input type="text" class="form-control restoReqInput" maxlength="50" placeholder="如：靠窗、過敏...">
+                  </div>
+                  <div class="col-md-2 d-flex align-items-end">
+                    <span class="autoAssignResult"></span>
+                  </div>
+                </div>
+            `;
+            restoProjectArea.appendChild(block);
             restoProjectArea.style.display = "block";
-            bindProjectBlockEventsDynamicPeriods(planValue);
+            bindRestoSelectAutoAssign(block, planValue);
             syncProjectPeopleInput();
         }
 
-        // 新增：根據餐廳選擇動態決定 periodName
-        function bindProjectBlockEventsDynamicPeriods(planValue) {
-            const blocks = restoProjectArea.querySelectorAll(".project-block");
-            blocks.forEach((block, blockIdx) => {
-                const restoSelect = block.querySelector(".restoSelect");
-                const timeslotSelect = block.querySelector(".timeslotSelect");
-                // 載入餐廳選單
-                fetch("/admin/roomo_info/resto/list")
-                    .then(res => res.json())
-                    .then(restos => {
-                        restoSelect.innerHTML = '<option value="">請選擇餐廳</option>';
-                        restos.forEach(resto => {
-                            const opt = document.createElement("option");
-                            opt.value = resto.restoId;
-                            opt.textContent = resto.restoName;
-                            restoSelect.appendChild(opt);
-                        });
+        function bindRestoSelectAutoAssign(block, planValue) {
+            const restoSelect = block.querySelector(".restoSelect");
+            const autoAssignResult = block.querySelector(".autoAssignResult");
+            // 載入餐廳選單
+            fetch("/admin/roomo_info/resto/list")
+                .then(res => res.json())
+                .then(restos => {
+                    restoSelect.innerHTML = '<option value="">請選擇餐廳</option>';
+                    restos.forEach(resto => {
+                        const opt = document.createElement("option");
+                        opt.value = resto.restoId;
+                        opt.textContent = resto.restoName;
+                        restoSelect.appendChild(opt);
                     });
-                restoSelect.addEventListener("change", function () {
-                    const restoId = Number(this.value);
-                    timeslotSelect.innerHTML = '<option value="">請先選擇餐廳</option>';
-                    timeslotSelect.disabled = true;
-                    if (!restoId) return;
-                    // 根據方案與餐廳決定 periodName
-                    let periodNames = [];
-                    if (planValue == "1") {
-                        periodNames = [restoId === 1 ? "早餐" : "早午餐"];
-                    } else if (planValue == "2") {
-                        periodNames = restoId === 1 ? ["早餐", "晚餐"] : ["早午餐", "晚餐"];
-                    } else if (planValue == "3") {
-                        periodNames = restoId === 1 ? ["早餐", "午茶", "晚餐"] : ["早午餐", "晚餐"];
+                });
+            restoSelect.addEventListener("change", function () {
+                const restoId = Number(this.value);
+                if (!restoId) {
+                    autoAssignResult.textContent = "";
+                    return;
+                }
+                // 取得入住/退房/人數/方案
+                const checkInDate = document.getElementById("checkInDate").value;
+                const checkOutDate = document.getElementById("checkOutDate").value;
+                const plan = planValue;
+                // 專案人數：動態加總所有房型明細的入住人數
+                let projectPeople = 0;
+                document.querySelectorAll('#orderDetailList select[name$=".numberOfPeople"]').forEach(select => {
+                    projectPeople += Number(select.value) || 0;
+                });
+                if (!checkInDate || !checkOutDate || !projectPeople) {
+                    autoAssignResult.textContent = "請先選擇入住/退房與人數";
+                    autoAssignResult.className = "autoAssignResult text-danger";
+                    return;
+                }
+                // 呼叫 API
+                fetch(`/admin/roomo_info/auto_assign_meal`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `restoId=${restoId}&numOfPeople=${projectPeople}&checkInDate=${checkInDate}&checkOutDate=${checkOutDate}&projectPlan=${plan}`
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        autoAssignResult.textContent = "可預約";
+                        autoAssignResult.className = "autoAssignResult text-success";
+                    } else {
+                        autoAssignResult.textContent = data.message || "有日期/時段無法預約";
+                        autoAssignResult.className = "autoAssignResult text-danger";
                     }
-                    fetch(`/admin/roomo_info/resto_periods?restoId=${restoId}`)
-                        .then(res => res.json())
-                        .then(periods => {
-                            const matchedPeriods = periods.filter(p => periodNames.includes(p.periodName));
-                            if (!matchedPeriods.length) return;
-                            const timeslotPromises = matchedPeriods.map(period =>
-                                fetch(`/admin/roomo_info/resto_timeslot?restoId=${restoId}&periodId=${period.periodId}`)
-                                    .then(res => res.json())
-                            );
-                            Promise.all(timeslotPromises).then(timeslotArrays => {
-                                const allTimeslots = timeslotArrays.flat();
-                                timeslotSelect.innerHTML = '<option value="">請選擇時段</option>';
-                                allTimeslots.forEach(ts => {
-                                    const opt = document.createElement("option");
-                                    opt.value = ts.timeslotId;
-                                    const periodName = ts.periodVO && ts.periodVO.periodName ? ts.periodVO.periodName : "";
-                                    opt.textContent = periodName + ' ' + ts.timeslotName;
-                                    timeslotSelect.appendChild(opt);
-                                });
-                                timeslotSelect.disabled = allTimeslots.length === 0;
-                            });
-                        });
+                })
+                .catch(() => {
+                    autoAssignResult.textContent = "查詢失敗";
+                    autoAssignResult.className = "autoAssignResult text-danger";
                 });
             });
         }
@@ -1329,7 +1317,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     totalPeople += Number(select.value) || 0;
                 });
                 // 將專案區塊的人數 input 設為總和且 readonly
-                const projectPeopleInputs = restoProjectArea.querySelectorAll('.projectPeopleInput');
+                const projectPeopleInputs = document.querySelectorAll('.projectPeopleInput');
                 projectPeopleInputs.forEach(input => {
                     input.value = totalPeople;
                     input.readOnly = true;

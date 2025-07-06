@@ -20,6 +20,11 @@ import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.stream.Collectors;
+import com.resto.model.ReservationService;
+import com.resto.model.TimeslotService;
+import com.resto.dto.RestoOrderFromRoomDTO;
+import com.resto.entity.TimeslotVO;
+import com.resto.integration.room.RoomOrderTxService;
 
 @Controller
 @RequestMapping("/member/order")
@@ -35,7 +40,13 @@ public class RoomOrderFrontController {
     @Autowired
     private RoomTypeService roomTypeService;
     @Autowired
-	private RoomTypeScheduleService roomScheduleService;
+    private RoomTypeScheduleService roomScheduleService;
+    @Autowired
+    private ReservationService reservationService;
+    @Autowired
+    private TimeslotService timeslotService;
+    @Autowired
+    private RoomOrderTxService roomOrderTxService;
 
     // 會員訂單列表
     @GetMapping("/roomOrder")
@@ -80,20 +91,18 @@ public class RoomOrderFrontController {
             model.addAttribute("errorMessage", "查無此訂單");
             return "front-end/room/roomOrderEditModal :: editModalContent";
         }
-        // 只允許更新特殊需求、房客代表（不允許更新入住日、退房日）
-        // oldOrder.setCheckInDate(roomOrder.getCheckInDate());
-        // oldOrder.setCheckOutDate(roomOrder.getCheckOutDate());
+        // 取得舊明細
+        List<RoomOList> oldDetails = roomOListService.findByRoomOrderId(oldOrder.getRoomOrderId());
+        oldOrder.setOrderDetails(oldDetails);
+        System.out.println("✅ 舊明細：" + oldDetails);
 
         // 更新明細的特殊需求（多筆）
         if (roomOrder.getOrderDetails() != null && !roomOrder.getOrderDetails().isEmpty()) {
             List<RoomOList> newDetails = roomOrder.getOrderDetails();
-            List<RoomOList> oldDetails = oldOrder.getOrderDetails();
             System.out.println("✅ 舊明細：" + oldDetails);
-        
             if (oldDetails != null && !oldDetails.isEmpty()) {
                 Map<Integer, RoomOList> oldDetailMap = oldDetails.stream()
-                    .collect(Collectors.toMap(RoomOList::getRoomOrderListId, d -> d));
-        
+                        .collect(Collectors.toMap(RoomOList::getRoomOrderListId, d -> d));
                 for (RoomOList newDetail : newDetails) {
                     RoomOList oldDetail = oldDetailMap.get(newDetail.getRoomOrderListId());
                     if (oldDetail != null) {
@@ -125,8 +134,10 @@ public class RoomOrderFrontController {
         RoomOrder order = roomOrderService.getById(roomOrderId);
         List<RoomOList> details = roomOListService.findByRoomOrderId(roomOrderId);
 
-        // 取消餐廳訂單
-        restoOrderService.cancelByRoomOrderId(roomOrderId);
+        if (order.getProjectAddOn() == 1) {
+            // 取消餐廳訂單
+            restoOrderService.cancelByRoomOrderId(roomOrderId);
+        }
 
         // 取消住宿訂單
         if (details.size() > 0) {
@@ -159,24 +170,38 @@ public class RoomOrderFrontController {
     }
 
     // 搜尋可預訂房間數量
-	@GetMapping("/roomOrder/{roomTypeId}/check_schedule")
-	@ResponseBody
-	public Integer getRoomInventoryRange(@PathVariable Integer roomTypeId,
-			@RequestParam String start,
-			@RequestParam String end) {
-		java.sql.Date startDate = java.sql.Date.valueOf(start);
-		java.sql.Date endDate = java.sql.Date.valueOf(end);
+    @GetMapping("/roomOrder/{roomTypeId}/check_schedule")
+    @ResponseBody
+    public Integer getRoomInventoryRange(@PathVariable Integer roomTypeId,
+            @RequestParam String start,
+            @RequestParam String end) {
+        java.sql.Date startDate = java.sql.Date.valueOf(start);
+        java.sql.Date endDate = java.sql.Date.valueOf(end);
 
-		RoomTypeVO roomType = roomTypeService.getOneRoomType(roomTypeId);
-		List<RoomTypeScheduleVO> schedules = roomScheduleService
-            .findSchedules(roomType, startDate, endDate);
+        RoomTypeVO roomType = roomTypeService.getOneRoomType(roomTypeId);
+        List<RoomTypeScheduleVO> schedules = roomScheduleService
+                .findSchedules(roomType, startDate, endDate);
 
-		// 找區間內的最少可訂
-		int minRemaining = schedules.stream()
-				.mapToInt(s -> s.getRoomAmount() - s.getRoomRSVBooked())
-				.min()
-				.orElse(0);
+        // 找區間內的最少可訂
+        int minRemaining = schedules.stream()
+                .mapToInt(s -> s.getRoomAmount() - s.getRoomRSVBooked())
+                .min()
+                .orElse(0);
 
-		return minRemaining;
-	}
+        return minRemaining;
+    }
+
+    // 查詢餐廳時段剩餘名額（轉發 ReservationController 的 API）
+    @GetMapping("/roomOrder/meal/remaining")
+    @ResponseBody
+    public Integer getMealRemaining(@RequestParam Integer restoId,
+            @RequestParam Integer timeslotId,
+            @RequestParam String date) {
+        // 這裡直接呼叫 reservationService.getRemaining
+        // 需將 date 轉為 LocalDate
+        java.time.LocalDate localDate = java.time.LocalDate.parse(date);
+        int remaining = reservationService.getRemaining(restoId, timeslotId, localDate);
+        return remaining;
+    }
+
 }
