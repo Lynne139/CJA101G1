@@ -50,7 +50,7 @@ public class RoomOrder {
     @JoinColumn(name = "COUPON_CODE",referencedColumnName = "coupon_code")
     private Coupon coupon;
 
-    @Column(name = "DISCOUNT_AMOUNT")
+    @Column(name = "DISCOUNT_AMOUNT", columnDefinition = "INT DEFAULT 0")
     private Integer discountAmount;
 
     @NotNull(message = "實際支付金額不可為空")
@@ -189,8 +189,7 @@ public class RoomOrder {
     }
 
     public List<RoomOList> getOrderDetails() {
-        // 保證永遠不會回傳 null
-        return orderDetails == null ? new ArrayList<>() : orderDetails;
+        return orderDetails;
     }
     public void setOrderDetails(List<RoomOList> orderDetails) {
         this.orderDetails = orderDetails;

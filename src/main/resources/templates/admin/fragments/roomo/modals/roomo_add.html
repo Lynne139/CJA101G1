@@ -95,10 +95,10 @@
                     <input type="text" name="orderDetails[0].specialReq" class="form-control" maxlength="50">
                   </div>
                 </div>
-                <div class="text-end mt-2">
+                <!-- <div class="text-end mt-2">
                   <button type="button" class="btn btn-danger remove-detail-btn"
                     th:attr="data-id=${detail?.roomOrderListId}">移除</button>
-                </div>
+                </div> -->
 
               </div>
             </div>
@@ -193,14 +193,14 @@
             </div>
 
             <!-- 最後更新人 -->
-            <div class="mb-3">
+            <!-- <div class="mb-3">
               <label for="employee" class="form-label">最後更新人</label>
-              <select th:field="*{employee}" id="employee" class="form-select">
-                <option value="1">SYSTEM</option>
-                <option th:each="emp : ${employeeList}" th:value="${emp.employeeId}" th:text="${emp.employeeName}">
-                </option>
-              </select>
-            </div>
+              <div>
+                <span th:text="${session.employeeJobTitle != null ? session.employeeJobTitle : '未知職稱'}">未知職稱</span>：
+                <span th:text="${session.currentEmployee != null ? session.currentEmployee.name : 'Admin'}">Admin</span>
+              </div>
+              <input type="hidden" id="employeeId" name="employeeId" th:value="${session.currentEmployee != null ? session.currentEmployee.employeeId : 1}" />
+            </div> -->
 
             <div class="modal-footer">
 
