@@ -28,6 +28,7 @@
 @import url(./admin/pages/resto_timeslot.css);
 @import url(./admin/pages/resto_order.css);
 @import url(./admin/pages/resto_order_today.css);
+@import url(./admin/pages/resto_reservation.css);
 
 /* === room === */
 @import url(./admin/room/roomTypeSchedule.css);

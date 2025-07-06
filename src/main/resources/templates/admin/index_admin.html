@@ -101,7 +101,7 @@
 					        <a th:href="@{/admin/resto_info}" th:classappend="${currentURI == '/admin/resto_info'} ? '-active'" class="sidebar_sub_link">餐廳資訊</a>
 					        <a th:href="@{/admin/resto_timeslot}" th:classappend="${currentURI == '/admin/resto_timeslot'} ? '-active'" class="sidebar_sub_link">時段管理</a>
 					        <a th:href="@{/admin/resto_order}" th:classappend="${currentURI == '/admin/resto_order'} ? '-active'" class="sidebar_sub_link">訂單管理</a>
-					        <a th:href="@{/admin/resto_reservation}" th:classappend="${currentURI == '/admin/resto_reservation'} ? '-active'" class="sidebar_sub_link">預約統計</a>
+					        <a th:href="@{/admin/resto_reservation}" th:classappend="${currentURI == '/admin/resto_reservation'} ? '-active'" class="sidebar_sub_link">預定表</a>
 					        <a th:href="@{/admin/resto_order_today}" th:classappend="${currentURI == '/admin/resto_order_today'} ? '-active'" class="sidebar_sub_link">今日訂位</a>
 			      		</div>
 			    	</div>
@@ -211,6 +211,9 @@
         
 		<script th:if="${mainFragment == 'admin/fragments/resto/restoOrderToday'}"
         th:src="@{/js/admin/resto/resto_order_today.js}"></script>
+
+		<script th:if="${mainFragment == 'admin/fragments/resto/restoReservation'}"
+        th:src="@{/js/admin/resto/resto_reservation.js}"></script>
  
         
         <!-- 房間 -->

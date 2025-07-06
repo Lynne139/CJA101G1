@@ -55,6 +55,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 	
   }
+  $(window).on('resize', function () {
+              $('#restoOrderTable').DataTable().columns.adjust();
+    });
 
 
   // ===== 清空複合查詢欄位 =====

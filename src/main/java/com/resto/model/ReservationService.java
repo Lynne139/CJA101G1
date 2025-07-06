@@ -1,13 +1,20 @@
 package com.resto.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.resto.dto.RestoRsvtRow;
 import com.resto.entity.RestoReservationVO;
 import com.resto.entity.TimeslotVO;
+import com.resto.utils.RestoRsvtCriteriaHelper;
 import com.resto.utils.exceptions.OverbookingException;
 
 import jakarta.persistence.EntityManager;
@@ -20,10 +27,17 @@ public class ReservationService {
     private EntityManager em;
     
     @Autowired
-    private ReservationRepository reservationRepository;
+    ReservationRepository reservationRepository;
     @Autowired
-    private RestoRepository restoRepository;
+    RestoRepository restoRepository;
+    @Autowired
+    TimeslotRepository timeslotRepository;
     
+    // 複合查詢（Criteria 結構）
+    @Transactional(readOnly = true)
+    public List<RestoReservationVO> compositeQuery(Map<String, String[]> paramMap) {
+        return RestoRsvtCriteriaHelper.getAll(paramMap, em);
+    } 
     
     
     
@@ -33,11 +47,6 @@ public class ReservationService {
     public int refreshSeatsTotal(Integer restoId, int newTotal) {
         return reservationRepository.updateSeatsTotalByResto(restoId, newTotal);
     }
-    
-    
-    
-    
-
     
     //取出、建立當天預約vo
     @Transactional
@@ -121,7 +130,7 @@ public class ReservationService {
     }
     
     
-    
+   
     
     
     

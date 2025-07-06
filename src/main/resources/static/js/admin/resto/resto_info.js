@@ -46,6 +46,9 @@ document.addEventListener("DOMContentLoaded", function () {
       info: true,
     });
   }
+  $(window).on('resize', function () {
+              $('#restoTable').DataTable().columns.adjust();
+    });
 
 
   // ===== 清空複合查詢欄位 =====

@@ -77,7 +77,7 @@ public class RestoOrderVO{
 	
 	@Size(max = 500, message = "備註敘述請勿超過500字")
 	@Column(name = "regi_req")
-	private String regiReq = "無";
+	private String regiReq;
 	
 	// 歷史訂單快照
 	@Column(name = "snapshot_resto_name")

@@ -2,6 +2,7 @@ package com.resto.model;
 
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,6 +21,10 @@ public interface ReservationRepository extends JpaRepository<RestoReservationVO,
 	findByRestoVO_RestoIdAndReserveDateAndReserveTimeslotVO_TimeslotId(
 	        Integer restoId, LocalDate date, Integer timeslotId);
 	
+	// 指定餐廳+日期+時段的資料是否存在
+	boolean existsByRestoVO_RestoIdAndReserveDateAndReserveTimeslotVO_TimeslotId(
+            Integer restoId, LocalDate date, Integer timeslotId);
+	
 	
 	// 預約表的餐廳容納人數隨餐廳的編輯更新
 	@Modifying
@@ -32,6 +37,11 @@ public interface ReservationRepository extends JpaRepository<RestoReservationVO,
 	int updateSeatsTotalByResto(@Param("restoId") Integer restoId,
 	                             @Param("newTotal") Integer newTotal);
 
+	
+	
+
+	
+	
 	
 	
 	

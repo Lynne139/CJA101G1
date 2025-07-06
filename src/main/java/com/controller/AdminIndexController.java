@@ -48,9 +48,11 @@ import com.resto.dto.RestoDTO;
 import com.resto.dto.RestoOrderDTO;
 import com.resto.dto.RestoOrderSummaryDTO;
 import com.resto.entity.PeriodVO;
+import com.resto.entity.RestoReservationVO;
 import com.resto.entity.RestoVO;
 import com.resto.entity.TimeslotVO;
 import com.resto.model.PeriodService;
+import com.resto.model.ReservationService;
 import com.resto.model.RestoOrderService;
 import com.resto.model.RestoService;
 import com.resto.model.TimeslotService;
@@ -79,6 +81,8 @@ public class AdminIndexController {
 	TimeslotService timeslotService;
 	@Autowired
 	RestoOrderService restoOrderService;
+	@Autowired
+	ReservationService reservationService;
 	
 	@Autowired
 	ProdService prodSvc;
@@ -456,7 +460,7 @@ public class AdminIndexController {
             model.addAttribute("selectedResto", selectedResto);
             model.addAttribute("selectedRestoId", restoId);
             
-         // 該餐廳的所有區段（period）與時段（timeslot）
+            // 該餐廳的所有區段（period）與時段（timeslot）
             List<PeriodVO> periodList = periodService.getPeriodsByRestoId(restoId);
             List<TimeslotVO> timeslotList = timeslotService.getTimeslotsByRestoId(restoId);
             model.addAttribute("periodList", periodList);
@@ -528,15 +532,30 @@ public class AdminIndexController {
     } 
     
     @GetMapping("/resto_reservation")
-    public String restoReservation(HttpServletRequest request,Model model) {
+    public String restoReservation(HttpServletRequest request,
+    							   HttpServletResponse response,
+    							   Model model) {
 
-    	
-    	
-    	
     	String mainFragment = "admin/fragments/resto/restoReservation";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 
+    	// 複合查詢 + Datatables
+    	Map<String, String[]> paramMap = request.getParameterMap();
+        List<RestoReservationVO> restoRsvtList = reservationService.compositeQuery(paramMap);
+    	model.addAttribute("restoRsvtList", restoRsvtList);
+    	
+    	// 把所有餐廳都傳給下拉選單使用
+        List<RestoVO> restoList = restoService.getAll();
+        model.addAttribute("restoList", restoList);
+        
+        
+        // 讓複合查詢欄位保持原值（用於 th:selected / th:value）
+        for (String key : paramMap.keySet()) {
+            model.addAttribute(key, paramMap.get(key)[0]);
+        }
+        
+    	
     	return "admin/index_admin";
 
     } 
@@ -577,8 +596,6 @@ public class AdminIndexController {
         	}
         	
 
-
-        	
         	// 軟刪除的餐廳只讀
             RestoVO Urlresto = restoService.getById(restoId);
         	boolean readonly = Urlresto.getIsDeleted();  
