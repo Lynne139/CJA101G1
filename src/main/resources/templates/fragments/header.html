@@ -81,6 +81,16 @@
 	    justify-content: center;
 	    animation: pulse 2s infinite;
 	}
+	
+	.btn-outline-coffee {
+    color: #7E4E24;
+    border: 1px solid #7E4E24;
+  }
+
+  .btn-outline-coffee:hover {
+    background-color: #7E4E24;
+    color: #ffffff;
+  }
   </style>
   <a th:href="@{/}" class="fw-bold text-brown text-decoration-none" style="cursor: pointer;">Maison d'Yuko</a>
     <div class="menu-img-div">
@@ -112,8 +122,8 @@
 		<div th:if="${loggedInMember != null}">
 			<span class="mx-1"></span>
 		    <span th:text="'歡迎，' + ${loggedInMember.memberName} + '！'" class="me-2" style="color: #7E4E24;"></span>
-		    <a th:href="@{/member/center}" class="btn btn-outline-primary btn-sm me-2">會員中心</a>
-		    <a th:href="@{/member/logout}" class="btn btn-link p-0 m-0 text-dark text-decoration-none" style="color: #7E4E24 !important;">
+		    <a th:href="@{/member/center}" class="btn btn-outline-coffee btn-sm me-2">會員中心</a>
+		    <a th:href="@{/member/logout}" class="btn btn-outline-coffee btn-sm me-2">
 		        會員登出
 		    </a>
 		</div>
