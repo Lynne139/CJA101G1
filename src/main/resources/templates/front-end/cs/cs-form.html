@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>聯絡客服 - Maison d'Yuko</title>
+
+  <!-- ✅ global CSS -->
+  <link rel="stylesheet" th:href="@{/homepage/vendor/bootstrap/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" integrity="sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- ✅ main CSS -->
+  <style>
+    /* 客服表單頁面專用樣式 */
+    .cs-form-section { padding: 60px 0; background: #fdf6ef; min-height: 80vh; }
+    .cs-form-container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+    .cs-form-header { text-align: center; margin-bottom: 40px; }
+    .cs-form-title { font-size: 2.5rem; color: #8B4513; margin-bottom: 10px; }
+    .cs-form-subtitle { font-size: 1.1rem; color: #666; margin-bottom: 30px; line-height: 1.6; }
+    
+    /* 表單容器 - 修正居中問題 */
+    .form-container { background: white; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; margin: 0 auto; width: 100%; }
+    
+    /* 表單標題欄 */
+    .form-header { background: linear-gradient(135deg, #8B4513, #d4a574); color: white; padding: 25px; text-align: center; font-size: 1.3rem; font-weight: 600; }
+    
+    /* 表單內容區域 */
+    .form-content { padding: 40px; }
+    
+    /* 表單群組 */
+    .form-group { margin-bottom: 25px; }
+    .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 1rem; }
+    .form-label.required::after { content: " *"; color: #e74c3c; }
+    
+    /* 表單控制項 */
+    .form-control { width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; outline: none; transition: all 0.3s ease; font-family: inherit; }
+    .form-control:focus { border-color: #8B4513; box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25); }
+    .form-control.error { border-color: #e74c3c; box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25); }
+    
+    /* 文本域 */
+    .form-textarea { min-height: 120px; resize: vertical; font-family: inherit; }
+    
+    /* 錯誤訊息 */
+    .error-message { color: #e74c3c; font-size: 0.9rem; margin-top: 5px; display: none; }
+    
+    /* 字數計數器 */
+    .char-counter { font-size: 0.85rem; color: #666; text-align: right; margin-top: 5px; }
+    .char-counter.warning { color: #f39c12; }
+    .char-counter.error { color: #e74c3c; }
+    
+    /* 提交按鈕 */
+    .submit-btn { background: #8B4513; color: white; border: none; padding: 15px 40px; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: block; margin: 0 auto; min-width: 150px; }
+    .submit-btn:hover:not(:disabled) { background: #6d3410; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3); }
+    .submit-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+    
+    /* 載入動畫 */
+    .loading { display: none; text-align: center; padding: 20px; }
+    .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #8B4513; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    /* 成功訊息 */
+    .success-message { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px; margin-bottom: 20px; display: none; }
+    
+    /* 錯誤訊息 */
+    .error-alert { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 8px; padding: 15px; margin-bottom: 20px; display: none; }
+    
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .cs-form-title { font-size: 2rem; }
+      .form-content { padding: 25px; }
+      .submit-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ header -->
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <!-- ✅ 子選單 Navbar -->
+  <nav class="sub-navbar d-flex justify-content-center align-items-center">
+    <ul class="nav">
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">關於嶼蔻</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" th:href="@{/front-end/about/brand-story}">品牌故事</a></li>
+          <li><a class="dropdown-item" th:href="@{/front-end/about/environment}">環境簡介</a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">最新消息</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" th:href="@{/news/notice}">最新公告</a></li>
+          <li><a class="dropdown-item" th:href="@{/news/promotion}">活動通知</a></li>
+          <li><a class="dropdown-item" th:href="@{/news/news}">媒體報導</a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="javascript:void(0);" tabindex="0">探索嶼蔻</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">珍饈美饌</a></li>
+          <li><a class="dropdown-item" th:href="@{/facilities}">多元設施</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a class="nav-link" href="#rooms">精緻客房</a></li>
+      <li class="nav-item"><a class="nav-link" th:href="@{/traffic}">交通資訊</a></li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle active" href="javascript:void(0);" tabindex="0">聯絡我們</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item active" th:href="@{/contact}">聯絡客服</a></li>
+          <li><a class="dropdown-item" th:href="@{/chatbot}">智慧客服</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a class="nav-link" href="#faq">常見問題</a></li>
+    </ul>
+  </nav>
+
+  <!-- ✅ Sticky 右側按鈕 -->
+  <div class="sticky-icons d-none d-lg-block">
+    <a href="#"><img th:src="@{/images/icon/bed.svg}" alt="bed" class="icon"/><br>線上訂房</a>
+    <a th:href="@{/front-end/shop}"><img th:src="@{/images/icon/bag.svg}" alt="bag" class="icon"/><br>帳號選物</a>
+    <a href="#"><img th:src="@{/images/icon/dish.svg}" alt="dish" class="icon"/><br>餐廳訂位</a>
+  </div>
+
+  <!-- ✅ Main Content -->
+  <section class="cs-form-section">
+    <div class="cs-form-container">
+      
+      <!-- 頁面標題 -->
+      <div class="cs-form-header">
+        <h1 class="cs-form-title">聯絡客服</h1>
+        <p class="cs-form-subtitle">
+          有任何問題或建議嗎？歡迎留言給我們！<br>
+          我們會盡快為您處理，並以電子郵件回覆您。
+        </p>
+      </div>
+
+      <!-- 表單容器 -->
+      <div class="form-container">
+        
+        <!-- 表單標題欄 -->
+        <div class="form-header">
+          <div>客服留言表單</div>
+        </div>
+
+        <!-- 表單內容區域 -->
+        <div class="form-content">
+          
+          <!-- 成功訊息 -->
+          <div class="success-message" id="successMessage">
+            <strong>留言已成功送出！</strong><br>
+            我們已收到您的留言，將會盡快為您處理並回覆。
+          </div>
+          
+          <!-- 錯誤訊息 -->
+          <div class="error-alert" id="errorMessage">
+            <strong>留言送出失敗！</strong><br>
+            <span id="errorText">請稍後再試或聯繫客服人員。</span>
+          </div>
+
+          <!-- 客服留言表單 -->
+          <form id="csForm">
+            
+            <!-- 隱藏的會員ID -->
+            <input type="hidden" id="memberId" th:value="${memberId}">
+            
+            <!-- 客戶名稱 -->
+            <div class="form-group">
+              <label for="customerName" class="form-label">名稱</label>
+              <input type="text" 
+                     class="form-control" 
+                     id="customerName" 
+                     name="customerName" 
+                     maxlength="50" 
+                     th:value="${memberName}" 
+                     placeholder="請輸入您的名稱">
+              <div class="error-message" id="customerNameError">名稱長度不能超過50字</div>
+            </div>
+
+            <!-- 客戶信箱 -->
+            <div class="form-group">
+              <label for="email" class="form-label required">電子信箱</label>
+              <input type="email" 
+                     class="form-control" 
+                     id="email" 
+                     name="email" 
+                     maxlength="50" 
+                     th:value="${memberEmail}" 
+                     placeholder="請輸入您的電子信箱">
+              <div class="error-message" id="emailError">請輸入有效的電子信箱</div>
+            </div>
+
+            <!-- 留言內容 -->
+            <div class="form-group">
+              <label for="message" class="form-label required">留言內容</label>
+              <textarea class="form-control form-textarea" 
+                        id="message" 
+                        name="message" 
+                        maxlength="1500" 
+                        placeholder="請詳細描述您的問題或建議..."></textarea>
+              <div class="char-counter" id="charCounter">0 / 1500</div>
+              <div class="error-message" id="messageError">請輸入留言內容</div>
+            </div>
+
+            <!-- 提交按鈕 -->
+            <button type="submit" class="submit-btn" id="submitBtn">
+              送出留言
+            </button>
+
+            <!-- 載入動畫 -->
+            <div class="loading" id="loading">
+              <div class="loading-spinner"></div>
+              <span style="margin-left: 10px;">處理中...</span>
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ✅ Overlay Full Menu -->
+  <div class="overlay-menu" id="overlayMenu">
+    <div class="overlay-menu-header d-flex justify-content-between align-items-start">
+      <div class="overlay-mobile-menu d-flex justify-content-between align-items-center p-3">
+        <div class="mb-menu-header">Maison d'Yuko</div>
+      </div>
+      <div class="overlay-logo-contact mb-5">
+        <img th:src="@{/images/logo/logo_hp.png}" alt="logo" class="overlay-logo mb-3" />
+        <div class="overlay-title">嶼蔻渡假村 Maison d'Yuko</div>
+        <div class="overlay-contact">
+          <div>+886-7-123-4567</div>
+          <div>service@maisondyuko.com</div>
+        </div>
+      </div>
+      <div class="close-btn" id="menuClose">&times;</div>
+    </div>
+    <div class="overlay-center">
+      <div class="overlay-menu-member px-5 mb-5 d-flex justify-content-center">
+        <img th:src="@{/images/icon/member.svg}" alt="member" class="text-center" style="padding:0 5px"/>
+        <a href="#" class="text-center">會員登入</a>
+      </div>
+      <div class="px-5 mb-5 d-flex justify-content-between">
+        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_bed.svg}" alt="bed" class="menu-icon"/><br>線上訂房</a>
+        <a th:href="@{/front-end/shop}" class="text-center"><img th:src="@{/images/icon/menu_bag.svg}" alt="bag" class="menu-icon"/><br>帳號選物</a>
+        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_dish.svg}" alt="dish" class="menu-icon"/><br>餐廳訂位</a>
+      </div>
+      <div class="overlay-menu-row d-flex justify-content-center">
+        <div class="overlay-menu-col">
+          <h5>關於嶼蔻</h5>
+          <a href="#">品牌故事</a>
+          <a href="#">環境簡介</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>最新消息</h5>
+          <a th:href="@{/news/notice}">最新公告</a>
+          <a th:href="@{/news/promotion}">活動通知</a>
+          <a th:href="@{/news/news}">媒體報導</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>探索嶼蔻</h5>
+          <a href="#">珍饈美饌</a>
+          <a th:href="@{/facilities}">豐富設施</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>精緻客房</h5>
+          <a href="#">蔻香居</a>
+          <a href="#">海音居</a>
+          <a href="#">晨曦之庭</a>
+          <a href="#">月影行館</a>
+        </div>
+        <div class="overlay-menu-col">
+          <h5>其他</h5>
+          <a href="#">交通資訊</a>
+          <a href="#">聯絡我們</a>
+          <a href="#">常見問題</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ footer -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
+
+  <!-- ✅ global JS -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- ✅ Main JS -->
+  <script>
+    // 表單相關變數
+    let isSubmitting = false;
+    
+    // 表單元素
+    const csForm = $('#csForm');
+    const customerNameInput = $('#customerName');
+    const emailInput = $('#email');
+    const messageInput = $('#message');
+    const submitBtn = $('#submitBtn');
+    const loading = $('#loading');
+    const successMessage = $('#successMessage');
+    const errorMessage = $('#errorMessage');
+    const charCounter = $('#charCounter');
+
+    // 初始化
+    $(document).ready(function() {
+      initializeEventHandlers();
+      updateCharCounter();
+      
+      const memberId = $('#memberId').val();
+    });
+
+    // 初始化事件處理器
+    function initializeEventHandlers() {
+      // Menu 收合功能
+      $('#menuToggle').on('click', function () {
+        $('#overlayMenu').addClass('active');
+      });
+      $('#menu-Toggle').on('click', function () {
+        $('#overlayMenu').addClass('active');
+      });
+      $('#menuClose').on('click', function () {
+        $('#overlayMenu').removeClass('active');
+      });
+
+      // 表單提交
+      csForm.on('submit', function(e) {
+        e.preventDefault();
+        submitForm();
+      });
+
+      // 即時驗證
+      customerNameInput.on('blur', function() {
+        validateCustomerName();
+      });
+
+      emailInput.on('blur', function() {
+        validateEmail();
+      });
+
+      messageInput.on('input', function() {
+        updateCharCounter();
+      });
+
+      messageInput.on('blur', function() {
+        validateMessage();
+      });
+
+      // 清除錯誤狀態
+      $('.form-control').on('input', function() {
+        clearFieldError($(this));
+      });
+    }
+
+    // 提交表單
+    function submitForm() {
+      if (isSubmitting) return;
+
+      // 隱藏之前的訊息
+      hideMessages();
+
+      // 驗證表單
+      if (!validateForm()) {
+        return;
+      }
+
+      // 準備資料
+      const formData = {
+        memberId: $('#memberId').val() || null,
+        customerName: customerNameInput.val().trim(),
+        email: emailInput.val().trim(),
+        message: messageInput.val().trim()
+      };
+
+      // 顯示載入狀態
+      showLoading();
+
+      // 發送AJAX請求
+      $.ajax({
+        url: '/api/cs',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(formData),
+        timeout: 10000,
+        success: function(response) {
+       		alert('您的留言已成功送出，我們將盡快回覆您。');
+           	window.location.href = '/home';
+        },
+        error: function(xhr, status, error) {
+          let errorText = '請稍後再試或聯繫客服人員。';
+          
+          if (status === 'timeout') {
+            errorText = '請求超時，請稍後再試。';
+          } else if (xhr.status === 400) {
+            errorText = '資料格式錯誤，請檢查輸入內容。';
+          } else if (xhr.status === 500) {
+            errorText = '伺服器錯誤，請稍後再試。';
+          }
+          
+          showError(errorText);
+          console.error('提交留言錯誤:', error);
+        },
+        complete: function() {
+          hideLoading();
+        }
+      });
+    }
+
+    // 驗證表單
+    function validateForm() {
+      let isValid = true;
+
+      if (!validateCustomerName()) isValid = false;
+      if (!validateEmail()) isValid = false;
+      if (!validateMessage()) isValid = false;
+
+      return isValid;
+    }
+
+    // 驗證名稱 (修改為選填)
+    function validateCustomerName() {
+      const name = customerNameInput.val().trim();
+      
+      // 名稱為選填，但如果有填寫則檢查長度
+      if (name && name.length > 50) {
+        showFieldError(customerNameInput, '名稱長度不能超過50字');
+        return false;
+      }
+      
+      clearFieldError(customerNameInput);
+      return true;
+    }
+
+    // 驗證電子信箱
+    function validateEmail() {
+      const email = emailInput.val().trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      if (!email) {
+        showFieldError(emailInput, '請輸入電子信箱');
+        return false;
+      }
+      
+      if (!emailRegex.test(email)) {
+        showFieldError(emailInput, '請輸入有效的電子信箱格式');
+        return false;
+      }
+      
+      if (email.length > 50) {
+        showFieldError(emailInput, '電子信箱長度不能超過50字');
+        return false;
+      }
+      
+      clearFieldError(emailInput);
+      return true;
+    }
+
+    // 驗證留言內容
+    function validateMessage() {
+      const message = messageInput.val().trim();
+      
+      if (!message) {
+        showFieldError(messageInput, '請輸入留言內容');
+        return false;
+      }
+      
+      if (message.length > 1500) {
+        showFieldError(messageInput, '留言內容不能超過1500字');
+        return false;
+      }
+      
+      clearFieldError(messageInput);
+      return true;
+    }
+
+    // 顯示欄位錯誤
+    function showFieldError(field, message) {
+      field.addClass('error');
+      const errorId = field.attr('id') + 'Error';
+      $('#' + errorId).text(message).show();
+    }
+
+    // 清除欄位錯誤
+    function clearFieldError(field) {
+      field.removeClass('error');
+      const errorId = field.attr('id') + 'Error';
+      $('#' + errorId).hide();
+    }
+
+    // 更新字數計數器
+    function updateCharCounter() {
+      const length = messageInput.val().length;
+      const maxLength = 1500;
+      
+      charCounter.text(length + ' / ' + maxLength);
+      
+      // 根據字數變色
+      if (length > maxLength * 0.9) {
+        charCounter.removeClass('warning').addClass('error');
+      } else if (length > maxLength * 0.8) {
+        charCounter.removeClass('error').addClass('warning');
+      } else {
+        charCounter.removeClass('warning error');
+      }
+    }
+
+    // 顯示載入狀態
+    function showLoading() {
+      isSubmitting = true;
+      submitBtn.prop('disabled', true).text('送出中...');
+      loading.show();
+    }
+
+    // 隱藏載入狀態
+    function hideLoading() {
+      isSubmitting = false;
+      submitBtn.prop('disabled', false).text('送出留言');
+      loading.hide();
+    }
+
+    // 顯示錯誤訊息
+    function showError(message) {
+      $('#errorText').text(message);
+      errorMessage.fadeIn();
+      
+      // 5秒後自動隱藏
+      setTimeout(function() {
+        errorMessage.fadeOut();
+      }, 5000);
+    }
+
+    // 隱藏所有訊息
+    function hideMessages() {
+      successMessage.hide();
+      errorMessage.hide();
+    }
+
+  </script>
+</body>
+</html>

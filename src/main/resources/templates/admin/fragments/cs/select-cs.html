@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>查詢客服留言</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" th:href="@{/css/all_admin.css}">
+    <style>
+        :root { --color-background: #F4EDE1; --color-primary: #7E4E24; --color-secondary: #B88D67; --color-tertiary: #9D3C3C; --color-accent: #FF7449; --color-black: #000000; --color-white: #FFFFFF; --color-success: #55AE6E; --color-error: #E96060; --color-bg-panel: #ffffff52; --panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); --hover-opacity: 80%; }
+        body { background-color: var(--color-background); color: var(--color-primary); }
+        .pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+        .pagination-info { color: var(--color-secondary); }
+        .card { background: var(--color-bg-panel); border: 1px solid var(--color-primary); box-shadow: var(--panel-shadow); }
+        .card-header { background: transparent; border-bottom: 1px solid var(--color-primary); color: var(--color-primary); }
+        .form-control { background-color: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); }
+        .form-control:focus { background-color: transparent; color: var(--color-primary); border-color: var(--color-accent); box-shadow: 0 0 4px 0 var(--color-accent); }
+        .form-control::placeholder { color: var(--color-secondary); }
+        .form-label { color: var(--color-primary); }
+        .input-group-text { background-color: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); }
+        .btn-outline-primary { color: var(--color-primary); border-color: var(--color-primary); background-color: transparent; }
+        .btn-outline-primary:hover { color: var(--color-white); background-color: var(--color-primary); border-color: var(--color-primary); opacity: var(--hover-opacity); }
+        .btn-success { background-color: var(--color-accent); border-color: var(--color-accent); color: var(--color-white); font-size: 1em; }
+        .btn-success:hover { background-color: var(--color-accent); border-color: var(--color-accent); color: var(--color-white); opacity: var(--hover-opacity); }
+        .table { --bs-table-bg: transparent; color: var(--color-primary); }
+        .table-bordered { --bs-table-border-color: var(--color-primary); }
+        .table thead th { color: var(--color-primary); background-color: transparent; border: 1px solid var(--color-primary); text-align: center; vertical-align: middle; }
+        .table tbody td { color: var(--color-primary); }
+        .text-danger { color: var(--color-error) !important; }
+        .pagination .page-link { background-color: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); }
+        .pagination .page-item.active .page-link { background-color: var(--color-accent); border-color: var(--color-accent); color: var(--color-white); }
+        .pagination .page-item:hover .page-link { opacity: var(--hover-opacity); }
+        .pagination .page-item.disabled .page-link { opacity: 0.3; pointer-events: none; }
+        .datetime-cell { line-height: 1.2; }
+        .status-badge { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; }
+        .status-pending { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .status-completed { background-color: #d1edff; color: #0c5460; border: 1px solid #b8daff; }
+        .customer-name { word-wrap: break-word; white-space: normal; max-width: 120px; }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">查詢客服留言</h4>
+            </div>
+            <div class="card-body">
+                <!-- 處理狀態查詢 -->
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label">處理狀態</label>
+                        <div class="input-group">
+                            <select id="processingStatus" class="form-control">
+                                <option value="">請選擇處理狀態</option>
+                                <option value="0">待回覆</option>
+                                <option value="1">已回覆</option>
+                            </select>
+                            <button class="btn btn-outline-primary" id="searchByStatusBtn">查詢</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 查詢結果 -->
+        <div class="card" id="resultSection" style="display: none;">
+            <div class="card-header">
+                <h5 class="mb-0">查詢結果</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle text-center" id="resultTable">
+                        <thead class="table-light" id="tableHeader">
+                            <!-- 表頭將由 JavaScript 動態生成 -->
+                        </thead>
+                        <tbody id="resultBody"></tbody>
+                    </table>
+                </div>
+                
+                <!-- 分頁控制 -->
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        <span id="paginationInfo">顯示 0 - 0 筆，共 0 筆資料</span>
+                    </div>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0" id="pagination">
+                            <!-- 分頁按鈕將由 JavaScript 動態生成 -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const resultSection = document.getElementById('resultSection');
+            let currentData = [];
+            let currentPage = 1;
+            let currentStatus = null;
+            const itemsPerPage = 5;
+
+            // 格式化日期時間函數
+            function formatDateTime(dateTimeString) {
+                if (!dateTimeString) return '';
+                
+                try {
+                    const date = new Date(dateTimeString);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+                    const seconds = String(date.getSeconds()).padStart(2, '0');
+                    
+                    return `${year}<br>${month}-${day}<br>${hours}:${minutes}:${seconds}`;
+                } catch (error) {
+                    return dateTimeString;
+                }
+            }
+
+            // 獲取處理狀態標籤
+            function getStatusLabel(status) {
+                switch (status) {
+                    case 0: return '<span class="status-badge status-pending">待回覆</span>';
+                    case 1: return '<span class="status-badge status-completed">已回覆</span>';
+                    default: return '<span class="status-badge">未知</span>';
+                }
+            }
+
+            // 生成表頭
+            function generateTableHeader(status) {
+                const tableHeader = document.getElementById('tableHeader');
+                let headerHTML = '';
+                
+                if (status === 0) {
+                    // 待回覆的表頭
+                    headerHTML = `
+                        <tr>
+                            <th>留言<br>流水號</th>
+                            <th>客戶<br>名稱</th>
+                            <th>留言<br>時間</th>
+                            <th>處理<br>狀態</th>
+                            <th>操作</th>
+                        </tr>
+                    `;
+                } else if (status === 1) {
+                    // 已回覆的表頭
+                    headerHTML = `
+                        <tr>
+                            <th>留言<br>流水號</th>
+                            <th>客戶<br>名稱</th>
+                            <th>處理<br>狀態</th>
+                            <th>員工<br>編號</th>
+                            <th>留言<br>時間</th>
+                            <th>回覆<br>時間</th>
+                        </tr>
+                    `;
+                }
+                
+                tableHeader.innerHTML = headerHTML;
+            }
+
+            function renderPagination(totalItems, currentPage, itemsPerPage) {
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                const pagination = document.getElementById('pagination');
+                const paginationInfo = document.getElementById('paginationInfo');
+                
+                // 更新資訊顯示
+                const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+                const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+                paginationInfo.textContent = `顯示 ${startItem} - ${endItem} 筆，共 ${totalItems} 筆資料`;
+                
+                // 清空分頁按鈕
+                pagination.innerHTML = '';
+                
+                if (totalPages <= 1) return;
+                
+                // 上一頁按鈕
+                const prevLi = document.createElement('li');
+                prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+                prevLi.innerHTML = '<a class="page-link" href="#" data-page="prev">上一頁</a>';
+                pagination.appendChild(prevLi);
+                
+                // 頁碼按鈕
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+                
+                // 如果當前頁接近開始，顯示更多後面的頁碼
+                if (currentPage <= 3) {
+                    endPage = Math.min(totalPages, 5);
+                }
+                
+                // 如果當前頁接近結束，顯示更多前面的頁碼
+                if (currentPage > totalPages - 3) {
+                    startPage = Math.max(1, totalPages - 4);
+                }
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    const li = document.createElement('li');
+                    li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                    li.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+                    pagination.appendChild(li);
+                }
+                
+                // 下一頁按鈕
+                const nextLi = document.createElement('li');
+                nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+                nextLi.innerHTML = '<a class="page-link" href="#" data-page="next">下一頁</a>';
+                pagination.appendChild(nextLi);
+                
+                // 綁定分頁點擊事件
+                pagination.querySelectorAll('.page-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const page = this.getAttribute('data-page');
+                        
+                        if (page === 'prev' && currentPage > 1) {
+                            renderResults(currentData, currentPage - 1, currentStatus);
+                        } else if (page === 'next' && currentPage < totalPages) {
+                            renderResults(currentData, currentPage + 1, currentStatus);
+                        } else if (!isNaN(page)) {
+                            renderResults(currentData, parseInt(page), currentStatus);
+                        }
+                    });
+                });
+            }
+
+            function renderResults(messages, page = 1, status = null) {
+                const tbody = document.getElementById('resultBody');
+                currentData = messages || [];
+                currentPage = page;
+                currentStatus = status;
+                
+                // 生成對應的表頭
+                generateTableHeader(status);
+                
+                // 清空原本的 <tbody>
+                tbody.innerHTML = '';
+                
+                // 如果是空的 ➜ 顯示「查無資料」紅字
+                if (!messages || messages.length === 0) {
+                    const colspan = status === 0 ? 5 : 6;
+                    tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-danger">查無資料</td></tr>`;
+                    document.getElementById('paginationInfo').textContent = '顯示 0 - 0 筆，共 0 筆資料';
+                    document.getElementById('pagination').innerHTML = '';
+                    resultSection.style.display = 'block';
+                    return;
+                }
+                
+                // 計算當前頁面要顯示的資料
+                const startIndex = (page - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const pageData = messages.slice(startIndex, endIndex);
+                
+                // 渲染當前頁面的資料
+                pageData.forEach(message => {
+                    const tr = document.createElement('tr');
+                    
+                    if (status === 0) {
+                        // 待回覆的資料行
+                        tr.innerHTML = `
+                            <td>${message.messageId || ''}</td>
+                            <td class="customer-name">${message.customerName || ''}</td>
+                            <td class="datetime-cell">${formatDateTime(message.submittedAt)}</td>
+                            <td>${getStatusLabel(message.processingStatus)}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary btn-handle" data-id="${message.messageId}">
+                                    處理
+                                </button>
+                            </td>
+                        `;
+                    } else if (status === 1) {
+                        // 已回覆的資料行
+                        tr.innerHTML = `
+                            <td>${message.messageId || ''}</td>
+                            <td class="customer-name">${message.customerName || ''}</td>
+                            <td>${getStatusLabel(message.processingStatus)}</td>
+                            <td>${message.employeeId || ''}</td>
+                            <td class="datetime-cell">${formatDateTime(message.submittedAt)}</td>
+                            <td class="datetime-cell">${formatDateTime(message.responsedAt)}</td>
+                        `;
+                    }
+                    
+                    tbody.appendChild(tr);
+                });
+
+                // 綁定處理按鈕事件（只有待回覆狀態才有）
+                if (status === 0) {
+                    document.querySelectorAll('.btn-handle').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const messageId = btn.getAttribute('data-id');
+                            window.location.href = `/admin/cs/reply/${messageId}`;
+                        });
+                    });
+                }
+
+                // 渲染分頁
+                renderPagination(messages.length, page, itemsPerPage);
+                
+                resultSection.style.display = 'block';
+            }
+
+            // 按狀態查詢
+            document.getElementById('searchByStatusBtn').addEventListener('click', function () {
+                const status = document.getElementById('processingStatus').value;
+                if (status === '') {
+                    alert("請選擇處理狀態");
+                    return;
+                }
+                
+                const statusValue = parseInt(status);
+                fetch(`/api/cs/status/${statusValue}`)
+                    .then(response => response.json())
+                    .then(data => renderResults(data, 1, statusValue))
+                    .catch(error => {
+                        console.error('查詢失敗:', error);
+                        renderResults([], 1, statusValue);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
