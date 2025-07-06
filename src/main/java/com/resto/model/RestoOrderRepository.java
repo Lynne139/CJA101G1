@@ -2,11 +2,9 @@ package com.resto.model;
 
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -33,39 +31,10 @@ public interface RestoOrderRepository extends JpaRepository<RestoOrderVO, Intege
 	// 抓特定狀態的訂單
 //	List<RestoOrderVO> findByOrderStatus(RestoOrderStatus status);
 	
-	// 抓今天特定狀態的訂單(排程器舊寫法定時切狀態用)
-//	@Query("FROM RestoOrderVO o WHERE o.regiDate = :today AND o.orderStatus = :status")
-//	List<RestoOrderVO> findTodayOrdersByOrderStatus(@Param("today") LocalDate today,
-//	                                          @Param("status") RestoOrderStatus status);
-	
-	// 到期訂單自動轉保留(排程器用)
-	@Modifying
-    @Query("""
-       UPDATE RestoOrderVO o
-          SET o.orderStatus = com.resto.utils.RestoOrderStatus.WITHHOLD
-        WHERE o.orderStatus  = com.resto.utils.RestoOrderStatus.CREATED
-          AND o.regiDate     = :today
-          AND o.reserveStartTime <= :now
-    """)
-    int bulkCreatedToWithhold(@Param("today") LocalDate today,
-                              @Param("now")   LocalDateTime now);
-
-	// 過保留訂單自動轉逾期(排程器用)
-    @Modifying
-    @Query("""
-       UPDATE RestoOrderVO o
-          SET o.orderStatus = com.resto.utils.RestoOrderStatus.NOSHOW
-        WHERE o.orderStatus  = com.resto.utils.RestoOrderStatus.WITHHOLD
-          AND o.regiDate     = :today
-          AND o.reserveExpireTime <= :now
-    """)
-    int bulkWithholdToNoShow(@Param("today") LocalDate today,
-                             @Param("now")   LocalDateTime now);
-	
-	
-	
-	
-	
+	// 抓今天特定狀態的訂單(排程器定時切狀態用)
+	@Query("FROM RestoOrderVO o WHERE o.regiDate = :today AND o.orderStatus = :status")
+	List<RestoOrderVO> findTodayOrdersByOrderStatus(@Param("today") LocalDate today,
+	                                          @Param("status") RestoOrderStatus status);
 	
 
 	// 以住宿訂單抓餐廳訂單

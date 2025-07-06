@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.resto.dto.RestoOrderSummaryDTO;
 import com.resto.entity.RestoOrderVO;
 import com.resto.entity.RestoVO;
 import com.resto.entity.TimeslotVO;
@@ -218,9 +220,6 @@ public class OrderController {
 	    return "redirect:/admin/resto_order";
 	}
 
-	
-
-
 	// ===== 修改 =====
 	//取得edit modal
 	@GetMapping("/resto_order/edit")
@@ -275,7 +274,6 @@ public class OrderController {
 	        return "admin/fragments/common/error_modal";
 	    }
 	    
-	    
 	    // 顯示人預約人數判斷
 	    // 把舊預約人數值拷貝出來（純 int，永遠不變）
 	    int originalSeats = original.getRegiSeats(); 
@@ -318,8 +316,6 @@ public class OrderController {
 	        hasAnyError = true;
 	    }
 	    
-
-	    
 	    // 管理員系統
 	    // 若欄位驗證有錯，回填 modal
 	    if (result.hasErrors()  || hasAnyError) {
@@ -333,14 +329,9 @@ public class OrderController {
 		    model.addAttribute("originalSeats", originalSeats);
 		    model.addAttribute("remainingSeats", remainingSeats);
 
-
-
-
 	        return "admin/fragments/resto/modals/order_resto_edit";
 	    }
-	    
-
-	    
+	     
 	    try {
 	    	// 寫入資料庫
 	        restoOrderService.update(restoOrder);
@@ -366,7 +357,7 @@ public class OrderController {
 	}
 
 	
-	
+	// ===== 今日訂單改狀態(完成/取消) =====
 	@PostMapping("/resto_order/{id}/status")
 	@ResponseBody
 	public Map<String, Object> toggleStatus(@PathVariable Integer id,
@@ -377,6 +368,7 @@ public class OrderController {
 		RestoOrderStatus newStatus = RestoOrderStatus.valueOf(status);
 	    return restoOrderService.toggleStatus(id, newStatus);
 	}
+
 
 
 
