@@ -52,6 +52,7 @@
                         <th class="text-center">入住日期</th>
                         <th class="text-center">退房日期</th>
                         <th>訂單成立日期</th>
+                        <th>最後更新人</th>
 
                         <!-- <th>使用折價券</th>
                         <th>折扣金額</th>
@@ -78,6 +79,7 @@
                         <td style="white-space: nowrap;" th:text="${roomo.checkInDate}"></td>
                         <td style="white-space: nowrap;" th:text="${roomo.checkOutDate}"></td>
                         <td th:text="${roomo.orderDate}"></td>
+                        <td th:text="${roomo.employee.name}"></td>
 
                         
                         
@@ -120,4 +122,3 @@
 
 </div>
 
-<script th:src="@{/js/roomo_edit.js}"></script>

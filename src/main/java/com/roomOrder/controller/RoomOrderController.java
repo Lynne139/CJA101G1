@@ -7,6 +7,8 @@ import com.resto.entity.RestoVO;
 import com.resto.entity.TimeslotVO;
 import com.resto.model.PeriodService;
 import com.resto.model.ReservationService;
+import com.resto.model.RestoOrderRepository;
+import com.resto.model.RestoOrderService;
 import com.resto.model.RestoService;
 import com.resto.model.TimeslotService;
 import com.roomOrder.model.RoomOrder;
@@ -36,6 +38,8 @@ import com.coupon.entity.Coupon;
 import com.coupon.service.CouponService;
 import com.coupon.service.MemberCouponService;
 import com.member.model.MemberService;
+import com.employee.service.EmployeeService;
+import com.employee.entity.Employee;
 
 @Controller
 @RequestMapping("/admin")
@@ -71,10 +75,19 @@ public class RoomOrderController {
 	private PeriodService periodService;
 
 	@Autowired
-	private ReservationService restroReservationService;
+	private RestoOrderService restoOrderService;
+
+	@Autowired
+	private ReservationService reservationService;
 
 	@Autowired
 	private NotificationService notificationService;
+
+	@Autowired
+	private EmployeeService employeeService;
+
+	@Autowired
+	private com.roomOrder.model.ResRoomOrderSvc resRoomOrderSvc;
 
 	// ===== 新增 =====
 
@@ -92,7 +105,27 @@ public class RoomOrderController {
 			@ModelAttribute RoomOrder roomOrder,
 			HttpServletRequest request,
 			Model model) {
-		
+
+		// 取得最後更新人
+		// 測試用
+		// Employee fake = new Employee();
+		// fake.setEmployeeId(1);
+		// request.getSession().setAttribute("currentEmployee", fake);
+
+		Employee employee = (Employee) request.getSession().getAttribute("currentEmployee");
+		if (employee != null) {
+			employee = employeeService.getEmployeeById(employee.getEmployeeId())
+					.orElse(null);
+		}
+
+		// 檢查 employee 是否為 null，決定是否設 updateEmp
+		if (employee != null) {
+			roomOrder.setEmployee(employee); // ✅ 關鍵：設定 UPDATE_EMP 欄位
+		} else {
+			// 若需要強制要有員工，則可拋錯
+			throw new IllegalStateException("無法取得登入員工資訊");
+		}
+
 		try {
 			// 取得 memberId
 			String memberIdStr = request.getParameter("memberId");
@@ -126,16 +159,16 @@ public class RoomOrderController {
 			for (RoomOList detail : details) {
 				roomScheduleService.reserve(detail);
 			}
-			
+
 			Integer memberId = roomOrder.getMember().getMemberId();
-			
+
 			// 4. 更新會員累計金額
 			System.out.println("更新會員累計金額：" + roomOrder.getActualAmount());
 			Integer price = roomOrder.getActualAmount();
 			memberService.updateConsumptionAndLevelAndPoints(memberId, price);
-			
+
 			// 5. 發送通知
-			notificationService.createNotification(memberId, "訂單成立", "訂單成立成功");
+			notificationService.createNotification(memberId, "訂單成立", "由服務人員訂單成立成功，請至訂單查詢頁面查看。");
 
 			// 6. 處理折價券（如果有選擇）
 			if (couponCode != null && !couponCode.trim().isEmpty()) {
@@ -148,7 +181,7 @@ public class RoomOrderController {
 			}
 
 			return "redirect:/admin/roomo_info?message=訂單建立成功";
-			
+
 		} catch (Exception e) {
 			// 記錄例外
 			e.printStackTrace();
@@ -161,8 +194,30 @@ public class RoomOrderController {
 	// ===== 取消訂單 =====
 	@PostMapping("/roomo_info/cancel")
 	@ResponseBody
-	public Map<String, Object> cancelRoomOrder(@RequestParam Integer roomOrderId) {
+	public Map<String, Object> cancelRoomOrder(@RequestParam Integer roomOrderId, HttpServletRequest request) {
+
 		RoomOrder order = orderService.getById(roomOrderId);
+
+		// 取得最後更新人
+		// 測試用
+		// Employee fake = new Employee();
+		// fake.setEmployeeId(2);
+		// request.getSession().setAttribute("currentEmployee", fake);
+
+		Employee employee = (Employee) request.getSession().getAttribute("currentEmployee");
+		if (employee != null) {
+			employee = employeeService.getEmployeeById(employee.getEmployeeId())
+					.orElse(null);
+		}
+
+		// 檢查 employee 是否為 null，決定是否設 updateEmp
+		if (employee != null) {
+			order.setEmployee(employee); // ✅ 關鍵：設定 UPDATE_EMP 欄位
+		} else {
+			// 若需要強制要有員工，則可拋錯
+			throw new IllegalStateException("無法取得登入員工資訊");
+		}
+
 		if (order != null) {
 			order.setOrderStatus(0); // 0:取消
 			// 這裡補查明細
@@ -170,7 +225,8 @@ public class RoomOrderController {
 			List<Integer> olistIds = new ArrayList<>();
 			if (details != null) {
 				for (RoomOList detail : details) {
-					detail.setListStatus("0"); // 0:取消
+					// 更新訂單明細狀態
+					detail.setListStatus(0); // 0:取消
 					roomOListService.save(detail);
 					olistIds.add(detail.getRoomOrderListId());
 
@@ -178,18 +234,50 @@ public class RoomOrderController {
 					roomScheduleService.cancelReservation(detail);
 				}
 			}
+
+			// 更新訂單狀態
 			orderService.save(order);
-			// 餐廳訂單取消
-			// 待補
+			if (order.getProjectAddOn() == 1) {
+				// 取消餐廳訂單
+				restoOrderService.cancelByRoomOrderId(roomOrderId);
+			}
 			// 5. 更新會員累計金(扣除整筆actualAmount)
 			Integer memberId = order.getMember().getMemberId();
 			memberService.updateConsumptionAndLevelAndPoints(memberId, -order.getActualAmount());
 			// 6.發送通知
-			notificationService.createNotification(memberId, "訂單取消", "訂單取消成功");
+			notificationService.createNotification(memberId, "訂單取消", "由服務人員訂單取消成功，請至訂單查詢頁面查看。");
 
 			return Map.of("success", true, "olistIds", olistIds);
 		}
 		return Map.of("success", false, "message", "找不到訂單");
+	}
+
+	// ===== restro:取消加購專案 =====
+	@PostMapping("/roomo_info/cancel_project_add_on")
+	@ResponseBody
+	public Map<String, Object> cancelProjectAddOn(@RequestParam Integer roomOrderId, HttpServletRequest request) {
+		RoomOrder order = orderService.getById(roomOrderId);
+		// 取得所有明細
+		List<RoomOList> details = roomOListService.findByRoomOrderId(roomOrderId);
+		Integer totalRoomPrice = 0;
+		for (RoomOList detail : details) {
+			totalRoomPrice += detail.getRoomPrice();
+		}
+		// 計算加購專案價格
+		Integer addonPrice = order.getTotalAmount() - totalRoomPrice;
+		// 計算新總價
+		Integer newTotal = totalRoomPrice - addonPrice;
+		// 計算新實際支付金額
+		Integer newActualAmount = newTotal - order.getDiscountAmount();
+		// 更新訂單
+		order.setTotalAmount(newTotal);
+		order.setActualAmount(newActualAmount);
+		order.setProjectAddOn(0);
+		System.out.println("更新訂單：" + order);
+		orderService.save(order);
+		// 取消餐廳訂單
+		// restoOrderService.cancelByRoomOrderId(roomOrderId);
+		return Map.of("success", true);
 	}
 
 	// ===== 檢視訂單 =====
@@ -214,11 +302,20 @@ public class RoomOrderController {
 	@GetMapping("/roomo_info/edit")
 	public String showEditModal(@Valid @RequestParam("roomOrderId") Integer roomOrderId, Model model) {
 		RoomOrder order = orderService.getById(roomOrderId);
+		System.out.println("查詢到的 order: " + order);
+		if (order == null) {
+			model.addAttribute("errorMessage", "查無此訂單");
+			return "admin/fragments/roomo/modals/roomo_edit :: editModalContent";
+		}
 		List<RoomOList> details = roomOListService.findByRoomOrderId(roomOrderId);
 		order.setOrderDetails(details);
-		model.addAttribute("order", order);
-		model.addAttribute("isAdmin", true);
-		return "common/order_edit :: editModalContent";
+		Coupon coupon = order.getCoupon();
+		model.addAttribute("coupon", coupon);
+		model.addAttribute("roomOrder", order);
+		model.addAttribute("roomTypeList", roomTypeService.getAll());
+		// model.addAttribute("roomOList", details);
+
+		return "admin/fragments/roomo/modals/roomo_edit :: editModalContent";
 	}
 
 	// 更新訂單
@@ -227,6 +324,25 @@ public class RoomOrderController {
 			@ModelAttribute RoomOrder roomOrder,
 			HttpServletRequest request,
 			RedirectAttributes redirectAttributes) {
+
+		// 測試用
+		// Employee fake = new Employee();
+		// fake.setEmployeeId(2);
+		// request.getSession().setAttribute("currentEmployee", fake);
+
+		Employee employee = (Employee) request.getSession().getAttribute("currentEmployee");
+		if (employee != null) {
+			employee = employeeService.getEmployeeById(employee.getEmployeeId())
+					.orElse(null);
+		}
+
+		// 檢查 employee 是否為 null，決定是否設 updateEmp
+		if (employee != null) {
+			roomOrder.setEmployee(employee); // ✅ 關鍵：設定 UPDATE_EMP 欄位
+		} else {
+			// 若需要強制要有員工，則可拋錯
+			throw new IllegalStateException("無法取得登入員工資訊");
+		}
 
 		roomOrder.setUpdateDate(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date()));
 
@@ -238,6 +354,8 @@ public class RoomOrderController {
 			memberService.updateConsumptionAndLevelAndPoints(memberId, price);
 			System.out.println("更新會員累計金額：" + price);
 		}
+
+		// 更新最後更新人
 
 		// 1. 更新主表
 		RoomOrder updatedOrder = orderService.updateOrder(roomOrder);
@@ -268,7 +386,7 @@ public class RoomOrderController {
 			}
 
 			// 先設定所有欄位值
-			detail.setListStatus(request.getParameter("orderDetails[" + i + "].listStatus"));
+			detail.setListStatus(Integer.valueOf(request.getParameter("orderDetails[" + i + "].listStatus")));
 			Integer roomTypeId = Integer.valueOf(request.getParameter("orderDetails[" + i + "].roomTypeId"));
 			detail.setRoomTypeId(roomTypeId);
 
@@ -313,9 +431,9 @@ public class RoomOrderController {
 
 			i++;
 		}
-		
+
 		// 6. 發送通知
-		notificationService.createNotification(memberId, "訂單更新", "訂單更新成功");
+		notificationService.createNotification(memberId, "訂單更新", "由服務人員更新訂單成功，請至訂單查詢頁面查看。");
 
 		redirectAttributes.addFlashAttribute("success", "訂單更新成功！");
 		return "redirect:/admin/roomo_info";
@@ -372,6 +490,21 @@ public class RoomOrderController {
 				})
 				.collect(Collectors.toList());
 	}
+
+	 // 查詢餐廳時段剩餘名額（轉發 ReservationController 的 API）
+	 @GetMapping("/roomOrder/meal/remaining")
+	 @ResponseBody
+	 public Integer getMealRemaining(@RequestParam Integer restoId,
+									 @RequestParam Integer timeslotId,
+									 @RequestParam String date) {
+		 // 這裡直接呼叫 reservationService.getRemaining
+		 // 需將 date 轉為 LocalDate
+		 java.time.LocalDate localDate = java.time.LocalDate.parse(date);
+		 int remaining = reservationService.getRemaining(restoId, timeslotId, localDate);
+		 return remaining;
+	 }
+
+	 
 
 	// ===== 查詢餐廳專案 =====
 	@GetMapping("/roomo_info/resto_periods")
@@ -435,7 +568,7 @@ public class RoomOrderController {
 			}
 			// ============
 
-			detail.setListStatus("1"); // 預設狀態
+			detail.setListStatus(1); // 預設狀態
 			Integer roomTypeId = Integer.valueOf(request.getParameter("orderDetails[" + i + "].roomTypeId"));
 			detail.setRoomTypeId(roomTypeId);
 
@@ -461,6 +594,19 @@ public class RoomOrderController {
 			i++;
 		}
 		return details;
+	}
+
+	/**
+	 * 前端查詢加購專案自動排餐廳時段
+	 */
+	@PostMapping("/roomo_info/auto_assign_meal")
+	@ResponseBody
+	public Map<String, Object> autoAssignMeal(@RequestParam Integer restoId,
+											  @RequestParam Integer numOfPeople,
+											  @RequestParam String checkInDate,
+											  @RequestParam String checkOutDate,
+											  @RequestParam Integer projectPlan) {
+		return resRoomOrderSvc.checkAndAutoAssignRestoTimeslots(restoId, numOfPeople, checkInDate, checkOutDate, projectPlan);
 	}
 
 }

@@ -5,6 +5,7 @@ import com.roomOrder.utils.RoomoCriteriaHelper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
+import com.roomOList.model.RoomOList;
 
 import java.lang.reflect.Member;
 import java.util.List;

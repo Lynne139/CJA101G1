@@ -7,7 +7,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="roomOrderEditForm" th:object="${order}" th:action="@{${isAdmin} ? '/admin/roomo_info/update' : '/member/room/update'}" method="post">
+          <form id="roomOrderEditForm" th:object="${order}" th:action="@{/member/order/roomOrder/update}" method="post">
             <!-- 訂單編號 -->
             <div class="mb-3">
               <label class="form-label">訂單編號</label>
@@ -16,18 +16,53 @@
             <!-- 入住日期 -->
             <div class="mb-3">
               <label class="form-label">入住日期</label>
-              <input type="date" th:field="*{checkInDate}" class="form-control" required id="editCheckInDate">
+              <input type="date" th:field="*{checkInDate}" class="form-control" required id="editCheckInDate" readonly>
             </div>
             <!-- 退房日期 -->
             <div class="mb-3">
               <label class="form-label">退房日期</label>
-              <input type="date" th:field="*{checkOutDate}" class="form-control" required id="editCheckOutDate">
+              <input type="date" th:field="*{checkOutDate}" class="form-control" required id="editCheckOutDate" readonly>
             </div>
-            <!-- RoomOList 明細特殊需求（假設只顯示第一筆） -->
-            <div class="mb-3">
-              <label class="form-label">特殊需求</label>
-              <input type="text" th:name="'orderDetails[0].specialReq'" class="form-control" maxlength="50" th:value="${order.orderDetails[0].specialReq}">
+            <!-- 多筆訂單明細動態渲染 -->
+            <div th:each="detail, iterStat : *{orderDetails}">
+              <div class="mb-3 border rounded p-2 mb-2">
+                <div>
+                  <span>入住房型：</span>
+                  <span th:text="${detail.roomType.roomTypeName}"></span>
+                </div>
+                <div>
+                  <span>入住間數：</span>
+                  <span th:text="${detail.roomAmount}"></span>
+                </div>
+                <div>
+                  <span>入住人數：</span>
+                  <span th:text="${detail.numberOfPeople}"></span>
+                </div>
+                <div class="mt-2">
+                  <label class="form-label">住客代表</label>
+                  <input type="text"
+                         th:name="'orderDetails[' + ${iterStat.index} + '].roomGuestName'"
+                         class="form-control"
+                         maxlength="30"
+                         th:value="${detail.roomGuestName}">
+                </div>
+                <div class="mt-2">
+                  <label class="form-label">特殊需求</label>
+                  <input type="text"
+                         th:name="'orderDetails[' + ${iterStat.index} + '].specialReq'"
+                         class="form-control"
+                         maxlength="50"
+                         th:value="${detail.specialReq}">
+                </div>
+                <input type="hidden" th:name="'orderDetails[' + ${iterStat.index} + '].roomOrderListId'" th:value="${detail.roomOrderListId}" />
+              </div>
             </div>
+
+            <hr>
+
+            <p class="text-danger">※欲修改其他資訊請聯絡客服</p>
+            <p class="text-danger">※加購專案內容請至餐廳訂單頁面修改或連繫客服</p>
+
             <!-- 僅後台可編輯欄位 -->
             <div th:if="${isAdmin}">
               <div class="mb-3">

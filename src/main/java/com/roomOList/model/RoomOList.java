@@ -51,7 +51,7 @@ public class RoomOList {
     private String createDate;
 
     @Column(name="LIST_STATUS")
-    private String listStatus;
+    private Integer listStatus;
 
     @Transient
     private Integer roomTypeId;
@@ -128,11 +128,11 @@ public class RoomOList {
         this.createDate = createDate;
     }
 
-    public String getListStatus() {
+    public Integer getListStatus() {
         return listStatus;
     }
 
-    public void setListStatus(String listStatus) {
+    public void setListStatus(Integer listStatus) {
         this.listStatus = listStatus;
     }
 
