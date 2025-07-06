@@ -43,12 +43,12 @@
           <div class="col-md-9">
             <div class="row g-3">
               <div class="col-md-6">
-                <label for="memberName" class="form-label">會員名稱</label>
+                <label for="memberName" class="form-label">會員名稱<span style="color: red;">*</span></label>
                 <input type="text" class="form-control" id="memberName" th:field="*{memberName}">
                 <div class="text-danger" th:if="${#fields.hasErrors('memberName')}" th:errors="*{memberName}"></div>
               </div>
               <div class="col-md-6">
-                <label for="memberPhone" class="form-label">電話</label>
+                <label for="memberPhone" class="form-label">電話<span style="color: red;">*</span></label>
                 <input type="text" class="form-control" id="memberPhone" th:field="*{memberPhone}">
                 <div class="text-danger" th:if="${#fields.hasErrors('memberPhone')}" th:errors="*{memberPhone}"></div>
               </div>
@@ -66,14 +66,14 @@
             <div class="text-danger" th:if="${#fields.hasErrors('memberBirthday')}" th:errors="*{memberBirthday}"></div>
           </div>
           <div class="col-md-6">
-            <label for="memberPassword" class="form-label">密碼</label>
-            <input type="password" class="form-control" id="memberPassword" th:field="*{memberPassword}">
+            <label for="memberPassword" class="form-label">密碼<span style="color: red;">*</span></label>
+            <input type="password" class="form-control" id="memberPassword" th:field="*{memberPassword}" placeholder="請輸入4-12個字符的密碼">
             <div class="text-danger" th:if="${#fields.hasErrors('memberPassword')}" th:errors="*{memberPassword}"></div>
           </div>
         </div>
 
         <div class="mb-3">
-          <label for="memberAddress" class="form-label">地址</label>
+          <label for="memberAddress" class="form-label">地址<span style="color: red;">*</span></label>
           <input type="text" class="form-control" id="memberAddress" th:field="*{memberAddress}">
           <div class="text-danger" th:if="${#fields.hasErrors('memberAddress')}" th:errors="*{memberAddress}"></div>
         </div>

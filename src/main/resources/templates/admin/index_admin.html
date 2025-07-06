@@ -54,22 +54,11 @@
 			        		<a th:href="@{/admin/select_page}" th:classappend="${currentURI == '/admin/select_page'} ? '-active'" class="sidebar_sub_link">會員查詢</a>
 			        		<a th:href="@{/admin/addMember}" th:classappend="${currentURI == '/admin/addMember'} ? '-active'" class="sidebar_sub_link">會員新增</a>
 			        		<a th:href="@{/admin/listAllMember}" th:classappend="${currentURI == '/admin/listAllMember'} ? '-active'" class="sidebar_sub_link">會員列表</a>			      			
-			      		 
+			      		 	<a th:href="@{/admin/listAllMemberLevelType}" th:classappend="${currentURI == '/admin/listAllMemberLevelType'} ? '-active'" class="sidebar_sub_link">會員等級</a>
 			      		</div>
 			    	</div>
 					
-					<!-- 會員等級 -->
-					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '會員管理權限')}"
-						th:classappend="${currentURI == '/admin/listAllMemberLevelType' or currentURI == '/admin/addMemberLevelType'} ? '-active'">
-						<a class="sidebar_link">
-							<i class="fa-solid fa-user"></i> 會員等級
-						</a>
-						<div class="submenu_block ps-4"
-							th:classappend="${currentURI == '/admin/listAllMemberLevelType' or currentURI == '/admin/addMemberLevelType'} ? 'show'">
-			        		<a th:href="@{/admin/listAllMemberLevelType}" th:classappend="${currentURI == '/admin/listAllMemberLevelType'} ? '-active'" class="sidebar_sub_link">等級列表</a>
-			        		<a th:href="@{/admin/addMemberLevelType}" th:classappend="${currentURI == '/admin/addMemberLevelType'} ? '-active'" class="sidebar_sub_link">等級新增</a>
-			      		</div>
-			    	</div>
+					
 			
 					<!-- 員工管理 -->
 					<div class="sidebar_section" th:if="${session.employeePermissions != null and #lists.contains(session.employeePermissions, '員工管理權限')}"

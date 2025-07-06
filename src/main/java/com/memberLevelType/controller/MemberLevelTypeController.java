@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.memberLevelType.model.MemberLevelType;
 import com.memberLevelType.model.MemberLevelTypeService;
@@ -80,16 +79,8 @@ public class MemberLevelTypeController {
     	    model.addAttribute("mainFragment", "admin/fragments/memberLevelType/update_memberLevelType_input");
     	    return "admin/index_admin";
         }
-        
+        memberLevelTypeSvc.updateMemberLevelType(memberLevelType);
         return "redirect:/admin/listAllMemberLevelType";
     }
-
-    // 處理刪除
-    @PostMapping("/deleteL")
-    public String deleteMmemberLevel(@RequestParam("memberLevel") String memberLevel, 
-    									Model model) {
-        memberLevelTypeSvc.deleteMemberLevelType(memberLevel);
-        model.addAttribute("success", "- (刪除成功)");
-        return "redirect:/admin/listAllMemberLevelType";
-    }
+    
 }

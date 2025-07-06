@@ -140,7 +140,7 @@
 	    </div>
         <div class="mt-3" th:if="${session.loggedInMember != null}">  
           <p><strong>會員編號：</strong> <span th:text="${session.loggedInMember.memberId}"></span></p>
-          <p><strong>會員姓名：</strong> <span th:text="${session.loggedInMember.memberName}"></span></p>
+          <p><strong>會員名稱：</strong> <span th:text="${session.loggedInMember.memberName}"></span></p>
           <p><strong>會員信箱：</strong> <span th:text="${session.loggedInMember.memberEmail}"></span></p>
           <p><strong>會員電話：</strong> <span th:text="${session.loggedInMember.memberPhone}"></span></p>
           <p><strong>會員生日：</strong> <span th:text="${session.loggedInMember.memberBirthday}"></span></p>
