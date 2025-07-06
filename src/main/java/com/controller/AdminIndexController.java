@@ -881,16 +881,16 @@ public class AdminIndexController {
     } 
     
     // === 客服管理 ===
-    @GetMapping("/cs1")
-    public String cs1(HttpServletRequest request,Model model) {
+    @GetMapping("/cs/select")
+    public String csSelectPage(HttpServletRequest request,Model model) {
 
-    	String mainFragment = "admin/fragments/cs/cs1";
+    	String mainFragment = "admin/fragments/cs/select-cs";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 
     	return "admin/index_admin";
     } 
-    
+
     // === 消息管理 ===
     @GetMapping("/news1")
     public String news1(HttpServletRequest request,Model model) {

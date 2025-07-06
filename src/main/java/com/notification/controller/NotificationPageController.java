@@ -9,10 +9,9 @@ import com.member.model.MemberVO;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/members")
 public class NotificationPageController {
 
-    @GetMapping("/notifications")
+    @GetMapping("/notification")
     public String notificationPage() {
         return "front-end/notification/notifications";
     }
