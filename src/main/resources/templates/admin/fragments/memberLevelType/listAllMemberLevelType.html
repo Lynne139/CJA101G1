@@ -13,9 +13,34 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <style>
 body {
-	margin: 1rem 12rem 2rem 12rem;
+  margin: 1rem auto 2rem auto;
+  max-width: 900px;
+  background-color: #F4EDE1;
+  font-family: "Noto Sans TC", sans-serif;
+}
+
+table.dataTable {
+  width: 100% !important;
+  table-layout: fixed;
+  word-break: break-word;
+}
+
+table.dataTable thead th {
+  text-align: center;
+  font-weight: bold;
+  color: #7E4E24;
+  background-color: #F4EDE1;
+}
+
+table.dataTable tbody td {
+  text-align: center;
+}
+
+.btn {
+  font-size: 0.85rem;
 }
 </style>
+
 </head>
 <body>
 	<h2>會員等級</h2>
@@ -27,11 +52,12 @@ body {
 	  </a>
 	</div>
 	
-	<table id="listAllMemberLevelType" class="display" style="width: 700px">
+	<div class="table-responsive" style="max-width: 800px; margin: auto;">
+  		<table id="listAllMemberLevelType" class="display">
 		<thead>
 			<tr style="background-color: #F4EDE1">
-				<th>等級排序</th>
-				<th>會員等級</th>
+				<th class="text-center">等級排序</th>
+				<th class="text-center">會員等級</th>
 				<th>修改</th>   								
 			</tr>
 		</thead>
@@ -39,8 +65,8 @@ body {
 		<tbody>
 			<th:block th:each="memberLevelType : ${memberLevelTypeList}">
 			<tr>
-			<td th:text="${memberLevelType.memberRank}"></td>
-			<td th:text="${memberLevelType.memberLevel}"></td>
+			<td class="text-center" th:text="${memberLevelType.memberRank}"></td>
+			<td class="text-center" th:text="${memberLevelType.memberLevel}"></td>
 			<!-- 修改按鈕 -->
 		  	<td>
 			    <a th:href="@{'/admin/updateMemberLevelType/' + ${memberLevelType.memberLevel}}"
@@ -53,7 +79,7 @@ body {
 		</tbody>
 
 </table>
-
+</div>
 <script>
 	$(document).ready(function() {
 		$('#listAllMemberLevelType').DataTable({
