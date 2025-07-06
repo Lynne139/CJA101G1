@@ -475,8 +475,8 @@ ALTER TABLE room_order AUTO_INCREMENT = 1000;
 
 INSERT INTO ROOM_ORDER (MEMBER_ID, ROOM_ORDER_STATUS, TOTAL_AMOUNT, ROOM_AMOUNT, CHECK_IN_DATE, CHECK_OUT_DATE, COUPON_CODE, DISCOUNT_AMOUNT, ACTUAL_AMOUNT, PROJECT_ADD_ON,UPDATE_EMP)
 VALUES 
-    (1, 1, 50000,1, '2025-06-01', '2025-06-03', 'A2505AAA', 100, 49900, 0 ,1),
-    (2, 2, 60000,2, '2025-06-05', '2025-06-07', 'B2505AAA', 150, 59850, 1 ,1);
+    (1, 1, 100000,1, '2025-07-11', '2025-07-13', 'A2505AAA', 100, 99900, 0 ,1),
+    (2, 2, 104800,2, '2025-07-15', '2025-07-17', 'B2505AAA', 150, 104650, 1 ,1);
 
 
 -- 房型 
@@ -492,10 +492,10 @@ CREATE TABLE room_type (
 	CONSTRAINT room_type_pk PRIMARY KEY (room_type_id)
 ) AUTO_INCREMENT = 1;
 
-INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '月影行館', '房間介紹一', 1, null, 50000, 6);
-INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '晨曦之庭', '房間介紹二', 1, null, 30000, 4);
-INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '海音居', '房間介紹三', 1, null, 20000, 2);
-INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '蔻香居', '房間介紹四', 1, null, 15000, 2);
+INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '月影行館', '獨棟頂級 Villa，附私人泳池與月光露台', 1, null, 50000, 6);
+INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '晨曦之庭', '南洋花園套房，開窗即是熱帶植物與日光灑落', 1, null, 30000, 4);
+INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '海音居', '靠海海景房，聽海浪入眠，私密陽台設計', 1, null, 20000, 2);
+INSERT INTO room_type (room_type_id, room_type_name, room_type_content, room_sale_status, room_type_pic, room_type_price, guest_num) VALUES (null, '蔻香居', '主打香氛放鬆體驗，適合芳療與瑜伽旅人', 1, null, 15000, 2);
 
 -- 房間 
 CREATE TABLE room (
@@ -509,9 +509,65 @@ CREATE TABLE room (
 );
 
 INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (1101, 1, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (1102, 1, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (1103, 1, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (1104, 1, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (1105, 1, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (1106, 1, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (1107, 1, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (1108, 1, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (1109, 1, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (1110, 1, null, 1, 0);
 INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (2101, 2, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (2102, 2, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (2103, 2, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (2104, 2, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (2105, 2, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (2106, 2, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (2107, 2, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (2108, 2, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (2109, 2, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (2110, 2, null, 1, 0);
 INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3101, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3102, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3103, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3104, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3105, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3106, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3107, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3108, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3109, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3110, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3111, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3112, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3113, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3114, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3115, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3116, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3117, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3118, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3119, 3, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (3120, 3, null, 1, 0);
 INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4101, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4102, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4103, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4104, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4105, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4106, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4107, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4108, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4109, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4110, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4111, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4112, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4113, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4114, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4115, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4116, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4117, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4118, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4119, 4, null, 1, 0);
+INSERT INTO room (room_id, room_type_id, room_guest_name, room_sale_status, room_status)  VALUES (4120, 4, null, 1, 0);
 
 
 -- 住宿訂單明細 
@@ -533,9 +589,9 @@ CREATE TABLE ROOM_ORDER_LIST (
 
 INSERT INTO ROOM_ORDER_LIST (ROOM_TYPE_ID,  ROOM_ORDER_ID, NUMBER_OF_PEOPLE, SPECIAL_REQ, ROOM_PRICE, ROOM_AMOUNT,ROOM_GUEST_NAME,LIST_STATUS)
 VALUES
-    (1, 1000, 2, 'No smoking', 50000, 1,'王大明',1),
-    (2, 1001, 3, 'No smoking', 30000, 1,'周牛牛',1),
-    (3, 1001, 3, 'Extra bed', 20000, 1,'楊大胖',1);
+    (1, 1000, 6, 'No smoking', 50000, 1,'王大明',1),
+    (2, 1001, 4, 'No smoking', 30000, 1,'周牛牛',1),
+    (3, 1001, 2, 'Extra bed', 20000, 1,'楊大胖',1);
 
 -- 以下設定: 自增主鍵的起點值，也就是初始值，取值範圍是1 .. 655355 --
 set auto_increment_offset=1;
@@ -562,8 +618,12 @@ CREATE TABLE room_type_schedule (
 ) AUTO_INCREMENT = 1;
 
 
--- INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 3, 10, 6, '2025-05-13');
--- INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 4, 10, 2, '2025-05-14');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 1, 10, 1, '2025-07-11');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 1, 10, 1, '2025-07-12');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 2, 10, 1, '2025-07-15');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 2, 10, 1, '2025-07-16');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 3, 20, 1, '2025-07-15');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 3, 20, 1, '2025-07-16');
 
 
 CREATE TABLE role_list (
