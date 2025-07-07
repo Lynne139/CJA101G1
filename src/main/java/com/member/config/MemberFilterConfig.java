@@ -39,8 +39,10 @@ public class MemberFilterConfig {
             "/member/room/*",       // 會員住宿訂單
             
             // 折價券相關
-            "/coupon/*/select",     // 查看折價券
-            "/coupon/*/claim"       // 領取折價券
+            "/coupon/select",     // 查看折價券
+            "/coupon/claim" ,     // 領取折價券
+            "/notification"       // 會員通知
+
             
             //餐廳相關
             
