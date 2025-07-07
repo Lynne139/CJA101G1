@@ -323,13 +323,16 @@ INSERT INTO product_category (PRODUCT_CATEGORY_NAME, PRODUCT_CATEGORY_DESC)
 VALUES 
   ('家電', '各類家庭電器'),
   ('書籍', '各式書籍、雜誌'),
-  ('3C產品', '電腦與周邊設備');
+  ('3C產品', '電腦與周邊設備'),
+  ('香氛', '包含香水、室內香氛、香氛蠟燭等。'),
+  ('寢具', '主要包含床墊、床單、被子、枕頭等。 這些用品可以依照材質、功能、季節性等不同面向進行分類和介紹。。');
 
 INSERT INTO PRODUCT (PRODUCT_CATEGORY_ID, PRODUCT_PRICE, PRODUCT_NAME, PRODUCT_STATUS)
 VALUES 
-  (1, 12000, 'Dyson 吸塵器', TRUE),
-  (2, 450, 'Java 程式設計入門', TRUE),
-  (3, 30000, 'MacBook Air M2', TRUE);
+  (1, 12000, '吸塵器', TRUE),
+  (4, 450, '香氛蠟燭', TRUE),
+  (5, 5900, '枕頭', TRUE),
+  (5, 450, '蠶絲被', TRUE);
 
 
 INSERT INTO PROD_CART_ITEM (MEMBER_ID, PRODUCT_ID,QUANTITY)

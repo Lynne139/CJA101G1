@@ -594,13 +594,6 @@ function checkoutWithCash(memberId) {
         if (cartSidebar) {
           cartSidebar.classList.remove('active');
         }
-        
-        // 可以選擇跳轉到訂單確認頁面或留在當前頁面
-        setTimeout(() => {
-          if (confirm('訂單建立成功！是否要查看訂單詳情？')) {
-            window.location.href = '/admin/shopOrd/select_page';
-          }
-        }, 2000);
       } else {
         showNotification(response.message || '訂單建立失敗', 'error');
       }
