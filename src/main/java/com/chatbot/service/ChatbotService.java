@@ -69,7 +69,7 @@ public class ChatbotService {
             }
         }
         if (bestAnswer == null) {
-            return "抱歉，我不明白您的問題。\n請重新提問，或改用「聯絡客服」提交留言表單。";
+            return "抱歉，我不明白您的問題。\n請重新提問，或改以「聯絡客服」提交留言表單。";
         }
         return bestAnswer;
     }
