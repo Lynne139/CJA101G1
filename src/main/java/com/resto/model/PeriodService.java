@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.resto.entity.PeriodVO;
+import com.resto.entity.TimeslotVO;
 import com.resto.integration.room.RestoPeriodCode;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -25,6 +27,25 @@ public class PeriodService {
     public List<PeriodVO> getPeriodsByRestoId(Integer restoId) {
 		return periodRepository.findByRestoVO_RestoIdOrderBySort(restoId);
 		}
+	
+	// 查詢某餐廳的 period+未軟刪timeslot
+    // 把「被軟刪除」的 timeslot 直接從 list 拿掉，避免畫面還要判斷
+	@Transactional(readOnly = true)
+    public List<PeriodVO> findEnabledByRestoIdWithSlots(Integer restoId) {
+
+        List<PeriodVO> list = periodRepository.findByRestoIdWithSlots(restoId);
+
+        list.forEach(p -> {
+            List<TimeslotVO> filtered = p.getTimeslots().stream()
+                                          .filter(ts -> !Boolean.TRUE.equals(ts.getIsDeleted()))
+                                          .collect(Collectors.toList());
+            p.setTimeslots(filtered);
+        });
+
+        return list;
+    }
+	
+	
 	
 	// id拿單筆
     @Transactional(readOnly = true)

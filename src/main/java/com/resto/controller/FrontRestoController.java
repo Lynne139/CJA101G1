@@ -3,6 +3,7 @@ package com.resto.controller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,13 +18,25 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.resto.dto.BookingFormDTO;
+import com.resto.dto.PreBookingDTO;
+import com.resto.entity.RestoOrderVO;
 import com.resto.entity.RestoVO;
+import com.resto.model.PeriodService;
+import com.resto.model.ReservationService;
+import com.resto.model.RestoOrderService;
 import com.resto.model.RestoService;
+import com.resto.model.TimeslotService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,6 +47,14 @@ public class FrontRestoController {
 	
 	@Autowired
 	RestoService restoSvc;
+	@Autowired
+	TimeslotService timeslotSvc;
+	@Autowired
+	RestoOrderService restoOrderSvc;
+	@Autowired
+	ReservationService reservationSvc;
+	@Autowired
+	PeriodService periodSvc;
 	
 	
 	
@@ -115,19 +136,69 @@ public class FrontRestoController {
 	
 	
 	
-//  ====餐廳分頁====	
-	@GetMapping("/restaurants/{id}")
-	public String viewRestaurant(@PathVariable Integer id, Model model) {
+    //  ====顯示餐廳分頁====	
+		@GetMapping("/restaurants/{id}")
+		public String viewRestaurant(@PathVariable Integer id, Model model) {
 
-	    // 只撈「上架且未刪除」的餐廳
-	    RestoVO resto = restoSvc.findOnline(id)
-	        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		    // 找出「上架」餐廳，若找不到就 404
+		    RestoVO selectedResto = restoSvc.findOnline(id)
+		            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		    model.addAttribute("selectedResto", selectedResto);
 
-	    model.addAttribute("resto", resto);
-	    return "front-end/resto/restoIntro";
+		    // 找出區段與時段（包含 isDeleted = false）
+		    model.addAttribute("periodList",
+		            periodSvc.findEnabledByRestoIdWithSlots(id));
+
+		    // 今天日期
+		    model.addAttribute("today", LocalDate.now());
+
+		    // 給 <form th:object="${restoOrder}">
+		    model.addAttribute("restoOrder", new RestoOrderVO());
+
+		    return "front-end/resto/restoIntro";
+		}
+
+	
+	//  ====第一階段送出表單（POST）====
+	@PostMapping("/restaurants/booking-pre")
+	public String handlePreBooking(
+	        @Validated @ModelAttribute("preBooking") PreBookingDTO dto,
+	        BindingResult br,
+	        Model model) {
+
+	    if (br.hasErrors()) {
+	        // 回傳原畫面並保留原輸入
+	        model.addAttribute("today", LocalDate.now());
+	        return "front-end/resto/restoIntro";
+	    }
+
+	    return "redirect:/restaurants/booking"
+	            + "?restoId=" + dto.getRestoId()
+	            + "&date=" + dto.getRegiDate()
+	            + "&slotId=" + dto.getTimeslotId()
+	            + "&seats=" + dto.getRegiSeats();
 	}
 
 	
+	
+	
+	@GetMapping("/restaurants/booking")
+	public String showBookingPage(@RequestParam Integer restoId,
+	                              @RequestParam LocalDate date,
+	                              @RequestParam Integer slotId,
+	                              @RequestParam Integer seats,
+	                              Model model) {
+
+	    model.addAttribute("preFilled", new BookingFormDTO(
+	        restoId, date, seats, slotId, null, null, null, 0, null
+	    ));
+
+	    // 新增預設空的 RestoOrderVO 供 form 綁定
+	    model.addAttribute("restoOrder", new RestoOrderVO());
+
+	    return "front-end/resto/restoBooking";
+	}
+
 	
 	
 	

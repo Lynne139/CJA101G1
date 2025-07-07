@@ -26,43 +26,43 @@ textarea.form-control.form-control:focus {
   background-color: transparent;
 }
 
-/* === radio === */
-.custom_radio {
-  /* display: none; */
-}
+/* /* === radio === */ */
+/* .custom_radio { */
+/*   display: none; */
+/* } */
 
-.custom_radio+label {
-  position: relative;
-  padding-left: 25px;
-  cursor: pointer;
-  line-height: 20px;
-}
+/* .custom_radio+label { */
+/*   position: relative; */
+/*   padding-left: 25px; */
+/*   cursor: pointer; */
+/*   line-height: 20px; */
+/* } */
 
-.custom_radio+label::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 2px;
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--color-primary);
-  border-radius: 50%;
-  background-color: transparent;
-}
+/* .custom_radio+label::before { */
+/*   content: ""; */
+/*   position: absolute; */
+/*   left: 0; */
+/*   top: 2px; */
+/*   width: 16px; */
+/*   height: 16px; */
+/*   border: 2px solid var(--color-primary); */
+/*   border-radius: 50%; */
+/*   background-color: transparent; */
+/* } */
 
-.custom_radio:checked+label::before {
-  border-color: #FF7449;
-  /* ✅ 自訂選取顏色 */
-  background-color: #FF7449;
-}
+/* .custom_radio:checked+label::before { */
+/*   border-color: #FF7449; */
+/*   ✅ 自訂選取顏色 */
+/*   background-color: #FF7449; */
+/* } */
 
-.custom_radio:checked+label::after {
-  content: "";
-  position: absolute;
-  left: 5px;
-  top: 7px;
-  width: 6px;
-  height: 6px;
-  background: white;
-  border-radius: 50%;
-}
+/* .custom_radio:checked+label::after { */
+/*   content: ""; */
+/*   position: absolute; */
+/*   left: 5px; */
+/*   top: 7px; */
+/*   width: 6px; */
+/*   height: 6px; */
+/*   background: white; */
+/*   border-radius: 50%; */
+/* } */

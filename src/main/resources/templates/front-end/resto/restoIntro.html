@@ -22,7 +22,8 @@
   
   <section id="hero">
     <div class="hero-banner"
-         th:style="|background-image: url('@{/restaurants/img/{id}(id=${resto.restoId})}');|"></div>
+         th:if="${selectedResto.restoImg != null}"
+         th:style="|background-image: url('@{/restaurants/img/{id}(id=${selectedResto.restoId})}');|"></div>
     <div class="container">
     
       <p class="breadcrumb">珍饈美饌 / 沐光餐廳</p>
@@ -33,70 +34,120 @@
       <section id="restaurant-info" class="restaurant-info-grid">
         <div class="info-left">
           <h1 class="restaurant-title"
-              th:text="${resto.restoName}">餐廳</h1>
+              th:text="${selectedResto.restoName}">餐廳</h1>
           <div class="restaurant-subtitle"
-               th:text="${resto.restoNameEn}">餐廳英文</div>
+               th:text="${selectedResto.restoNameEn}">餐廳英文</div>
         </div>
         <div class="info-right">
-          <p class="restaurant-location" th:text="${resto.restoLoc}">樓層位置</p>
-          <div class="restaurant-tagline" th:text="${resto.restoType}">類型</div>
-          <div class="restaurant-description" th:text="${resto.restoInfo}">
+          <p class="restaurant-location" th:text="${selectedResto.restoLoc}">樓層位置</p>
+          <div class="restaurant-tagline" th:text="${selectedResto.restoType}">類型</div>
+          <div class="restaurant-description" th:text="${selectedResto.restoInfo}">
         </div>
-          <div class="mt-4 restaurant-content" th:utext="${resto.restoContent}"></div>          </div>
+          <div class="mt-4 restaurant-content" th:utext="${selectedResto.restoContent}"></div>          </div>
       </section>
   
       <hr>
   
       <section id="reservation" class="reservation-container">
-        <h2 class="reservation-title">預約訂位</h2>
-        <form class="reservation-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="guests">用餐人數</label>
-              <div class="custom-select">
-                <span>1 人</span>
-                <img src="/page/8f9fda5a-cc8e-4f0d-b367-9ff34f83dd55/images/419_3584.svg" alt="dropdown arrow">
+        <div class="reservation-title">預約訂位</div>
+        
+        <form class="reservation-form"
+              id="restoOrderFrontForm"
+                th:object="${restoOrder}" 
+                th:action="@{/restaurants/booking}"
+                method="post">
+                
+          <div class="form-row row d-flex">
+          
+            <!-- 用餐人數 -->
+            <div class="form-group col-12">
+            
+              <label for="regiSeats" class="form-label form-group-title">用餐人數</label>
+              <p class="form-hint">
+                可接受 1-8 位訂位（含大人與小孩）
+                * 超過 8 人的訂位，請使用電話預約 <span th:text="${selectedResto.restoPhone}">01-2345678 #123</span>
+              </p>              
+              <select th:field="*{regiSeats}" id="regiSeats" class="form-select form_control" required>
+                <option disabled selected value="">請選擇人數</option>
+                <option th:each="i : ${#numbers.sequence(1, 8)}"
+                        th:value="${i}"
+                        th:text="${i + ' 人'}">
+                </option>
+              </select>
+              
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('regiSeats')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('regiSeats')}" th:text="${err}"></span>
               </div>
-              <p class="form-hint">可接受 1-8 位訂位（含大人與小孩）<br> * 超過 8 人的訂位，請使用電話預約 01-2345678 #123</p>
+              
+              
             </div>
-            <div class="form-group">
-              <label for="date">用餐日期</label>
-              <div class="custom-select">
-                <span>6 月 3 號 週二</span>
-                <img src="/page/8f9fda5a-cc8e-4f0d-b367-9ff34f83dd55/images/419_3543.svg" alt="dropdown arrow">
+            
+            <!-- 用餐日期 -->
+            <div class="form-group col-12">
+              <label for="regiDate" class="form-label form-group-title">用餐日期</label>
+              <input type="date" th:field="*{regiDate}" id="regiDate" class="form-control" required
+               th:attr="min=${today}">
+               
+               <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('regiDate')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('regiDate')}" th:text="${err}"></span>
               </div>
+               
             </div>
           </div>
-  
-          <div class="form-group">
-            <label>用餐時段</label>
-            <div class="meal-slots">
-              <div class="meal-group">
-                <div class="meal-title">早餐</div>
-                <div class="time-slots">
-                  <button type="button" class="time-slot">07:00</button>
-                  <button type="button" class="time-slot">08:30</button>
-                </div>
-              </div>
-              <div class="meal-group">
-                <div class="meal-title">午餐</div>
-                <div class="time-slots">
-                  <button type="button" class="time-slot disabled">11:30</button>
-                  <button type="button" class="time-slot active">13:00</button>
-                </div>
-              </div>
-              <div class="meal-group">
-                <div class="meal-title">晚餐</div>
-                <div class="time-slots">
-                  <button type="button" class="time-slot">17:30</button>
-                  <button type="button" class="time-slot">19:00</button>
-                </div>
-              </div>
-            </div>
+          
+          <!-- 用餐時段 -->
+          <input type="hidden" th:field="*{timeslotVO.timeslotId}" id="timeslotId">
+
+          <!-- 錯誤提示 -->
+          <div class="text-danger" th:if="${#fields.hasErrors('timeslotVO.timeslotId')}">
+            <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+            <span th:each="err : ${#fields.errors('timeslotVO.timeslotId')}" th:text="${err}"></span>
           </div>
-  
-          <button type="submit" class="submit-btn">填表預訂</button>
+
+          <div th:each="period : ${periodList}" class="meal-group">
+            <div class="period-label meal-title mt-3" th:text="${period.periodName}"></div>
+            
+            <div class="time-slots">
+                  <button
+                    type="button"
+                    class="time-slot"
+                    th:each="ts : ${period.timeslots}"
+                    th:data-slot-id="${ts.timeslotId}"
+                    th:text="${ts.timeslotName}"
+                    th:classappend="${ts.isDeleted} ? 'disabled' : ''">
+                  </button>
+              </div>
+          </div>
+          
+<!--           用餐時段 -->
+<!--           <input type="hidden" th:field="*{timeslotVO.timeslotId}" id="timeslotId"> -->
+
+<!--           <div class="meal-group" th:each="period : ${periodList}"> -->
+<!--               <div class="meal-title period-label" th:text="${period.periodName}">早餐</div> -->
+          
+<!--               <div class="time-slots"> -->
+<!--                   <button -->
+<!--                     type="button" -->
+<!--                     class="time-slot" -->
+<!--                     th:data-slot-id="${ts.timeslotId}" -->
+<!--                     th:text="${ts.timeslotName}" -->
+<!--                     th:classappend="${ts.isEnabled} ? '' : ' disabled'" -->
+<!--                     th:each="ts : ${period.timeslotList}"> -->
+<!--                   </button> -->
+<!--               </div> -->
+<!--           </div> -->
+          
+          
+          
         </form>
+        <div class="mt-5">
+          <button type="submit" form="restoOrderFrontForm" class="submit-btn">填表預訂</button>
+        </div>
+   
       </section>
     </div>
   </main>

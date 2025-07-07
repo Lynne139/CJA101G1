@@ -7,6 +7,8 @@
   --text-color-dark: #000000;
   --border-color: #7e4e24;
   --border-color-light: #b88d67;
+  --form-focus-shadow: 0 0 4px 0 var(--accent-color);
+  
 }
 
 /* CSS from section:hero */
@@ -102,22 +104,12 @@
   color: var(--primary-color);
 }
 
-/* .restaurant-content table{ */
-/* 	height:auto; */
-/* 	border:none; */
-/* 	display: block; */
-/*   overflow-x: auto; */
-/* /*   white-space: nowrap; */ */
-/*   margin:0 10px; */
-/* } */
-
 .restaurant-content th,.restaurant-content td{
 	padding:4px;
 	border:1px solid var(--secondary-color);
 }
 
 .reservation-container {
-  background-color: rgba(255, 255, 255, 0.3);
   border-radius: 20px;
   padding: 60px 32px;
 }
@@ -132,48 +124,33 @@
   margin-bottom: 60px;
 }
 
-.reservation-form {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  max-width: 1256px;
-  margin: 0 auto;
-}
 
-.form-row {
-  display: flex;
-  gap: 30px;
-}
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-
-.form-group label {
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 24px;
-  letter-spacing: 0.8px;
-  color: var(--primary-color);
-  margin-bottom: 6px;
-}
-
-.custom-select {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 50px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 10px 16px;
+input.form-control.form-control,
+select.form-select.form-select,
+textarea.form-control.form-control {
   background-color: transparent;
-  font-size: 20px;
-  font-weight: 500;
   color: var(--primary-color);
+  border-color: var(--primary-color);
+  outline: none;
 }
+input.form-control.form-control:focus,
+select.form-select.form-select:focus,
+textarea.form-control.form-control:focus {
+  background-color: transparent;
+  color: var(--primary-color);
+  box-shadow: var(--form-focus-shadow);
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.form-group-title{
+	font-size:1.5rem;
+	font-weight:400;
+	opacity:80%;
+	color:var(--accent-color);
+}
+
 
 .form-hint {
   font-size: 12px;
@@ -184,12 +161,6 @@
   margin-top: 4px;
 }
 
-.meal-slots {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
 .meal-group {
   display: flex;
   flex-direction: column;
@@ -197,35 +168,44 @@
 }
 
 .meal-title {
-  border: 1px solid var(--border-color-light);
+  border-bottom: 1px solid var(--primary-color);
   padding: 8px 0;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
-  line-height: 24px;
-  letter-spacing: 0.8px;
+  line-height: 32px;
+  letter-spacing: 1.5%;
   color: var(--secondary-color);
 }
 
 .time-slots {
   display: flex;
-  gap: 16px;
+  gap: 24px;  
 }
 
 .time-slot {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   background-color: transparent;
-  padding: 10px 16px;
-  height: 50px;
-  width: 88px;
-  font-size: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--primary-color);
   text-align: center;
+  :hover{
+	color: var(--text-color-light);
+	background-color:var(--accent-color);
+    font-weight: 500;
+  }
+}
+.time-slot:not(.disabled):hover {
+  border-color: var(--accent-color);
+  color: var(--text-color-light);
+  background-color:var(--accent-color);
+  font-weight: 500;
 }
 
 .time-slot.disabled {
-  opacity: 0.4;
+  opacity: 40%;
   cursor: not-allowed;
 }
 
