@@ -3,7 +3,7 @@ package com.resto.model;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,17 +52,31 @@ public class RestoService {
         return RestoCriteriaHelper.getAllDTO(paramMap, em);
     }
     
-    // 多筆
+    // 多筆(前台上架)
+    @Transactional(readOnly = true)
+    public List<RestoVO> getAllEnabled() {
+        return restoRepository.findByIsDeletedFalseAndIsEnabledTrue();
+    }
+
+    // 多筆(後台無軟刪)
     @Transactional(readOnly = true)
     public List<RestoVO> getAll() {
-        return restoRepository.findByIsDeletedFalse();
+    	return restoRepository.findByIsDeletedFalse();
     }
     
-    // id拿單筆
+    // id拿單筆(允許後台抓得到已軟刪資料)
     @Transactional(readOnly = true)
     public RestoVO getById(Integer id) {
         return restoRepository.findById(id).orElse(null);
     }
+
+    // id拿單筆(前台限上架且未軟刪)
+    // 查單筆給前台(必須上架且非軟刪)
+    public Optional<RestoVO> findOnline(Integer id) {            // 前台用
+        return restoRepository.findByRestoIdAndIsDeletedFalseAndIsEnabledTrue(id);
+    }
+    
+    
 
     // 軟刪除
     @Transactional
