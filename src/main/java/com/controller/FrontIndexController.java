@@ -112,9 +112,29 @@ public class FrontIndexController {
         return result;
     }
     
+    @GetMapping("/api/member/refresh")
+    @ResponseBody
+    public MemberVO refreshMember(HttpSession session) {
+        MemberVO sessionMember = (MemberVO) session.getAttribute("loggedInMember");
+
+        if (sessionMember == null) {
+            return null; // 或回傳錯誤訊息物件
+        }
+
+        // 從資料庫重新查最新資料
+        MemberVO updated = memberSvc.getOneMember(sessionMember.getMemberId());
+
+        // 放回 session，讓 Thymeleaf 也能看到新資料
+        session.setAttribute("loggedInMember", updated);
+
+        return updated;
+    }
+    
     @GetMapping("/member/logout")
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/home";
     }
+    
+    
 }

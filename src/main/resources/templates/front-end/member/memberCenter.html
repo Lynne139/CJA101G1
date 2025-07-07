@@ -187,8 +187,16 @@
   
   <!-- ✅ main JS -->
   <script>
-	 
-  </script>
+  fetch("/api/member/refresh")
+    .then(res => res.json())
+    .then(data => {
+      if (data) {
+        document.querySelector("#memberPoints").innerText = data.memberPoints;
+        document.querySelector("#memberLevel").innerText = data.memberLevel;
+        document.querySelector("#memberConsumption").innerText = data.memberAccumulativeConsumption + " 元"; 
+      }
+    });
+</script>
 </body>
 
 </html>
