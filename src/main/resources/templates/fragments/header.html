@@ -219,8 +219,8 @@
                     聯絡我們
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="contactDropdown">
-                    <li><a class="dropdown-item" th:href="@{/contact}">聯絡客服</a></li>
                     <li><a class="dropdown-item" th:href="@{/chatbot}">智慧客服</a></li>
+                    <li><a class="dropdown-item" th:href="@{/cs}">聯絡客服</a></li>
                   </ul>
                 </div>
             </div>
@@ -250,8 +250,8 @@
                 </div>
                 <div class="overlay-menu-col">
                     <h5>聯絡我們</h5>
-                    <a th:href="@{/contact}">聯絡客服</a>
                     <a th:href="@{/chatbot}">智慧客服</a>
+                    <a th:href="@{/cs}">聯絡客服</a>
                 </div>
                 <div class="overlay-menu-col">
                     <h5>其他</h5>
@@ -331,15 +331,16 @@
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 	<script th:inline="javascript">
-		// 載入頁面時更新未讀通知數量(會顯示在小鈴鐺旁)
+		// 載入頁面和有新通知時，更新未讀通知數量(會顯示在小鈴鐺旁)
 	    document.addEventListener('DOMContentLoaded', function () {
 	    	var memberId = /*[[${loggedInMember != null} ? ${loggedInMember.memberId} : 'null']]*/ null;
-	        if (!memberId) {
-	            // 沒登入會員，不執行 API 呼叫
-	            console.log('未登入會員，不更新未讀數量');
-	            return;
+	    	if (memberId == 'null') {
+	            console.log('未登入會員');
+	            return; // 沒登入會員，不執行 API 呼叫
+	        } else {
+	        	console.log('已登入，即將取得未讀訊息數量，並建立 WebSocket 連線');
 	        }
-	        // 呼叫 API 取得未讀訊息數量
+	        // 1. 呼叫 API 取得未讀訊息數量
 	        fetch(`/api/notifications/unread-count`)
 	            .then(response => {
 	                if (!response.ok) throw new Error('Network response was not ok');
@@ -359,15 +360,8 @@
 	            .catch(error => {
 	                console.error('取得未讀訊息數量失敗:', error);
 	            });
-	    });
-		
-		// 建立 WebSocket 連線
-	    document.addEventListener('DOMContentLoaded', function () {
-	        var memberId = /*[[${loggedInMember != null} ? ${loggedInMember.memberId} : 'null']]*/ null;
-	        if (!memberId) {
-	            console.log('未登入會員，不建立 WebSocket');
-	            return;
-	        }
+
+			// 2. 建立 WebSocket 連線
 	        var socket = new SockJS('/ws-notifications');
 	        var stompClient = Stomp.over(socket);
 	        stompClient.connect({}, function (frame) {
