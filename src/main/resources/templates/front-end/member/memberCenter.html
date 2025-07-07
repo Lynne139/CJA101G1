@@ -59,31 +59,10 @@
   <!-- ✅ header -->
   <div th:replace="~{fragments/header :: header}"></div>
 
-  <!-- ✅ 子選單 Navbar -->
-  <nav class="sub-navbar d-flex justify-content-center align-items-center">
-    <ul class="nav">
-      <li class="nav-item"><a class="nav-link" href="#">關於嶼蔻</a></li>
-      <li class="nav-item"><a class="nav-link" href="#">最新消息</a></li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" tabindex="0">探索嶼蔻</a>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#">珍饈美饌</a></li>
-          <li><a class="dropdown-item" href="#">多元設施</a></li>
-        </ul>
-      </li>
-      <li class="nav-item"><a class="nav-link" href="#rooms">精緻客房</a></li>
-      <li class="nav-item"><a class="nav-link" href="#faq">交通資訊</a></li>
-      <li class="nav-item"><a class="nav-link" href="#footer">聯絡我們</a></li>
-      <li class="nav-item"><a class="nav-link" href="#faq">常見問題</a></li>
-    </ul>
-  </nav>
+  
 
-  <!-- ✅ Sticky 右側按鈕 -->
-  <div class="sticky-icons d-none d-lg-block">
-    <a href="#"><img th:src="@{/images/icon/bed.svg}" alt="bed" class="icon"/><br>線上訂房</a>
-    <a th:href="@{/front-end/shop}"><img th:src="@{/images/icon/bag.svg}" alt="bag" class="icon"/><br>帳號選物</a>
-    <a href="#"><img th:src="@{/images/icon/dish.svg}" alt="dish" class="icon"/><br>餐廳訂位</a>
-  </div>
+ 
+  
 
   <!-- ✅ Main -->
 	<div class="container my-5">
@@ -104,7 +83,7 @@
 	          </a>
 	        </li>
 	        <li class="list-group-item sidebar-item">
-	          <a th:href="@{/member/order/shop}">
+	          <a th:href="@{/front-end/shop}">
 	            <i class="bi bi-bag-fill me-2"></i> 商品訂單
 	          </a>
 	        </li>
@@ -114,12 +93,17 @@
 	          </a>
 	        </li>
 	        <li class="list-group-item sidebar-item">
-	          <a th:href="@{/member/coupon}">
-	            <i class="bi bi-ticket-perforated-fill me-2"></i> 折價券
+	          <a th:href="@{/coupon/claim}">
+	            <i class="bi bi-ticket-perforated-fill me-2"></i> 領取折價券
 	          </a>
 	        </li>
 	        <li class="list-group-item sidebar-item">
-	          <a th:href="@{/member/notify}">
+	          <a th:href="@{/coupon/select}">
+	            <i class="bi bi-ticket-perforated-fill me-2"></i> 我的折價券
+	          </a>
+	        </li>
+	        <li class="list-group-item sidebar-item">
+	          <a th:href="@{/notification}">
 	            <i class="bi bi-bell-fill me-2"></i> 系統通知
 	          </a>
 	        </li>
@@ -162,7 +146,7 @@
   </div>
 </div>
 
-  <!-- ✅ Overlay Full Menu -->
+  <!-- Overlay Full Menu -->
   <div class="overlay-menu" id="overlayMenu">
     <div class="overlay-menu-header d-flex justify-content-between align-items-start">
       <div class="overlay-mobile-menu d-flex justify-content-between align-items-center p-3">
@@ -180,48 +164,18 @@
     </div>
     <div class="overlay-center">
       <div class="overlay-menu-member px-5 mb-5 d-flex justify-content-center">
-        <img th:src="@{/images/icon/member.svg}" alt="member" class="text-center" style="padding:0 5px"/>
+        <img th:src="@{/images/icon/member.svg}" alt="member" class="text-center" style="padding:0 5px" />
         <a href="#" class="text-center">會員登入</a>
       </div>
       <div class="px-5 mb-5 d-flex justify-content-between">
-        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_bed.svg}" alt="bed" class="menu-icon"/><br>線上訂房</a>
-        <a th:href="@{/front-end/shop}" class="text-center"><img th:src="@{/images/icon/menu_bag.svg}" alt="bag" class="menu-icon"/><br>帳號選物</a>
-        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_dish.svg}" alt="dish" class="menu-icon"/><br>餐廳訂位</a>
+        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_bed.svg}" alt="bed" class="menu-icon"/><br>線上訂房</span></a>
+        <a th:href="@{/front-end/shop}" class="text-center"><img th:src="@{/images/icon/menu_bag.svg}" alt="bag" class="menu-icon"/><br>帳號選物</span></a>
+        <a href="#" class="text-center"><img th:src="@{/images/icon/menu_dish.svg}" alt="dish" class="menu-icon"/><br>餐廳訂位</span></a>
       </div>
-      <div class="overlay-menu-row d-flex justify-content-center">
-        <div class="overlay-menu-col">
-          <h5>關於嶼蔻</h5>
-          <a href="#">品牌故事</a>
-          <a href="#">環境簡介</a>
-        </div>
-        <div class="overlay-menu-col">
-          <h5>最新消息</h5>
-          <a th:href="@{/news/notice}">最新公告</a>
-          <a th:href="@{/news/promotion}">活動通知</a>
-          <a th:href="@{/news/news}">媒體報導</a>
-        </div>
-        <div class="overlay-menu-col">
-          <h5>探索嶼蔻</h5>
-          <a href="#">珍饈美饌</a>
-          <a href="#">豐富設施</a>
-        </div>
-        <div class="overlay-menu-col">
-          <h5>精緻客房</h5>
-          <a href="#">蔻香居</a>
-          <a href="#">海音居</a>
-          <a href="#">晨曦之庭</a>
-          <a href="#">月影行館</a>
-        </div>
-        <div class="overlay-menu-col">
-          <h5>其他</h5>
-          <a href="#">交通資訊</a>
-          <a href="#">聯絡我們</a>
-          <a href="#">常見問題</a>
-        </div>
-      </div>
-    </div>
+     </div> 
   </div>
-
+  <!-- Sticky 右側按鈕 -->
+  <div th:replace="fragments/mainfunction :: stickyIcons"></div>
   <!-- ✅ footer -->
   <div th:replace="~{fragments/footer :: footer}"></div>
 
