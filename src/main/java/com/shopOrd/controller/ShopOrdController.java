@@ -40,6 +40,7 @@ import com.coupon.service.MemberCouponService;
 import com.coupon.repository.MemberCouponRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
@@ -430,6 +431,23 @@ public class ShopOrdController {
 		response.put("success", true);
 		response.put("message", "訂單已取消");
 		return response;
+	}
+
+	@GetMapping("/api/member/orders")
+	@ResponseBody
+	public List<Map<String, Object>> getMemberOrders(HttpSession session) {
+		com.member.model.MemberVO member = (com.member.model.MemberVO) session.getAttribute("loggedInMember");
+		if (member == null) return java.util.Collections.emptyList();
+		List<com.shopOrd.model.ShopOrdVO> orders = shopOrdSvc.getOrdersByMemberId(member.getMemberId());
+		return orders.stream().map(o -> {
+			Map<String, Object> map = new java.util.HashMap<>();
+			map.put("prodOrdId", o.getProdOrdId());
+			map.put("prodOrdDate", o.getProdOrdDate());
+			map.put("prodAmount", o.getProdAmount());
+			map.put("payMethod", o.getPayMethod());
+			map.put("ordStat", o.getOrdStat());
+			return map;
+		}).collect(java.util.stream.Collectors.toList());
 	}
 
 }

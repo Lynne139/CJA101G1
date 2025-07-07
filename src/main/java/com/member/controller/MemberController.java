@@ -20,6 +20,7 @@ import com.member.model.MemberService;
 import com.member.model.MemberVO;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -152,6 +153,16 @@ public class MemberController {
 	     }
 	
 	     return "redirect:/admin/listAllMember";
+	 }
+	
+	 @GetMapping("/orders")
+	 public String memberOrders(HttpSession session, Model model) {
+	     MemberVO loggedInMember = (MemberVO) session.getAttribute("loggedInMember");
+	     if (loggedInMember == null) {
+	         return "redirect:/front-end/shop";
+	     }
+	     model.addAttribute("loggedInMember", loggedInMember);
+	     return "front-end/member/memberOrders";
 	 }
 	
     

@@ -478,4 +478,10 @@ public class ShopOrdService {
 		notificationService.createNotification(memberId, notificationTitle, notificationContent);
 	}
 
+	public List<ShopOrdVO> getOrdersByMemberId(Integer memberId) {
+		return repository.findAll().stream()
+			.filter(o -> o.getMemberVO() != null && o.getMemberVO().getMemberId().equals(memberId))
+			.toList();
+	}
+
 }
