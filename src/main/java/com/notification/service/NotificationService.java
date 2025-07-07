@@ -22,12 +22,12 @@ public class NotificationService {
         this.notificationWebSocketService = notificationWebSocketService;
     }
 
-    // 新增通知
-    public Notification createNotification(Notification notification) {
-        return notificationRepository.save(notification);
-    }
+    // 新增通知(舊版)
+//    public Notification createNotification(Notification notification) {
+//        return notificationRepository.save(notification);
+//    }
     
-    // 更簡單使用的新增通知
+    // 新增通知(簡潔版，含推播功能)
     public Notification createNotification(Integer memberId, String title, String content) {
         Notification notification = new Notification();
         notification.setMemberId(memberId);
