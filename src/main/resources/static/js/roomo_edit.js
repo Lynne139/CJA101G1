@@ -20,16 +20,29 @@ function bindEditButton(editBtnSelector, modalContainerSelector, editUrlPrefix) 
   });
 }
 // 前台初始化
-if (window.location.pathname.includes('/member/room/roomOrderView')) {
-  bindEditButton('.btn_edit', '#modalContainer', '/member/room/edit?roomOrderId=');
+if (window.location.pathname.includes('/member/order/roomOrder')) {
+  bindEditButton('.btn_edit', '#modalContainer', '/member/order/roomOrder/edit?roomOrderId=');
   // 新增檢視功能
   $(document).on('click', '.btn_view', function() {
     var orderId = $(this).data('id');
-    $('#modalContainer').load('/member/room/view?roomOrderId=' + orderId, function() {
+    $('#modalContainer').load('/member/order/roomOrder/view?roomOrderId=' + orderId, function() {
       $('#roomoViewModal').modal('show');
     });
   });
 }
+
+// 取消訂單
+if (window.location.pathname.includes('/member/order/roomOrder')) {
+  $(document).on('click', '.btn_cancel', function() {
+    var orderId = $(this).data('id');
+    if (confirm('確定要取消此訂單嗎？取消後不可再修改，需重新下單。')) {
+      $('#modalContainer').load('/member/order/roomOrder/cancel?roomOrderId=' + orderId, function() {
+        // 可在這裡加上取消成功的提示或後續處理
+      });
+    }
+  });
+}
+
 // 後台初始化
 if (window.location.pathname.includes('/admin/roomo_info')) {
   bindEditButton('.btn_edit', '#roomoInfoModalContainer', '/admin/roomo_info/edit?roomOrderId=');
@@ -84,3 +97,81 @@ function initRoomoTable() {
       }
   });
 }
+
+// ====== 新增入住/退房日與房量檢查 ======
+function checkRoomInventoryAndDate(callback) {
+  const checkIn = document.getElementById('editCheckInDate').value;
+  const checkOut = document.getElementById('editCheckOutDate').value;
+  let valid = true;
+  let errorMsg = '';
+  let requests = [];
+
+  // 先檢查日期邏輯
+  if (!checkIn || !checkOut) {
+    callback(false, '請選擇入住與退房日期');
+    return;
+  }
+  if (checkIn >= checkOut) {
+    callback(false, '入住日期不可大於或等於退房日期！');
+    return;
+  }
+
+  // 取得所有明細
+  $('#roomOrderEditForm [name^="orderDetails"][name$="roomOrderListId"]').each(function() {
+    const name = $(this).attr('name');
+    const matchType = name.match(/orderDetails\[(\d+)\]\.roomOrderListId/);
+    if (matchType) {
+      const idx = matchType[1];
+      let roomTypeId = $(`[name='orderDetails[${idx}].roomType.roomTypeId']`).val() ||
+                       $(`[name='orderDetails[${idx}].roomTypeId']`).val();
+      let roomTypeName = $(`[name='orderDetails[${idx}].roomType.roomTypeName']`).val();
+      let roomAmount = $(`[name='orderDetails[${idx}].roomAmount']`).val();
+      if (roomTypeId && roomAmount) {
+        requests.push(
+          $.get(`/member/order/roomOrder/${roomTypeId}/check_schedule`, {
+            start: checkIn,
+            end: checkOut
+          }).then(function(available) {
+            if (parseInt(available) < parseInt(roomAmount)) {
+              valid = false;
+              errorMsg = `房型 ${roomTypeName} 剩餘房間不足，請洽客服`;
+            }
+          })
+        );
+      }
+    }
+  });
+
+  // 等所有查詢完成
+  $.when.apply($, requests).then(function() {
+    callback(valid, errorMsg);
+  });
+}
+
+// 綁定入住/退房日 change 事件
+$(document).on('change', '#editCheckInDate, #editCheckOutDate', function() {
+  checkRoomInventoryAndDate(function(valid, msg) {
+    if (!valid) {
+      alert(msg);
+      $('#roomOrderEditForm [type=submit]').prop('disabled', true);
+    } else {
+      $('#roomOrderEditForm [type=submit]').prop('disabled', false);
+    }
+  });
+});
+
+// 送出前再次檢查
+$(document).on('submit', '#roomOrderEditForm', function(e) {
+  let allowSubmit = false;
+  e.preventDefault();
+  checkRoomInventoryAndDate(function(valid, msg) {
+    if (!valid) {
+      alert(msg);
+      allowSubmit = false;
+    } else {
+      allowSubmit = true;
+      $('#roomOrderEditForm')[0].submit();
+    }
+  });
+});
+// ====== END ======

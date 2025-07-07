@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.member.model.MemberService;
 import com.member.model.MemberVO;
 
+import jakarta.validation.Valid;
+
 
 @Controller
 @RequestMapping("/front-end/member")
@@ -31,13 +33,13 @@ public class RegisterMemberController {
 
     @PostMapping("/register")
     public String registerMember(
-            @ModelAttribute("memberVO") MemberVO memberVO,
+    		@ModelAttribute("memberVO") MemberVO memberVO,
             BindingResult result,
             @RequestParam("confirmPassword") String confirmPassword,
             Model model) {
     	
     	memberVO.setMemberLevel("普通會員");
-        memberVO.setMemberStatus(0);
+        memberVO.setMemberStatus(1);
         memberVO.setMemberPoints(0);
         memberVO.setMemberAccumulativeConsumption(0);
         memberVO.setMemberPic(null);

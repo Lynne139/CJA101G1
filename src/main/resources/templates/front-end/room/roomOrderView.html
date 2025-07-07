@@ -53,7 +53,7 @@
                         <thead class="table_head align-top">
                         <tr>
                             <th>訂單編號</th>
-                            <th class="text-center">訂單狀態</th>
+                            <th>訂單狀態</th>
                             <th>付款狀態</th>
                             <th>訂單總金額</th>
                             <th>實際支付金額</th>
@@ -64,23 +64,23 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="order : ${roomOrders}">
-                            <td th:text="${order.roomOrderId}"></td>
-                            <td class="text-center">
-                                <span th:classappend="${order.orderStatus} == 2 ? 'badge bg-success' : (${order.orderStatus} == 1 ? 'badge bg-primary' : 'badge bg-secondary')"
-                                      th:text="${order.orderStatus} == 2 ? '完成' : (${order.orderStatus} == 1 ? '成立' : '取消')"></span>
+                        <tr th:each="roomo : ${roomOrders}">
+                            <td th:text="${roomo.roomOrderId}"></td>
+                            <td style="text-align: center;">
+                                <span th:classappend="${roomo.orderStatus} == 2 ? 'badge bg-success' : (${roomo.orderStatus} == 1 ? 'badge bg-primary' : 'badge bg-secondary')"
+                                      th:text="${roomo.orderStatus} == 2 ? '完成' : (${roomo.orderStatus} == 1 ? '成立' : '取消')"></span>
                             </td>
-                            <td th:text="${order.payStatus} == 1 ? '已付款' : '未付款'"></td>
-                            <td th:text="${order.totalAmount}"></td>
-                            <td th:text="${order.actualAmount}"></td>
-                            <td style="white-space: nowrap;" th:text="${order.checkInDate}"></td>
-                            <td style="white-space: nowrap;" th:text="${order.checkOutDate}"></td>
-                            <td th:text="${order.orderDate}"></td>
+                            <td th:text="${roomo.payStatus} == 1 ? '已付款' : '未付款'"></td>
+                            <td th:text="${roomo.totalAmount}"></td>
+                            <td th:text="${roomo.actualAmount}"></td>
+                            <td style="white-space: nowrap;" th:text="${roomo.checkInDate}"></td>
+                            <td style="white-space: nowrap;" th:text="${roomo.checkOutDate}"></td>
+                            <td th:text="${roomo.orderDate}"></td>
                             <td>
                                 <div class="table_row_actions d-flex justify-content-center align-items-start">
-                                    <button class="btn_icon btn_view" th:data-id="${order.roomOrderId}" title="查看訂單" th:disabled="${order.orderStatus} == 0"><i class="fas fa-eye"></i></button>
-                                    <button class="btn_icon btn_edit" th:data-id="${order.roomOrderId}" title="編輯資料" th:disabled="${order.orderStatus} == 0"><i class="fas fa-edit"></i></button>
-                                    <button class="btn_icon btn_cancel" th:data-id="${order.roomOrderId}" title="取消訂單" th:disabled="${order.orderStatus} == 0"><i class="fas fa-times"></i></button>
+                                    <button class="btn_icon btn_view" th:data-id="${roomo.roomOrderId}" title="查看訂單" th:disabled="${roomo.orderStatus} == 0"><i class="fas fa-eye"></i></button>
+                                    <button class="btn_icon btn_edit" th:data-id="${roomo.roomOrderId}" title="編輯資料" th:disabled="${roomo.orderStatus} == 0"><i class="fas fa-edit"></i></button>
+                                    <button class="btn_icon btn_cancel" th:data-id="${roomo.roomOrderId}" title="取消訂單" th:disabled="${roomo.orderStatus} == 0"><i class="fas fa-times"></i></button>
                                 </div>
                             </td>
                         </tr>

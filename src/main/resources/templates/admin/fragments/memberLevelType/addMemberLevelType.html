@@ -1,10 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>新增會員等級</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #F4EDE1;
+  }
+  input.form-control,
+  select.form-select,
+  textarea.form-control {
+    background-color: #F4EDE1;       
+    border: 1px solid #7E4E24;       
+    color: #333;                     
+    border-radius: 6px;             
+  }
+</style>
 </head>
 <body>
- 
+<div class="container mt-5" th:fragment="add_member_input">
+  <h3>新增會員等級</h3>
+
+  <form th:action="@{/memberLevelType/insertL}" method="post" th:object="${memberLevelType}">
+    <div class="mb-3">
+      <label for="memberRank" class="form-label">等級排序 <span style="color:red">*</span></label>
+      <input type="text" class="form-control" id="memberRank" th:field="*{memberRank}" required>
+      <div class="text-danger" th:if="${#fields.hasErrors('memberRank')}" th:errors="*{memberRank}"></div>
+    </div>
+
+    <div class="mb-3">
+      <label for="memberLevel" class="form-label">會員等級 <span style="color:red">*</span></label>
+      <input type="text" class="form-control" id="memberLevel" th:field="*{memberLevel}" required>
+      <div class="text-danger" th:if="${#fields.hasErrors('memberLevel')}" th:errors="*{memberLevel}"></div>
+    </div>
+
+    <button type="submit" class="btn btn-success">新增</button>
+    <a th:href="@{/admin/listAllMemberLevelType}" class="btn btn-secondary">取消</a>
+  </form>
+</div>
 </body>
 </html>

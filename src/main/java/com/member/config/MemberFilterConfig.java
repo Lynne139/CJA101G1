@@ -26,8 +26,10 @@ public class MemberFilterConfig {
             
             // 帳號選物相關
 //            "/front-end/shop",       商城首頁
-//            "/prodCart/*",          // 購物車相關
-//            "/shopOrd/*",           // 訂單相關
+
+            //"/prodCart/*",          // 購物車相關
+           // "/shopOrd/*",           // 訂單相關
+
             
             // 會員功能相關
             "/member/center",       // 會員中心

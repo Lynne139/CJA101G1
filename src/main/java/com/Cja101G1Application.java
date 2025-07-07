@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.member.model.MemberImageUploader;
 
+
 @SpringBootApplication
 @EnableScheduling 
 public class Cja101G1Application {

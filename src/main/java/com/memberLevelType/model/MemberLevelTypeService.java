@@ -20,6 +20,7 @@ public class MemberLevelTypeService {
     // 修改
     public void updateMemberLevelType(MemberLevelType memberLevelType) {
     	repository.save(memberLevelType);
+    	System.out.println("要更新到 DB 的資料: " + memberLevelType.getMemberLevel());
     }
     
     // 刪除

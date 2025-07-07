@@ -5,10 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>會員新增</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #F4EDE1;
+  }
+  input.form-control,
+  select.form-select,
+  textarea.form-control {
+    background-color: #F4EDE1;       
+    border: 1px solid #7E4E24;       
+    color: #333;                     
+    border-radius: 6px;            
+ }
+</style>
+  
 </head>
 <body>
 <div class="container mt-5" th:fragment="addMember">
-  <h3>會員新增</h3>
+  <h3 style="color: #7E4E24;">會員新增</h3>
  
   <form th:action="@{/admin/insert}" method="post" th:object="${memberVO}" enctype="multipart/form-data">
     
@@ -23,17 +40,25 @@
 
     <div class="mb-3">
       <label for="memberLevel" class="form-label">會員等級</label>
-      <input type="text" class="form-control" id="memberLevel" th:field="*{memberLevel}">
+      <select class="form-select" id="memberLevel" th:field="*{memberLevel}">
+	    <option th:value="普通會員" th:selected="${memberVO.memberLevel == '普通會員'}">普通會員</option>
+	    <option th:value="銀卡會員" th:selected="${memberVO.memberLevel == '銀卡會員'}">銀卡會員</option>
+	    <option th:value="金卡會員" th:selected="${memberVO.memberLevel == '金卡會員'}">金卡會員</option>
+	    <option th:value="白金卡會員" th:selected="${memberVO.memberLevel == '白金卡會員'}">白金卡會員</option>
+	  </select>
+      <div class="text-danger" th:if="${#fields.hasErrors('memberLevel')}" th:errors="*{memberLevel}"></div>
     </div>
 
     <div class="mb-3">
       <label for="memberPassword" class="form-label">密碼</label>
-      <input type="password" class="form-control" id="memberPassword" th:field="*{memberPassword}">
+      <input type="password" class="form-control" id="memberPassword" th:field="*{memberPassword}" placeholder="請輸入4-12個字符的密碼">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberPassword')}" th:errors="*{memberPassword}"></div>
     </div>
 
     <div class="mb-3">
       <label for="memberName" class="form-label">會員名稱</label>
       <input type="text" class="form-control" id="memberName" th:field="*{memberName}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberName')}" th:errors="*{memberName}"></div>
     </div>
 
     <div class="mb-3">
@@ -44,11 +69,13 @@
     <div class="mb-3">
       <label for="memberPhone" class="form-label">電話</label>
       <input type="text" class="form-control" id="memberPhone" th:field="*{memberPhone}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberBirthday')}" th:errors="*{memberBirthday}"></div>
     </div>
 
     <div class="mb-3">
       <label for="memberAddress" class="form-label">地址</label>
       <input type="text" class="form-control" id="memberAddress" th:field="*{memberAddress}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberAddress')}" th:errors="*{memberAddress}"></div>
     </div>
 
     <div class="mb-3">
@@ -58,25 +85,32 @@
 
     <div class="mb-3">
       <label for="memberStatus" class="form-label">會員狀態</label>
-      <input type="text" class="form-control" id="memberStatus" th:field="*{memberStatus}">
+      <select class="form-select" id="memberStatus" th:field="*{memberStatus}">
+        <option th:value="1" th:selected="${memberVO.memberStatus == 1}">1: 啟用</option>
+        <option th:value="2" th:selected="${memberVO.memberStatus == 2}">2: 停權</option>
+      </select>
+      <div class="text-danger" th:if="${#fields.hasErrors('memberStatus')}" th:errors="*{memberStatus}"></div>
     </div>
 
     <div class="mb-3">
       <label for="memberEmail" class="form-label">電子信箱</label>
       <input type="email" class="form-control" id="memberEmail" th:field="*{memberEmail}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberEmail')}" th:errors="*{memberEmail}"></div>
     </div>
 
     <div class="mb-3">
       <label for="memberPoints" class="form-label">會員積分</label>
       <input type="number" class="form-control" id="memberPoints" th:field="*{memberPoints}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberPoints')}" th:errors="*{memberPoints}"></div>
     </div>
 
     <div class="mb-3">
       <label for="memberAccumulativeConsumption" class="form-label">會員累積消費金額</label>
       <input type="number" class="form-control" id="memberAccumulativeConsumption" th:field="*{memberAccumulativeConsumption}">
+      <div class="text-danger" th:if="${#fields.hasErrors('memberAccumulativeConsumption')}" th:errors="*{memberAccumulativeConsumption}"></div>
     </div>
 
-    <button type="submit" class="btn btn-primary">送出新增</button>
+    <button type="submit" class="btn btn-primary">新增</button>
     <button type="reset" class="btn btn-secondary">重設</button>
 
   </form>

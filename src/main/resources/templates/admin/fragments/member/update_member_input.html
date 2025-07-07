@@ -6,10 +6,25 @@
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>修改會員資料</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+ <style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #F4EDE1;
+  }
+  input.form-control,
+  select.form-select,
+  textarea.form-control {
+    background-color: #F4EDE1;       
+    border: 1px solid #7E4E24;       
+    color: #333;                     
+    border-radius: 6px;            
+ }
+</style>
 </head>
 <body>
 <div class="container mt-5" th:fragment="update_member_input">
-  <h3>修改會員資料</h3>
+  <h3 style="color: #7E4E24;">修改會員資料</h3>
 
   <form th:action="@{/admin/update}" method="post" enctype="multipart/form-data" th:object="${memberVO}">
     
@@ -37,7 +52,7 @@
     <!-- 密碼 -->
     <div class="mb-3">
       <label for="memberPassword" class="form-label">密碼</label>
-      <input type="text" class="form-control" id="memberPassword" th:field="*{memberPassword}">
+      <input type="text" class="form-control" id="memberPassword" th:field="*{memberPassword}" placeholder="請輸入4-12個字符的密碼">
       <div class="text-danger" th:if="${#fields.hasErrors('memberPassword')}" th:errors="*{memberPassword}"></div>
     </div>
 
@@ -65,7 +80,12 @@
     <!-- 會員等級 -->
     <div class="mb-3">
       <label for="memberLevel" class="form-label">會員等級</label>
-      <input type="text" class="form-control" id="memberLevel" th:field="*{memberLevel}">
+      <select class="form-select" id="memberLevel" th:field="*{memberLevel}">
+	    <option th:value="普通會員" th:selected="${memberVO.memberLevel == '普通會員'}">普通會員</option>
+	    <option th:value="銀卡會員" th:selected="${memberVO.memberLevel == '銀卡會員'}">銀卡會員</option>
+	    <option th:value="金卡會員" th:selected="${memberVO.memberLevel == '金卡會員'}">金卡會員</option>
+	    <option th:value="白金卡會員" th:selected="${memberVO.memberLevel == '白金卡會員'}">白金卡會員</option>
+	  </select>
       <div class="text-danger" th:if="${#fields.hasErrors('memberLevel')}" th:errors="*{memberLevel}"></div>
     </div>
 
@@ -95,15 +115,36 @@
 
     <!-- 會員圖片 -->
     <div class="mb-3">
-      <label class="form-label">會員圖片</label><br>
-      <img th:src="@{/member/ImageReader(memberId=${memberVO.memberId})}" width="120" height="120" class="mb-2" />
-      <input type="file" class="form-control" name="uploadPic" th:field="*{uploadPic}">
-    </div>
+	  <label class="form-label">會員圖片</label><br>
+	  <img id="preview" th:src="@{/member/ImageReader(memberId=${memberVO.memberId})}"
+	       onerror="this.src='/images/default-avatar.png'"
+	       width="120" height="120" class="mb-2 border rounded" />
+	  <input type="file" class="form-control" name="uploadPic" th:field="*{uploadPic}" id="uploadPicInput">
+	</div>
 
     <button type="submit" class="btn btn-primary">送出修改</button>
     <a th:href="@{/admin/listAllMember}" class="btn btn-secondary">取消</a>
-
+	
   </form>
 </div>
+	<script>
+	  document.addEventListener('DOMContentLoaded', function () {
+	    const fileInput = document.getElementById('uploadPicInput');
+	    const previewImg = document.getElementById('preview');
+	
+	    fileInput.addEventListener('change', function () {
+	      const file = this.files[0];
+	      if (file && file.type.startsWith("image/")) {
+	        const reader = new FileReader();
+	        reader.onload = function (e) {
+	          previewImg.src = e.target.result; // 直接蓋掉原圖
+	        };
+	        reader.readAsDataURL(file);
+	      }
+	    });
+	  });
+	</script>
+
+
 </body>
 </html>

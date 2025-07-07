@@ -75,7 +75,7 @@
                       class="form-select roomTypeSelect" required>
                       <option value="">請選擇</option>
                       <option th:each="rt : ${roomTypeList}" th:value="${rt.roomTypeId}" th:text="${rt.roomTypeName}"
-                        th:attr="data-price=${rt.roomTypePrice},data-guest-num=${rt.guestNum}"
+                        th:attr="data-price=${rt.roomTypePrice}"
                         th:selected="${rt.roomTypeId} == ${detail.roomType.roomTypeId}">
                       </option>
                     </select>
@@ -101,7 +101,7 @@
                   </div>
 
                   <div class="row g-2 align-items-end">
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                       <label class="form-label" style="padding: 5px;">住客代表姓名</label>
                       <input type="text" th:name="'orderDetails[' + ${stat.index} + '].roomGuestName'"
                         class="form-control" th:value="${detail.roomGuestName}">
@@ -109,141 +109,165 @@
                     <div class="col-md-3">
                       <label class="form-label" style="padding: 5px;">入住人數 <span class="text-danger">*</span></label>
                       <select th:name="'orderDetails[' + ${stat.index} + '].numberOfPeople'"
-                        class="form-control numberOfPeopleSelect" style="width:100px" required>
-                        <option value="">請先選擇房型</option>
-                        <option th:each="i : ${#numbers.sequence(1, detail.roomType.guestNum != null ? detail.roomType.guestNum : 4)}" 
-                          th:value="${i}" th:text="${i}"
-                          th:selected="${i == detail.numberOfPeople}"></option>
+                        class="form-control numberOfPeopleSelect" th:value="${detail.numberOfPeople}"
+                        data-selected-value="${detail.numberOfPeople}" style="width:100px" required>
+                        <option th:value="${detail.numberOfPeople}" th:text="${detail.numberOfPeople}"></option>
+                        <option value="">請先選擇房型與日期</option>
                       </select>
-                    </div>
-                  </div>
 
-                  <div class="row mt-2">
-                    <div class="col">
-                      <label class="form-label">特殊需求</label>
-                      <input type="text" th:name="'orderDetails[' + ${stat.index} + '].specialReq'" class="form-control"
-                        maxlength="50" th:value="${detail.specialReq}">
                     </div>
-                  </div>
 
-                  <!-- 刪除按鈕 -->
-                  <!-- <div class="text-end mt-2">
+
+                    <div class="row mt-2">
+                      <div class="col">
+                        <label class="form-label">特殊需求</label>
+                        <input type="text" th:name="'orderDetails[' + ${stat.index} + '].specialReq'"
+                          class="form-control" maxlength="50" th:value="${detail.specialReq}">
+                      </div>
+                    </div>
+
+                    <!-- 刪除按鈕 -->
+                    <!-- <div class="text-end mt-2">
                     <button type="button" class="btn btn-danger remove-detail-btn"
                       th:attr="data-id=${detail.roomOrderListId}">移除訂單</button>
                   </div> -->
+                  </div>
                 </div>
               </div>
+            </div>
 
-              <button type="button" class="btn btn-primary mb-3" id="btnAddDetail">新增房型訂單</button>
+            <button type="button" class="btn btn-primary mb-3" id="btnAddDetail">新增房型訂單</button>
+
+            <hr>
 
 
 
-              <!-- 折價券選擇 -->
-              <div class="mb-3">
+            <!-- 折價券選擇 -->
+            <!-- <div class="mb-3">
                 <label for="coupon" class="form-label">折價券(不可修改)</label>
-                <select th:field="*{coupon}" id="coupon" class="form-select" disabled>
-                  <option th:each="c : ${couponList}" th:value="${c.couponCode}"
-                    th:text="${c.couponName} + '（' + ${c.couponCode} + '）:'+ ${c.discountValue} + '元'"
-                    th:attr="data-discount=${c.discountValue}">
-                  </option>
-                </select>
-              </div>
-
-              <!-- 折扣金額 -->
-              <div class="mb-3">
-                <label for="discountAmount" class="form-label">折扣金額</label>
-                <input type="number" th:field="*{discountAmount}" id="discountAmount" class="form-control" default="0"
-                  readonly>
-              </div>
-
-              <!-- 是否加購專案 -->
-              <div class="mb-3">
-                <label class="form-label">是否加購專案 <span class="text-danger">*</span></label>
-                <div class="form-check">
-                  <input type="radio" id="projectAddOnNo" name="projectAddOn" value="0" class="form-check-input" th:checked="${roomOrder.projectAddOn == 0}" required>
-                  <label for="projectAddOnNo" class="form-check-label">否</label>
-                </div>
-                <div class="form-check">
-                  <input type="radio" id="projectAddOnYes" name="projectAddOn" value="1" class="form-check-input" th:checked="${roomOrder.projectAddOn == 1}" required>
-                  <label for="projectAddOnYes" class="form-check-label">是</label>
-                </div>
-              </div>
-              <!-- 專案方案選擇 -->
-              <div class="mb-3" id="projectPlanArea" style="display:none;">
-                <label class="form-label">選擇專案方案 <span class="text-danger">*</span></label>
-                <select id="projectPlanSelect" class="form-select">
-                  <option value="">請選擇專案</option>
-                  <option value="1" data-price="800">南島晨光專案 +800/人</option>
-                  <option value="2" data-price="1800">蔚藍晨夕專案 +1800/人</option>
-                  <option value="3" data-price="2800">悠日饗茶專案 +2800/人</option>
-                </select>
-              </div>
-              <!-- 專案加購區塊（動態產生） -->
-              <div id="restoProjectArea" style="display:none;"></div>
-
-              <!-- 付款狀態 -->
-              <div class="mb-3">
-                <label for="payStatus" class="form-label">付款狀態</label>
-                <select th:field="*{payStatus}" id="payStatus" class="form-select">
-                  <option value="0">未付款</option>
-                  <option value="1">已付款</option>
-                </select>
-              </div>
-
-              <!-- 付款方式 0:現金 1:信用卡 -->
-              <div class="mb-3">
-                <label for="payMethod" class="form-label">付款方式</label>
-                <select th:field="*{payMethod}" id="payMethod" class="form-select">
-                  <option value="0">現金</option>
-                  <option value="1">信用卡</option>
-                </select>
-              </div>
+                <input type="text" th:field="${counpon.couponCode}" id="coupon" class="form-control" readonly>
+              </div> -->
 
 
-              <!-- 房間總數量 -->
-              <div class="mb-3">
-                <label for="RoomAmount" class="form-label">房間總數量</label>
-                <input type="number" id="roomAmount" name="roomAmount" class="form-control" readonly required th:value="${roomAmount}">
+
+            <!-- 是否加購專案在edit區僅有取消按鈕，觸發後發送取消餐廳訂單API -->
+
+            <input type="hidden" th:field="*{projectAddOn}" />
+
+            <div class="mb-3" id="projectAddOnArea" th:if="*{projectAddOn == 1}">
+              <label class="form-label">此訂單已加購專案</label>
+              <p style="font-size: 12px; color: red;">取消後不可再修改，需重新下單。</p>
+              <!-- 未來要連結至餐廳訂單修改畫面 -->
+              <button type="button" class="btn btn-primary" id="viewProjectAddOn">查看訂單</button>
+              <button type="button" class="btn btn-danger" id="cancelProjectAddOn" th:if="*{projectAddOn == 1}"
+                th:attr="data-id=*{roomOrderId}">
+                取消加購專案
+              </button>
+
+            </div>
+
+            <hr th:if="*{projectAddOn == 1}">
+
+
+            <!-- <div class="mb-3">
+              <label class="form-label">是否加購專案 <span class="text-danger">*</span></label>
+              <div class="form-check">
+                <input type="radio" id="projectAddOnNo" name="projectAddOn" value="0" class="form-check-input"
+                  th:checked="${roomOrder.projectAddOn == 0}" required>
+                <label for="projectAddOnNo" class="form-check-label">否</label>
               </div>
+              <div class="form-check">
+                <input type="radio" id="projectAddOnYes" name="projectAddOn" value="1" class="form-check-input"
+                  th:checked="${roomOrder.projectAddOn == 1}" required>
+                <label for="projectAddOnYes" class="form-check-label">是</label>
+              </div>
+            </div> -->
+            <!-- 專案方案選擇 -->
+            <!-- <div class="mb-3" id="projectPlanArea" style="display:none;">
+              <label class="form-label">選擇專案方案 <span class="text-danger">*</span></label>
+              <select id="projectPlanSelect" class="form-select">
+                <option value="">請選擇專案</option>
+                <option value="1" data-price="800">南島晨光專案 +800/人</option>
+                <option value="2" data-price="1800">蔚藍晨夕專案 +1800/人</option>
+                <option value="3" data-price="2800">悠日饗茶專案 +2800/人</option>
+              </select>
+            </div> -->
+            <!-- 專案加購區塊（動態產生） -->
+            <!-- <div id="restoProjectArea" style="display:none;"></div> -->
+
+            <!-- 付款狀態 -->
+            <div class="mb-3">
+              <label for="payStatus" class="form-label">付款狀態</label>
+              <select th:field="*{payStatus}" id="payStatus" class="form-select">
+                <option value="0">未付款</option>
+                <option value="1">已付款</option>
+              </select>
+            </div>
+
+            <!-- 付款方式 0:現金 1:信用卡 -->
+            <div class="mb-3">
+              <label for="payMethod" class="form-label">付款方式</label>
+              <select th:field="*{payMethod}" id="payMethod" class="form-select">
+                <option value="0">現金</option>
+                <option value="1">信用卡</option>
+              </select>
+            </div>
+
+
+            <!-- 房間總數量 -->
+            <div class="mb-3">
+              <label for="RoomAmount" class="form-label">房間總數量</label>
+              <input type="number" id="roomAmount" name="roomAmount" th:field="*{roomAmount}" class="form-control"
+                readonly required th:value="${roomAmount}">
+            </div>
+
+            <!-- 折扣碼隱藏欄位 -->
+            <input type="hidden" th:field="*{coupon.couponCode}" />
+
+            <!-- 折扣金額 -->
+            <div class="mb-3">
+              <label for="discountAmount" class="form-label">折扣金額</label>
+              <input type="number" th:field="*{discountAmount}" class="form-control" readonly step="1">
+            </div>
 
             <!-- 房間總價格 -->
             <!-- 純計算欄位，不輸入資料庫 -->
             <div class="mb-3">
               <label for="totalRoomPrice" class="form-label">房間總價格</label>
-              <input type="number" id="totalRoomPrice" name="totalRoomPrice" class="form-control" default="0" readonly required th:value="${totalRoomPrice}">
+              <input type="number" id="totalRoomPrice" name="totalRoomPrice" class="form-control" default="0" readonly
+                required th:value="${totalRoomPrice}">
             </div>
-            
+
 
             <!-- 訂單總金額 -->
             <div class="mb-3">
               <label for="totalPrice" class="form-label">訂單總金額</label>
-              <input type="number" id="totalPrice" name="totalAmount" class="form-control" default="0" readonly required th:value="${totalAmount}">
+              <input type="number" id="totalPrice" name="totalAmount" th:field="*{totalAmount}" class="form-control"
+                default="0" readonly required th:value="${totalAmount}">
             </div>
 
-              <!-- 實際支付金額 -->
-              <div class="mb-3">
-                <label for="actualAmount" class="form-label">實際支付金額</label>
-                <input type="number" id="actualAmount" name="actualAmount" class="form-control" readonly required th:value="${actualAmount}">
-              </div>
+            <!-- 實際支付金額 -->
+            <div class="mb-3">
+              <label for="actualAmount" class="form-label">實際支付金額</label>
+              <input type="number" id="actualAmount" name="actualAmount" th:field="*{actualAmount}" class="form-control"
+                readonly required th:value="${actualAmount}">
+            </div>
 
-              <!-- 最後更新人 -->
-              <div class="mb-3">
-                <label for="employee" class="form-label">最後更新人</label>
-                <select th:field="*{employee}" id="employee" class="form-select">
-                  <option value="1">SYSTEM</option>
-                  <option th:each="emp : ${employeeList}" th:value="${emp.employeeId}" th:text="${emp.employeeName}">
-                  </option>
-                </select>
-              </div>
+            <!-- 最後更新人 -->
+            <div class="mb-3">
+              <label for="employee" class="form-label">最後更新人</label>
+              <input type="hidden" th:value="${roomOrder.employee != null ? roomOrder.employee.employeeId : ''}" />
+              <span th:text="${roomOrder.employee != null ? roomOrder.employee.name : ''}"></span>
+            </div>
 
-              <input type="hidden" th:field="*{member.memberId}" />
-              <input type="hidden" th:field="*{roomOrderId}" />
+            <input type="hidden" th:field="*{member.memberId}" />
+            <input type="hidden" th:field="*{roomOrderId}" />
 
-              <!-- 提交按鈕 -->
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="submit" class="btn btn-primary">儲存變更</button>
-              </div>
+            <!-- 提交按鈕 -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+              <button type="submit" class="btn btn-primary">儲存變更</button>
+            </div>
           </form>
         </div>
       </div>
