@@ -11,13 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Configuration
 public class FilterConfig implements WebMvcConfigurer {
 
-    @Autowired
-    private com.employee.config.EmployeePermissionInterceptor employeePermissionInterceptor;
+    // 註解掉 Interceptor 以避免與 Filter 的權限設定產生衝突
+    // @Autowired
+    // private com.employee.config.EmployeePermissionInterceptor employeePermissionInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(employeePermissionInterceptor)
-                .addPathPatterns("/admin/**");
+        // 註解掉 Interceptor 註冊，改用 Filter 統一處理權限
+        // registry.addInterceptor(employeePermissionInterceptor)
+        //         .addPathPatterns("/admin/**");
     }
 
     @Bean

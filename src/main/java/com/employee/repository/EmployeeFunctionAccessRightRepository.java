@@ -13,11 +13,21 @@ import java.util.List;
 public interface EmployeeFunctionAccessRightRepository extends JpaRepository<EmployeeFunctionAccessRight, Integer> {
     
     @Query("SELECT efar FROM EmployeeFunctionAccessRight efar " +
+           "JOIN FETCH efar.functionAccessRight " +
            "WHERE efar.employee.employeeId = :employeeId " +
            "AND (efar.startDate IS NULL OR efar.startDate <= :checkDate) " +
            "AND (efar.endDate IS NULL OR efar.endDate >= :checkDate) " +
            "AND efar.enabled = true")
     List<EmployeeFunctionAccessRight> findByEmployeeIdAndDateRange(
+            @Param("employeeId") Integer employeeId, 
+            @Param("checkDate") LocalDate checkDate);
+    
+    @Query("SELECT efar FROM EmployeeFunctionAccessRight efar " +
+           "JOIN FETCH efar.functionAccessRight " +
+           "WHERE efar.employee.employeeId = :employeeId " +
+           "AND (efar.startDate IS NULL OR efar.startDate <= :checkDate) " +
+           "AND (efar.endDate IS NULL OR efar.endDate >= :checkDate)")
+    List<EmployeeFunctionAccessRight> findAllByEmployeeIdAndDateRange(
             @Param("employeeId") Integer employeeId, 
             @Param("checkDate") LocalDate checkDate);
 } 

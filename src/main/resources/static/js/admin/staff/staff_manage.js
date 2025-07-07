@@ -49,6 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         
         // 建立日期驗證
+        const createdDateInput = document.querySelector('input[name="createdDate"]');
         if (createdDateInput) {
             createdDateInput.addEventListener('change', function() {
                 const selectedDate = new Date(this.value);
@@ -123,23 +124,17 @@ document.addEventListener("DOMContentLoaded", function () {
     // 執行即時驗證設置
     setupRealTimeValidation();
 
-    // 載入部門/角色
-    fetch("/employees/roles").then(res => res.json()).then(data => {
-        const roleSelect = document.getElementById("roleSelect");
-        if (roleSelect) {
-            roleSelect.innerHTML = '<option value="">請選擇部門</option>' + 
-                data.map(r => `<option value="${r.roleId}">${r.roleName}</option>`).join("");
-        }
-    });
+    // 設定建立日期預設值為今天
+    const createdDateInput = document.querySelector('input[name="createdDate"]');
+    if (createdDateInput) {
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0];
+        createdDateInput.value = todayString;
+        createdDateInput.min = todayString; // 設定最小日期為今天
+    }
 
-    // 載入職稱
-    fetch("/employees/job-titles").then(res => res.json()).then(data => {
-        const jobTitleSelect = document.getElementById("jobTitleSelect");
-        if (jobTitleSelect) {
-            jobTitleSelect.innerHTML = '<option value="">請選擇職稱</option>' + 
-                data.map(jt => `<option value="${jt.jobTitleId}">${jt.jobTitleName}</option>`).join("");
-        }
-    });
+    // 下拉選單資料已經在服務端渲染，不需要額外的 AJAX 請求
+    console.log('部門和職稱選單已載入');
 
     // 僅保留權限管理（新增/編輯權限）功能
     const editAccessSelect = document.getElementById("editAccessSelect");

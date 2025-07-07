@@ -56,12 +56,24 @@ public class EmployeeController {
 
     // 更新員工
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateEmployee(@PathVariable Integer id, @Valid @RequestBody Employee employeeDetails) {
+    public ResponseEntity<String> updateEmployee(@PathVariable Integer id, @RequestBody Employee employeeDetails) {
         try {
+            // 手動驗證而不使用 @Valid，避免 roleId 為 null 的問題
+            if (employeeDetails.getName() != null) {
+                if (employeeDetails.getName().trim().isEmpty()) {
+                    return ResponseEntity.badRequest().body("姓名不能為空");
+                }
+                if (!employeeDetails.getName().matches("^[\u4e00-\u9fff\\s]+$")) {
+                    return ResponseEntity.badRequest().body("姓名只能包含中文字符");
+                }
+            }
+            
             Employee updated = employeeService.updateEmployee(id, employeeDetails);
             return ResponseEntity.ok("員工資料更新成功");
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("員工不存在");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("員工不存在：" + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("更新失敗：" + e.getMessage());
         }
     }
 
