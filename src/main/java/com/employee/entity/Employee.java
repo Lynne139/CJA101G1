@@ -12,7 +12,7 @@ public class Employee {
 	@Column(name = "Employee_id")
 	private Integer employeeId;
 
-	@Column(name = "Role_id", nullable = false)
+	@Column(name = "Role_id", nullable = true)
 	private Integer roleId;
 
 	@Column(name = "job_title_id", nullable = true)

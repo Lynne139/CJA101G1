@@ -347,8 +347,8 @@ function saveEmployeeEdit() {
 
     const employeeData = {
         name: name,
-        roleId: roleId ? parseInt(roleId) : null,
-        jobTitleId: jobTitleId ? parseInt(jobTitleId) : null,
+        roleId: roleId && roleId.trim() !== '' ? parseInt(roleId) : null,
+        jobTitleId: jobTitleId && jobTitleId.trim() !== '' ? parseInt(jobTitleId) : null,
         status: status
     };
 

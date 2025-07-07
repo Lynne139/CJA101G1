@@ -26,12 +26,18 @@
 				<label>部門</label>
 				<select name="roleId" class="form-select" id="roleSelect">
 					<option value="">請選擇部門</option>
+					<option th:each="role : ${roleList}" 
+							th:value="${role.roleId}" 
+							th:text="${role.roleName}">部門名稱</option>
 				</select>
 			</div>
 			<div class="mb-2">
 				<label>職稱 <span class="text-danger">*</span></label>
 				<select name="jobTitleId" class="form-select" id="jobTitleSelect" required>
 					<option value="">請選擇職稱</option>
+					<option th:each="jobTitle : ${jobTitleList}" 
+							th:value="${jobTitle.jobTitleId}" 
+							th:text="${jobTitle.jobTitleName}">職稱名稱</option>
 				</select>
 			</div>
 			<div class="mb-2">
@@ -40,6 +46,14 @@
 					<option value="true">啟用</option>
 					<option value="false">停用</option>
 				</select>
+			</div>
+			<div class="mb-2">
+				<label>建立日期 <span class="text-danger">*</span></label>
+				<input type="date" name="createdDate" class="form-control" required 
+					   title="建立日期不能早於今日" />
+				<div class="invalid-feedback">
+					建立日期不能早於今日
+				</div>
 			</div>
 			<div class="mb-2">
 				<label>照片</label>

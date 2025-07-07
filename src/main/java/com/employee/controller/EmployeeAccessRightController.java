@@ -41,7 +41,7 @@ public class EmployeeAccessRightController {
     public String editRights(@PathVariable("id") Integer id, Model model) {
         Employee employee = employeeRepository.findById(id).orElse(null);
         List<FunctionAccessRight> allRights = functionAccessRightRepository.findAll();
-        List<EmployeeFunctionAccessRight> empRights = employeeFunctionAccessRightRepository.findByEmployeeIdAndDateRange(id, LocalDate.now());
+        List<EmployeeFunctionAccessRight> empRights = employeeFunctionAccessRightRepository.findAllByEmployeeIdAndDateRange(id, LocalDate.now());
         Set<Integer> enabledRightIds = empRights.stream()
                 .filter(EmployeeFunctionAccessRight::getEnabled)
                 .map(e -> e.getFunctionAccessRight().getAccessId())
@@ -56,13 +56,15 @@ public class EmployeeAccessRightController {
     @PostMapping("/employee/{id}/edit-rights")
     public String saveRights(@PathVariable("id") Integer id, @RequestParam(value = "rights", required = false) List<Integer> rights) {
         List<FunctionAccessRight> allRights = functionAccessRightRepository.findAll();
-        List<EmployeeFunctionAccessRight> empRights = employeeFunctionAccessRightRepository.findByEmployeeIdAndDateRange(id, LocalDate.now());
+        List<EmployeeFunctionAccessRight> empRights = employeeFunctionAccessRightRepository.findAllByEmployeeIdAndDateRange(id, LocalDate.now());
         Set<Integer> selected = rights == null ? new HashSet<>() : new HashSet<>(rights);
+        
         // 先全部設為 disabled
         for (EmployeeFunctionAccessRight efar : empRights) {
             efar.setEnabled(false);
             employeeFunctionAccessRightRepository.save(efar);
         }
+        
         // 再針對勾選的設為 enabled，若無紀錄則新增
         for (FunctionAccessRight right : allRights) {
             if (selected.contains(right.getAccessId())) {
@@ -91,7 +93,7 @@ public class EmployeeAccessRightController {
     @ResponseBody
     public Map<String, Object> getEmployeeRightsJson(@PathVariable("id") Integer id) {
         List<FunctionAccessRight> allRights = functionAccessRightRepository.findAll();
-        List<EmployeeFunctionAccessRight> empRights = employeeFunctionAccessRightRepository.findByEmployeeIdAndDateRange(id, java.time.LocalDate.now());
+        List<EmployeeFunctionAccessRight> empRights = employeeFunctionAccessRightRepository.findAllByEmployeeIdAndDateRange(id, java.time.LocalDate.now());
         Set<Integer> enabledRightIds = empRights.stream()
                 .filter(EmployeeFunctionAccessRight::getEnabled)
                 .map(e -> e.getFunctionAccessRight().getAccessId())
