@@ -38,9 +38,7 @@ public class ReservationService {
     public List<RestoReservationVO> compositeQuery(Map<String, String[]> paramMap) {
         return RestoRsvtCriteriaHelper.getAll(paramMap, em);
     } 
-    
-    
-    
+
     
     // 隨餐廳編輯更新預約表的容納人數
     @Transactional

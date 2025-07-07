@@ -21,6 +21,14 @@ public class PreBookingDTO {
     @NotNull(message = "請選擇時段")
     Integer timeslotId;
     
+    
+    
+    
+    
+	public PreBookingDTO() {
+		super();
+	}
+
 	public PreBookingDTO(Integer restoId, LocalDate regiDate, Integer regiSeats, Integer timeslotId) {
 		super();
 		this.restoId = restoId;

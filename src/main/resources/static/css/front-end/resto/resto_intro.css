@@ -158,7 +158,6 @@ textarea.form-control.form-control:focus {
   line-height: 18px;
   letter-spacing: 0.6px;
   color: var(--secondary-color);
-  margin-top: 4px;
 }
 
 .meal-group {

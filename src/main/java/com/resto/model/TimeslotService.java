@@ -131,7 +131,9 @@ import com.resto.entity.TimeslotVO;
 
     
     
-    
+	    public List<TimeslotVO> findByResto(Integer restoId) {
+	        return timeslotRepository .findByResto(restoId);
+	    }
     
     
     
