@@ -52,30 +52,39 @@ public class ResRoomOrderSvc {
                 .filter(t -> t.getPeriodVO() != null)
                 .collect(Collectors.groupingBy(t -> t.getPeriodVO().getPeriodId()));
 
-        for (LocalDate date : stayDates) {
-            for (Integer periodId : periodIds) {
-                List<TimeslotVO> timeslots = timeslotMapByPeriod.getOrDefault(periodId, Collections.emptyList());
+        boolean allAvailable = stayDates.stream()
+                .flatMap(date -> periodIds.stream().map(periodId -> Map.entry(date, periodId)))
+                .allMatch(entry -> {
+                    LocalDate date = entry.getKey();
+                    Integer periodId = entry.getValue();
 
-                Optional<TimeslotVO> availableSlot = timeslots.stream()
-                        .filter(slot -> reservationService.getRemaining(restoId, slot.getTimeslotId(),
-                                date) >= numOfPeople)
-                        .findFirst();
+                    List<TimeslotVO> timeslots = timeslotMapByPeriod.getOrDefault(periodId, Collections.emptyList());
 
-                if (availableSlot.isPresent()) {
-                    TimeslotVO slot = availableSlot.get();
-                    RestoOrderFromRoomDTO dto = new RestoOrderFromRoomDTO();
-                    dto.setRegiDate(date);
-                    dto.setRestoId(restoId);
-                    dto.setTimeslotId(slot.getTimeslotId());
-                    result.add(dto);
-                } else {
-                    // 若任一天、某 period 沒有時段可用，可在這裡 early return
-                    return Map.of("success", false, "message", "有日期/時段無法預約");
-                }
-            }
+                    Optional<TimeslotVO> availableSlot = timeslots.stream()
+                            .filter(slot -> reservationService.getRemaining(restoId, slot.getTimeslotId(),
+                                    date) >= numOfPeople)
+                            .findFirst();
+
+                    if (availableSlot.isPresent()) {
+                        TimeslotVO slot = availableSlot.get();
+                        RestoOrderFromRoomDTO dto = new RestoOrderFromRoomDTO();
+                        dto.setRegiDate(date);
+                        dto.setRestoId(restoId);
+                        dto.setTimeslotId(slot.getTimeslotId());
+                        result.add(dto);
+                        return true;
+                    } else {
+                        return false; // 讓 allMatch 中止
+                    }
+                });
+
+        if (!allAvailable) {
+            return Map.of("success", false, "message", "有日期/時段無法預約");
         }
-        // 全部都找到可預約時段
+
+        // 如果成功，回傳 result 對應資料
         return Map.of("success", true, "data", result);
+
     }
 
     // 依方案取得 periodId 清單
@@ -92,7 +101,8 @@ public class ResRoomOrderSvc {
 
     /**
      * 取消加購專案，並更新訂單金額與 projectAddOn 狀態
-     * @param order RoomOrder
+     * 
+     * @param order   RoomOrder
      * @param details List<RoomOList>
      * @return 更新後的 RoomOrder
      */

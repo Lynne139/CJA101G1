@@ -690,44 +690,44 @@ document.addEventListener("DOMContentLoaded", function () {
     function bindRoomDetailPriceAutoFill() {
         document.getElementById("orderDetailList").addEventListener("change", function (e) {
             // 房型選擇時
-            if (e.target.classList.contains("roomTypeSelect")) {
+            if (e.target.classList.contains("roomTypeSelect") || e.target.classList.contains("roomAmountInput") || e.target.classList.contains("roomAmountSelect")) {
                 const item = e.target.closest(".order-detail-item");
-                const price = e.target.selectedOptions[0].getAttribute("data-price") || 0;
-                const guestNum = e.target.selectedOptions[0].getAttribute("data-guest-num") || 4;
+                const roomTypeSelect = item.querySelector(".roomTypeSelect");
                 const amountInput = item.querySelector(".roomAmountInput, .roomAmountSelect");
                 const priceInput = item.querySelector(".roomPriceInput");
                 const numberOfPeopleSelect = item.querySelector(".numberOfPeopleSelect");
+                // 取得單間最大人數
+                const guestNum = roomTypeSelect?.selectedOptions[0]?.getAttribute("data-guest-num") || 4;
+                // 取得房間數量
                 const amount = Number(amountInput?.value) || 1;
-                priceInput.value = price * amount;
-                // 存單價到 input 的 data 屬性，方便數量變動時用
-                priceInput.setAttribute("data-unit-price", price);
-
+                // 計算最大入住人數
+                const maxPeople = amount * guestNum;
                 // 更新入住人數選單
                 if (numberOfPeopleSelect) {
                     numberOfPeopleSelect.innerHTML = '<option value="">請選擇人數</option>';
-                    for (let i = 1; i <= guestNum; i++) {
+                    for (let i = 1; i <= maxPeople; i++) {
                         const opt = document.createElement("option");
                         opt.value = i;
                         opt.textContent = i;
                         numberOfPeopleSelect.appendChild(opt);
                     }
                 }
-            }
-            // 房間數量變動時
-            if (e.target.classList.contains("roomAmountInput") || e.target.classList.contains("roomAmountSelect")) {
-                const item = e.target.closest(".order-detail-item");
-                const priceInput = item.querySelector(".roomPriceInput");
-                // 取單價
-                let unitPrice = priceInput.getAttribute("data-unit-price");
-                if (!unitPrice) {
-                    // 若沒抓過單價，預設 0
-                    unitPrice = 0;
+                // 房型選擇時自動帶入價格
+                if (e.target.classList.contains("roomTypeSelect")) {
+                    const price = roomTypeSelect.selectedOptions[0].getAttribute("data-price") || 0;
+                    priceInput.setAttribute("data-unit-price", price);
+                    priceInput.value = price * amount;
                 }
-                const amount = Number(e.target.value) || 1;
-                priceInput.value = unitPrice * amount;
+                // 房間數量變動時自動計算價格
+                if (e.target.classList.contains("roomAmountInput") || e.target.classList.contains("roomAmountSelect")) {
+                    let unitPrice = priceInput.getAttribute("data-unit-price");
+                    if (!unitPrice) {
+                        unitPrice = 0;
+                    }
+                    priceInput.value = unitPrice * amount;
+                }
             }
             calcActualAmount(); // 每次明細變動都重新計算總價
-
         });
     }
 
@@ -774,20 +774,26 @@ document.addEventListener("DOMContentLoaded", function () {
         // ===== 新增：計算專案總價 =====
         let projectTotal = 0;
         let projectPeople = 0;
-        let projectPrice = 0;
+        let allPeopleSelected = true;
         const restoProjectArea = document.getElementById("restoProjectArea");
         if (restoProjectArea && restoProjectArea.style.display !== "none") {
             const planSelect = document.getElementById("projectPlanSelect");
             const planOption = planSelect?.selectedOptions[0];
             if (planOption) {
-                if (planOption.value == "1") projectPrice = 800;
-                else if (planOption.value == "2") projectPrice = 1800;
-                else if (planOption.value == "3") projectPrice = 2800;
+                if (planOption.value == "1") projectTotal = 800;
+                else if (planOption.value == "2") projectTotal = 1800;
+                else if (planOption.value == "3") projectTotal = 2800;
             }
             // 取專案人數（任一區塊都一樣）
-            const peopleInput = restoProjectArea.querySelector('.projectPeopleInput');
-            projectPeople = Number(peopleInput?.value) || 0;
-            projectTotal = projectPrice * projectPeople;
+            const peopleInputs = restoProjectArea.querySelectorAll('.projectPeopleInput');
+            peopleInputs.forEach(input => {
+                if (!input.value) {
+                    allPeopleSelected = false;
+                } else {
+                    projectPeople += Number(input.value);
+                }
+            });
+            projectTotal = projectPeople * projectTotal;
         }
         // ===== 計算入住天數（退房日不算在內） =====
         let stayNights = 1;
@@ -1276,10 +1282,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 const plan = planValue;
                 // 專案人數：動態加總所有房型明細的入住人數
                 let projectPeople = 0;
+                let allPeopleSelected = true;
                 document.querySelectorAll('#orderDetailList select[name$=".numberOfPeople"]').forEach(select => {
-                    projectPeople += Number(select.value) || 0;
+                    if (!select.value) {
+                        allPeopleSelected = false;
+                    } else {
+                        projectPeople += Number(select.value);
+                    }
                 });
-                if (!checkInDate || !checkOutDate || !projectPeople) {
+                if (!checkInDate || !checkOutDate || !allPeopleSelected) {
                     autoAssignResult.textContent = "請先選擇入住/退房與人數";
                     autoAssignResult.className = "autoAssignResult text-danger";
                     return;

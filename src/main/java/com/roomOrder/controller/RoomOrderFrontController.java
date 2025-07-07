@@ -1,5 +1,7 @@
 package com.roomOrder.controller;
 
+import com.coupon.entity.Coupon;
+import com.coupon.service.MemberCouponService;
 import com.member.model.MemberService;
 import com.member.model.MemberVO;
 import com.resto.model.RestoOrderService;
@@ -11,11 +13,16 @@ import com.roomtypeschedule.model.RoomTypeScheduleService;
 import com.roomtypeschedule.model.RoomTypeScheduleVO;
 import com.roomOList.model.RoomOList;
 import com.roomOList.model.RoomOListService;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Map;
@@ -34,8 +41,6 @@ public class RoomOrderFrontController {
     @Autowired
     private RoomOListService roomOListService;
     @Autowired
-    private MemberService memberService;
-    @Autowired
     private RestoOrderService restoOrderService;
     @Autowired
     private RoomTypeService roomTypeService;
@@ -44,9 +49,8 @@ public class RoomOrderFrontController {
     @Autowired
     private ReservationService reservationService;
     @Autowired
-    private TimeslotService timeslotService;
-    @Autowired
-    private RoomOrderTxService roomOrderTxService;
+    private MemberCouponService memberCouponService;
+   
 
     // 會員訂單列表
     @GetMapping("/roomOrder")
@@ -203,5 +207,5 @@ public class RoomOrderFrontController {
         int remaining = reservationService.getRemaining(restoId, timeslotId, localDate);
         return remaining;
     }
-
+    
 }

@@ -455,6 +455,9 @@ public class RoomOrderController {
 	// return result;
 	// }
 
+
+	// ================================查詢用API===============================
+
 	// 搜尋可預訂房間數量
 	@GetMapping("/roomo_info/{roomTypeId}/check_schedule")
 	@ResponseBody
