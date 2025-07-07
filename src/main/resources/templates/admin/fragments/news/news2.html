@@ -63,11 +63,11 @@
 							</div>
 							<div class="mb-3">
 								<label class="form-label">開始日期</label>
-								<input type="date" class="form-control" name="startDate" required>
+								<input type="date" class="form-control" id="addStartDate" name="startDate" required>
 							</div>
 							<div class="mb-3">
 								<label class="form-label">結束日期</label>
-								<input type="date" class="form-control" name="endDate" required>
+								<input type="date" class="form-control" id="addEndDate" name="endDate" required>
 							</div>
 							<div class="mb-3">
 								<label class="form-label">圖片</label>
@@ -112,11 +112,11 @@
 								</div>
 								<div class="mb-3">
 									<label class="form-label">開始日期</label>
-									<input type="date" class="form-control" name="startDate" th:value="${news.startDate}" required>
+									<input type="date" class="form-control edit-start-date" th:name="startDate" th:value="${news.startDate}" th:id="${'editStartDate' + news.promoNo}" required>
 								</div>
 								<div class="mb-3">
 									<label class="form-label">結束日期</label>
-									<input type="date" class="form-control" name="endDate" th:value="${news.endDate}" required>
+									<input type="date" class="form-control edit-end-date" th:name="endDate" th:value="${news.endDate}" th:id="${'editEndDate' + news.promoNo}" required>
 								</div>
 								<div class="mb-3">
 									<label class="form-label">目前圖片</label><br>
@@ -145,4 +145,78 @@
 			</div>
 		</div>
 	</div>
+
+	<script>
+		// 設定今天為最小日期
+		function setMinDateToToday() {
+			const today = new Date().toISOString().split('T')[0];
+			
+			// 新增表單的日期限制
+			const addStartDate = document.getElementById('addStartDate');
+			const addEndDate = document.getElementById('addEndDate');
+			
+			if (addStartDate) {
+				addStartDate.min = today;
+			}
+			if (addEndDate) {
+				addEndDate.min = today;
+			}
+			
+			// 編輯表單的日期限制
+			document.querySelectorAll('.edit-start-date').forEach(startDateInput => {
+				startDateInput.min = today;
+			});
+			document.querySelectorAll('.edit-end-date').forEach(endDateInput => {
+				endDateInput.min = today;
+			});
+		}
+
+		// 新增表單的日期邏輯
+		function setupAddFormDateLogic() {
+			const addStartDate = document.getElementById('addStartDate');
+			const addEndDate = document.getElementById('addEndDate');
+
+			if (addStartDate && addEndDate) {
+				addStartDate.addEventListener('change', function() {
+					if (this.value) {
+						addEndDate.min = this.value;
+						if (addEndDate.value && addEndDate.value < this.value) {
+							addEndDate.value = this.value;
+						}
+					}
+				});
+			}
+		}
+
+		// 編輯表單的日期邏輯
+		function setupEditFormDateLogic() {
+			document.querySelectorAll('.edit-start-date').forEach(startDateInput => {
+				const promoNo = startDateInput.id.replace('editStartDate', '');
+				const endDateInput = document.getElementById('editEndDate' + promoNo);
+				
+				if (endDateInput) {
+					startDateInput.addEventListener('change', function() {
+						if (this.value) {
+							endDateInput.min = this.value;
+							if (endDateInput.value && endDateInput.value < this.value) {
+								endDateInput.value = this.value;
+							}
+						}
+					});
+				}
+			});
+		}
+
+		// 頁面載入完成後初始化
+		document.addEventListener('DOMContentLoaded', function() {
+			setMinDateToToday();
+			setupAddFormDateLogic();
+			setupEditFormDateLogic();
+		});
+
+		// Modal 顯示時重新設定日期限制
+		document.addEventListener('shown.bs.modal', function() {
+			setMinDateToToday();
+		});
+	</script>
 </div>
