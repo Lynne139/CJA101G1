@@ -38,6 +38,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.member.model.MemberRepository;
 import com.member.model.MemberService;
 import com.member.model.MemberVO;
+import com.notification.service.NotificationService;
 import com.resto.dto.PreBookingDTO;
 import com.resto.entity.PeriodVO;
 import com.resto.entity.RestoOrderVO;
@@ -51,7 +52,6 @@ import com.resto.model.RestoService;
 import com.resto.model.TimeslotService;
 import com.resto.utils.RestoOrderSource;
 import com.resto.utils.exceptions.OverbookingException;
-import com.roomOrder.model.RoomOrder;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -77,6 +77,9 @@ public class FrontRestoController {
 	MemberRepository memberRepo;	
 	@Autowired
 	RestoOrderRepository restoOrderRepository;
+	
+	@Autowired
+	private NotificationService notificationSvc;
 	
 	
 	//  ====餐廳列表====	
@@ -347,6 +350,21 @@ public class FrontRestoController {
         /* -------- 填表送出時再次名額驗證 ＋ 原子插單 -------- */
         try {
             restoOrderSvc.tryCreateOrder(order);   // 寫入並回填 orderId
+            
+            /* === 2. 若是會員 → 建立通知 === */
+            if (order.getMemberVO() != null) {
+                Integer memberId = order.getMemberVO().getMemberId();
+
+                String title   = "餐廳訂位成功";
+                String content = String.format("您已成功預約 %s %s（%s人）。",
+                                  order.getRestoVO().getRestoName(),
+                                  order.getRegiDate() + " " + order.getTimeslotVO().getTimeslotName(),
+                                  order.getRegiSeats());
+
+            notificationSvc.createNotification(memberId, title, content);
+            }
+
+
         } catch (OverbookingException e){  // 名額被搶
             br.reject("full","很抱歉，名額剛好被訂完，請重新選擇時段");
             keepOrder(order, br, ra);
