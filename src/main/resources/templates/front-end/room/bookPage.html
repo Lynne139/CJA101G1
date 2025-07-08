@@ -217,7 +217,7 @@
 								<!-- 提交按鈕 -->
 								<div class="button-group">
 									<button type="button" class="btn btn-secondary">取消預訂</button>
-									<button class="btn-book" id="bookBtn">確認預訂</button>
+									<button class="btn-book" id="bookBtn" type="button" disabled>確認預訂</button>
 								</div>
 						</form>
 					</div>
@@ -226,6 +226,7 @@
 		</div>
 	</div>
 	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/mainfunction :: stickyIcons}"></div>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 	<script th:src="@{/js/room/bookPage.js}"></script>
 	<script th:inline="javascript">

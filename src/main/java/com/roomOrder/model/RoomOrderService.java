@@ -81,4 +81,12 @@ public class RoomOrderService {
         return repository.getByMember_MemberId(memberId);
     }
 
+    public void updatePayStatus(String orderId, int payStatus) {
+        RoomOrder order = repository.findById(Integer.valueOf(orderId)).orElse(null);
+        if (order != null) {
+            order.setPayStatus(String.valueOf(payStatus));
+            repository.save(order);
+        }
+    }
+
 }

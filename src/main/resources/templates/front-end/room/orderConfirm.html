@@ -1,88 +1,361 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
-    <title>訂單確認</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maison d'Yuko - 訂單確認</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <h3>訂單確認</h3>
-    <p>訂單編號: <span th:text="${roomOrder.roomOrderId}" id="orderId"></span></p>
-    <p>總金額: <span th:text="${roomOrder.actualAmount}" id="totalAmount"></span></p>
-    
-    <!-- 顯示訂單明細 -->
-    <table class="table">
-        <thead>
-            <tr>
-                <th>房型名稱</th>
-                <th>房型數量</th>
-                <th>入住人數</th>
-                <th>金額</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="detail : ${roomOrder.orderDetails}">
-                <td th:text="${detail.roomType.roomTypeName}"></td>
-                <td th:text="${detail.roomAmount}"></td>
-                <td th:text="${detail.numberOfPeople}"></td>
-                <td th:text="${detail.roomPrice * detail.roomAmount}"></td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <!-- LinePay 付款按鈕 -->
-    <button id="linePayBtn" class="btn btn-success">使用 LinePay 付款</button>
+    <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/room/bookSingle.css}">
+    <link rel="stylesheet" th:href="@{/css/room/bookPage.css}">
+    <style>
+        .booking-container {
+            background-color: #F4EDE1;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
 
-    <div th:if="${roomOrder.paymentMethod == 'OFFLINE'}">
-        <p>請盡速聯絡客服索取訂金付款資訊。</p>
+        .booking-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #7E4E24;
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: 0.1em;
+        }
+
+        .order-info-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(126, 78, 36, 0.1);
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid #E8DCC8;
+        }
+
+        .order-number {
+            background: #7E4E24;
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .status-badge {
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .payment-section {
+            background: #F4EDE1;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #7E4E24;
+        }
+
+        .payment-method {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #7E4E24;
+            margin-bottom: 10px;
+        }
+
+        .payment-notice {
+            color: #7E4E24;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .btn-linepay {
+            background: #00B900;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            letter-spacing: 0.1em;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-linepay:hover {
+            background: #009900;
+            transform: translateY(-2px);
+        }
+
+        .btn-linepay::before {
+            content: "LINE";
+            font-weight: bold;
+        }
+
+        .total-rooms {
+            background: #E8DCC8;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #7E4E24;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn-back {
+            background-color: transparent;
+            border: 2px solid #7E4E24;
+            color: #7E4E24;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background-color: #7E4E24;
+            color: #fff;
+        }
+
+        @media (max-width: 991px) {
+            .booking-title {
+                font-size: 1.8rem;
+            }
+
+            .confirm-actions {
+                flex-direction: column;
+            }
+
+            .btn-linepay,
+            .btn-back {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="booking-container">
+        <h1 class="booking-title">訂單確認</h1>
+
+        <div class="main-content">
+            <div class="row">
+                <!-- 左側：訂單摘要 -->
+                <div class="col-lg-5">
+                    <div class="booking-summary">
+                        <div class="summary-header">
+                            <span class="summary-icon"></span> 訂單摘要
+                        </div>
+
+                        <!-- 訂單編號 -->
+                        <div class="order-number">
+                            訂單編號：<span th:text="${roomOrder.roomOrderId}" id="orderId"></span>
+                        </div>
+
+                        <!-- 訂單狀態 -->
+                        <div class="mb-3">
+                            <span class="status-badge">訂單成立</span>
+                        </div>
+
+                        <!-- 入住日期資訊 -->
+                        <div class="booking-dates">
+                            <div class="date-info">
+                                <span><strong>入住日期：</strong></span>
+                                <span th:text="${roomOrder.checkInDate}"></span>
+                            </div>
+                            <div class="date-info">
+                                <span><strong>退房日期：</strong></span>
+                                <span th:text="${roomOrder.checkOutDate}"></span>
+                            </div>
+                            <div class="date-info">
+                                <span><strong>住宿天數：</strong></span>
+                                <span th:text="${nights} + '晚'"></span>
+                            </div>
+                        </div>
+
+                        <!-- 房型資訊 -->
+                        <div th:each="detail : ${roomOrder.orderDetails}" class="room-card">
+                            <div class="room-name" th:text="${detail.roomType.roomTypeName}"></div>
+                            <div class="room-details">
+                                <div class="room-info">
+                                    <div>
+                                        <strong>房間數量：</strong>
+                                        <span th:text="${detail.roomAmount}"></span> 間
+                                    </div>
+                                    <div>
+                                        <strong>入住人數：</strong>
+                                        <span th:text="${detail.numberOfPeople}"></span> 位
+                                    </div>
+                                    <div>
+                                        <strong>房客代表：</strong>
+                                        <span th:text="${detail.roomGuestName}"></span>
+                                    </div>
+                                    <div th:if="${detail.specialReq}">
+                                        <strong>特殊需求：</strong>
+                                        <span th:text="${detail.specialReq}"></span>
+                                    </div>
+                                </div>
+                                <div class="room-price">
+                                    NT$ <span th:text="${detail.roomPrice * detail.roomAmount}"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 專案明細 -->
+                        <div class="booking-dates" th:if="${roomOrder.projectAddOn == 1}">
+                            <div class="section-title">專案加購</div>
+                            <div class="date-info">
+                                <span th:text="${projectAddOnName}"></span>
+                                <span>NT$ <span th:text="${packagePrice}"></span></span>
+                            </div>
+                        </div>
+
+                        <!-- 折扣資訊 -->
+                        <div class="booking-dates" th:if="${roomOrder.discountAmount > 0}">
+                            <div class="section-title">優惠折扣</div>
+                            <div class="date-info">
+                                <span>折扣金額：</span>
+                                <span>-NT$ <span th:text="${roomOrder.discountAmount}"></span></span>
+                            </div>
+                        </div>
+
+                        <!-- 總金額 -->
+                        <div class="total-section">
+                            <div class="total-amount">
+                                實付金額 NT$ <span th:text="${roomOrder.actualAmount}" id="actualAmount"></span>
+                            </div>
+                            <small>含稅及服務費</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右側：付款資訊 -->
+                <div class="col-lg-7">
+                    <div class="booking-form">
+                        <div class="form-section">
+                            <div class="section-title">付款資訊</div>
+
+                            <div class="payment-section">
+                                <div class="payment-method">
+                                    付款方式：<span th:text="${roomOrder.payMethod == '0' ? '臨櫃付款' : 'LINE Pay'}"></span>
+                                </div>
+
+                                <!-- 臨櫃付款說明 -->
+                                <div th:if="${roomOrder.payMethod == '0'}">
+                                    <div class="payment-notice">
+                                        <i class="fas fa-info-circle"></i>
+                                        請於入住當日至櫃台完成付款手續
+                                    </div>
+                                    <div class="payment-notice">
+                                        請盡速聯絡客服索取訂金付款資訊。
+                                    </div>
+                                </div>
+
+                                <!-- LINE Pay 付款 -->
+                                <div th:if="${roomOrder.payMethod == '1'}">
+                                    <div class="payment-notice">
+                                        <i class="fas fa-credit-card"></i>
+                                        請點擊下方按鈕完成 LINE Pay 付款
+                                    </div>
+                                    <!-- <button id="linePayBtn" class="btn-linepay w-100">
+                                        Pay 付款
+                                    </button> -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 訂單明細表格 -->
+                        <div class="form-section">
+                            <div class="section-title">訂單明細</div>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>房型名稱</th>
+                                            <th>房間數量</th>
+                                            <th>入住人數</th>
+                                            <th>特殊需求</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="detail : ${roomOrder.orderDetails}">
+                                            <td th:text="${detail.roomType.roomTypeName}"></td>
+                                            <td th:text="${detail.roomAmount}"></td>
+                                            <td th:text="${detail.numberOfPeople}"></td>
+                                            <td th:text="${detail.specialReq}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- 注意事項 -->
+                        <div class="form-section">
+                            <div class="section-title">注意事項</div>
+                            <div class="alert alert-info">
+                                <ul class="mb-0">
+                                    <li>請保留此訂單確認頁面作為入住憑證</li>
+                                    <li>如需修改或取消訂單，請聯絡客服</li>
+                                    <li>入住時請攜帶有效身分證件</li>
+                                    <li>退房時間為隔日上午11:00前</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- 操作按鈕 -->
+                        <div class="confirm-actions">
+                            <a href="/home" class="btn-back">
+                                返回首頁
+                            </a>
+                            <button type="button" class="btn btn-secondary" onclick="window.print()">
+                                列印訂單
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/mainfunction :: stickyIcons}"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script>
-    document.getElementById('linePayBtn').addEventListener('click', function() {
-        // 從畫面抓訂單資訊
-        const orderId = document.getElementById('orderId').textContent.trim();
-        const totalAmount = document.getElementById('totalAmount').textContent.trim();
-        const orderName = "訂房訂單"; // 可自訂
-
-        // 組資料
-        const linepayBody = {
-            amount: Number(totalAmount),
-            currency: "TWD",
-            orderId: orderId,
-            packages: [{
-                id: "package-1",
-                amount: Number(totalAmount),
-                name: orderName,
-                products: [{
-                    name: orderName,
-                    quantity: 1,
-                    price: Number(totalAmount)
-                }]
-            }],
-            redirectUrls: {
-                confirmUrl: "http://localhost:8080/api/confirmpayment/" + orderId + "/room",
-                cancelUrl: "http://localhost:8080/front-end/room/orderConfirm?cancel=1"
-            }
-        };
-        const linepayOrder = {
-            orderId: orderId,
-            totalAmount: Number(totalAmount)
-        };
-
-        fetch('/api/linepay/room', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({linepayBody, linepayOrder})
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                window.location.href = data.data; // 跳轉到 LinePay 付款頁
-            } else {
-                alert('LinePay 付款連線失敗');
-            }
+        // 列印功能優化
+        window.addEventListener('beforeprint', function () {
+            // 隱藏不需要列印的元素
+            const elementsToHide = document.querySelectorAll('.btn, .confirm-actions, .payment-section button');
+            elementsToHide.forEach(el => el.style.display = 'none');
         });
-    });
+
+        window.addEventListener('afterprint', function () {
+            // 恢復隱藏的元素
+            const elementsToShow = document.querySelectorAll('.btn, .confirm-actions, .payment-section button');
+            elementsToShow.forEach(el => el.style.display = '');
+        });
     </script>
 </body>
+
 </html>

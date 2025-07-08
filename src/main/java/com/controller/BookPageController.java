@@ -55,15 +55,23 @@ public class BookPageController {
 	@Autowired
 	private CouponService couponService;
 
+	@Autowired
+	private RoomOListService roomOListService;
+
+	@Autowired
+	private RoomTypeService roomTypeService;
+
+	@Autowired
+	private RoomTypeScheduleService roomScheduleService;
+
+	@Autowired
+	private NotificationService notificationService;
+
 	@PostMapping("/orderInfo")
 	public String showOrderInfo(@RequestParam Map<String, String> params,
 			Model model,
 			HttpSession session) {
 		MemberVO member = (MemberVO) session.getAttribute("loggedInMember");
-		// if (member != null) {
-		// member = memberService.getOneMember(member.getMemberId());
-		// }
-
 		model.addAttribute("member", member);
 		System.out.println(member.getMemberId());
 
@@ -163,13 +171,12 @@ public class BookPageController {
 
 		// 模板顯示
 		model.addAttribute("roomOrder", roomOrder);
-		model.addAttribute("projectAddOnName", packageNames.get(params.get("package"))); // 不動 VO
-		model.addAttribute("params", params); // 如果頁面還在用 params
+		model.addAttribute("projectAddOnName", packageNames.get(params.get("package")));
+		model.addAttribute("params", params);
 		return "front-end/room/bookPage";
 	}
 
 	// ===== 查詢會員擁有的所有適用優惠券列表 =====
-
 	@GetMapping("/orderInfo/member_coupons")
 	@ResponseBody
 	public List<Coupon> getMemberCoupons(
@@ -178,34 +185,11 @@ public class BookPageController {
 		return memberCouponService.getRoomOrderApplicableCoupons(memberId, priceBeforeUsingCoupon);
 	}
 
-	@GetMapping("/orderInfo/confirm")
-	public String showConfirmPage(HttpSession session, Model model) {
-		RoomOrder confirmedOrder = (RoomOrder) session.getAttribute("confirmedOrder");
-		if (confirmedOrder == null) {
-			model.addAttribute("errorMsg", "查無訂單資料，請重新下單。");
-			return "front-end/room/bookPage";
-		}
-		model.addAttribute("roomOrder", confirmedOrder);
-		session.removeAttribute("confirmedOrder");
-		return "front-end/room/orderConfirm";
-	}
-
-	// ===== 儲存訂單 =====
-
-	@Autowired
-	private RoomOListService roomOListService;
-
-	@Autowired
-	private RoomTypeService roomTypeService;
-
-	@Autowired
-	private RoomTypeScheduleService roomScheduleService;
-
-	@Autowired
-	private NotificationService notificationService;
+	// =====統一處理表單提交=====
 
 	@PostMapping("/orderInfo/confirm")
-	public String createOrder(@ModelAttribute RoomOrder roomOrder,
+	@ResponseBody
+	public String processBookingForm(@ModelAttribute RoomOrder roomOrder,
 			HttpSession session, Model model, HttpServletRequest request) {
 
 		// 設定會員
@@ -220,46 +204,143 @@ public class BookPageController {
 		String captcha = request.getParameter("captcha");
 		if (captcha == null || captcha.trim().isEmpty()) {
 			model.addAttribute("errorMessage", "請輸入驗證碼");
-			return "front-end/room/bookPage";
+			return prepareBookPageData(model, roomOrder);
 		}
 
-		try {
-			// 設定訂單基本資料
-			roomOrder.setOrderStatus(1); // 設定訂單狀態為已確認
-			roomOrder.setOrderDate(LocalDate.now().toString()); // 設定訂單日期
+		// 根據付款方式決定處理流程
+		String payMethod = roomOrder.getPayMethod();
+		if ("0".equals(payMethod)) {
+			// 臨櫃付款 - 直接建立訂單並跳轉到確認頁面
+			return processCounterPayment(roomOrder, session, model, request);
+		} else if ("1".equals(payMethod)) {
+			// LINE Pay - 暫存資料到 Session，返回成功狀態讓前端調用 LINE Pay API
+			// 這裡直接回傳 JSON
+			Map<String, Object> result = processLinePayPreparation(roomOrder, session, model, request);
+			// 轉成 JSON 字串回傳
+			try {
+				return new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(result);
+			} catch (Exception e) {
+				return "{\"status\":\"error\",\"message\":\"JSON 轉換失敗\"}";
+			}
+		} else {
+			model.addAttribute("errorMsg", "請選擇付款方式");
+			return prepareBookPageData(model, roomOrder);
+		}
+	}
 
-			// 處理折價券
-			String couponCode = request.getParameter("couponCode");
-			if (couponCode != null && !couponCode.trim().isEmpty()) {
-				// 查詢折價券資料並設定
-				Coupon coupon = couponService.getCouponByCode(couponCode).orElse(null);
-				if (coupon != null) {
-					roomOrder.setCoupon(coupon);
-					// 計算折扣後的實際金額
-					Integer originalAmount = roomOrder.getActualAmount();
-					Integer discountAmount = Integer.valueOf(request.getParameter("discountAmount"));
-					roomOrder.setActualAmount(originalAmount - discountAmount);
+	// 修改 processLinePayPreparation，直接回傳 JSON 狀態
+	@ResponseBody
+	private Map<String, Object> processLinePayPreparation(RoomOrder roomOrder, HttpSession session,
+			Model model, HttpServletRequest request) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			// Set order basic data
+			roomOrder.setOrderStatus(0); // Pending payment
+			roomOrder.setOrderDate(LocalDate.now().toString());
+			roomOrder.setPayStatus("0"); // Unpaid
+
+			// Process coupon
+			processCoupon(roomOrder, request);
+
+			// Parse order details
+			List<RoomOList> details = parseOrderDetailsFromRequest(request, roomOrder);
+			roomOrder.setOrderDetails(details);
+
+			// Store order data in session
+			session.setAttribute("pendingRoomOrder", roomOrder);
+
+			// 回傳成功狀態
+			result.put("status", "success");
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("status", "error");
+			result.put("message", "LINE Pay 準備失敗：" + e.getMessage());
+			return result;
+		}
+	}
+
+	// Add error handling to counter payment processing
+	private String processCounterPayment(RoomOrder roomOrder, HttpSession session,
+			Model model, HttpServletRequest request) {
+		try {
+			// Set order basic data
+			roomOrder.setOrderStatus(1); // Confirmed
+			roomOrder.setOrderDate(LocalDate.now().toString());
+			roomOrder.setPayStatus("0"); // Unpaid
+
+			// Process coupon
+			processCoupon(roomOrder, request);
+
+			// Save main order
+			RoomOrder savedOrder = roomOrderService.save(roomOrder);
+			if (savedOrder == null) {
+				throw new RuntimeException("訂單儲存失敗");
+			}
+
+			// Parse and save order details
+			List<RoomOList> details = parseOrderDetailsFromRequest(request, savedOrder);
+			for (RoomOList detail : details) {
+				RoomOList savedDetail = roomOListService.save(detail);
+				if (savedDetail == null) {
+					throw new RuntimeException("訂單明細儲存失敗");
 				}
 			}
 
-			// 付款方式檢查
-			String payMethodStr = request.getParameter("payMethod");
-			Integer payMethod = null;
-			try {
-				payMethod = Integer.valueOf(payMethodStr);
-				if (payMethod != 0 && payMethod != 1) throw new NumberFormatException();
-			} catch (Exception e) {
-				model.addAttribute("errorMsg", "付款方式有誤，請重新選擇");
-				// 補齊所有頁面資料再回原頁
+			// Update inventory
+			for (RoomOList detail : details) {
+				roomScheduleService.reserve(detail);
+			}
+
+			// Update member data
+			memberService.updateConsumptionAndLevelAndPoints(
+					roomOrder.getMember().getMemberId(), savedOrder.getActualAmount());
+
+			// Send notification
+			notificationService.createNotification(
+					roomOrder.getMember().getMemberId(), "訂單成立", "訂單已成立，請至訂單查詢頁面查看");
+
+			// Process coupon usage
+			String couponCode = request.getParameter("couponCode");
+			if (couponCode != null && !couponCode.trim().isEmpty()) {
+				memberCouponService.useCoupon(roomOrder.getMember().getMemberId(), couponCode);
+			}
+
+			// Put order data in session and redirect to confirmation page
+			session.setAttribute("confirmedOrder", savedOrder);
+			return "redirect:/orderInfo/orderConfirm";
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.addAttribute("errorMsg", "訂單建立失敗：" + e.getMessage());
+			return prepareBookPageData(model, roomOrder);
+		}
+	}
+
+	// ===== LINE Pay 付款成功後的處理 =====
+	@GetMapping("/orderInfo/linepay-success")
+	public String handleLinePaySuccess(@RequestParam String orderId,
+			HttpSession session, Model model) {
+
+		try {
+			// 從 Session 取得待付款訂單
+			RoomOrder roomOrder = (RoomOrder) session.getAttribute("pendingRoomOrder");
+			if (roomOrder == null) {
+				model.addAttribute("errorMsg", "查無待付款訂單資料");
 				return "front-end/room/bookPage";
 			}
+
+			// 更新訂單狀態
+			roomOrder.setOrderStatus(1); // 已確認
+			roomOrder.setPayStatus("1"); // 已付款
 
 			// 儲存主訂單
 			RoomOrder savedOrder = roomOrderService.save(roomOrder);
 
-			// 2. 解析並儲存訂單明細
-			List<RoomOList> details = parseOrderDetailsFromRequest(request, savedOrder);
+			// 儲存訂單明細
+			List<RoomOList> details = roomOrder.getOrderDetails();
 			for (RoomOList detail : details) {
+				detail.setRoomOrder(savedOrder);
 				roomOListService.save(detail);
 			}
 
@@ -269,50 +350,108 @@ public class BookPageController {
 			}
 
 			// 更新會員資料
-			memberService.updateConsumptionAndLevelAndPoints(member.getMemberId(), savedOrder.getActualAmount());
+			memberService.updateConsumptionAndLevelAndPoints(
+					roomOrder.getMember().getMemberId(), savedOrder.getActualAmount());
 
 			// 發通知
 			notificationService.createNotification(
-					member.getMemberId(), "訂單成立", "訂單已成立，請至訂單查詢頁面查看");
+					roomOrder.getMember().getMemberId(), "訂單成立", "LINE Pay 付款成功，訂單已成立");
 
 			// 處理折價券使用
-			if (couponCode != null && !couponCode.trim().isEmpty()) {
-				memberCouponService.useCoupon(member.getMemberId(), couponCode);
+			if (roomOrder.getCoupon() != null) {
+				memberCouponService.useCoupon(
+						roomOrder.getMember().getMemberId(),
+						roomOrder.getCoupon().getCouponCode());
 			}
 
-			// 將訂單資料存入 session 供確認頁面使用
-			session.setAttribute("confirmedOrder", savedOrder);
+			// 清除 Session 中的待付款訂單
+			session.removeAttribute("pendingRoomOrder");
 
-			return "front-end/member/memberCenter";
+			// 將完成的訂單放入 Session，轉跳至確認頁面
+			session.setAttribute("confirmedOrder", savedOrder);
+			return "redirect:/orderInfo/orderConfirm";
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			// 直接 forward 回訂房頁，帶錯誤訊息與原資料
-			model.addAttribute("errorMsg", "訂單建立失敗：" + e.getMessage());
-			model.addAttribute("roomOrder", roomOrder);
-			// 如有 nights、params 也一併補齊
-			// model.addAttribute("nights", nights);
-			// model.addAttribute("params", params);
-
-			// 取得房型、價格、專案名稱等資料
-			Map<String, String> roomTypeNames = roomTypeSvc.getAllAvailableRoomTypes().stream()
-					.collect(Collectors.toMap(
-							roomType -> String.valueOf(roomType.getRoomTypeId()),
-							RoomTypeVO::getRoomTypeName));
-			Map<String, Integer> roomTypePrices = roomTypeSvc.getAllAvailableRoomTypes().stream()
-					.collect(Collectors.toMap(
-							roomType -> String.valueOf(roomType.getRoomTypeId()),
-							RoomTypeVO::getRoomTypePrice));
-			model.addAttribute("roomTypeNames", roomTypeNames);
-			model.addAttribute("roomTypePrices", roomTypePrices);
-
-			Map<String, String> packageNames = new HashMap<>();
-			packageNames.put("800", "南島晨光專案");
-			packageNames.put("1800", "蔚藍晨夕專案");
-			packageNames.put("2800", "悠日饗茶專案");
-			model.addAttribute("packageNames", packageNames);
-
+			model.addAttribute("errorMsg", "訂單處理失敗：" + e.getMessage());
 			return "front-end/room/bookPage";
+		}
+	}
+
+	// ===== 折價券處理共用方法 =====
+	private void processCoupon(RoomOrder roomOrder, HttpServletRequest request) {
+		String couponCode = request.getParameter("couponCode");
+		if (couponCode != null && !couponCode.trim().isEmpty()) {
+			Coupon coupon = couponService.getCouponByCode(couponCode).orElse(null);
+			if (coupon != null) {
+				roomOrder.setCoupon(coupon);
+				// 這裡假設前端已經計算好折扣後的金額
+				// 如果需要在後端重新計算，可以在這裡處理
+			}
+		}
+	}
+
+	// ===== 訂單確認頁面 =====
+	// Add this method to handle the chunked encoding issue
+	@GetMapping("/orderInfo/orderConfirm")
+	public String showConfirmPage(HttpSession session, Model model) {
+		RoomOrder confirmedOrder = (RoomOrder) session.getAttribute("confirmedOrder");
+		if (confirmedOrder == null) {
+			// Better error handling
+			model.addAttribute("errorMsg", "查無訂單資料，請重新下單。");
+			return "front-end/room/bookPage";
+		}
+
+		try {
+			// Ensure all required data is present
+			if (confirmedOrder.getOrderDetails() != null) {
+				for (RoomOList detail : confirmedOrder.getOrderDetails()) {
+					if (detail.getRoomType() == null && detail.getRoomTypeId() != null) {
+						RoomTypeVO roomType = roomTypeSvc.getOneRoomType(detail.getRoomTypeId());
+						if (roomType != null) {
+							detail.setRoomType(roomType);
+						}
+					}
+				}
+			}
+
+			// Calculate nights safely
+			long nights = 0;
+			if (confirmedOrder.getCheckInDate() != null && confirmedOrder.getCheckOutDate() != null) {
+				LocalDate checkIn = LocalDate.parse(confirmedOrder.getCheckInDate());
+				LocalDate checkOut = LocalDate.parse(confirmedOrder.getCheckOutDate());
+				nights = ChronoUnit.DAYS.between(checkIn, checkOut);
+			}
+
+			// Set default values to prevent null references
+			model.addAttribute("roomOrder", confirmedOrder);
+			model.addAttribute("nights", nights);
+
+			// Add project add-on name if exists
+			if (confirmedOrder.getProjectAddOn() == 1) {
+				Map<String, String> packageNames = new HashMap<>();
+				packageNames.put("800", "南島晨光專案");
+				packageNames.put("1800", "蔚藍晨夕專案");
+				packageNames.put("2800", "悠日饗茶專案");
+				// You'll need to determine which package was selected
+				model.addAttribute("projectAddOnName", "專案加購"); // Default value
+				model.addAttribute("packagePrice", 0); // Default value
+			}
+
+			// Set default discount amount if not set
+			if (confirmedOrder.getDiscountAmount() == null) {
+				confirmedOrder.setDiscountAmount(0);
+			}
+
+			// Clear session after setting all data
+			// session.removeAttribute("confirmedOrder"); // 這行先註解掉
+
+			return "front-end/room/orderConfirm";
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.addAttribute("errorMsg", "訂單資料處理失敗：" + e.getMessage());
+			return "redirect:/member/memberCenter";
 		}
 	}
 
@@ -372,11 +511,31 @@ public class BookPageController {
 		return details;
 	}
 
-	// 可能需要的額外方法
-	private boolean validateCaptcha(String userInput, String expectedCaptcha) {
-		// 實作驗證碼驗證邏輯
-		// 這裡假設驗證碼存在session中
-		return userInput != null && userInput.equals(expectedCaptcha);
+	// ===== 準備 bookPage 所需資料 =====
+	private String prepareBookPageData(Model model, RoomOrder roomOrder) {
+		// 取得房型、價格、專案名稱等資料
+		Map<String, String> roomTypeNames = roomTypeSvc.getAllAvailableRoomTypes().stream()
+				.collect(Collectors.toMap(
+						roomType -> String.valueOf(roomType.getRoomTypeId()),
+						RoomTypeVO::getRoomTypeName));
+		Map<String, Integer> roomTypePrices = roomTypeSvc.getAllAvailableRoomTypes().stream()
+				.collect(Collectors.toMap(
+						roomType -> String.valueOf(roomType.getRoomTypeId()),
+						RoomTypeVO::getRoomTypePrice));
+		model.addAttribute("roomTypeNames", roomTypeNames);
+		model.addAttribute("roomTypePrices", roomTypePrices);
+
+		Map<String, String> packageNames = new HashMap<>();
+		packageNames.put("800", "南島晨光專案");
+		packageNames.put("1800", "蔚藍晨夕專案");
+		packageNames.put("2800", "悠日饗茶專案");
+		model.addAttribute("packageNames", packageNames);
+
+		return "front-end/room/bookPage";
 	}
 
+	// 驗證碼驗證方法
+	private boolean validateCaptcha(String userInput, String expectedCaptcha) {
+		return userInput != null && userInput.equals(expectedCaptcha);
+	}
 }
