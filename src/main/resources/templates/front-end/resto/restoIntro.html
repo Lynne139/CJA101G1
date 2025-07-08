@@ -54,11 +54,20 @@
       <section id="reservation" class="reservation-container" th:if="${periodList != null and #lists.size(periodList) > 0}">
         <div class="reservation-title">預約訂位</div>
         
+
+        
+        
         <form class="reservation-form"
               id="restoOrderFrontForm"
                 th:object="${preBooking}" 
                 th:action="@{/restaurants/booking-pre}"
                 method="post">
+                
+        <div th:if="${globalError}" class="alert alert-danger">
+  <i class="fa-solid fa-triangle-exclamation me-2"></i>
+  <span th:text="${globalError}"></span>
+</div>
+                
                 
           <input type="hidden" th:field="*{restoId}" />
                 

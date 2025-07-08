@@ -242,9 +242,23 @@ public class FrontRestoController {
 						          @RequestParam Integer timeslotId,
 						          Model model
 	) {
+		
+		/* ---- 餐廳必須是上線狀態 ---- */
+	    RestoVO resto = restoSvc.findOnline(restoId)                       // 只撈 enabled
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-		RestoVO resto = restoSvc.getById(restoId);
-	    TimeslotVO ts = timeslotSvc.getById(timeslotId);
+	    /* ---- 時段必須存在，且隸屬同一間餐廳 ---- */
+	    TimeslotVO ts = timeslotSvc.findNotDeleted(timeslotId)                // 只撈 enabled
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		
+	    if (!ts.getPeriodVO().getRestoVO().getRestoId().equals(restoId)) {
+	        throw new ResponseStatusException(HttpStatus.NOT_FOUND);       // timeslot 不屬於該餐廳
+	    }
+
+		
+
+//		RestoVO resto = restoSvc.getById(restoId);
+//	    TimeslotVO ts = timeslotSvc.getById(timeslotId);
 		
 
         // summary 需要的靜態資料
@@ -274,6 +288,24 @@ public class FrontRestoController {
 					          HttpSession session,
                               RedirectAttributes ra){
 		
+		
+		
+		/* ---- 餐廳必須 online ---- */
+	    RestoVO resto = restoSvc.findOnline(restoId)
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+	    /* ---- 時段 id 來自 hidden，必須同餐廳 & enabled ---- */
+	    TimeslotVO ts = timeslotSvc.findNotDeleted(order.getTimeslotVO().getTimeslotId())
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+	    if (!ts.getPeriodVO().getRestoVO().getRestoId().equals(restoId)) {
+	        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+	    }
+	    
+	    /* ---- ③ 將受管實體塞回訂單 (避免 TransientObjectException) ---- */
+	    order.setRestoVO(resto);   // 受管實體
+	    order.setTimeslotVO(ts);   // 受管實體
+	    
 		
 	
 		
@@ -315,6 +347,13 @@ public class FrontRestoController {
         } catch (OverbookingException e){  // 名額被搶
             br.reject("full","很抱歉，名額剛好被訂完，請重新選擇時段");
             keepOrder(order, br, ra);
+            
+            String errorMsg = br.getGlobalError() != null
+            	    ? br.getGlobalError().getDefaultMessage()
+            	    : "很抱歉，名額已滿，請重試";
+
+            	ra.addFlashAttribute("globalError", errorMsg);
+            
             return "redirect:/restaurants/" + restoId;   // 回第一步
         }
 
