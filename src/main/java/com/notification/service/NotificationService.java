@@ -21,13 +21,8 @@ public class NotificationService {
         this.notificationRepository = notificationRepository;
         this.notificationWebSocketService = notificationWebSocketService;
     }
-
-    // 新增通知(舊版)
-//    public Notification createNotification(Notification notification) {
-//        return notificationRepository.save(notification);
-//    }
     
-    // 新增通知(簡潔版，含推播功能)
+    // 新增通知(有含推播功能)
     public Notification createNotification(Integer memberId, String title, String content) {
         Notification notification = new Notification();
         notification.setMemberId(memberId);
