@@ -4,6 +4,7 @@ import com.coupon.entity.Coupon;
 import com.coupon.service.MemberCouponService;
 import com.member.model.MemberService;
 import com.member.model.MemberVO;
+import com.notification.service.NotificationService;
 import com.resto.model.RestoOrderService;
 import com.roomOrder.model.RoomOrder;
 import com.roomOrder.model.RoomOrderService;
@@ -50,7 +51,11 @@ public class RoomOrderFrontController {
     private ReservationService reservationService;
     @Autowired
     private MemberCouponService memberCouponService;
-   
+    @Autowired
+    private MemberService memberService;
+    @Autowired
+    private NotificationService notificationService;
+
 
     // 會員訂單列表
     @GetMapping("/roomOrder")
@@ -130,18 +135,17 @@ public class RoomOrderFrontController {
     }
 
     // 取消訂單
-    @PostMapping("/roomOrder/cancel")
+    @GetMapping("/roomOrder/cancel")
     @ResponseBody
     public String cancelOrder(@RequestParam Integer roomOrderId, HttpSession session) {
         MemberVO member = (MemberVO) session.getAttribute("loggedInMember");
-        // MemberVO member = memberService.getOneMember(1);
         RoomOrder order = roomOrderService.getById(roomOrderId);
         List<RoomOList> details = roomOListService.findByRoomOrderId(roomOrderId);
 
-        if (order.getProjectAddOn() == 1) {
-            // 取消餐廳訂單
-            restoOrderService.cancelByRoomOrderId(roomOrderId);
-        }
+        // if (order.getProjectAddOn() == 1) {
+        //     // 取消餐廳訂單
+        //     restoOrderService.cancelByRoomOrderId(roomOrderId);
+        // }
 
         // 取消住宿訂單
         if (details.size() > 0) {
@@ -153,8 +157,15 @@ public class RoomOrderFrontController {
             return "fail";
         }
         order.setOrderStatus(0); // 0:取消
+        order.setPayStatus("2"); // 2:已退款
         roomOrderService.save(order);
-        return "success";
+        // 更新會員累計金額
+        Integer memberId = order.getMember().getMemberId();
+        memberService.updateConsumptionAndLevelAndPoints(memberId, -order.getActualAmount());
+        // 發送通知
+        notificationService.createNotification(memberId, "訂單取消", "已成功取消訂單，請至訂單查詢頁面查看。");
+
+        return "redirect:/member/order/roomOrder";
     }
 
     // 會員訂單檢視（for 檢視 modal）

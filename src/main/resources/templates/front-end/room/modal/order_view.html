@@ -17,16 +17,16 @@
                             <p><strong>實際支付金額：</strong> <span th:text="${roomOrder != null && roomOrder.actualAmount != null ? roomOrder.actualAmount : 0}"></span></p>
                             <p><strong>訂單成立日期：</strong> <span th:text="${roomOrder != null && roomOrder.orderDate != null ? roomOrder.orderDate : ''}"></span></p>
                             <p><strong>訂單狀態：</strong>
-                                <span th:text="${roomOrder != null ? 
-                                    (roomOrder.orderStatus == 1 ? '已成立' : 
-                                     (roomOrder.orderStatus == 2 ? '已完成' : '已取消')) 
+                                <span th:text="${roomOrder != null ?
+                                    (roomOrder.orderStatus == 1 ? '已成立' :
+                                     (roomOrder.orderStatus == 2 ? '已完成' : '已取消'))
                                 : '已取消'}">
                   </span>
                             </p>
-                            <p><strong>付款狀態：</strong> <span th:text="${(roomOrder != null) ? (roomOrder.getPayStatus() == 1 ? ' 已付款'
-                                : (roomOrder.getPayStatus()==2 ? '已退款': '未付款' )) 
+                            <p><strong>付款狀態：</strong> <span th:text="${(roomOrder != null) ? (roomOrder.getPayStatus() == '1' ? ' 已付款'
+                                : (roomOrder.getPayStatus()=='2' ? '已退款': '未付款' ))
                                 : '未付款'}"></span></p>
-                            <p><strong>付款方式：</strong> <span th:text="${roomOrder != null && roomOrder.payMethod == 1 ? 'Linepay' : '臨櫃付款'}"></span></p>
+                            <p><strong>付款方式：</strong> <span th:text="${roomOrder != null && roomOrder.payMethod == '1' ? 'Linepay' : '臨櫃付款'}"></span></p>
                             <p><strong>房間總數：</strong> <span th:text="${roomOrder != null && roomOrder.roomAmount != null ? roomOrder.roomAmount : 0}"></span></p>
                             <p><strong>入住日期：</strong> <span th:text="${roomOrder != null && roomOrder.checkInDate != null ? roomOrder.checkInDate : ''}"></span></p>
                             <p><strong>退房日期：</strong> <span th:text="${roomOrder != null && roomOrder.checkOutDate != null ? roomOrder.checkOutDate : ''}"></span></p>

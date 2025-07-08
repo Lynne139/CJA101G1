@@ -70,7 +70,7 @@
                                 <span th:classappend="${roomo.orderStatus} == 2 ? 'badge bg-success' : (${roomo.orderStatus} == 1 ? 'badge bg-primary' : 'badge bg-secondary')"
                                       th:text="${roomo.orderStatus} == 2 ? '完成' : (${roomo.orderStatus} == 1 ? '成立' : '取消')"></span>
                             </td>
-                            <td th:text="${roomo.payStatus} == 1 ? '已付款' : '未付款'"></td>
+                            <td th:text="${roomo.payStatus} == 1 ? '已付款' : (${roomo.payStatus} == 2 ? '已退款' : '未付款')"></td>
                             <td th:text="${roomo.totalAmount}"></td>
                             <td th:text="${roomo.actualAmount}"></td>
                             <td style="white-space: nowrap;" th:text="${roomo.checkInDate}"></td>
@@ -80,7 +80,7 @@
                                 <div class="table_row_actions d-flex justify-content-center align-items-start">
                                     <button class="btn_icon btn_view" th:data-id="${roomo.roomOrderId}" title="查看訂單"><i class="fas fa-eye"></i></button>
                                     <button class="btn_icon btn_edit" th:data-id="${roomo.roomOrderId}" title="編輯資料" th:disabled="${roomo.orderStatus} == 0"><i class="fas fa-edit"></i></button>
-                                    <button class="btn_icon btn_cancel" th:data-id="${roomo.roomOrderId}" title="取消訂單" th:disabled="${roomo.orderStatus} == 0"><i class="fas fa-times"></i></button>
+                                    <button class="btn_icon btn_cancel" th:data-id="${roomo.roomOrderId}" title="取消訂單" th:disabled="${roomo.orderStatus == 0 or roomo.payMethod == '1'}"><i class="fas fa-times"></i></button>
                                 </div>
                             </td>
                         </tr>

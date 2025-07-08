@@ -220,6 +220,7 @@ public class RoomOrderController {
 
 		if (order != null) {
 			order.setOrderStatus(0); // 0:取消
+			order.setPayStatus("2"); // 2:已退款
 			// 這裡補查明細
 			List<RoomOList> details = roomOListService.findByRoomOrderId(roomOrderId);
 			List<Integer> olistIds = new ArrayList<>();
@@ -237,10 +238,10 @@ public class RoomOrderController {
 
 			// 更新訂單狀態
 			orderService.save(order);
-			if (order.getProjectAddOn() == 1) {
-				// 取消餐廳訂單
-				restoOrderService.cancelByRoomOrderId(roomOrderId);
-			}
+			// if (order.getProjectAddOn() == 1) {
+			// 	// 取消餐廳訂單
+			// 	restoOrderService.cancelByRoomOrderId(roomOrderId);
+			// }
 			// 5. 更新會員累計金(扣除整筆actualAmount)
 			Integer memberId = order.getMember().getMemberId();
 			memberService.updateConsumptionAndLevelAndPoints(memberId, -order.getActualAmount());
@@ -252,7 +253,7 @@ public class RoomOrderController {
 		return Map.of("success", false, "message", "找不到訂單");
 	}
 
-	// ===== restro:取消加購專案 =====
+	// ===== resto:取消加購專案 =====
 	@PostMapping("/roomo_info/cancel_project_add_on")
 	@ResponseBody
 	public Map<String, Object> cancelProjectAddOn(@RequestParam Integer roomOrderId, HttpServletRequest request) {
@@ -275,6 +276,13 @@ public class RoomOrderController {
 		order.setProjectAddOn(0);
 		System.out.println("更新訂單：" + order);
 		orderService.save(order);
+
+		// 退款要新增部分退款選項
+
+		// 更新會員累計金額
+		Integer memberId = order.getMember().getMemberId();
+		memberService.updateConsumptionAndLevelAndPoints(memberId, -addonPrice);
+
 		// 取消餐廳訂單
 		// restoOrderService.cancelByRoomOrderId(roomOrderId);
 		return Map.of("success", true);
