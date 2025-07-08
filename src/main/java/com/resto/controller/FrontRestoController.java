@@ -209,9 +209,17 @@ public class FrontRestoController {
 	        
 	    
 	    // ========== 成功，進入下一階段填表頁 ==========
-	    ra.addFlashAttribute("preBooking", dto);
+	    
+//	    ra.addFlashAttribute("preBooking", dto);
+
 //        ra.addFlashAttribute("org.springframework.validation.BindingResult.preBooking", br);
-        return "redirect:/restaurants/booking/confirm/" + dto.getRestoId();
+//        return "redirect:/restaurants/booking/confirm/" + dto.getRestoId();
+
+	    // 用 query string 傳遞參數
+	    return "redirect:/restaurants/booking/confirm/" + dto.getRestoId()
+	    + "?regiDate=" + dto.getRegiDate()
+	    + "&regiSeats=" + dto.getRegiSeats()
+	    + "&timeslotId=" + dto.getTimeslotId();
 	
 	}
 //
@@ -220,25 +228,29 @@ public class FrontRestoController {
     //  ====填聯絡資料頁====
 	@GetMapping("/restaurants/booking/confirm/{restoId}")
 	public String showBookingForm(@PathVariable Integer restoId,
-						            @ModelAttribute("preBooking") PreBookingDTO dto,
-						            Model model
+						          @RequestParam LocalDate regiDate,
+						          @RequestParam Integer regiSeats,
+						          @RequestParam Integer timeslotId,
+						          Model model
 	) {
 
+		RestoVO resto = restoSvc.getById(restoId);
+	    TimeslotVO ts = timeslotSvc.getById(timeslotId);
 		
 
         // summary 需要的靜態資料
-        model.addAttribute("resto",    restoSvc.getById(restoId));
-        model.addAttribute("timeslot", timeslotSvc.getById(dto.getTimeslotId()));
-        model.addAttribute("seats", dto.getRegiSeats());
+	    model.addAttribute("resto",    resto);
+	    model.addAttribute("timeslot", ts);
+	    model.addAttribute("seats",    regiSeats);
 		
         /* 第一次進來才建立空的 restoOrder 讓 <form> 綁定  */
         if (!model.containsAttribute("restoOrder")) {
-            RestoOrderVO o = new RestoOrderVO();
-            o.setRestoVO(restoSvc.getById(restoId));
-            o.setTimeslotVO(timeslotSvc.getById(dto.getTimeslotId()));
-            o.setRegiDate(dto.getRegiDate());
-            o.setRegiSeats(dto.getRegiSeats());
-            model.addAttribute("restoOrder", o);
+            RestoOrderVO order = new RestoOrderVO();
+        	order.setRestoVO(resto);
+            order.setTimeslotVO(ts);
+            order.setRegiDate(regiDate);
+            order.setRegiSeats(regiSeats);
+            model.addAttribute("restoOrder", order);
         }
         
 	    return "front-end/resto/restoBooking";

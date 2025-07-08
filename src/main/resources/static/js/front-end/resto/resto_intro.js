@@ -50,7 +50,6 @@ function updateSlots() {
     .catch(err => console.error('取可用時段失敗', err));
 }
 
-
 // -------- 初次 DOM Ready --------
 document.addEventListener('DOMContentLoaded', () => {
 
