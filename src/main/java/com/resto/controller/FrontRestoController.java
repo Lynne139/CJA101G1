@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.member.model.MemberVO;
 import com.resto.dto.PreBookingDTO;
 import com.resto.entity.PeriodVO;
 import com.resto.entity.RestoOrderVO;
@@ -49,6 +50,7 @@ import com.resto.utils.exceptions.OverbookingException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/")
@@ -136,7 +138,7 @@ public class FrontRestoController {
 
 	
     //  ====顯示餐廳分頁====	
-		@GetMapping("/restaurants/{id}")
+		@GetMapping("/restaurants/{id:\\\\d+}")
 		public String intro(@PathVariable Integer id, 
 									Model model,
 									@RequestParam(required = false) LocalDate date) {
@@ -242,6 +244,7 @@ public class FrontRestoController {
 	    model.addAttribute("resto",    resto);
 	    model.addAttribute("timeslot", ts);
 	    model.addAttribute("seats",    regiSeats);
+	    model.addAttribute("regiDate", regiDate);
 		
         /* 第一次進來才建立空的 restoOrder 讓 <form> 綁定  */
         if (!model.containsAttribute("restoOrder")) {
@@ -259,40 +262,63 @@ public class FrontRestoController {
 	//  ====送出聯絡資料====	
 	@PostMapping("/restaurants/booking/confirm/{restoId}")
     public String createOrder(@PathVariable Integer restoId,
-                              @Validated @ModelAttribute("restoOrder") RestoOrderVO order,
-                              BindingResult br,
+    						  @Validated @ModelAttribute("restoOrder") RestoOrderVO order,
+					          BindingResult br,
+                              HttpSession session,
                               RedirectAttributes ra){
 
+		// 將memberId 與 orderSource 寫進 order
+	    MemberVO member = (MemberVO) session.getAttribute("member");
+	    order.setMemberVO(member);
+//	    order.setOrderSource(RestoOrderSource.MEMBER);
+		
+		
         if (br.hasErrors()){
+        	
+        	System.out.println("==== 檢查 br 的所有錯誤 ====");
+        	System.out.println("==== Validation Errors ====");
+            br.getFieldErrors().forEach(fe -> {
+                System.out.printf("[欄位錯誤] field=%s, message=%s%n", fe.getField(), fe.getDefaultMessage());
+            });
+
+            br.getGlobalErrors().forEach(ge -> {
+                System.out.printf("[全域錯誤] object=%s, message=%s%n", ge.getObjectName(), ge.getDefaultMessage());
+
+            });
+        	
             keepOrder(order, br, ra);
-            return "redirect:/restaurants/booking/confirm/" + restoId;
+            return "redirect:/restaurants/booking/confirm/" + restoId 
+            		+ "?regiDate="  + order.getRegiDate()
+                    + "&regiSeats=" + order.getRegiSeats()
+                    + "&timeslotId="+ order.getTimeslotVO().getTimeslotId();
         }
+                
         
-        
-        /* -------- 填表送出時再次名額驗證 -------- */
+        /* -------- 填表送出時再次名額驗證 ＋ 原子插單 -------- */
         try {
-            restoOrderSvc.tryCreateOrder(order);   // <<<<<< 使用新的原子方法
-        } catch (OverbookingException e){
+            restoOrderSvc.tryCreateOrder(order);   // 寫入並回填 orderId
+        } catch (OverbookingException e){  // 名額被搶
             br.reject("full","很抱歉，名額剛好被訂完，請重新選擇時段");
             keepOrder(order, br, ra);
             return "redirect:/restaurants/" + restoId;   // 回第一步
         }
 
         ra.addFlashAttribute("orderId", order.getRestoOrderId());
-        return "redirect:/restaurants/booking-result";
+        ra.addFlashAttribute("toast",   "已完成訂位！");
+        return "redirect:/restaurants/BookSuccess";
     }
 
 
 	
     //  ====結果頁====	
-	@GetMapping("/restaurants/Booking-result")
-	public String showBookingResult(@PathVariable Integer id,
+	@GetMapping("/restaurants/BookSuccess")
+	public String showBookingResult(@ModelAttribute("orderId") Integer id,
 									Model model
 						        
 						        
 	) {
-		if (id == null){
-            return "redirect:/restaurants";   // 防止刷新直接進
+		if (id == null){ // 防直接刷新/手動輸入URL進入
+            return "redirect:/restaurants";
         }
         model.addAttribute("order", restoOrderSvc.getById(id));
         return "front-end/resto/restoBookResult";

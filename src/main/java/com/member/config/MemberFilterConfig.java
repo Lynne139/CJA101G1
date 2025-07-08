@@ -41,11 +41,11 @@ public class MemberFilterConfig {
             // 折價券相關
             "/coupon/select",     // 查看折價券
             "/coupon/claim" ,     // 領取折價券
-            "/notification"       // 會員通知
+            "/notification",       // 會員通知
 
             
             //餐廳相關
-            
+            "/restaurants/booking/confirm/*"     // 訂位訂單頁面
             
         );
         

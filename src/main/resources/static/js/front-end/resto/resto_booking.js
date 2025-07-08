@@ -1,25 +1,45 @@
 document.addEventListener('DOMContentLoaded', () => {
 	
 	
-	document.querySelector('#orderGuestName').addEventListener('input', (e) => {
-	  document.querySelector('#summary_guestName').textContent = e.target.value;
+	// ----- 右側摘要同步 -----
+	const fields = [
+	  ["orderGuestName",   "#summary_guestName"],
+	  ["orderGuestPhone",  "#summary_guestPhoneName"],
+	  ["orderGuestEmail",  "#summary_guestEmail"],
+	  ["highChairs",       "#summary_highChairs"],
+	  ["regiReq",          "#summary_regiReq"]
+	];
+
+	fields.forEach(([inputId, targetSel]) => {
+	  const input  = document.getElementById(inputId);
+	  const target = document.querySelector(targetSel);
+
+	  if (!input || !target) return;
+
+	  // 初始填
+	  target.textContent = input.value || "—";
+
+	  // keyup / change 即時更新
+	  input.addEventListener("input", () => {
+	    target.textContent = input.value || "—";
+	  });
 	});
 
-	document.querySelector('#orderGuestPhone').addEventListener('input', (e) => {
-	  document.querySelector('#summary_guestPhoneName').textContent = e.target.value;
-	});
-
-	document.querySelector('#orderGuestEmail').addEventListener('input', (e) => {
-	  document.querySelector('#summary_guestEmail').textContent = e.target.value;
-	});
-
-	document.querySelector('#highChairs').addEventListener('input', (e) => {
-	  document.querySelector('#summary_highChairs').textContent = e.target.value;
-	});
-
-	document.querySelector('#regiReq').addEventListener('input', (e) => {
-	  document.querySelector('#summary_regiReq').textContent = e.target.value;
-	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 
 
