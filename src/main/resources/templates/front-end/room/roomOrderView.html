@@ -78,7 +78,7 @@
                             <td th:text="${roomo.orderDate}"></td>
                             <td>
                                 <div class="table_row_actions d-flex justify-content-center align-items-start">
-                                    <button class="btn_icon btn_view" th:data-id="${roomo.roomOrderId}" title="查看訂單" th:disabled="${roomo.orderStatus} == 0"><i class="fas fa-eye"></i></button>
+                                    <button class="btn_icon btn_view" th:data-id="${roomo.roomOrderId}" title="查看訂單"><i class="fas fa-eye"></i></button>
                                     <button class="btn_icon btn_edit" th:data-id="${roomo.roomOrderId}" title="編輯資料" th:disabled="${roomo.orderStatus} == 0"><i class="fas fa-edit"></i></button>
                                     <button class="btn_icon btn_cancel" th:data-id="${roomo.roomOrderId}" title="取消訂單" th:disabled="${roomo.orderStatus} == 0"><i class="fas fa-times"></i></button>
                                 </div>

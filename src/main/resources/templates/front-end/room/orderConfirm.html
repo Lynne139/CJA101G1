@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>訂單確認</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <h3>訂單確認</h3>
+    <p>訂單編號: <span th:text="${roomOrder.roomOrderId}" id="orderId"></span></p>
+    <p>總金額: <span th:text="${roomOrder.actualAmount}" id="totalAmount"></span></p>
+    
+    <!-- 顯示訂單明細 -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>房型名稱</th>
+                <th>房型數量</th>
+                <th>入住人數</th>
+                <th>金額</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="detail : ${roomOrder.orderDetails}">
+                <td th:text="${detail.roomType.roomTypeName}"></td>
+                <td th:text="${detail.roomAmount}"></td>
+                <td th:text="${detail.numberOfPeople}"></td>
+                <td th:text="${detail.roomPrice * detail.roomAmount}"></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- LinePay 付款按鈕 -->
+    <button id="linePayBtn" class="btn btn-success">使用 LinePay 付款</button>
+
+    <div th:if="${roomOrder.paymentMethod == 'OFFLINE'}">
+        <p>請盡速聯絡客服索取訂金付款資訊。</p>
+    </div>
+
+    <script>
+    document.getElementById('linePayBtn').addEventListener('click', function() {
+        // 從畫面抓訂單資訊
+        const orderId = document.getElementById('orderId').textContent.trim();
+        const totalAmount = document.getElementById('totalAmount').textContent.trim();
+        const orderName = "訂房訂單"; // 可自訂
+
+        // 組資料
+        const linepayBody = {
+            amount: Number(totalAmount),
+            currency: "TWD",
+            orderId: orderId,
+            packages: [{
+                id: "package-1",
+                amount: Number(totalAmount),
+                name: orderName,
+                products: [{
+                    name: orderName,
+                    quantity: 1,
+                    price: Number(totalAmount)
+                }]
+            }],
+            redirectUrls: {
+                confirmUrl: "http://localhost:8080/api/confirmpayment/" + orderId + "/room",
+                cancelUrl: "http://localhost:8080/front-end/room/orderConfirm?cancel=1"
+            }
+        };
+        const linepayOrder = {
+            orderId: orderId,
+            totalAmount: Number(totalAmount)
+        };
+
+        fetch('/api/linepay/room', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({linepayBody, linepayOrder})
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                window.location.href = data.data; // 跳轉到 LinePay 付款頁
+            } else {
+                alert('LinePay 付款連線失敗');
+            }
+        });
+    });
+    </script>
+</body>
+</html>
