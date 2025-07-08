@@ -33,8 +33,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.resto.dto.BookingFormDTO;
 import com.resto.dto.PreBookingDTO;
 import com.resto.entity.PeriodVO;
 import com.resto.entity.RestoOrderVO;
@@ -45,6 +45,7 @@ import com.resto.model.ReservationService;
 import com.resto.model.RestoOrderService;
 import com.resto.model.RestoService;
 import com.resto.model.TimeslotService;
+import com.resto.utils.exceptions.OverbookingException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -136,49 +137,19 @@ public class FrontRestoController {
 	
     //  ====顯示餐廳分頁====	
 		@GetMapping("/restaurants/{id}")
-		public String viewRestaurant(@PathVariable Integer id, 
+		public String intro(@PathVariable Integer id, 
 									Model model,
 									@RequestParam(required = false) LocalDate date) {
 
 
-//			// 找出「上架」餐廳，若找不到就 404
-//		    RestoVO selectedResto = restoSvc.findOnline(id)
-//		            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-//		    model.addAttribute("selectedResto", selectedResto);
-//		    model.addAttribute("restoSeats", selectedResto.getRestoSeatsTotal());
-//
-//		    // 找出區段與時段（包含 isDeleted = false）
-//		    List<PeriodVO> periodList = periodSvc.findEnabledByRestoIdWithSlots(id);
-//		    model.addAttribute("periodList",periodList);
-//
-//		    // 今天日期
-//		    model.addAttribute("today", LocalDate.now());
-//
-//		    // 抓出timeslot滿額名單
-//		    Map<Integer, Boolean> fullSlotMap = new HashMap<>();
-//		    int requiredSeats = 1; // 初始顯示畫面時沒選擇人數，預設為1
-//
-//		    for (PeriodVO period : periodList) {
-//		        for (TimeslotVO slot : period.getTimeslots()) {
-//		            int usedSeats = reservationSvc.getReserved(id, slot.getTimeslotId(), LocalDate.now());
-//		            boolean isFull = (usedSeats + requiredSeats > selectedResto.getRestoSeatsTotal());
-//		            fullSlotMap.put(slot.getTimeslotId(), isFull);
-//		        }
-//		    }
-//			model.addAttribute("fullSlotMap", fullSlotMap);
-
 			prepareIntroPage(model, id, 1, LocalDate.now());
-		    model.addAttribute("preBooking", new PreBookingDTO(id, null, null, null));
+			if (!model.containsAttribute("preBooking")) {
+	            model.addAttribute("preBooking", new PreBookingDTO(id, null, null, null));
+	        }
 
-
-
-		    // 給 <form th:object="${preBooking}">
-		    model.addAttribute("preBooking", new PreBookingDTO(id, null, null, null));
-		    
-		    
-		    
 		    return "front-end/resto/restoIntro";
 		}
+		
 		
 	    //  ====給前端JS timeslot 可訂狀態去enable 按鈕(非超時與非滿額)====	
 		@GetMapping("/restaurants/{restoId}/available")
@@ -186,7 +157,8 @@ public class FrontRestoController {
 		public Map<Integer, Boolean> checkAvailable(
 		        @PathVariable Integer restoId,
 		        @RequestParam Integer seats,
-		        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+		        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+		) {
 
 		    LocalTime now = LocalTime.now();
 			
@@ -206,112 +178,145 @@ public class FrontRestoController {
 		}
 
 	
-	//  ====第一階段送出表單（POST）====
+	//  ====intro 按「填表預訂」(POST)====
 	@PostMapping("/restaurants/booking-pre")
 	public String handlePreBooking(
 	        @Validated @ModelAttribute("preBooking") PreBookingDTO dto,
 	        BindingResult br,
-	        Model model) {
+	        RedirectAttributes ra
+	) {
 		
 	    if (br.hasErrors()) {
-	    	
-//	        // 回傳原畫面並保留原輸入
-//	        model.addAttribute("today", LocalDate.now());
-//	        
-//	        // 加入必要資料以重新渲染頁面
-//	        RestoVO resto = restoSvc.findOnline(dto.getRestoId())
-//                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));	        model.addAttribute("preBooking", dto);
-//	        model.addAttribute("selectedResto", resto);
-//	        model.addAttribute("restoSeats", resto.getRestoSeatsTotal());
-//	        model.addAttribute("periodList", periodSvc.findEnabledByRestoIdWithSlots(dto.getRestoId()));
-//	        
-//	        // 給 timeslot 滿額地圖（預設 seats=1）
-//	        // 預設把每顆按鈕鎖起來，前端 JS 會再 call /available 更新
-//	        Map<Integer, Boolean> fullSlotMap = new HashMap<>();
-//	        for (PeriodVO p : periodSvc.findEnabledByRestoIdWithSlots(dto.getRestoId())) {
-//	            for (TimeslotVO slot : p.getTimeslots()) {
-//	                boolean isFull = reservationSvc.getReserved(dto.getRestoId(), slot.getTimeslotId(), LocalDate.now()) + 1
-//	                                 > resto.getRestoSeatsTotal();
-//	                fullSlotMap.put(slot.getTimeslotId(), isFull);
-//	            }
-//	        }
-//	        model.addAttribute("fullSlotMap", fullSlotMap);
-//	        
-//	        
-//	        return "front-end/resto/restoIntro";
-	    	
-	    	// 用 1 人、今天 來計算預設的滿額 Map
-	        prepareIntroPage(model, dto.getRestoId(), 1, LocalDate.now());
-	        // preBooking **保持 dto**，不要 new
-	        model.addAttribute("preBooking", dto);
-	        return "front-end/resto/restoIntro";
-	    	
-	    	
-	    	
+	    	keep(dto, br, ra);
+//	    	ra.addFlashAttribute("preBooking", dto);
+//            ra.addFlashAttribute("org.springframework.validation.BindingResult.preBooking", br);
+            return "redirect:/restaurants/" + dto.getRestoId();
 	    }
 	    
-	    // ========== 名額不足驗證 ==========
+	    // ========== pre名額不足驗證 ==========
 	    int remaining = reservationSvc.getRemaining(
 	        dto.getRestoId(), dto.getTimeslotId(), dto.getRegiDate());
 
 	    if (remaining < dto.getRegiSeats()) {
-	        br.rejectValue("timeslotId", "full", "訂位名額產生異動，該時段已無足夠座位，請選擇其他時段");
+	        br.rejectValue("timeslotId", "full", "訂位名額產生異動，該時段已無足夠座位，請選擇其他日期、時段");
 	        
-//	        model.addAttribute("today", LocalDate.now());
-//	        RestoVO resto = restoSvc.getById(dto.getRestoId());
-//	        model.addAttribute("selectedResto", resto);
-//	        model.addAttribute("restoSeats", resto.getRestoSeatsTotal());
-//	        model.addAttribute("periodList", periodSvc.findEnabledByRestoIdWithSlots(dto.getRestoId()));
-//
-//	        // 給 timeslot 滿額地圖
-//	        Map<Integer, Boolean> fullSlotMap = new HashMap<>();
-//	        for (PeriodVO p : periodSvc.findEnabledByRestoIdWithSlots(dto.getRestoId())) {
-//	            for (TimeslotVO slot : p.getTimeslots()) {
-//	                boolean isFull = reservationSvc.getRemaining(dto.getRestoId(), slot.getTimeslotId(), dto.getRegiDate())
-//	                                 < dto.getRegiSeats();
-//	                fullSlotMap.put(slot.getTimeslotId(), isFull);
-//	            }
-//	        }
-//	        model.addAttribute("fullSlotMap", fullSlotMap);
-//	        return "front-end/resto/restoIntro";
-	        
-	     // 用「使用者剛選的人數 / 日期」重算滿額 Map，讓時段按鈕即時鎖起來
-	        prepareIntroPage(model,
-	                         dto.getRestoId(),
-	                         dto.getRegiSeats(),
-	                         dto.getRegiDate());
-
-	        model.addAttribute("preBooking", dto);
-	        return "front-end/resto/restoIntro";
-	        
+	        keep(dto, br, ra);
+//	        ra.addFlashAttribute("preBooking", dto);
+//            ra.addFlashAttribute("org.springframework.validation.BindingResult.preBooking", br);
+            return "redirect:/restaurants/" + dto.getRestoId();
 	        
 	    }
 	        
-	    // ========== 成功 → 進入下一階段填表頁 ==========
-	    return "redirect:/restaurants/booking"
-	            + "?restoId=" + dto.getRestoId()
-	            + "&date=" + dto.getRegiDate()
-	            + "&slotId=" + dto.getTimeslotId()
-	            + "&seats=" + dto.getRegiSeats();
-    
+	    
+	    // ========== 成功，進入下一階段填表頁 ==========
+	    ra.addFlashAttribute("preBooking", dto);
+//        ra.addFlashAttribute("org.springframework.validation.BindingResult.preBooking", br);
+        return "redirect:/restaurants/booking/confirm/" + dto.getRestoId();
+	
 	}
+//
+	
 
-	/** 把 intro 頁面一定要的共用資料全部塞進 model */
+    //  ====填聯絡資料頁====
+	@GetMapping("/restaurants/booking/confirm/{restoId}")
+	public String showBookingForm(@PathVariable Integer restoId,
+						            @ModelAttribute("preBooking") PreBookingDTO dto,
+						            Model model
+	) {
+
+		
+
+        // summary 需要的靜態資料
+        model.addAttribute("resto",    restoSvc.getById(restoId));
+        model.addAttribute("timeslot", timeslotSvc.getById(dto.getTimeslotId()));
+        model.addAttribute("seats", dto.getRegiSeats());
+		
+        /* 第一次進來才建立空的 restoOrder 讓 <form> 綁定  */
+        if (!model.containsAttribute("restoOrder")) {
+            RestoOrderVO o = new RestoOrderVO();
+            o.setRestoVO(restoSvc.getById(restoId));
+            o.setTimeslotVO(timeslotSvc.getById(dto.getTimeslotId()));
+            o.setRegiDate(dto.getRegiDate());
+            o.setRegiSeats(dto.getRegiSeats());
+            model.addAttribute("restoOrder", o);
+        }
+        
+	    return "front-end/resto/restoBooking";
+	}
+	
+	//  ====送出聯絡資料====	
+	@PostMapping("/restaurants/booking/confirm/{restoId}")
+    public String createOrder(@PathVariable Integer restoId,
+                              @Validated @ModelAttribute("restoOrder") RestoOrderVO order,
+                              BindingResult br,
+                              RedirectAttributes ra){
+
+        if (br.hasErrors()){
+            keepOrder(order, br, ra);
+            return "redirect:/restaurants/booking/confirm/" + restoId;
+        }
+        
+        
+        /* -------- 填表送出時再次名額驗證 -------- */
+        try {
+            restoOrderSvc.tryCreateOrder(order);   // <<<<<< 使用新的原子方法
+        } catch (OverbookingException e){
+            br.reject("full","很抱歉，名額剛好被訂完，請重新選擇時段");
+            keepOrder(order, br, ra);
+            return "redirect:/restaurants/" + restoId;   // 回第一步
+        }
+
+        ra.addFlashAttribute("orderId", order.getRestoOrderId());
+        return "redirect:/restaurants/booking-result";
+    }
+
+
+	
+    //  ====結果頁====	
+	@GetMapping("/restaurants/Booking-result")
+	public String showBookingResult(@PathVariable Integer id,
+									Model model
+						        
+						        
+	) {
+		if (id == null){
+            return "redirect:/restaurants";   // 防止刷新直接進
+        }
+        model.addAttribute("order", restoOrderSvc.getById(id));
+        return "front-end/resto/restoBookResult";
+	}
+	
+	
+	
+	// 將 dto + errors 放入 flash
+	private void keep(PreBookingDTO dto, BindingResult br, RedirectAttributes ra){
+        ra.addFlashAttribute("preBooking", dto);
+        ra.addFlashAttribute("org.springframework.validation.BindingResult.preBooking", br);
+    }
+    private void keepOrder(RestoOrderVO o, BindingResult br, RedirectAttributes ra){
+        ra.addFlashAttribute("restoOrder", o);
+        ra.addFlashAttribute("org.springframework.validation.BindingResult.restoOrder", br);
+    }
+	
+
+    //  ====intro 共用資料====
 	private void prepareIntroPage(Model model,
-	                              Integer restoId,
-	                              int seatsForFullMap,       // 要用多少人去算滿額
-	                              LocalDate dateForFullMap) {
+                              Integer restoId,
+                              int seatsForFullMap,       // 要用多少人去算滿額
+                              LocalDate dateForFullMap
+    ) {
 
 	    RestoVO resto = restoSvc.findOnline(restoId)
 	                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
+	
 	    model.addAttribute("selectedResto", resto);
 	    model.addAttribute("restoSeats",    resto.getRestoSeatsTotal());
 	    model.addAttribute("today",         LocalDate.now());
-
+	
 	    List<PeriodVO> periodList = periodSvc.findEnabledByRestoIdWithSlots(restoId);
 	    model.addAttribute("periodList", periodList);
-
+	
+	    
 	    // ==== timeslot 是否滿額 ====
 	    Map<Integer, Boolean> fullSlotMap = new HashMap<>();
 	    for (PeriodVO p : periodList) {
@@ -323,33 +328,6 @@ public class FrontRestoController {
 	    }
 	    model.addAttribute("fullSlotMap", fullSlotMap);
 	}
-
-	
-	
-	
-	
-	
-	@GetMapping("/restaurants/booking")
-	public String showBookingPage(@RequestParam Integer restoId,
-	                              @RequestParam LocalDate date,
-	                              @RequestParam Integer slotId,
-	                              @RequestParam Integer seats,
-	                              Model model) {
-
-	    model.addAttribute("preFilled", new BookingFormDTO(
-	        restoId, date, seats, slotId, null, null, null, 0, null
-	    ));
-
-	    // 新增預設空的 RestoOrderVO 供 form 綁定
-	    model.addAttribute("restoOrder", new RestoOrderVO());
-
-	    return "front-end/resto/restoBooking";
-	}
-	
-	
-	
-	
-
 
 	
 	

@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org"
+                     xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+                     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+                     xmlns:form="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,7 +29,7 @@
          th:style="|background-image: url('@{/restaurants/img/{id}(id=${selectedResto.restoId})}');|"></div>
     <div class="container">
     
-      <p class="breadcrumb">珍饈美饌 / 沐光餐廳</p>
+      <p class="breadcrumb" th:text="${'珍饈美饌 / '+selectedResto.restoName}"></p>
     </div>
   </section>
   <main id="main-content">
@@ -46,28 +49,31 @@
           <div class="mt-4 restaurant-content" th:utext="${selectedResto.restoContent}"></div>          </div>
       </section>
   
-      <hr>
+      <hr th:if="${periodList != null and #lists.size(periodList) > 0}">
   
-      <section id="reservation" class="reservation-container">
+      <section id="reservation" class="reservation-container" th:if="${periodList != null and #lists.size(periodList) > 0}">
         <div class="reservation-title">預約訂位</div>
         
         <form class="reservation-form"
               id="restoOrderFrontForm"
                 th:object="${preBooking}" 
-                th:action="@{/restaurants/booking}"
+                th:action="@{/restaurants/booking-pre}"
                 method="post">
+                
+          <input type="hidden" th:field="*{restoId}" />
+                
                 
           <div class="form-row row d-flex meal-group">
           
             <!-- 用餐人數 -->
-            <div class="form-group col-12">
+            <div class="form-group">
             
               <label for="regiSeats" class="form-label form-group-title">用餐人數</label>
               <p class="form-hint">
-                可接受 1-8 位訂位（含大人與小孩）
+                可接受 1-8 位訂位（含大人與小孩）<br>
                 * 超過 8 人的訂位，請使用電話預約 <span th:text="${selectedResto.restoPhone}">01-2345678 #123</span>
               </p>              
-              <select th:field="*{regiSeats}" id="regiSeats" class="form-select form_control" required>
+              <select th:field="*{regiSeats}" id="regiSeats" class="form-select form_control">
                 <option disabled selected value="">請選擇人數</option>
                 <option th:each="i : ${#numbers.sequence(1, 8)}"
                         th:value="${i}"
@@ -85,11 +91,11 @@
             </div>
             
             <!-- 用餐日期 -->
-            <div class="form-group col-12">
+            <div class="form-group mt-2">
             
                           
               <label for="regiDate" class="form-label form-group-title">用餐日期</label>
-              <input type="date" th:field="*{regiDate}" id="regiDate" class="form-control" required
+              <input type="date" th:field="*{regiDate}" id="regiDate" class="form-control"
                th:attr="min=${today}">
                
                <!-- 錯誤提示 -->
@@ -101,24 +107,26 @@
             </div>
           
           <!-- 用餐時段 -->
-          <div class="form-group col-12">
+          <div class="form-group mt-2">
               <label for="regiSeats" class="form-label form-group-title">用餐時段</label>
-              <div id="slot-hint" class="text-muted">
+              <div id="slot-hint" class="form-hint mb-4">
                 請先選擇「人數」與「日期」，可訂位的時段才會顯示
               </div>
           <input type="hidden" th:field="*{timeslotId}" id="timeslotId">
 
           <!-- 錯誤提示 -->
           <div class="text-danger" th:if="${#fields.hasErrors('timeslotId')}">
-            <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+            <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2 mb-5"></i>
             <span th:each="err : ${#fields.errors('timeslotId')}" th:text="${err}"></span>
           </div>
 
           <div class="form-group col-12">
-            <div th:each="period : ${periodList}" class="meal-group">
+            <div th:each="period : ${periodList}"
+                    th:if="${period.timeslots != null and #lists.size(period.timeslots) > 0}"
+                    class="meal-group">
               <div class="period-label meal-title" th:text="${period.periodName}"></div>
               
-              <div class="time-slots">
+              <div class="time-slots mb-4">
                       <button
                         type="button"
                         class="time-slot disabled"

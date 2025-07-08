@@ -38,8 +38,20 @@ public interface ReservationRepository extends JpaRepository<RestoReservationVO,
 	                             @Param("newTotal") Integer newTotal);
 
 	
-	
-
+	// 比對庫存來加座位
+	@Modifying
+	@Query("""
+	UPDATE RestoReservationVO r
+	   SET r.reserveSeatsTotal = r.reserveSeatsTotal + :seats
+	 WHERE r.restoVO.restoId       = :restoId
+	   AND r.reserveTimeslotVO.timeslotId = :timeslotId
+	   AND r.reserveDate           = :date
+	   AND r.reserveSeatsTotal + :seats <= r.restoSeatsTotal
+	""")
+	int addSeatsIfAvailable(@Param("restoId")     Integer restoId,
+	                        @Param("timeslotId")  Integer timeslotId,
+	                        @Param("date")        LocalDate date,
+	                        @Param("seats")       int seats);
 	
 	
 	

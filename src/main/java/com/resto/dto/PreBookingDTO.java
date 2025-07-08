@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 
 public class PreBookingDTO {
 	
-	@NotNull(message = "請選擇餐廳")
+	@NotNull
     Integer restoId;
 
     @NotNull(message = "請選擇日期")
@@ -18,7 +18,7 @@ public class PreBookingDTO {
     @NotNull(message = "請選擇人數")
     Integer regiSeats;
 
-    @NotNull(message = "請選擇時段")
+    @NotNull(message = "請選擇一個時段")
     Integer timeslotId;
     
     
