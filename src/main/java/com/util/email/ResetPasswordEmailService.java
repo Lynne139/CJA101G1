@@ -39,13 +39,14 @@ public class ResetPasswordEmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setFrom("maisonyukog1@gmail.com");
-            helper.setTo(toMemberEmail);
+            String toEmail = "cja101g1@gmail.com"; //避免誤傳, 寫死記給cja101g1
+            helper.setTo(toEmail);
             helper.setSubject("【嶼蔻渡假村】密碼變更通知信");
 
             // 5. HTML 內容（用 replace 插入密碼）
             String htmlContent = """
                 <div style='font-family: Arial, sans-serif; color: #333333; max-width: 650px; margin: auto; font-size: 1.35em;'>
-                    <img src='cid:headerImage' alt='飯店橫幅圖' style='width: 95%%; max-width: 675px; height: auto; display: block; border: none; margin: 0 auto;'>
+                    <img src='cid:headerImage' alt='飯店橫幅圖' style='width: 95%; max-width: 675px; height: auto; display: block; border: none; margin: 0 auto;'>
 
                     <div style='padding: 25px;'>
                         <h2 style='color: #c06014; font-size: 1.8em; margin-top: 5px;'>密碼變更通知！</h2>

@@ -48,28 +48,6 @@ public class MemberCouponController {
 	     return ResponseEntity.ok(coupons);
 	 }
 
-    // 3. 查詢會員可用於訂房的折價券
-//    @GetMapping("/room-order-usable")
-//    public ResponseEntity<List<Coupon>> getRoomOrderCoupons(
-//            @RequestParam Integer priceBeforeUsingCoupon,
-//	        HttpSession session) {
-//    	MemberVO loggedInMember = (MemberVO) session.getAttribute("loggedInMember");
-//	    Integer memberId = loggedInMember.getMemberId();
-//        List<Coupon> coupons = memberCouponService.getRoomOrderApplicableCoupons(memberId, priceBeforeUsingCoupon);
-//        return ResponseEntity.ok(coupons);
-//    }
-
-    // 4. 查詢會員可用於商城的折價券
-//    @GetMapping("/product-order-usable")
-//    public ResponseEntity<List<Coupon>> getProductOrderCoupons(
-//            @RequestParam Integer priceBeforeUsingCoupon,
-//	        HttpSession session) {
-//    	MemberVO loggedInMember = (MemberVO) session.getAttribute("loggedInMember");
-//	    Integer memberId = loggedInMember.getMemberId();
-//        List<Coupon> coupons = memberCouponService.getProductOrderApplicableCoupons(memberId, priceBeforeUsingCoupon);
-//        return ResponseEntity.ok(coupons);
-//    }
-
     // 5. 領取折價券
     @PostMapping("/claim/{couponCode}")
     public ResponseEntity<MemberCoupon> claimCoupon(
@@ -81,14 +59,4 @@ public class MemberCouponController {
         return ResponseEntity.ok(claimed);
     }
 
-    // 6. 使用折價券
-//    @PutMapping("/use/{couponCode}")
-//    public ResponseEntity<MemberCoupon> useCoupon(
-//            @PathVariable String couponCode,
-//	        HttpSession session) {
-//    	MemberVO loggedInMember = (MemberVO) session.getAttribute("loggedInMember");
-//	    Integer memberId = loggedInMember.getMemberId();
-//        MemberCoupon used = memberCouponService.useCoupon(memberId, couponCode);
-//        return ResponseEntity.ok(used);
-//    }
 }

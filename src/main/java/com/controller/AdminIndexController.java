@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.coupon.entity.Coupon;
@@ -31,6 +32,9 @@ import com.member.model.MemberService;
 import com.member.model.MemberVO;
 import com.memberLevelType.model.MemberLevelType;
 import com.memberLevelType.model.MemberLevelTypeService;
+import com.employee.service.EmployeeService;
+import com.employee.entity.Role;
+import com.employee.entity.JobTitle;
 import com.news.service.HotNewsService;
 import com.news.service.NewsService;
 import com.news.service.PromotionNewsService;
@@ -92,9 +96,12 @@ public class AdminIndexController {
 	@Autowired
 	MemberService memberSvc;
 	
-	@Autowired
+		@Autowired
     private MemberLevelTypeService memberLevelTypeSvc;
-	
+    
+    @Autowired
+    private EmployeeService employeeService;
+    
 	@Autowired
 	ShopOrdService shopOrdSvc;
 	
@@ -340,6 +347,18 @@ public class AdminIndexController {
     	String mainFragment = "admin/fragments/staff/staff1";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
+
+    	// 載入部門和職稱資料傳給前端
+        try {
+            List<Role> roleList = employeeService.getAllRoles();
+            List<JobTitle> jobTitleList = employeeService.getAllJobTitles();
+            model.addAttribute("roleList", roleList);
+            model.addAttribute("jobTitleList", jobTitleList);
+        } catch (Exception e) {
+            // 如果載入失敗，至少傳送空的列表避免前端錯誤
+            model.addAttribute("roleList", new ArrayList<>());
+            model.addAttribute("jobTitleList", new ArrayList<>());
+        }
 
     	return "admin/index_admin";
     } 
@@ -936,5 +955,19 @@ public class AdminIndexController {
 
     	return "admin/index_admin";
     } 
+	
+	@GetMapping("/test-permissions")
+	@ResponseBody
+	public Map<String, Object> testPermissions(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Employee currentEmployee = (Employee) session.getAttribute("currentEmployee");
+		List<String> permissions = (List<String>) session.getAttribute("employeePermissions");
+		
+		Map<String, Object> result = new HashMap<>();
+		result.put("employeeId", currentEmployee != null ? currentEmployee.getEmployeeId() : null);
+		result.put("employeeName", currentEmployee != null ? currentEmployee.getName() : null);
+		result.put("permissions", permissions);
+		return result;
+	}
 	
 }

@@ -13,6 +13,7 @@ import com.employee.repository.EmployeeFunctionAccessRightRepository;
 import com.employee.repository.FunctionAccessRightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class EmployeeService {
     
     @Autowired
@@ -89,12 +91,9 @@ public class EmployeeService {
                     if (employeeDetails.getName() != null) {
                         employee.setName(employeeDetails.getName());
                     }
-                    if (employeeDetails.getRoleId() != null) {
-                        employee.setRoleId(employeeDetails.getRoleId());
-                    }
-                    if (employeeDetails.getJobTitleId() != null) {
-                        employee.setJobTitleId(employeeDetails.getJobTitleId());
-                    }
+                    // 總是更新 roleId 和 jobTitleId，允許為 null
+                    employee.setRoleId(employeeDetails.getRoleId());
+                    employee.setJobTitleId(employeeDetails.getJobTitleId());
                     if (employeeDetails.getStatus() != null) {
                         employee.setStatus(employeeDetails.getStatus());
                     }
@@ -161,6 +160,7 @@ public class EmployeeService {
     }
 
     // 根據員工ID和日期取得權限列表
+    @Transactional(readOnly = true)
     public List<String> getEmployeePermissions(Integer employeeId, LocalDate checkDate) {
         List<EmployeeFunctionAccessRight> accessRights = employeeFunctionAccessRightRepository
                 .findByEmployeeIdAndDateRange(employeeId, checkDate);
@@ -172,6 +172,7 @@ public class EmployeeService {
     }
     
     // 檢查員工是否有特定權限
+    @Transactional(readOnly = true)
     public boolean hasPermission(Integer employeeId, String permissionName, LocalDate checkDate) {
         List<String> permissions = getEmployeePermissions(employeeId, checkDate);
         return permissions.contains(permissionName);

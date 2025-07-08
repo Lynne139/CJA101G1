@@ -49,7 +49,7 @@ INSERT INTO MEMBER (
     member_points,
     member_accumulative_consumption
 ) VALUES 
-('普通會員', 'Pw123456', '吳永志', '1990-05-20', '0987654321', '台北市', NULL, 1, 'cja101g1@gmail.com', 0, 0),
+('金卡會員', '1234', '郭惠民', '1990-05-20', '0987654321', '桃園市', NULL, 1, 'test@gmail.com', 6000, 60000),
 ('金卡會員', 'Pw223456', '張書涵', '1987-02-09', '0912345678', '新北市新莊區中華路一段320號', NULL, 1, 'shuhan.chang@example.com', 2600, 34000),
 ('銀卡會員', 'Pw323456', '周柏睿', '1993-06-21', '0933444555', '桃園市平鎮區中豐路168號', NULL, 1, 'boerh.chou@example.com', 1000, 12000),
 ('普通會員', 'Pw423456', '黃思妍', '1996-09-10', '0966123456', '台中市南屯區公益路二段28號', NULL, 1, 'siyan.huang@example.com', 0, 0),
@@ -128,12 +128,22 @@ CREATE TABLE notification
 );
 
 INSERT INTO notification (member_id, title, content)
-VALUES (1, '測試通知標題一', '測試通知內容一'),
-	(1, '測試通知標題二', '測試通知內容二'),
-	(2, '測試通知標題三', '測試通知內容三'),
-    (2, '測試通知標題四', '測試通知內容四'),
-	(3, '測試通知標題五', '測試通知內容五'),
-	(3, '測試通知標題六', '測試通知內容六');
+VALUES (1, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+	(1, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (1, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (1, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (1, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (1, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (1, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (1, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (1, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (1, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (1, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (2, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (2, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (2, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (2, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。'),
+    (2, '登入成功通知', '親愛的貴賓，您已於 2025-07-07 20:57:12 成功登入。');
 
 -- 職稱
 CREATE TABLE job_title (
@@ -323,13 +333,16 @@ INSERT INTO product_category (PRODUCT_CATEGORY_NAME, PRODUCT_CATEGORY_DESC)
 VALUES 
   ('家電', '各類家庭電器'),
   ('書籍', '各式書籍、雜誌'),
-  ('3C產品', '電腦與周邊設備');
+  ('3C產品', '電腦與周邊設備'),
+  ('香氛', '包含香水、室內香氛、香氛蠟燭等。'),
+  ('寢具', '主要包含床墊、床單、被子、枕頭等。 這些用品可以依照材質、功能、季節性等不同面向進行分類和介紹。。');
 
 INSERT INTO PRODUCT (PRODUCT_CATEGORY_ID, PRODUCT_PRICE, PRODUCT_NAME, PRODUCT_STATUS)
 VALUES 
-  (1, 12000, 'Dyson 吸塵器', TRUE),
-  (2, 450, 'Java 程式設計入門', TRUE),
-  (3, 30000, 'MacBook Air M2', TRUE);
+  (1, 12000, '吸塵器', TRUE),
+  (4, 450, '香氛蠟燭', TRUE),
+  (5, 5900, '枕頭', TRUE),
+  (5, 450, '蠶絲被', TRUE);
 
 
 INSERT INTO PROD_CART_ITEM (MEMBER_ID, PRODUCT_ID,QUANTITY)
@@ -476,7 +489,15 @@ ALTER TABLE room_order AUTO_INCREMENT = 1000;
 INSERT INTO ROOM_ORDER (MEMBER_ID, ROOM_ORDER_STATUS, TOTAL_AMOUNT, ROOM_AMOUNT, CHECK_IN_DATE, CHECK_OUT_DATE, COUPON_CODE, DISCOUNT_AMOUNT, ACTUAL_AMOUNT, PROJECT_ADD_ON,UPDATE_EMP)
 VALUES 
     (1, 1, 100000,1, '2025-07-11', '2025-07-13', 'A2505AAA', 100, 99900, 0 ,1),
-    (2, 2, 104800,2, '2025-07-15', '2025-07-17', 'B2505AAA', 150, 104650, 1 ,1);
+    (2, 1, 104800,2, '2025-07-15', '2025-07-17', 'B2505AAA', 150, 104650, 1 ,1),
+    (3, 1, 15000,1, '2025-07-12', '2025-07-13', null, 0, 15000, 0 ,1),
+    (4, 1, 80000,2, '2025-07-18', '2025-07-20', null, 0, 80000, 0 ,1),
+    (5, 1, 50000,1, '2025-07-19', '2025-07-20', null, 0, 50000, 0 ,1),
+    (6, 1, 60000,2, '2025-07-12', '2025-07-13', null, 0, 60000, 0 ,1),
+    (7, 1, 30000,2, '2025-07-26', '2025-07-27', null, 0, 30000, 0 ,1),
+    (8, 1, 30000,1, '2025-07-25', '2025-07-27', null, 0, 30000, 0 ,1),
+    (9, 1, 60000,1, '2025-07-17', '2025-07-20', null, 0, 60000, 0 ,1),
+    (10, 1, 30000,1, '2025-07-12', '2025-07-13', null, 0, 30000, 0 ,1);
 
 
 -- 房型 
@@ -591,7 +612,15 @@ INSERT INTO ROOM_ORDER_LIST (ROOM_TYPE_ID,  ROOM_ORDER_ID, NUMBER_OF_PEOPLE, SPE
 VALUES
     (1, 1000, 6, 'No smoking', 50000, 1,'王大明',1),
     (2, 1001, 4, 'No smoking', 30000, 1,'周牛牛',1),
-    (3, 1001, 2, 'Extra bed', 20000, 1,'楊大胖',1);
+    (3, 1001, 2, 'Extra bed', 20000, 1,'楊大胖',1),
+    (4, 1002, 2, null, 15000, 1, null,1),
+    (3, 1003, 4, null, 20000, 2,'陳春',1),
+    (1, 1004, 6, null, 50000, 1,'黃嘉明',1),
+    (2, 1005, 8, null, 30000, 2,'李柏翰',1),
+    (4, 1006, 4, null, 15000, 2,'趙元新',1),
+    (4, 1007, 2, null, 15000, 1,'張君和',1),
+    (3, 1008, 2, null, 20000, 1,'蔡詩穎',1),
+    (2, 1009, 4, null, 30000, 1,'蔡詩穎',1);
 
 -- 以下設定: 自增主鍵的起點值，也就是初始值，取值範圍是1 .. 655355 --
 set auto_increment_offset=1;
@@ -624,6 +653,15 @@ INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount
 INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 2, 10, 1, '2025-07-16');
 INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 3, 20, 1, '2025-07-15');
 INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 3, 20, 1, '2025-07-16');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 4, 20, 1, '2025-07-12');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 3, 20, 3, '2025-07-18');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 3, 20, 3, '2025-07-19');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 1, 20, 1, '2025-07-19');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 2, 20, 3, '2025-07-12');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 4, 20, 3, '2025-07-26');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 4, 20, 1, '2025-07-25');
+INSERT INTO room_type_schedule (room_type_schedule_id, room_type_id, room_amount, room_rsv_booked, room_order_date)  VALUES (null, 3, 20, 1, '2025-07-17');
+
 
 
 CREATE TABLE role_list (

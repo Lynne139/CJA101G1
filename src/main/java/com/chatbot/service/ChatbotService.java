@@ -56,7 +56,7 @@ public class ChatbotService {
                     int tolerance = Math.max(keyword.length() / 3, 1);
                     if (distance <= tolerance) {
                         matchCount++;
-                        break; // 該 keyword 找到一個 userWord 匹配即跳下一 keyword
+                        break; // 當該 keyword 找到一個 userWord 匹配，即跳下一 keyword
                     }
                 }
             }
@@ -69,7 +69,7 @@ public class ChatbotService {
             }
         }
         if (bestAnswer == null) {
-            return "抱歉，我不明白您的問題，請重新提問，或電話聯絡我們。";
+            return "抱歉，我不明白您的問題。\n請重新提問，或改以「聯絡客服」提交留言表單。";
         }
         return bestAnswer;
     }

@@ -3,6 +3,7 @@ package com.employee.filter;
 import com.employee.entity.Employee;
 import com.employee.entity.JobTitle;
 import com.employee.repository.JobTitleRepository;
+import com.employee.service.EmployeeService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -18,6 +20,9 @@ public class AdminPermissionFilter implements Filter {
 
     @Autowired
     private JobTitleRepository jobTitleRepository;
+    
+    @Autowired
+    private EmployeeService employeeService;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -26,6 +31,7 @@ public class AdminPermissionFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         HttpSession session = httpRequest.getSession();
         String requestURI = httpRequest.getRequestURI();
+        
         // 排除登入相關的 URL 和靜態資源
         if (requestURI.equals("/admin/login") || 
             requestURI.equals("/admin/doLogin") || 
@@ -40,6 +46,7 @@ public class AdminPermissionFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
+        
         // 檢查是否為後台 URL（/admin 或 /admin/* 或 /employees/*）
         boolean isAdminUrl = requestURI.equals("/admin") || 
                            requestURI.startsWith("/admin/") || 
@@ -48,6 +55,7 @@ public class AdminPermissionFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
+        
         // 第一層權限檢查：是否已登入
         Employee currentEmployee = (Employee) session.getAttribute("currentEmployee");
         if (currentEmployee == null) {
@@ -61,12 +69,14 @@ public class AdminPermissionFilter implements Filter {
             httpResponse.sendRedirect("/admin/login");
             return;
         }
+        
         // 檢查員工狀態是否啟用
         if (!currentEmployee.getStatus()) {
             session.invalidate();
             httpResponse.sendRedirect("/admin/login?error=account_disabled");
             return;
         }
+        
         // 查詢員工職稱
         String jobTitleName = "未知職稱";
         if (currentEmployee.getJobTitleId() != null) {
@@ -80,28 +90,12 @@ public class AdminPermissionFilter implements Filter {
             }
         }
         session.setAttribute("employeeJobTitle", jobTitleName);
-        // 根據員工 ID 給不同的權限
-        List<String> employeePermissions;
-        Integer employeeId = currentEmployee.getEmployeeId();
         
-        if (employeeId != null && (employeeId == 1 || employeeId == 2)) {
-            // 員工1（SYSTEM）和員工2（吳永志）- 所有權限
-            employeePermissions = List.of(
-                "會員管理權限", "員工管理權限", "住宿管理權限", 
-                "餐廳管理權限", "商店管理權限", "優惠管理權限", 
-                "客服管理權限", "消息管理權限"
-            );
-        } else if (employeeId != null && employeeId == 3) {
-            // 員工3（吳冠宏）- 只有客服相關權限
-            employeePermissions = List.of(
-                "客服管理權限"
-            );
-        } else {
-            // 其他員工或employeeId為null - 預設權限
-            employeePermissions = List.of(
-                "客服管理權限"
-            );
-        }
+        // 使用 EmployeeService 從資料庫查詢員工權限
+        Integer employeeId = currentEmployee.getEmployeeId();
+        List<String> employeePermissions = employeeService.getEmployeePermissions(employeeId, LocalDate.now());
+        
+        // 資料庫中的權限名稱已經包含 "權限" 後綴，不需要再添加
         session.setAttribute("employeePermissions", employeePermissions);
         
         chain.doFilter(request, response);

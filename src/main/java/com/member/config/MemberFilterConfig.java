@@ -26,8 +26,10 @@ public class MemberFilterConfig {
             
             // 帳號選物相關
 //            "/front-end/shop",       商城首頁
+
             //"/prodCart/*",          // 購物車相關
            // "/shopOrd/*",           // 訂單相關
+
             
             // 會員功能相關
             "/member/center",       // 會員中心
@@ -37,8 +39,10 @@ public class MemberFilterConfig {
             "/member/room/*",       // 會員住宿訂單
             
             // 折價券相關
-            "/coupon/*/select",     // 查看折價券
-            "/coupon/*/claim"       // 領取折價券
+            "/coupon/select",     // 查看折價券
+            "/coupon/claim" ,     // 領取折價券
+            "/notification"       // 會員通知
+
             
             //餐廳相關
             
