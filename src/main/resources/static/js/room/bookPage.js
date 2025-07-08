@@ -117,6 +117,15 @@ function validateForm() {
         return false;
     }
 
+    if (payMethod === "1") {
+        // 修正：使用不同的變數名稱避免衝突
+        const userConfirmed = window.confirm("LINE Pay付款後不可取消訂單，確定要使用LINE Pay付款嗎？");
+        if (!userConfirmed) {
+            return false;
+        }
+        return true;
+    }
+
     if (!isValid) {
         alert('請檢查並填寫所有必填欄位');
         return false;

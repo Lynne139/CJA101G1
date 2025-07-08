@@ -9,148 +9,7 @@
     <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/room/bookSingle.css}">
     <link rel="stylesheet" th:href="@{/css/room/bookPage.css}">
-    <style>
-        .booking-container {
-            background-color: #F4EDE1;
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
-
-        .booking-title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #7E4E24;
-            margin-bottom: 30px;
-            text-align: center;
-            letter-spacing: 0.1em;
-        }
-
-        .order-info-card {
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(126, 78, 36, 0.1);
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 2px solid #E8DCC8;
-        }
-
-        .order-number {
-            background: #7E4E24;
-            color: #fff;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .status-badge {
-            background: #28a745;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            display: inline-block;
-        }
-
-        .payment-section {
-            background: #F4EDE1;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            border-left: 4px solid #7E4E24;
-        }
-
-        .payment-method {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #7E4E24;
-            margin-bottom: 10px;
-        }
-
-        .payment-notice {
-            color: #7E4E24;
-            font-size: 0.95rem;
-            margin-bottom: 15px;
-        }
-
-        .btn-linepay {
-            background: #00B900;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            letter-spacing: 0.1em;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-linepay:hover {
-            background: #009900;
-            transform: translateY(-2px);
-        }
-
-        .btn-linepay::before {
-            content: "LINE";
-            font-weight: bold;
-        }
-
-        .total-rooms {
-            background: #E8DCC8;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: #7E4E24;
-        }
-
-        .confirm-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-
-        .btn-back {
-            background-color: transparent;
-            border: 2px solid #7E4E24;
-            color: #7E4E24;
-            padding: 12px 30px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            transition: all 0.3s;
-            text-decoration: none;
-        }
-
-        .btn-back:hover {
-            background-color: #7E4E24;
-            color: #fff;
-        }
-
-        @media (max-width: 991px) {
-            .booking-title {
-                font-size: 1.8rem;
-            }
-
-            .confirm-actions {
-                flex-direction: column;
-            }
-
-            .btn-linepay,
-            .btn-back {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/room/orderConfirm.css}">
 </head>
 
 <body>
@@ -276,7 +135,10 @@
                                 <div th:if="${roomOrder.payMethod == '1'}">
                                     <div class="payment-notice">
                                         <i class="fas fa-credit-card"></i>
-                                        請點擊下方按鈕完成 LINE Pay 付款
+                                        已完成 LINE Pay 付款
+                                        <hr>
+                                         <!-- 紅字提醒 -->
+                                        <p style="color: red;">※LINE Pay付款後不可取消訂單，如需改期請洽客服※</p>
                                     </div>
                                     <!-- <button id="linePayBtn" class="btn-linepay w-100">
                                         Pay 付款
@@ -342,20 +204,7 @@
     <div th:replace="~{fragments/mainfunction :: stickyIcons}"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // 列印功能優化
-        window.addEventListener('beforeprint', function () {
-            // 隱藏不需要列印的元素
-            const elementsToHide = document.querySelectorAll('.btn, .confirm-actions, .payment-section button');
-            elementsToHide.forEach(el => el.style.display = 'none');
-        });
-
-        window.addEventListener('afterprint', function () {
-            // 恢復隱藏的元素
-            const elementsToShow = document.querySelectorAll('.btn, .confirm-actions, .payment-section button');
-            elementsToShow.forEach(el => el.style.display = '');
-        });
-    </script>
+    <script th:src="@{/js/room/orderConfirm.js}"></script>
 </body>
 
 </html>
