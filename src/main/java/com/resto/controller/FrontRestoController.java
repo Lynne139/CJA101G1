@@ -50,6 +50,7 @@ import com.resto.model.RestoOrderRepository;
 import com.resto.model.RestoOrderService;
 import com.resto.model.RestoService;
 import com.resto.model.TimeslotService;
+import com.resto.utils.RestoEmailService;
 import com.resto.utils.RestoOrderSource;
 import com.resto.utils.exceptions.OverbookingException;
 
@@ -80,6 +81,9 @@ public class FrontRestoController {
 	
 	@Autowired
 	private NotificationService notificationSvc;
+	
+	@Autowired
+	RestoEmailService restoEmailSvc;
 	
 	
 	//  ====餐廳列表====	
@@ -362,6 +366,14 @@ public class FrontRestoController {
                                   order.getRegiSeats());
 
             notificationSvc.createNotification(memberId, title, content);
+            }
+            
+            /* 3. 寄出 Email － 目前只寄會員訂單 */
+            String guestEmail = order.getOrderGuestEmail();  
+            try {
+                restoEmailSvc.sendExampleEmail(guestEmail, order);
+            } catch (Exception e) {
+                br.reject("error","送餐廳訂位確認信失敗");
             }
 
 
