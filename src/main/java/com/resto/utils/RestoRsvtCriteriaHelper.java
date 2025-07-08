@@ -48,6 +48,13 @@ public class RestoRsvtCriteriaHelper {
         Root<RestoReservationVO> root = cq.from(RestoReservationVO.class);
 
         List<Predicate> predicateList = new ArrayList<>();
+        
+        // 預設只抓今天(含)之後
+        predicateList.add(cb.greaterThanOrEqualTo(
+                root.get("reserveDate"),
+                LocalDate.now()
+        ));
+        
 
         // 處理前端傳來的 map 條件
         for (String column : map.keySet()) {

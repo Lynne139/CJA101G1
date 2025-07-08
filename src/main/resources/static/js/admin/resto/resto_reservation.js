@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
       paging: true,
       pageLength: 5,
       lengthMenu: [5, 10],
-      order: [[0, 'desc']],
+      order: [[0, 'asc']],
       autoWidth: false,
       columnDefs: [
         { targets: [0], width: "20%" },

@@ -73,16 +73,16 @@ public class RestoScheduler {
     // ===== 每天凌晨 00:05 執行Reservation 補空白排程 =====
 	//只補今天至兩個月後的缺口，已存在的資料完全不碰
 //	@Scheduled(cron = "0 5 0 * * ?")   // 每天 00:05
-	@Scheduled(cron = "0 0 3 * * ?")   // 每天 00:05
+	@Scheduled(cron = "0 0 9 * * ?")   // 測試
     public void fillMissingReservations() {
 
         LocalDate today      = LocalDate.now();
-        LocalDate twoMonths  = today.plusMonths(2);
+        LocalDate oneMonths  = today.plusMonths(1);
 
         List<RestoVO> restos = restoRepo.findAll();          // 取全部餐廳
         List<TimeslotVO> allSlots = timeslotRepo.findAll();  // 取全部時段
 
-        for (LocalDate d = today; !d.isAfter(twoMonths); d = d.plusDays(1)) {
+        for (LocalDate d = today; !d.isAfter(oneMonths); d = d.plusDays(1)) {
 
             for (RestoVO resto : restos) {
 
