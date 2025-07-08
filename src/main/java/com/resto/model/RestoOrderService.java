@@ -225,7 +225,7 @@ public class RestoOrderService {
 
         LocalTime slotTime = LocalTime.parse(ts.getTimeslotName());
         original.setReserveExpireTime(
-        original.getRegiDate().atTime(slotTime).plusMinutes(10));
+        		original.getRegiDate().atTime(slotTime).plusMinutes(10));
         
         
         // 同步更新預約佔位

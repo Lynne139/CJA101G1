@@ -316,6 +316,29 @@ public class OrderController {
 	        hasAnyError = true;
 	    }
 	    
+	    
+	    
+	    
+	 // 名額驗證
+	    if (!result.hasErrors()) {   // 其他欄位都OK時才檢查
+	        int remaining = reservationService.getRemaining(
+	        		restoOrder.getRestoVO().getRestoId(),
+	        		restoOrder.getTimeslotVO().getTimeslotId(),
+	        		restoOrder.getRegiDate());
+
+	        if (restoOrder.getRegiSeats() > remaining) {
+	            result.rejectValue(    // 綁定在regiSeats欄位
+	                    "regiSeats",
+	                    "seats.exceed",      // errorCode(messages.properties配文案)
+	                    new Object[]{remaining},          // 參數
+	                    "剩餘 " + remaining + " 位，名額不足"   // 預設訊息
+	            );
+	        }
+	    }
+	    
+	    
+	    
+	    
 	    // 管理員系統
 	    // 若欄位驗證有錯，回填 modal
 	    if (result.hasErrors()  || hasAnyError) {
