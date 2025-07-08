@@ -1,3 +1,4 @@
+
 package com.controller;
 
 import java.io.BufferedReader;
@@ -31,8 +32,8 @@ public class LinePayController {
     @Autowired
     private ShopOrdService shopOrdService;
 
-    @PostMapping("/api/linepay/{isCamp}")
-    public ApiResponse<String> doLinePay(@PathVariable Boolean isCamp, @RequestBody String jsonBody,
+    @PostMapping("/api/linepay/{orderType}")
+    public ApiResponse<String> doLinePay(@PathVariable String orderType, @RequestBody String jsonBody,
             HttpServletResponse response) throws IOException, JSONException {
         final String channelId = "1656895462";
         final String CHANNEL_SECRET = "fd01e635b9ea97323acbe8d5c6b2fb71";
@@ -63,6 +64,7 @@ public class LinePayController {
         try (OutputStream os = conn.getOutputStream()) {
             os.write(linepayBody.toString().getBytes("UTF-8"));
         }
+        
         // 取得回應
         StringBuilder responseLinePay = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
@@ -76,41 +78,44 @@ public class LinePayController {
         String returnCode = resJson.getString("returnCode");
 
         if (returnCode.equals("0000")) {
-            // 付款網址請求成功，將訂單資料(未付款)塞入DB
-            if (isCamp) {
-                System.out.println("Camp");
-                // campsiteOrdSvc.createOneCampOrderJson(linepayOrder);
-            } else {
-                System.out.println("Shop");
+            // 付款網址請求成功
+            if (orderType.equals("room")) {
+                System.out.println("Room Order - LINE Pay URL Generated");
+                // 房間訂單的資料已經在 Session 中，不需要額外處理
+            } else if (orderType.equals("shop")) {
+                System.out.println("Shop Order");
                 // 將 linepayOrder 轉換為 Map 並傳給 ShopOrdService
                 Map<String, Object> orderMap = linepayOrder.toMap();
                 shopOrdService.createShopOrderFromLinePay(orderMap);
+            } else if (orderType.equals("room")) {
+                System.out.println("Room Order");
+                // 房間訂單不需要在這裡處理，因為資料已經在 Session 中
+                // 等付款成功後再處理
             }
 
-            System.out.println("aaaaaa");
+            System.out.println("LINE Pay 付款網址取得成功");
             String paymentUrl = (info != null && info.has("paymentUrl"))
                     ? info.getJSONObject("paymentUrl").getString("web")
                     : null;
 
             // 回傳 paymentUrl 給前端
-            return new ApiResponse<>("success", paymentUrl, "查詢成功");
+            return new ApiResponse<>("success", paymentUrl, "取得付款網址成功");
         } else {
             // 交易失敗
-            return new ApiResponse<>("fail", "fail", "查詢失敗");
+            return new ApiResponse<>("fail", "fail", "取得付款網址失敗");
         }
-
     }
 
     // 確認LINEPAY付款狀態
-    @GetMapping("api/confirmpayment/{orderId}/{isCamp}")
-    public void checkLinePayStatus(@PathVariable String orderId, @PathVariable Boolean isCamp,
+    @GetMapping("api/confirmpayment/{orderId}/{orderType}")
+    public void checkLinePayStatus(@PathVariable String orderId, @PathVariable String orderType,
             HttpServletResponse responseServlet)
             throws IOException, URISyntaxException, JSONException {
         final String channelId = "1656895462";
         final String CHANNEL_SECRET = "fd01e635b9ea97323acbe8d5c6b2fb71";
         final String API_URL = "https://sandbox-api-pay.line.me/v2/payments/orders/" + orderId + "/check";
 
-        // 發送 HTTP POST 請求到 LINE Pay
+        // 發送 HTTP GET 請求到 LINE Pay
         HttpURLConnection conn = (HttpURLConnection) new URL(API_URL).openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-Type", "application/json");
@@ -132,21 +137,31 @@ public class LinePayController {
         String returnCode = json.getString("returnCode");
         String returnMessage = json.getString("returnMessage");
         System.out.println("LINEPAY交易(" + orderId + "): " + returnCode + "||" + returnMessage);
+        
         if (returnCode.equals("0000")) {
-            // 交易成功，將訂單狀態改成已付款塞入DB
-            if (isCamp) {
-                System.out.println("Camp");
+            // 交易成功，根據訂單類型進行不同處理
+            if (orderType.equals("camp")) {
+                System.out.println("Camp Order Success");
                 // campsiteOrdSvc.updatePaymentStatus(orderId, (byte)1);
-                responseServlet.sendRedirect("http://127.0.0.1:5501/linepay-success.html?orderId=" + orderId + "&isCamp=" + isCamp);
-            } else {
-                System.out.println("Shop");
-                // 這裡要改成商品的成功頁面
+                responseServlet.sendRedirect("http://127.0.0.1:5501/linepay-success.html?orderId=" + orderId + "&orderType=" + orderType);
+            } else if (orderType.equals("shop")) {
+                System.out.println("Shop Order Success");
+                // 商品訂單的成功頁面
                 responseServlet.sendRedirect("http://localhost:8080/front-end/shop?payment=success&orderId=" + orderId);
+            } else if (orderType.equals("room")) {
+                System.out.println("Room Order Success");
+                // 房間訂單付款成功，轉跳至後端處理
+                responseServlet.sendRedirect("http://localhost:8080/orderInfo/linepay-success?orderId=" + orderId);
             }
-
         } else {
-            // 交易失敗
-            responseServlet.sendRedirect("http://localhost:8080/front-end/shop?payment=failed&orderId=" + orderId);
+            // 交易失敗，根據訂單類型跳轉至不同的失敗頁面
+            if (orderType.equals("camp")) {
+                responseServlet.sendRedirect("http://127.0.0.1:5501/linepay-failed.html?orderId=" + orderId + "&orderType=" + orderType);
+            } else if (orderType.equals("shop")) {
+                responseServlet.sendRedirect("http://localhost:8080/front-end/shop?payment=failed&orderId=" + orderId);
+            } else if (orderType.equals("room")) {
+                responseServlet.sendRedirect("http://localhost:8080/front-end/room?payment=failed&orderId=" + orderId);
+            }
         }
     }
-} 
+}
