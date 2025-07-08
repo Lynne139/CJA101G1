@@ -35,6 +35,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.member.model.MemberRepository;
+import com.member.model.MemberService;
 import com.member.model.MemberVO;
 import com.resto.dto.PreBookingDTO;
 import com.resto.entity.PeriodVO;
@@ -46,8 +48,10 @@ import com.resto.model.ReservationService;
 import com.resto.model.RestoOrderService;
 import com.resto.model.RestoService;
 import com.resto.model.TimeslotService;
+import com.resto.utils.RestoOrderSource;
 import com.resto.utils.exceptions.OverbookingException;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -66,7 +70,10 @@ public class FrontRestoController {
 	ReservationService reservationSvc;
 	@Autowired
 	PeriodService periodSvc;
-	
+	@Autowired
+	MemberService memberSvc;
+	@Autowired
+	MemberRepository memberRepo;	
 	
 	
 //  ====餐廳列表====	
@@ -138,7 +145,7 @@ public class FrontRestoController {
 
 	
     //  ====顯示餐廳分頁====	
-		@GetMapping("/restaurants/{id:\\\\d+}")
+		@GetMapping("/restaurants/{id}")
 		public String intro(@PathVariable Integer id, 
 									Model model,
 									@RequestParam(required = false) LocalDate date) {
@@ -264,27 +271,35 @@ public class FrontRestoController {
     public String createOrder(@PathVariable Integer restoId,
     						  @Validated @ModelAttribute("restoOrder") RestoOrderVO order,
 					          BindingResult br,
-                              HttpSession session,
+					          HttpSession session,
                               RedirectAttributes ra){
-
-		// 將memberId 與 orderSource 寫進 order
-	    MemberVO member = (MemberVO) session.getAttribute("member");
-	    order.setMemberVO(member);
-//	    order.setOrderSource(RestoOrderSource.MEMBER);
 		
+		
+	
+		
+		/* ---------- 從 session 取會員 ---------- */
+	    MemberVO loggedIn = (MemberVO) session.getAttribute("loggedInMember");
+	    if (loggedIn != null) {
+	        // 用 managed reference，避免「TransientObjectException」
+	        MemberVO managed = memberRepo.getReferenceById(loggedIn.getMemberId());
+	        order.setMemberVO(managed);
+	        order.setOrderSource(RestoOrderSource.MEMBER);
+	    }
+
+
 		
         if (br.hasErrors()){
         	
-        	System.out.println("==== 檢查 br 的所有錯誤 ====");
-        	System.out.println("==== Validation Errors ====");
-            br.getFieldErrors().forEach(fe -> {
-                System.out.printf("[欄位錯誤] field=%s, message=%s%n", fe.getField(), fe.getDefaultMessage());
-            });
-
-            br.getGlobalErrors().forEach(ge -> {
-                System.out.printf("[全域錯誤] object=%s, message=%s%n", ge.getObjectName(), ge.getDefaultMessage());
-
-            });
+//        	System.out.println("==== 檢查 br 的所有錯誤 ====");
+//        	System.out.println("==== Validation Errors ====");
+//            br.getFieldErrors().forEach(fe -> {
+//                System.out.printf("[欄位錯誤] field=%s, message=%s%n", fe.getField(), fe.getDefaultMessage());
+//            });
+//
+//            br.getGlobalErrors().forEach(ge -> {
+//                System.out.printf("[全域錯誤] object=%s, message=%s%n", ge.getObjectName(), ge.getDefaultMessage());
+//
+//            });
         	
             keepOrder(order, br, ra);
             return "redirect:/restaurants/booking/confirm/" + restoId 
@@ -321,8 +336,12 @@ public class FrontRestoController {
             return "redirect:/restaurants";
         }
         model.addAttribute("order", restoOrderSvc.getById(id));
-        return "front-end/resto/restoBookResult";
+        return "front-end/resto/restoBookSuccess";
 	}
+	
+	
+	
+	
 	
 	
 	

@@ -36,12 +36,14 @@
             
 <input type="hidden" name="restoVO.restoId"   th:value="${resto.restoId}" />
         
-<!-- pre-booking 帶來的三項 -->
-<input type="hidden" th:field="*{regiDate}" />
-<input type="hidden" th:field="*{regiSeats}"/>
-<!-- 返回頁面時Id給JS抓來渲染按鈕用 -->
-<input type="hidden" th:field="*{timeslotVO.timeslotId}" id="selectedTimeslotId"/> 
-<input type="hidden" name="orderSource" value="MEMBER" />
+            <!-- pre-booking 帶來的三項 -->
+            <input type="hidden" th:field="*{regiDate}" />
+            <input type="hidden" th:field="*{regiSeats}"/>
+            <!-- 返回頁面時Id給JS抓來渲染按鈕用 -->
+            <input type="hidden" th:field="*{timeslotVO.timeslotId}" id="selectedTimeslotId"/> 
+            <input type="hidden" name="orderSource" value="MEMBER" />
+<!--             <input type="hidden" th:field="*{memberVO.memberId}" /> -->
+            
             
             
             <!-- 姓名 -->

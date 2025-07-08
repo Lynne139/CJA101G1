@@ -41,8 +41,17 @@
 //   [[${toast} != null]] ? toast.success([[${toast}]]) : '';
 // /*]]>*/
 <!-- </script> -->
-  
-  
+
+
+<script>
+  // 清除上一頁的狀態（避免回到填單畫面）
+  window.history.replaceState({}, document.title, "/restaurants");
+
+  // 如果使用者按了上一頁，強制跳轉首頁（或其他指定頁）
+  window.addEventListener("popstate", function () {
+    window.location.href = "/restaurants"; // 或導向你希望的頁面
+  });
+</script>
   
 
 
@@ -52,6 +61,7 @@
   <script th:src="@{/js/admin/loading_overlay.js}"></script>
   <script th:src="@{/js/admin/toast.js}"></script>
         
+    <script th:src="@{/js/front-end/resto/resto_Book_success.js}"></script>
   
   
 </body>
