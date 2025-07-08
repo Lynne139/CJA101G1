@@ -1,5 +1,6 @@
 package com.resto.model;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.resto.dto.RestoDTO;
+import com.resto.entity.RestoOrderVO;
 import com.resto.entity.RestoVO;
 
 @Repository
@@ -27,6 +29,14 @@ public interface RestoRepository extends JpaRepository<RestoVO, Integer> {
 
     // 查單筆給前台(必須上架且非軟刪)
     Optional<RestoVO> findByRestoIdAndIsDeletedFalseAndIsEnabledTrue(Integer id);
+    
+    
+    
+    
+    
+
+    
+    
     
     
     

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maison d’Yuko - 珍饌美饌</title>
+  
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+	<link rel="stylesheet" th:href="@{/css/front-end/resto/resto_memorder.css}">
+    
+  
+  
+  
+</head>
+<body>
+
+  <!-- Header -->
+  <div th:replace="~{fragments/header :: header}"></div>
+
+    <main id="section-member-orders" class="member-orders">
+      <div class="member-orders-container">
+        <aside class="sidebar">
+          <nav class="breadcrumbs">
+            <p>會員中心 / 餐廳訂位</p>
+          </nav>
+          <h1 class="page-title">餐廳訂位</h1>
+          <nav class="sidebar-nav">
+            <a th:href="@{/member/order/restaurant(type='current')}" 
+               class="sidebar-nav-item"
+               th:classappend="${type} == 'current' ? ' active' : ''">進行中訂位</a>
+            <a th:href="@{/member/order/restaurant(type='history')}" 
+               class="sidebar-nav-item"
+               th:classappend="${type} == 'history' ? ' active' : ''">歷史訂位</a>
+          </nav>
+        </aside>
+        <section class="content-area">
+<!--           <div class="toolbar"> -->
+<!--             <div class="search-bar"> -->
+<!--               <i class="fa-solid fa-magnifying-glass"></i> -->
+<!--               <div class="col-md-4"> -->
+<!-- 					<label class="form-label">關鍵字搜索</label> -->
+<!-- 					<input type="text" class="form-control" name="keyword" th:value="${keyword}"> -->
+<!-- 			  </div> -->
+<!--             </div> -->
+<!--           </div> -->
+    
+          <!-- 有訂單資料 -->
+          <div class="order-list" th:each="restoOrder : ${restoOrderList}">
+            <article class="order-card-wrapper">
+              <div class="order-card">
+                <div class="order-details">
+                  <h2 class="restaurant-name" th:text="${restoOrder.snapshotRestoName}">餐廳名稱</h2>
+                  <div class="order-info">
+                    <p>
+                      <span th:text="${restoOrder.snapshotPeriodName}">區段</span>
+                      <span th:text="${restoOrder.snapshotTimeslotName}">時段</span>
+                    </p>
+                    <p><span th:text="${restoOrder.regiSeats}">人數</span> 位</p>
+                  </div>
+                  <p class="order-date" th:text="${restoOrder.regiDate}">2025-07-09</p>
+                </div>
+                <div class="order-actions">
+                  <div class="status-reserved">
+                    <p th:text="${restoOrder.orderStatus.label}">訂單狀態</p>
+                  </div>
+                  <div class="action-buttons">
+                    <button class="btn btn-cancel disabled">取消訂單</button>
+                    <button class="btn btn-contact">聯繫客服</button>
+                  </div>
+                </div>
+              </div>
+              <div class="order-notes">
+                <p th:text="${restoOrder.regiReq}">需求備註</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+            
+    
+    
+<!--           <nav class="pagination"> -->
+<!--             <span>第1頁</span> -->
+<!--             <div class="page-controls"> -->
+<!--               <a href="#" class="page-arrow prev"><img src="/page/cfd63966-2181-403d-a744-fb4058654db4/images/388_2576.svg" alt="Previous Page"></a> -->
+<!--               <a href="#" class="page-number active">1</a> -->
+<!--               <a href="#" class="page-arrow next"><img src="/page/cfd63966-2181-403d-a744-fb4058654db4/images/388_2580.svg" alt="Next Page"></a> -->
+<!--             </div> -->
+<!--             <span>第n頁</span> -->
+<!--           </nav> -->
+      </div>
+    </main>
+  
+  
+  
+  
+  
+  
+
+  <!-- Footer -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        
+  <script th:src="@{/js/admin/loading_overlay.js}"></script>
+  <script th:src="@{/js/admin/toast.js}"></script>
+        
+  <script th:src="@{/js/front-end/resto/resto_memorder.js}"></script>
+  
+  
+</body>
+</html>

@@ -483,7 +483,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!timeslotId || !restoId) return;
 
-      if (confirm("項目一旦刪除將無法復原，是否確定刪除？")) {
+      if (confirm("是否確定下架該時段？")) {
 		
 		const params = new URLSearchParams();
 		params.append("timeslotId",  timeslotId);

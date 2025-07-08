@@ -2,6 +2,7 @@ package com.resto.utils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,14 +44,21 @@ public class RestoScheduler {
 	// 間隔 60 秒執行一次
 //    @Scheduled(fixedRate = 60_000)
 //	 每日 04:00~23:59間，每1min都觸發一次
-	@Scheduled(cron = "0 */1 4-23 * * ?") // 整點 0 秒 每n分 每小時 每日 每月 星期(?不指定，與日期擇一） 暫關
+	@Scheduled(cron = "0 */1 00-23 * * ?") // 整點 0 秒 每n分 每小時 每日 每月 星期(?不指定，與日期擇一） 暫關
 	public void updateRestoOrderStatus() {
+		
+		LocalDate today = LocalDate.now();
         LocalDateTime now = LocalDateTime.now();
+        
+        // 用來收集實際改變狀態的訂單
+        List<RestoOrderVO> changed = new ArrayList<>();
+        
         // CREATED → WITHHOLD
         List<RestoOrderVO> createdList = orderRepo.findTodayOrdersByOrderStatus(LocalDate.now(), RestoOrderStatus.CREATED);
         for (RestoOrderVO o : createdList) {
             if (o.getReserveStartTime() != null && !now.isBefore(o.getReserveStartTime())) {
                 o.setOrderStatus(RestoOrderStatus.WITHHOLD);
+                changed.add(o);
             }
         }
         // WITHHOLD → NOSHOW
@@ -58,11 +66,16 @@ public class RestoScheduler {
         for (RestoOrderVO o : withholdList) {
             if (o.getReserveExpireTime() != null && !now.isBefore(o.getReserveExpireTime())) {
                 o.setOrderStatus(RestoOrderStatus.NOSHOW);
+                changed.add(o);
             }
         }
         
-        // 有狀態改變才呼叫SSE
-        if (!createdList.isEmpty() || !withholdList.isEmpty()) {
+        // 有改動才批次存檔 & SSE推播
+        if (!changed.isEmpty()) {
+            // 先flush進資料庫，確保狀態已經commit
+            orderRepo.saveAll(changed); 
+
+            // refresh一次推
             sseController.sendStatusUpdate("refresh");
         }
         
@@ -73,7 +86,7 @@ public class RestoScheduler {
     // ===== 每天凌晨 00:05 執行Reservation 補空白排程 =====
 	//只補今天至兩個月後的缺口，已存在的資料完全不碰
 //	@Scheduled(cron = "0 5 0 * * ?")   // 每天 00:05
-	@Scheduled(cron = "0 0 9 * * ?")   // 測試
+    @Scheduled(fixedRate = 600_000)   // 測試用
     public void fillMissingReservations() {
 
         LocalDate today      = LocalDate.now();

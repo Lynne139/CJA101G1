@@ -105,7 +105,7 @@
                           
               <label for="regiDate" class="form-label form-group-title">用餐日期</label>
               <input type="date" th:field="*{regiDate}" id="regiDate" class="form-control"
-               th:attr="min=${today}">
+               th:attr="min=${today}, max=${maxDate}">
                
                <!-- 錯誤提示 -->
               <div class="text-danger" th:if="${#fields.hasErrors('regiDate')}">
@@ -149,13 +149,12 @@
       </div>
         
         
+          <button type="submit" form="restoOrderFrontForm" class="submit-pre-btn mx-auto mt-4">填表預訂</button>
        </div>
           
           
         </form>
-        <div class="mt-1">
-          <button type="submit" form="restoOrderFrontForm" class="submit-btn">填表預訂</button>
-        </div>
+        
    
       </section>
     </div>

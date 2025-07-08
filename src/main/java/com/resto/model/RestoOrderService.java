@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import com.resto.controller.SseController;
 import com.resto.dto.RestoOrderDTO;
 import com.resto.dto.RestoOrderSummaryDTO;
 import com.resto.entity.PeriodVO;
@@ -44,6 +46,9 @@ public class RestoOrderService {
     TimeslotRepository timeslotRepository;
     @Autowired
     ReservationService reservationService;
+    
+    @Autowired
+    private SseController sseController;
     
 
     // Datatable顯示複合查詢結果
@@ -143,13 +148,14 @@ public class RestoOrderService {
 
 //            callCancelRoomProjectApi(order.getRoomOrder().getRoomOrderId());
         }
-        
-        
-        
+         
         // 同步更新預約佔位
         syncReservationSeats(order, null);
 
         restoOrderRepository.delete(order);
+        
+        sseController.sendStatusUpdate("refresh");
+        
     }
 
 
@@ -181,6 +187,8 @@ public class RestoOrderService {
         RestoOrderVO saved = restoOrderRepository.save(restoOrderVO);
         // 同步更新預約佔位
         syncReservationSeats(null, saved);
+        
+        sseController.sendStatusUpdate("refresh");
     }
     
     
@@ -241,15 +249,11 @@ public class RestoOrderService {
             original.getRoomOrder()   != null) {
 
             Integer roomOrderId = original.getRoomOrder().getRoomOrderId();
-//            callCancelRoomProjectApi(roomOrderId); 
+            callCancelRoomProjectApi(roomOrderId); 
+            
         }
-        
-        
-        
-        
-        
-        
-        
+
+        sseController.sendStatusUpdate("refresh");
         
         
     }
@@ -317,40 +321,40 @@ public class RestoOrderService {
     
     
     
-//    private final RestTemplate restTemplate = new RestTemplate();
-//    private static final String ROOM_API_URL = "http://localhost:8080/room/cancel_project_add_on"; // ⚠️先用本機開發用的網址
-//
-//    // 呼叫住宿系統的 Controller API 取消加購專案
-//    private void callCancelRoomProjectApi(Integer roomOrderId) {
-//        try {
-//            // 設定請求的 Header
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//            // 建立 JSON 結構 { "roomOrderId": 123 }
-//            Map<String, Object> body = new HashMap<>();
-//            body.put("roomOrderId", roomOrderId);
-//
-//            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-//
-//            // 發出 POST 請求
-//            ResponseEntity<String> response = restTemplate.postForEntity(
-//                ROOM_API_URL,
-//                requestEntity,
-//                String.class
-//            );
-//
-//            // 檢查回應狀態
-//            if (response.getStatusCode().is2xxSuccessful()) {
-//                System.out.println("通知住宿取消專案成功：" + roomOrderId);
-//            } else {
-//                System.err.println("通知住宿取消專案失敗，回應：" + response.getStatusCode());
-//            }
-//
-//        } catch (Exception e) {
-//            System.err.println("呼叫住宿取消專案失敗: " + e.getMessage());
-//        }
-//    }
+    private final RestTemplate restTemplate = new RestTemplate();
+    private static final String ROOM_API_URL = "http://localhost:8080/room/cancel_project_add_on"; // 先用本機開發用的網址
+
+    // 呼叫住宿系統的 Controller API 取消加購專案
+    private void callCancelRoomProjectApi(Integer roomOrderId) {
+        try {
+            // 設定請求的 Header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // 建立 JSON 結構 { "roomOrderId": 123 }
+            Map<String, Object> body = new HashMap<>();
+            body.put("roomOrderId", roomOrderId);
+
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            // 發出 POST 請求
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                ROOM_API_URL,
+                requestEntity,
+                String.class
+            );
+
+            // 檢查回應狀態
+            if (response.getStatusCode().is2xxSuccessful()) {
+                System.out.println("通知住宿取消專案成功：" + roomOrderId);
+            } else {
+                System.err.println("通知住宿取消專案失敗，回應：" + response.getStatusCode());
+            }
+
+        } catch (Exception e) {
+            System.err.println("呼叫住宿取消專案失敗: " + e.getMessage());
+        }
+    }
 
     
     // 前台嘗試定位(驗證名額)
@@ -368,14 +372,8 @@ public class RestoOrderService {
         // 占位成功，insert()+syncReservationSeats()
         insert(order); 
     }
+    
 
-  
-    
-    
-    
-    
-    
-    
     
     
     

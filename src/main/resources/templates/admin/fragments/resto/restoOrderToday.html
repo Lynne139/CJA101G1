@@ -90,6 +90,7 @@
               <div class="fs-4 fw-bold" data-field="totalSeats" th:text="${summary.totalSeats}?: 0">0">0</div>
             </div>
           </div>
+          
         </div>
         
  
@@ -99,7 +100,7 @@
         <div class="text-center mb-4" th:if="${selectedResto != null and #lists.isEmpty(orderList)}">本餐廳今日暫無訂單</div>
                 
         
-        
+      <div th:fragment="orderCardsFragment"> 
         <!-- ====== 今日訂單卡片群 ====== -->
         <div class="order_cards" th:if="${selectedResto != null and !#lists.isEmpty(orderList)}">
           
@@ -170,7 +171,7 @@
                   <div class="">
                         <p><strong></strong> <span th:text="${order.orderGuestEmail}"></span></p>
                         <p><strong></strong> <span th:text="${order.orderGuestPhone}"></span></p>
-                    </div>
+                  </div>
           
                 </div>
                 
@@ -197,7 +198,6 @@
                     </div>
                     
 
-                  </div>
                 
                 
                 
@@ -209,25 +209,15 @@
           
           </div><!-- /.order_cards -->
           
-              </div>
+        </div>  
+          
+          
+          
+     </div>
         
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-      
-        
-    </div>
-    
+     
     
     <!-- Modal -->
       <div id="restoOrderModalContainer"></div>

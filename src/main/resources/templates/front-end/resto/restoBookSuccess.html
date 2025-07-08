@@ -25,9 +25,8 @@
     <h1 class="success-title">預約成功</h1>
     <p class="success-message">感謝您的預約！我們已收到您的訂單資訊。</p>
 
-    <button class="action-button" onclick="goToOrders()">前往查看訂單</button>
+    <a th:href="@{/member/order/restaurant}" class="action-button">前往查看訂單</a>
   </div>
-  
   
   <!-- Footer -->
   <div th:replace="~{fragments/footer :: footer}"></div>

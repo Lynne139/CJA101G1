@@ -28,7 +28,9 @@ import com.resto.entity.RestoOrderVO;
 import com.resto.entity.RestoVO;
 import com.resto.entity.TimeslotVO;
 import com.resto.model.ReservationService;
+import com.resto.model.RestoOrderRepository;
 import com.resto.model.RestoOrderService;
+import com.resto.model.RestoRepository;
 import com.resto.model.RestoService;
 import com.resto.model.TimeslotService;
 import com.resto.utils.RestoOrderSource;
@@ -51,6 +53,10 @@ public class OrderController {
 	TimeslotService timeslotService;
 	@Autowired
 	ReservationService reservationService;
+	@Autowired
+	RestoRepository restoRepository;
+	@Autowired
+	RestoOrderRepository restoOrderRepository;
 
 	// ===== restoOrder.html ====================================================== //
 
@@ -319,23 +325,7 @@ public class OrderController {
 	    
 	    
 	    
-	 // 名額驗證
-	    if (!result.hasErrors()) {   // 其他欄位都OK時才檢查
-	        int remaining = reservationService.getRemaining(
-	        		restoOrder.getRestoVO().getRestoId(),
-	        		restoOrder.getTimeslotVO().getTimeslotId(),
-	        		restoOrder.getRegiDate());
-
-	        if (restoOrder.getRegiSeats() > remaining) {
-	            result.rejectValue(    // 綁定在regiSeats欄位
-	                    "regiSeats",
-	                    "seats.exceed",      // errorCode(messages.properties配文案)
-	                    new Object[]{remaining},          // 參數
-	                    "剩餘 " + remaining + " 位，名額不足"   // 預設訊息
-	            );
-	        }
-	    }
-	    
+	
 	    
 	    
 	    
@@ -415,6 +405,16 @@ public class OrderController {
 	
 	
 	
+	@GetMapping("/admin/resto_order_today/cards")
+	public String getOrderCardsFragment(@RequestParam Integer restoId, Model model) {
+	    RestoVO resto = restoRepository.findById(restoId).orElse(null);
+	    List<RestoOrderVO> orderList = restoOrderRepository.findTodayOrders(restoId);
+
+	    model.addAttribute("selectedResto", resto);
+	    model.addAttribute("orderList", orderList);
+
+	    return "back-end/resto/restoOrderToday :: orderCardsFragment";
+	}
 	
 
 

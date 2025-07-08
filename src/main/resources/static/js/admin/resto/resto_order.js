@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
       paging: true,
       pageLength: 10,
       lengthMenu: [10, 20, 50],
-      order: [[1, 'desc'],[4,'desc']],
+      order: [12, 'desc'],
       autoWidth: false,
       columnDefs: [
         { targets: [0], width: "5%"}, //ID
@@ -185,81 +185,89 @@ document.addEventListener("DOMContentLoaded", function () {
 		    filterTimeslotByDate();
 
 		    // 只顯示所選餐廳的時段
-		    function filterTimeslot () {
-		      const selectedRestoId = restoSelect.value;      // "" 代表未選
-			  
-			  const orderSource = document.getElementById('orderSource')?.value;
+			function filterTimeslot () {
+			  const selectedRestoId = restoSelect.value;            // "" 代表未選
+			  const orderSource     = document.getElementById('orderSource')?.value;
 			  const periodCode      = document.querySelector('[name="snapshotPeriodCode"]')?.value;
-			  
-			  
-		      timeslotSelect.querySelectorAll('option').forEach(opt => {
-				const restoId  = opt.dataset.restoId;        // data-resto-id
-				const slotCode = opt.dataset.periodCode;     // data-period-code
-				
-				let show = false;
-				
-		        // 未選餐廳(只留 placeholder，沒有 data-resto-id)
-		        if (!selectedRestoId) {
-					show = !restoId;
-//		          opt.style.display = restoId ? 'none' : '';  // 有 restoId → 隱藏
-				   return;
-		        }
-				
-				// 如果來自 ROOM 且 snapshotPeriodCode 存在，就限制只顯示該 code 的時段
-				    if (orderSource === 'ROOM' && periodCode) {
-				      show = (restoId === selectedRestoId) && (slotCode === periodCode);
-//				      opt.style.display = show ? '' : 'none';
-				    } else {
-				      // 一般狀況只看餐廳
-					  show = (restoId === selectedRestoId);
-//				      opt.style.display = (restoId === selectedRestoId) ? '' : 'none';
-				    }
-					
-					opt.hidden   = !show;
-					opt.disabled = !show;
-				  });
 
-		      // 若目前選到被隱藏的option，重設為 placeholder
-		      if (timeslotSelect.selectedOptions[0]?.style.display === 'none') {
-		        timeslotSelect.selectedIndex = 0;
-		      }
-		    }
+			  timeslotSelect.querySelectorAll('option').forEach(opt => {
+			    const restoId  = opt.dataset.restoId || '';         // placeholder 會是 ""
+			    const slotCode = opt.dataset.periodCode || '';
+
+			    /* === 1. 未選餐廳：只顯示 placeholder === */
+			    if (!selectedRestoId) {
+			      const isPlaceholder   = !restoId;  // 沒有 data-resto-id
+			      opt.hidden   = !isPlaceholder;
+			      opt.disabled = !isPlaceholder;
+			      return;                             // 跳過後續判斷
+			    }
+
+			    /* === 2. 已選餐廳：決定是否顯示 === */
+			    let show;
+			    if (orderSource === 'ROOM' && periodCode) {
+			      // 房務過來，強制比對 periodCode
+			      show = (restoId === selectedRestoId) && (slotCode === periodCode);
+			    } else {
+			      show = (restoId === selectedRestoId);
+			    }
+
+			    opt.hidden   = !show;
+			    opt.disabled = !show;
+			  });
+
+			  /* === 3. 若目前選到的 option 被隱藏，重設選擇 === */
+			  if (timeslotSelect.selectedOptions.length &&
+			      timeslotSelect.selectedOptions[0].hidden) {
+			    timeslotSelect.selectedIndex = 0; // 回到 placeholder
+			  }
+			}
 
 		    //灰掉今天已過時段
-		    function filterTimeslotByDate () {
-		      const selectedDate = dateInput.value;
-		      const today        = new Date().toISOString().split('T')[0];
-		      const now          = new Date();
-		      const currMin      = now.getHours() * 60 + now.getMinutes();
+			function filterTimeslotByDate () {
+			  const selectedDate = dateInput.value;
+			  if (!selectedDate) return;                           // 還沒選日期直接跳過
 
-		      timeslotSelect.querySelectorAll('option').forEach(opt => {
-		        // 跳過已被餐廳篩選隱藏的
-		        if (opt.style.display === 'none') return;
+			  /* === 1. 取得「今天」的本地 yyyy-MM-dd === */
+			  const todayStr = new Date().toLocaleDateString('en-CA'); // en-CA → 2025-07-09
 
-		        const timeStr = opt.getAttribute('data-time');   // HH:mm
-		        const label   = opt.getAttribute('data-label');
+			  /* === 2. 現在時間的「分鐘數」 === */
+			  const now     = new Date();
+			  const currMin = now.getHours() * 60 + now.getMinutes();
 
-		        if (!timeStr) return;    // placeholder
+			  timeslotSelect.querySelectorAll('option').forEach(opt => {
+			    /* 2-1. 跳過已被餐廳篩掉的 option（hidden=true） */
+			    if (opt.hidden) return;
 
-		        const [h, m] = timeStr.split(':').map(Number);
-		        const optMin = h * 60 + m;
-				
-				const isPast = (selectedDate === today && optMin <= currMin);
+			    const timeStr = opt.dataset.time;   // HH:mm
+			    const label   = opt.dataset.label;
+			    if (!timeStr) return;               // placeholder
 
-		        if (isPast) {
-		          opt.textContent = label + '（已過）';
-		          opt.disabled   = !isEditMode; // Add: true ；Edit: false
-		        } else {
-		          opt.textContent = label;
-		          opt.disabled   = false;
-		        }
-		      });
+			    /* 2-2. 將 HH:mm 轉成「分鐘數」 */
+			    const [h, m] = timeStr.split(':').map(Number);
+			    const optMin = h * 60 + m;
 
-		      // 若目前選到 disabled 的 option，重設為 placeholder
-		      if (timeslotSelect.selectedOptions[0]?.disabled) {
-		        timeslotSelect.selectedIndex = 0;
-		      }
-		    }
+			    /* 2-3. 判斷是否為過去時段 */
+			    const isPast = (selectedDate === todayStr && optMin <= currMin);
+
+			    if (isPast) {
+			      opt.textContent = `${label}（已過）`;
+			      opt.disabled    = !isEditMode;    // Add: true；Edit: false
+			    } else {
+			      opt.textContent = label;
+			      opt.disabled    = false;
+			    }
+			  });
+
+			  /* 3. 若目前選到已被 disable 的 option，就回到 placeholder */
+			  if (timeslotSelect.selectedOptions.length &&
+			      timeslotSelect.selectedOptions[0].disabled) {
+			    timeslotSelect.selectedIndex = 0;
+			  }
+			}
+
+			
+			
+			
 		  }
 
 		  

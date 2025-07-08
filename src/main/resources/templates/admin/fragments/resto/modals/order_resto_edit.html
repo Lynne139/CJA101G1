@@ -122,7 +122,7 @@
             <div class="mb-3">
               <label for="timeslotId" class="form-label">時段<span class="text-danger">*</span></label>
               <select id="timeslotId" class="form-select" th:field="*{timeslotVO.timeslotId}" required>
-                <option value="" th:selected="*{timeslotVO.timeslotId} == null">請先選擇餐廳</option>
+                <option value="" th:selected="*{timeslotVO.timeslotId} == null">請先選擇餐廳與日期</option>
                 <option th:each="timeslot : ${timeslotVOList}" 
                         th:value="${timeslot.timeslotId}" 
                         th:text="${timeslot.timeslotName + ' (' + timeslot.periodVO.periodName + ')'}"

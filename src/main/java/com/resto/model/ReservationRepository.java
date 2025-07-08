@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.resto.entity.RestoOrderVO;
 import com.resto.entity.RestoReservationVO;
 
 @Repository
@@ -54,7 +55,7 @@ public interface ReservationRepository extends JpaRepository<RestoReservationVO,
 	                        @Param("seats")       int seats);
 	
 	
-	
+
 	
 	
 }

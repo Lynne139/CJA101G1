@@ -45,13 +45,14 @@ import com.resto.entity.RestoVO;
 import com.resto.entity.TimeslotVO;
 import com.resto.model.PeriodService;
 import com.resto.model.ReservationService;
+import com.resto.model.RestoOrderRepository;
 import com.resto.model.RestoOrderService;
 import com.resto.model.RestoService;
 import com.resto.model.TimeslotService;
 import com.resto.utils.RestoOrderSource;
 import com.resto.utils.exceptions.OverbookingException;
+import com.roomOrder.model.RoomOrder;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -74,9 +75,11 @@ public class FrontRestoController {
 	MemberService memberSvc;
 	@Autowired
 	MemberRepository memberRepo;	
+	@Autowired
+	RestoOrderRepository restoOrderRepository;
 	
 	
-//  ====餐廳列表====	
+	//  ====餐廳列表====	
 	@GetMapping("/restaurants")
 	public String showRestoList(HttpServletRequest request, 
 								HttpServletResponse response,
@@ -408,7 +411,11 @@ public class FrontRestoController {
 	    model.addAttribute("selectedResto", resto);
 	    model.addAttribute("restoSeats",    resto.getRestoSeatsTotal());
 	    model.addAttribute("today",         LocalDate.now());
-	
+	    LocalDate today   = LocalDate.now();
+	    LocalDate maxDate = today.plusMonths(1);
+	    model.addAttribute("maxDate",maxDate);
+	    
+	    
 	    List<PeriodVO> periodList = periodSvc.findEnabledByRestoIdWithSlots(restoId);
 	    model.addAttribute("periodList", periodList);
 	
@@ -425,6 +432,28 @@ public class FrontRestoController {
 	    model.addAttribute("fullSlotMap", fullSlotMap);
 	}
 
+	
+	//  ====餐廳列表====	
+	@GetMapping("/member/order/restaurant")
+	public String showRestoOrderPage(HttpSession session, Model model) {
+        MemberVO member = (MemberVO) session.getAttribute("loggedInMember");
+        if (member == null) {
+            return "redirect:/front-end/member/login";
+        }
+
+	    List<RestoOrderVO> restoOrderList = restoOrderRepository.findAllByMemberVO_MemberIdOrderByRegiDateDesc(member.getMemberId());
+	    model.addAttribute("restoOrderList", restoOrderList);
+	    return "front-end/resto/restoMemOrder";
+	}
+
+
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

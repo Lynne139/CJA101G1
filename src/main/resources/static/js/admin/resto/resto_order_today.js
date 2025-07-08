@@ -100,11 +100,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	function setupSSE() {
 	  const eventSource = new EventSource("/sse/order-status");
 
-	  eventSource.addEventListener("order-status-update", (e) => {
+	  eventSource.addEventListener("order-status-update", async (e) => {
 	    console.log("SSE 訊息：", e.data);
 	    if (e.data === "refresh") {
-	      refreshSummary();      // 更新統計數字
-	      refreshCardStatuses();   // 更新卡片
+	      await refreshSummary();      // 更新統計數字
+	      refreshCardStatuses();   // 更新卡片狀態
+		  await refreshOrderCards(); 
 	    }
 	  });
 
@@ -152,6 +153,22 @@ document.addEventListener('DOMContentLoaded', () => {
 	  });
 	}
 
+
+	async function refreshOrderCards() {
+	  const RESTO_ID = parseInt(document.getElementById("orderTodayPage")?.dataset?.restoId || "-1", 10);
+	  if (RESTO_ID < 0) return;
+
+	  const r = await fetch(`/admin/resto_order_today/cards?restoId=${RESTO_ID}`);
+	  if (!r.ok) return;
+
+	  const html = await r.text();
+
+	  // 把整塊卡片容器內容換掉
+	  const container = document.querySelector(".order_cards");
+	  if (container) {
+	    container.outerHTML = html;
+	  }
+	}
 
 
   

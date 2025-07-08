@@ -95,6 +95,12 @@ public interface RestoOrderRepository extends JpaRepository<RestoOrderVO, Intege
 			List<RestoOrderSummaryDTO> findAllTodaySummaryPerResto();
 
 
+	
+	
+	// 會員訂單
+	// 查詢某會員的所有訂單，依日期從新到舊排序
+    List<RestoOrderVO> findAllByMemberVO_MemberIdOrderByRegiDateDesc(Integer memberId);
+
 
 
 
