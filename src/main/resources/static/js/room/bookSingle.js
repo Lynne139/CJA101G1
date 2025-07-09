@@ -114,7 +114,7 @@ function generateCalendar(year, month) {
 			}
 		}
 
-		html += `<div class="${classes.join(' ')}" ${hasData && !isPast ? `onclick="selectDate('${dateStr}')"` : ''}>
+		html += `<div class="${classes.join(' ')}" ${hasData && !isPast && remaining !== 0 ? `onclick="selectDate('${dateStr}')"` : ''}>
 			                <div>${day}</div>
 			                <div style="font-size:0.8em; color:${infoColor};">${infoText}</div>
 			            </div>`;
