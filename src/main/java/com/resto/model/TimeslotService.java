@@ -38,6 +38,13 @@ import com.resto.entity.TimeslotVO;
 	    }
 
 	    
+	    // id拿單筆(非軟刪)
+	    public Optional<TimeslotVO> findNotDeleted(Integer timeslotId) {
+	        return timeslotRepository.findByTimeslotIdAndIsDeletedFalse(timeslotId);
+	    }
+	    
+	    
+	    
 	    // 新增入資料庫
 	    @Transactional
 	    public void insert(TimeslotVO timeslotVO) {
@@ -131,7 +138,9 @@ import com.resto.entity.TimeslotVO;
 
     
     
-    
+	    public List<TimeslotVO> findByResto(Integer restoId) {
+	        return timeslotRepository .findByResto(restoId);
+	    }
     
     
     

@@ -32,9 +32,9 @@
         <!-- readonly 狀態時顯示的遮罩 -->
         <div th:if="${readonly}" class="block-overlay"></div>        
 
+        <!-- 若無選餐廳提示 -->
         <div th:if="${selectedResto == null}" class="text-center">請先選擇餐廳，以載入開放時段</div>
         
-        <!-- 若無選餐廳提示 -->
         <h4 class="resto_name mb-4" th:if="${selectedResto != null}" th:text="${selectedResto.restoName}"></h4>
 
 
@@ -140,18 +140,19 @@
                     <!-- 過濾屬於此 period 的 timeslot -->
                     <div class="timeslot_wrapper" th:each="timeslot : ${timeslotList}"
                         th:if="${timeslot.periodVO != null and timeslot.periodVO.periodId == period.periodId}"
-                        th:data-id="${timeslot.timeslotId}">
+                        th:data-id="${timeslot.timeslotId}"
+                        th:data-time="${timeslot.timeslotName}">
                         
                         <div class="timeslot_block d-flex justify-content-between align-items-center">
                             <div class="px-2 timeslot_name" th:text="${timeslot.timeslotName}">07:00</div>
                             
-                            <div class="px-3">|</div>
+<!--                             <div class="px-3">|</div> -->
                             <div class="d-flex justify-content-end align-items-center">
-                              <button class="btn btn_icon btn_edit btn_timeslot_edit py-1 px-2" title="編輯" th:data-id="${timeslot.timeslotId}">
-                                  <i class="fas fa-edit"></i>
-                              </button>
+<!--                               <button class="btn btn_icon btn_edit btn_timeslot_edit py-1 px-2" title="編輯" th:data-id="${timeslot.timeslotId}"> -->
+<!--                                   <i class="fas fa-edit"></i> -->
+<!--                               </button> -->
                               <button class="btn btn_icon btn_delete btn_timeslot_del py-1 px-2" title="刪除" th:data-id="${timeslot.timeslotId}">
-                                  <i class="fas fa-trash"></i>
+                                  <i class="fa-solid fa-xmark"></i>
                               </button>
                             </div>
                             

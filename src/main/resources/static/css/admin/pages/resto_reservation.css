@@ -1,0 +1,11 @@
+/* ===== data table ===== */
+#restoReservationTable {
+  width: 100%;
+}
+
+#restoReservationTable td {
+  word-break: break-word;
+  white-space: nowrap;
+
+  
+}

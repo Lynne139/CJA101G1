@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,14 +27,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.coupon.entity.Coupon;
 import com.coupon.service.CouponService;
 import com.employee.entity.Employee;
+import com.employee.entity.JobTitle;
+import com.employee.entity.Role;
+import com.employee.service.EmployeeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.member.model.MemberService;
 import com.member.model.MemberVO;
 import com.memberLevelType.model.MemberLevelType;
 import com.memberLevelType.model.MemberLevelTypeService;
-import com.employee.service.EmployeeService;
-import com.employee.entity.Role;
-import com.employee.entity.JobTitle;
 import com.news.service.HotNewsService;
 import com.news.service.NewsService;
 import com.news.service.PromotionNewsService;
@@ -47,10 +47,13 @@ import com.prodPhoto.model.ProdPhotoService;
 import com.prodPhoto.model.ProdPhotoVO;
 import com.resto.dto.RestoDTO;
 import com.resto.dto.RestoOrderDTO;
+import com.resto.dto.RestoOrderSummaryDTO;
 import com.resto.entity.PeriodVO;
+import com.resto.entity.RestoReservationVO;
 import com.resto.entity.RestoVO;
 import com.resto.entity.TimeslotVO;
 import com.resto.model.PeriodService;
+import com.resto.model.ReservationService;
 import com.resto.model.RestoOrderService;
 import com.resto.model.RestoService;
 import com.resto.model.TimeslotService;
@@ -80,6 +83,8 @@ public class AdminIndexController {
 	TimeslotService timeslotService;
 	@Autowired
 	RestoOrderService restoOrderService;
+	@Autowired
+	ReservationService reservationService;
 	
 	@Autowired
 	ProdService prodSvc;
@@ -447,8 +452,9 @@ public class AdminIndexController {
         // 若選定某餐廳，才撈出該餐廳的區段與時段
         if (restoId != null) {
         	
+        	// 軟刪除的餐廳只讀
             RestoVO Urlresto = restoService.getById(restoId);
-        	boolean readonly = Urlresto.getIsDeleted();  // 軟刪除的餐廳只讀
+        	boolean readonly = Urlresto.getIsDeleted();  
             model.addAttribute("readonly", readonly);
         	
         	// 把選到的餐廳的詳細資訊放進 model 以顯示餐廳名稱
@@ -456,7 +462,7 @@ public class AdminIndexController {
             model.addAttribute("selectedResto", selectedResto);
             model.addAttribute("selectedRestoId", restoId);
             
-         // 該餐廳的所有區段（period）與時段（timeslot）
+            // 該餐廳的所有區段（period）與時段（timeslot）
             List<PeriodVO> periodList = periodService.getPeriodsByRestoId(restoId);
             List<TimeslotVO> timeslotList = timeslotService.getTimeslotsByRestoId(restoId);
             model.addAttribute("periodList", periodList);
@@ -528,18 +534,91 @@ public class AdminIndexController {
     } 
     
     @GetMapping("/resto_reservation")
-    public String restoReservation(HttpServletRequest request,Model model) {
+    public String restoReservation(HttpServletRequest request,
+    							   HttpServletResponse response,
+    							   Model model) {
 
     	String mainFragment = "admin/fragments/resto/restoReservation";
     	model.addAttribute("mainFragment", mainFragment);
     	model.addAttribute("currentURI", request.getRequestURI());
 
+    	// 複合查詢 + Datatables
+    	Map<String, String[]> paramMap = request.getParameterMap();
+        List<RestoReservationVO> restoRsvtList = reservationService.compositeQuery(paramMap);
+    	model.addAttribute("restoRsvtList", restoRsvtList);
+    	
+    	// 把所有餐廳都傳給下拉選單使用
+        List<RestoVO> restoList = restoService.getAll();
+        model.addAttribute("restoList", restoList);
+        
+        
+        // 讓複合查詢欄位保持原值（用於 th:selected / th:value）
+        for (String key : paramMap.keySet()) {
+            model.addAttribute(key, paramMap.get(key)[0]);
+        }
+        
+    	
     	return "admin/index_admin";
 
     } 
 
     @GetMapping("/resto_order_today")
-    public String restoOrderToday(HttpServletRequest request,Model model) {
+    public String restoOrderToday(HttpServletRequest request,
+    							  @RequestParam(value = "restoId", required = false) Integer restoId,
+								  Model model) {
+    	
+    	// 把所有餐廳都傳給下拉選單使用
+        List<RestoVO> restoList = restoService.getAll();
+        model.addAttribute("restoList", restoList);
+        
+        
+    	// 餐廳總統計
+    	List<RestoOrderSummaryDTO> summaryList = restoOrderService.getAllTodaySummaryPerResto();
+    	model.addAttribute("summaryList", summaryList);
+    	
+    	long allTotal = summaryList.stream()
+    		    .mapToLong(RestoOrderSummaryDTO::getTotal)
+    		    .sum();
+    		model.addAttribute("allTotal", allTotal);
+        
+        
+
+        // 若選定某餐廳，才撈出該餐廳的區段與時段
+        if (restoId != null) {
+        	
+        	// 各間餐廳統計
+        	if (restoId != null) {
+        	    RestoOrderSummaryDTO summary = restoOrderService.getTodaySummary(restoId);
+
+        	    if (summary == null) {
+        	        summary = new RestoOrderSummaryDTO(0L, 0L, 0L, 0L, 0L, 0L);
+        	    }
+
+        	    model.addAttribute("summary", summary);
+        	}
+        	
+
+        	// 軟刪除的餐廳只讀
+            RestoVO Urlresto = restoService.getById(restoId);
+        	boolean readonly = Urlresto.getIsDeleted();  
+            model.addAttribute("readonly", readonly);
+        	
+        	// 把選到的餐廳的詳細資訊放進 model 以顯示餐廳名稱
+            RestoVO selectedResto = restoService.getById(restoId);
+            model.addAttribute("selectedResto", selectedResto);
+            model.addAttribute("selectedRestoId", restoId);
+            
+           // 該餐廳的所有今日訂單
+            model.addAttribute("orderList", restoOrderService.findTodayOrders(restoId));
+            
+            
+        } else {
+        	// 若沒選餐廳，仍補空值避免渲染錯誤
+            model.addAttribute("selectedResto", null);
+            model.addAttribute("readonly", false);
+        }
+    	
+    	
     	
     	String mainFragment = "admin/fragments/resto/restoOrderToday";
     	model.addAttribute("mainFragment", mainFragment);

@@ -3,7 +3,7 @@ package com.resto.model;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,40 +26,57 @@ public class RestoService {
 
 	@Autowired
     RestoRepository restoRepository;
+	@Autowired
+	private ReservationService reservationService;
 
     
     // 複合查詢（Criteria 結構）
 //    @Transactional(readOnly = true)
-//    public List<RestoVO> compositeQuery(Map<String, String[]> map) {
-//        return RestoCriteriaHelper.getAll(map, em);
+//    public List<RestoDTO> compositeQuery(Map<String, String[]> paramMap) {
+//		List<RestoVO> voList = RestoCriteriaHelper.getAll(paramMap, em);
+//	  return voList.stream()
+//	      .map(vo -> new RestoDTO(
+//	          vo.getRestoId(),
+//	          vo.getRestoName(),
+//	          vo.getRestoNameEn(),
+//	          vo.getRestoLoc(),
+//	          vo.getRestoSeatsTotal(),
+//	          vo.getIsEnabled()
+//	      ))
+//	      .collect(Collectors.toList());
+//        return RestoCriteriaHelper.getAll(paramMap, em);
 //    }
    
     @Transactional(readOnly = true)
     public List<RestoDTO> compositeQueryAsDTO(Map<String, String[]> paramMap) {
-        List<RestoDTO> voList = RestoCriteriaHelper.getAllDTO(paramMap, em);
-        return voList.stream()
-            .map(vo -> new RestoDTO(
-                vo.getRestoId(),
-                vo.getRestoName(),
-                vo.getRestoNameEn(),
-                vo.getRestoLoc(),
-                vo.getRestoSeatsTotal(),
-                vo.getIsEnabled()
-            ))
-            .collect(Collectors.toList());
+        return RestoCriteriaHelper.getAllDTO(paramMap, em);
     }
     
-    // 多筆
+    // 多筆(前台上架)
+    @Transactional(readOnly = true)
+    public List<RestoVO> getAllEnabled() {
+        return restoRepository.findByIsDeletedFalseAndIsEnabledTrue();
+    }
+
+    // 多筆(後台無軟刪)
     @Transactional(readOnly = true)
     public List<RestoVO> getAll() {
-        return restoRepository.findByIsDeletedFalse();
+    	return restoRepository.findByIsDeletedFalse();
     }
     
-    // id拿單筆
+    // id拿單筆(允許後台抓得到已軟刪資料)
     @Transactional(readOnly = true)
     public RestoVO getById(Integer id) {
         return restoRepository.findById(id).orElse(null);
     }
+
+    // id拿單筆(前台限上架且未軟刪)
+    // 查單筆給前台(必須上架且非軟刪)
+    public Optional<RestoVO> findOnline(Integer id) {            // 前台用
+        return restoRepository.findByRestoIdAndIsDeletedFalseAndIsEnabledTrue(id);
+    }
+    
+    
 
     // 軟刪除
     @Transactional
@@ -85,6 +102,9 @@ public class RestoService {
     @Transactional
     public void saveWithImage(RestoVO vo, MultipartFile img, String clearImgFlag) {
         RestoVO target;
+        
+        // 記住舊值
+        Integer oldSeatsTotal = null;
 
         if (vo.getRestoId() == null) {
             // 新增
@@ -99,6 +119,9 @@ public class RestoService {
                 throw new OptimisticLockException("資料已被他人修改，請重新載入");
             }
             
+            oldSeatsTotal = target.getRestoSeatsTotal();
+            
+                        
             // 更新欄位
             target.setRestoName(vo.getRestoName());
             target.setRestoNameEn(vo.getRestoNameEn());
@@ -124,6 +147,15 @@ public class RestoService {
 
         // 儲存
         restoRepository.save(target);
+        
+        // 若座位量有改，同步 reservation 快照
+        if (oldSeatsTotal != null
+            && !oldSeatsTotal.equals(target.getRestoSeatsTotal())) {
+
+            reservationService.refreshSeatsTotal(target.getRestoId(),
+                                              target.getRestoSeatsTotal());
+        }
+        
     }
 
     

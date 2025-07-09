@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maison d’Yuko - 珍饌美饌</title>
+  
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+	<link rel="stylesheet" th:href="@{/css/front-end/resto/resto_booking.css}">
+    
+  
+  
+  
+</head>
+<body>
+
+  <!-- Header -->
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <main id="booking" class="booking-section">
+    <div class="container booking-container">
+      <div class="booking-form-wrapper">
+        <h1 class="booking-title">訂位聯絡資訊</h1>
+        
+        <form class="booking-form" 
+              id="restoOrderFrontFormDetail" 
+              th:object="${restoOrder}"
+              th:action="@{/restaurants/booking/confirm/{id}(id=${resto.restoId})}"
+              method="post">
+
+          <fieldset class="form-fieldset">
+            <legend class="fieldset-title">聯繫資訊</legend>
+            
+            
+            <input type="hidden" name="restoVO.restoId"   th:value="${resto.restoId}" />
+        
+            <!-- pre-booking 帶來的三項 -->
+            <input type="hidden" th:field="*{regiDate}" />
+            <input type="hidden" th:field="*{regiSeats}"/>
+            <!-- 返回頁面時Id給JS抓來渲染按鈕用 -->
+            <input type="hidden" th:field="*{timeslotVO.timeslotId}" id="selectedTimeslotId"/> 
+            <input type="hidden" name="orderSource" value="MEMBER" />
+<!--             <input type="hidden" th:field="*{memberVO.memberId}" /> -->
+            
+            
+            
+            <!-- 姓名 -->
+            <div class="form-group form-group-error">
+              <div class="label-group">
+                <label for="orderGuestName">姓名</label>
+                <span class="required-asterisk">*</span>
+              </div>
+              <input type="text" id="orderGuestName" name="orderGuestName" th:field="*{orderGuestName}" class="form-input">
+            <!-- 錯誤提示 -->
+            <div class="text-danger" th:if="${#fields.hasErrors('orderGuestName')}">
+              <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+              <span th:each="err : ${#fields.errors('orderGuestName')}" th:text="${err}"></span>
+            </div>
+            </div>
+            
+
+            <!-- 手機 -->
+            <div class="form-group">
+              <div class="label-group">
+                <label for="orderGuestPhone">手機號碼</label>
+                <span class="format-hint">格式：0912345678</span>
+              </div>
+              <input type="tel" id="orderGuestPhone" name="orderGuestPhone" th:field="*{orderGuestPhone}" class="form-input">
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('orderGuestPhone')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('orderGuestPhone')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+                        
+            
+            <!-- Email -->
+            <div class="form-group">
+              <div class="label-group">
+                <label for="orderGuestEmail">Email</label>
+                <span class="required-asterisk">*</span>
+              </div>
+              <input type="email" id="orderGuestEmail" name="orderGuestEmail" th:field="*{orderGuestEmail}" class="form-input">
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('orderGuestEmail')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('orderGuestEmail')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            
+          </fieldset>
+          
+          <fieldset class="form-fieldset">
+            <legend class="fieldset-title">需求備註</legend>
+            <!-- 兒童椅 -->
+            <div class="form-group">
+              <div class="label-group">
+                <label for="highChairs">孩童座椅數</label>
+              </div>
+              <input type="number" id="highChairs" name="highChairs" th:field="*{highChairs}" class="form-input">
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('highChairs')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('highChairs')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            
+            <!-- 備註 -->
+            <div class="form-group">
+              <div class="label-group">
+                <label for="regiReq">其他需求</label>
+              </div>
+              <textarea th:field="*{regiReq}" id="regiReq" name="regiReq" rows="5" class="form-textarea"></textarea>
+              <!-- 錯誤提示 -->
+              <div class="text-danger" th:if="${#fields.hasErrors('regiReq')}">
+                <i class="fa-solid fa-circle-exclamation fa-xs me-1 ms-2"></i>
+                <span th:each="err : ${#fields.errors('regiReq')}" th:text="${err}"></span>
+              </div>
+            </div>
+            
+            
+          </fieldset>
+        </form>
+      </div>
+      
+      
+      <aside class="booking-summary-wrapper">
+        <h2 class="summary-title">明細預覽</h2>
+        <div class="summary-card">
+        
+        <!-- 圖片 -->
+        <img th:src="@{/restaurants/img/{id}(id=${resto.restoId})}"  
+                   th:alt="${resto.restoName}" class="summary-image">          
+          
+          <div class="summary-content">
+            <div class="summary-section">
+              <div class="restaurant-info">
+              
+                <!-- 餐廳名稱 -->
+                <div class="restaurant-name" th:text="${resto.restoName}">餐廳名稱</div>
+
+              </div>
+            </div>
+            <div class="summary-section">
+              <div class="detail-item">
+              
+                <!-- 用餐人數 -->
+                <span class="detail-label">用餐人數</span>
+                <span class="detail-value" th:text="${restoOrder.regiSeats + ' 人'}"></span>              </div>
+              
+              <div class="detail-item">
+                <!-- 用餐日期 -->
+                <span class="detail-label">用餐日期</span>
+                <span class="detail-value" 
+                      th:text="${#temporals.format(restoOrder.regiDate, 'yyyy 年 MM 月 dd 日 E', 'Asia/Taipei')}">日期</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">用餐時段</span>
+                <!-- 用餐時段 -->
+                <span class="detail-value" th:text="${timeslot.timeslotName}">13:00</span>
+              </div>
+            </div>
+            <div class="summary-section">
+              <h4 class="summary-subtitle">聯繫資訊</h4>
+              <div class="info-item">
+                <span>姓名</span>
+                <span id="summary_guestName"></span>
+              </div>
+              <div class="info-item">
+                <span>手機號碼</span>
+                <span id="summary_guestPhoneName"></span>
+              </div>
+              <div class="info-item">
+                <span>Email</span>
+                <span id="summary_guestEmail"></span>
+              </div>
+            </div>
+            <div class="summary-section">
+              <h4 class="summary-subtitle">需求備註</h4>
+              <div class="info-item">
+                <span>兒童座椅數</span>
+                <span id="summary_highChairs"></span>
+              </div>
+              <div class="info-item">
+                <span>其他需求</span>
+                <div id="summary_regiReq"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="submit" 
+                form="restoOrderFrontFormDetail" 
+                class="confirm-button">確認訂位</button>
+      </aside>
+    </div>
+  </main>
+  
+  
+  
+  
+  
+  
+  
+
+  <!-- Footer -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        
+  <script th:src="@{/js/admin/loading_overlay.js}"></script>
+  <script th:src="@{/js/admin/toast.js}"></script>
+        
+  <script th:src="@{/js/front-end/resto/resto_Booking.js}"></script>
+  
+  
+</body>
+</html>

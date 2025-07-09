@@ -1,6 +1,98 @@
 <div class="main_resto_reservation">
+    <div class="mt-5 mb-5">
+      <h2 class="page_title">餐廳預定表</h2>
+    </div>
 
 
+
+    <!-- 複合查詢 -->
+    <form class="filter panel p-4 mb-4" method="get" th:action="@{/admin/resto_reservation}">
+      <div class="row g-3">
+        
+        <div class="col-md-3">
+			<label for="minDate" class="form-label">日期（起）</label> <input
+				type="date" class="form-control" id="minDate" name="minDate"
+				th:value="${minDate}">
+		</div>
+		<div class="col-md-3">
+			<label for="maxDate" class="form-label">日期（迄）</label> <input
+				type="date" class="form-control" id="maxDate" name="maxDate"
+				th:value="${maxDate}">
+		</div>
+    
+        <div class="col-md-3">
+            
+              <label class="form-label">餐廳</label>
+                <select class="form-select" name="restoId">
+                <option value="" th:selected="${restoId == null}">--- 餐廳 ---</option>
+                  <option th:each="resto : ${restoList}"
+                          th:value="${resto.restoId}"
+                          th:text="${resto.restoName}"
+                          th:selected="${resto.restoId == restoId}">
+                  </option>
+                </select>
+         </div>
+    
+        <div class="col-md-3">
+          <label for="minAmount" class="form-label">需求人數</label> <input
+            type="number" class="form-control" id="availableMin" name="availableMin"
+            th:value="${availableMin}">
+        </div>
+
+
+
+
+
+        <div class="search_btns col-md-12 d-flex justify-content-end align-items-end gap-2">
+          <button type="button" class="btn btn_secondary btn_search_clear">清空</button>
+          <button type="submit" class="btn btn_primary">搜尋</button>
+        </div>
+      
+      </div>
+    </form>
+
+    <!-- 資料表 -->
+    <div class="table panel p-4 mb-5">
+      <div class="table_header d-flex justify-content-between align-items-end mb-4">
+        <h4 class="table_title">餐廳預定列表</h4>
+      </div>  
+
+      
+      <div class="table-responsive">
+        <table id="restoReservationTable" class="table table-bordered">
+          <thead class="table_head align-top">
+            <tr>
+              <th class="text-center">日期</th>
+              <th class="text-center">餐廳</th>
+              <th class="text-center">區段</th>
+              <th class="text-center">時段</th>
+              <th class="text-center">最多可接待人數</th>
+              <th class="text-center">已預約人數</th>
+              <th class="text-center">剩餘名額</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="rsvt : ${restoRsvtList}">
+              <td class="text-center" th:text="${rsvt.reserveDate}"></td>
+              <td class="text-center" th:text="${rsvt.restoVO.restoName}"></td>
+              <td class="text-center" th:text="${rsvt.TimeslotVO.periodVO.periodName}"></td>
+              <td class="text-center" th:text="${rsvt.TimeslotVO.timeslotName}"></td>
+              <td class="text-center" th:text="${rsvt.restoSeatsTotal}"></td>
+              <td class="text-center" th:text="${rsvt.reserveSeatsTotal}"></td>
+              <td th:text="${T(java.lang.Math).max((rsvt.restoSeatsTotal ?: 0) - (rsvt.reserveSeatsTotal ?: 0), 0)}" class="text-center"></td>
+             
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+      
+      
+      
+      
+      
+      
+    
 
 
 

@@ -483,7 +483,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!timeslotId || !restoId) return;
 
-      if (confirm("項目一旦刪除將無法復原，是否確定刪除？")) {
+      if (confirm("是否確定下架該時段？")) {
 		
 		const params = new URLSearchParams();
 		params.append("timeslotId",  timeslotId);
@@ -837,11 +837,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
           const timeslotId = elWrapper.dataset.id;          // wrapper 的 data-id = timeslotId
           moveTimeslot(timeslotId, toId, fromId, elWrapper);        // 更新後端
-        }
+		  // 重新依 data-time 排序
+		  sortGroupByTime(evt.to);
+		}
       });
 
     });
   }
+  
+  function sortGroupByTime(groupEl) {
+    const wrappers = [...groupEl.querySelectorAll('.timeslot_wrapper')];
+
+    wrappers
+      .sort((a, b) => {
+        const t1 = a.dataset.time;
+        const t2 = b.dataset.time;
+        return t1.localeCompare(t2);
+      })
+      .forEach(el => groupEl.appendChild(el)); // 排完再 append，順序就變了
+  }
+
 
 
   // 呼叫後端同步 periodId

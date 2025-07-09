@@ -73,7 +73,7 @@ public class RestoOrderVO{
 	
     @Min(value = 0, message = "數值不可小於0")
 	@Column(name = "high_chairs")
-	private Integer highChairs;
+	private Integer highChairs = 0;
 	
 	@Size(max = 500, message = "備註敘述請勿超過500字")
 	@Column(name = "regi_req")

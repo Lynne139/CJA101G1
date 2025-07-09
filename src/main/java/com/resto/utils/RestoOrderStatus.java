@@ -2,7 +2,7 @@ package com.resto.utils;
 
 public enum RestoOrderStatus {
     CANCELED(0, "已取消", "secondary"), //不佔位
-    CREATED(1, "已成立", "yuko-accent"), //佔位
+    CREATED(1, "已成立", "yuko-secondary"), //佔位
     DONE(2, "已完成", "success"), //不佔位（用餐完成即釋放）
     WITHHOLD(3, "保留", "warning"), //佔位
     NOSHOW(4, "未到", "danger"); //不佔位

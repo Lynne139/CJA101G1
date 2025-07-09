@@ -23,4 +23,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest()
               .body(Map.of("success", false, "code", "BAD_PARAM", "msg", ex.getMessage()));
     }
+    
+
 }

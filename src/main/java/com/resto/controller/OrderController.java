@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,22 +15,28 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.resto.dto.RestoOrderSummaryDTO;
 import com.resto.entity.RestoOrderVO;
 import com.resto.entity.RestoVO;
 import com.resto.entity.TimeslotVO;
 import com.resto.model.ReservationService;
+import com.resto.model.RestoOrderRepository;
 import com.resto.model.RestoOrderService;
+import com.resto.model.RestoRepository;
 import com.resto.model.RestoService;
 import com.resto.model.TimeslotService;
 import com.resto.utils.RestoOrderSource;
 import com.resto.utils.RestoOrderStatus;
 import com.resto.utils.ValidationGroups;
+import com.resto.utils.exceptions.OverbookingException;
 
 import jakarta.validation.Valid;
 import jakarta.validation.groups.Default;
@@ -45,6 +53,10 @@ public class OrderController {
 	TimeslotService timeslotService;
 	@Autowired
 	ReservationService reservationService;
+	@Autowired
+	RestoRepository restoRepository;
+	@Autowired
+	RestoOrderRepository restoOrderRepository;
 
 	// ===== restoOrder.html ====================================================== //
 
@@ -99,7 +111,8 @@ public class OrderController {
 	        RedirectAttributes redirectAttributes,
 	        Model model
 	) {
-		
+
+
 		// 錯誤 flag（初始 false）
 	    boolean hasAnyError = false;
 		
@@ -213,9 +226,6 @@ public class OrderController {
 	    return "redirect:/admin/resto_order";
 	}
 
-	
-
-
 	// ===== 修改 =====
 	//取得edit modal
 	@GetMapping("/resto_order/edit")
@@ -229,6 +239,15 @@ public class OrderController {
 	    }
 	    
 	    
+	    // 顯示人預約人數判斷
+	    // 把舊預約人數值拷貝出來（純 int，永遠不變）
+	    int originalSeats = restoOrder.getRegiSeats(); 
+	    int remainingSeats = reservationService.getRemaining(
+	    		restoOrder.getRestoVO().getRestoId(),
+	    		restoOrder.getTimeslotVO().getTimeslotId(),
+	    		restoOrder.getRegiDate());      
+	    
+	    
 	    List<RestoVO> restoVOList = restoService.getAll();   // 只抓啟用的餐廳
 	    List<TimeslotVO> timeslotVOList = timeslotService.getAllEnabled();
 	    
@@ -239,6 +258,10 @@ public class OrderController {
 	    model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
 	    // 抓當日日期，避免過往日期可預約
 //	    model.addAttribute("today", LocalDate.now());
+	    model.addAttribute("originalSeats", originalSeats);
+	    model.addAttribute("remainingSeats", remainingSeats);
+
+	    
 	    return "admin/fragments/resto/modals/order_resto_edit";
 	}
 	
@@ -256,9 +279,16 @@ public class OrderController {
 	    	result.reject("notfound", "資料不存在或已刪除");
 	        return "admin/fragments/common/error_modal";
 	    }
+	    
+	    // 顯示人預約人數判斷
+	    // 把舊預約人數值拷貝出來（純 int，永遠不變）
+	    int originalSeats = original.getRegiSeats(); 
+	    int remainingSeats = reservationService.getRemaining(
+	    		restoOrder.getRestoVO().getRestoId(),
+	    		restoOrder.getTimeslotVO().getTimeslotId(),
+	    		restoOrder.getRegiDate()); 
 
-		
-		
+
 	    // 錯誤 flag（初始 false）
 	    boolean hasAnyError = false;
 		
@@ -291,7 +321,13 @@ public class OrderController {
 	                "此時段不屬於所選餐廳");
 	        hasAnyError = true;
 	    }
-
+	    
+	    
+	    
+	    
+	
+	    
+	    
 	    
 	    // 管理員系統
 	    // 若欄位驗證有錯，回填 modal
@@ -303,29 +339,82 @@ public class OrderController {
 		    model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
 //		    model.addAttribute("today", LocalDate.now());     // 加回 today，避免 JS 抓不到 min 值
 	        model.addAttribute("restoOrder", restoOrder);
-
+		    model.addAttribute("originalSeats", originalSeats);
+		    model.addAttribute("remainingSeats", remainingSeats);
 
 	        return "admin/fragments/resto/modals/order_resto_edit";
 	    }
-	    
+	     
+	    try {
+	    	// 寫入資料庫
+	        restoOrderService.update(restoOrder);
+	    } catch (OverbookingException e) {
+	        result.rejectValue("regiSeats","overbooked", e.getMessage());
+	        
+	        // 回填
+	        model.addAttribute("restoVOList", restoService.getAll());
+	        model.addAttribute("timeslotVOList", timeslotService.getAllEnabled());
+		    model.addAttribute("orderStatusOptions", List.of(RestoOrderStatus.values()));
+		    model.addAttribute("orderSourceOptions", List.of(RestoOrderSource.values()));
+	        model.addAttribute("restoOrder", restoOrder);
+		    model.addAttribute("originalSeats", originalSeats);
+		    model.addAttribute("remainingSeats", remainingSeats);
 
-	    // 寫入資料庫
-		restoOrderService.update(restoOrder);
+
+
+	        
+	        return "admin/fragments/resto/modals/order_resto_edit";
+	    }
+	    
 	    return "redirect:/admin/resto_order";
 	}
 
+	
+	// ===== 今日訂單改狀態(完成/取消) =====
+	@PostMapping("/resto_order/{id}/status")
+	@ResponseBody
+	public Map<String, Object> toggleStatus(@PathVariable Integer id,
+											@RequestBody Map<String, String> body) {
+		
+		String status = body.get("status");
+		
+		RestoOrderStatus newStatus = RestoOrderStatus.valueOf(status);
+	    return restoOrderService.toggleStatus(id, newStatus);
+	}
 
+
+	// ===== 獲得今日訂單統計資訊 =====
+	@GetMapping("/resto_order/summary-json")
+	@ResponseBody
+	public RestoOrderSummaryDTO todaySummaryJson(@RequestParam Integer restoId) {
+	    return restoOrderService.getTodaySummary(restoId);
+	}
+
+	// ===== 獲得每張訂單的最新狀態 =====
+	@GetMapping("/resto_order/statuses")
+	@ResponseBody
+	public Map<Integer, Map<String,String>> todayStatuses(@RequestParam Integer restoId) {
+	    return restoOrderService.findTodayOrders(restoId).stream()
+	            .collect(Collectors.toMap(
+	                RestoOrderVO::getRestoOrderId,
+	                o -> Map.of("cssClass", o.getOrderStatus().getCssClass(),
+	                            "label",    o.getOrderStatus().getLabel())
+	            ));
+	}
 	
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
+	@GetMapping("/admin/resto_order_today/cards")
+	public String getOrderCardsFragment(@RequestParam Integer restoId, Model model) {
+	    RestoVO resto = restoRepository.findById(restoId).orElse(null);
+	    List<RestoOrderVO> orderList = restoOrderRepository.findTodayOrders(restoId);
+
+	    model.addAttribute("selectedResto", resto);
+	    model.addAttribute("orderList", orderList);
+
+	    return "back-end/resto/restoOrderToday :: orderCardsFragment";
+	}
 	
 
 

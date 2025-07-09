@@ -34,7 +34,7 @@ public class RoomTypeScheduleCriteriaHelper {
 		    return cb.le(cb.diff(root.get("roomAmount"), root.get("roomRSVBooked")), Integer.valueOf(value));
 		// 沒有特別寫的case，做模糊查詢
 		default:
-			return null;
+				return null;
 		}
 	}
 

@@ -62,5 +62,22 @@ public interface PeriodRepository  extends JpaRepository<PeriodVO, Integer>{
             """)
         List<PeriodVO> findByPeriodCodeWithRestoAndTimeslots(@Param("code") RestoPeriodCode code);
 
+	    // 抓指定餐廳(上架)的 period，並一次把 timeslot 一併載入  
+	    @Query("""
+	            select distinct p
+	            from PeriodVO p
+	            left join fetch p.timeslots ts
+	            where p.restoVO.restoId = :restoId
+	              and p.restoVO.isDeleted = false
+	              and p.restoVO.isEnabled = true
+	            order by p.sortOrder asc, ts.timeslotId asc
+	            """)
+	     List<PeriodVO> findByRestoIdWithSlots(Integer restoId);
+	    
+    
+    
+    
+    
+    
     
 }

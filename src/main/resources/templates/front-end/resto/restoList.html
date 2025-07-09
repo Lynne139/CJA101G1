@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maison d’Yuko - 珍饌美饌</title>
+  
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/homepage/css/style.css}">
+	<link rel="stylesheet" th:href="@{/css/front-end/resto/resto_list.css}">
+    
+  
+  
+  
+</head>
+<body>
+
+  <!-- Header -->
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <section id="page-title" class="page-title-section">
+    <div class="container container-1320">
+      <p class="breadcrumb mb-4">探索嶼蔻 /</p>
+      <h1 class="main-heading ">珍饈美饌</h1>
+    </div>
+  </section>
+  <main>
+    <section id="restaurants" class="restaurants-section">
+      <div class="container container-1320">
+        <div class="restaurants-list">
+          
+          <!-- 餐廳卡片 -->
+          <article class="restaurant-card" 
+                   th:each="resto : ${restoList}">
+            <div class="card-image-wrapper">
+              <!-- 圖片 -->
+              <img th:src="@{/restaurants/img/{id}(id=${resto.restoId})}"  
+                   th:alt="${resto.restoName}" class="card-image">
+            </div>
+            <div class="card-content">
+              <div class="card-text-group">
+                <!-- restoType -->
+                <p class="card-subtitle" th:text="${resto.restoType}">類型</p>
+                
+                <!-- 中英名稱 -->
+                <div class="card-title-group ">
+                  <div class="card-title" th:text="${resto.restoName}">餐廳名稱</div>
+                  <span class="card-title-en" th:text="${resto.restoNameEn}">Name En</span>
+                </div>
+                <!-- 位置 -->
+                <p class="card-location" th:text="${resto.restoLoc}">樓層位置</p>
+                <!-- 簡介 -->
+                <p class="card-description" th:text="${resto.restoInfo}">餐廳簡介</p>
+              </div>
+              
+              <!-- MORE 按鈕 → 詳細頁 -->
+              <a class="more-button" th:href="@{/restaurants/{id}(id=${resto.restoId})}">
+                <div class="more-button-visuals">
+                  <span class="more-ellipse"></span>
+                  <span class="more-text">MORE</span>
+                  <span class="arrow more-line"></span>
+                </div> 
+              </a>
+              
+            </div>
+          </article>
+
+
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Footer -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
+  
+  
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        
+  <script th:src="@{/js/admin/loading_overlay.js}"></script>
+  <script th:src="@{/js/admin/toast.js}"></script>
+        
+  
+  
+</body>
+</html>
