@@ -30,19 +30,12 @@ public class RoomTypeScheduleCriteriaHelper {
 			return cb.lessThanOrEqualTo(root.get("roomOrderDate"), java.sql.Date.valueOf(value));
 		// cb.diff(a, b) 就是建立 (a - b) 的條件式
 		case "minAmount":
-			int need = Integer.parseInt(value);   // value 來自使用者輸入
-			
-			//cb.diff(A, B) 讓 JPA 產生 (A - B)；cb.ge(expr, need) 產生 >= 條件
-		    Expression<Integer> remain =
-		            cb.diff(root.get("roomAmount"), root.get("roomRSVBooked"));
-		    return cb.ge(remain, need);           // roomAmount - roomRSVBooked >= need
-		
-		
+		    return cb.ge(cb.diff(root.get("roomAmount"), root.get("roomRSVBooked")), Integer.valueOf(value));
 		case "maxAmount":
 		    return cb.le(cb.diff(root.get("roomAmount"), root.get("roomRSVBooked")), Integer.valueOf(value));
 		// 沒有特別寫的case，做模糊查詢
 		default:
-			return null;
+				return null;
 		}
 	}
 
