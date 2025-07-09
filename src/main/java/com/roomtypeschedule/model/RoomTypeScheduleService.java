@@ -69,7 +69,9 @@ public class RoomTypeScheduleService {
 	
 	//訂房
 	public List<RoomTypeScheduleVO> findSchedules(RoomTypeVO roomTypeVO, java.sql.Date start, java.sql.Date end) {
-        return roomTypeScheduleRepository.findByRoomTypeVOAndRoomOrderDateBetween(roomTypeVO, start, end);
+        return roomTypeScheduleRepository.findByRoomTypeVOAndRoomOrderDateBetween(roomTypeVO, start, end).stream()
+                .filter(s -> !s.getRoomOrderDate().before(start) && s.getRoomOrderDate().before(end)) // 退房日不算
+                .collect(Collectors.toList());
     }
 	
 	//查詢今天之後可預定之日期(多房型頁面使用)
