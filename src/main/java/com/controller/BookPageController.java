@@ -166,6 +166,7 @@ public class BookPageController {
 			model.addAttribute("packagePrice", packagePrice);
 		}
 		model.addAttribute("packageSubtotal", packageSubtotal);
+		roomOrder.setTotalAmount(totalRoomAmount + packageSubtotal);
 		roomOrder.setActualAmount(totalRoomAmount + packageSubtotal);
 		roomOrder.setOrderDetails(orderDetails);
 
@@ -451,7 +452,7 @@ public class BookPageController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			model.addAttribute("errorMsg", "訂單資料處理失敗：" + e.getMessage());
-			return "redirect:/member/memberCenter";
+			return "redirect:/member/center";
 		}
 	}
 

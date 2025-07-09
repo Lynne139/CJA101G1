@@ -7,7 +7,7 @@ function refreshCaptcha() {
 
 // 移除無效樣式當用戶開始輸入
 document.querySelectorAll('.form-control, .form-select').forEach(field => {
-    field.addEventListener('input', function() {
+    field.addEventListener('input', function () {
         this.classList.remove('is-invalid');
     });
 });
@@ -19,7 +19,7 @@ function queryCouponsForMember() {
     const totalAmount = amountInput ? amountInput.value : 0;
     const couponSelect = document.getElementById('couponSelect');
     const discountAmountInput = document.getElementById('discountAmount');
-    
+
     if (!couponSelect || !discountAmountInput) return;
 
     console.log("🚀 啟動查詢折價券", { memberId, totalAmount });
@@ -65,10 +65,10 @@ function queryCouponsForMember() {
 function handleCouponChange() {
     const couponSelect = document.getElementById('couponSelect');
     const discountAmountInput = document.getElementById('discountAmount');
-    
+
     if (!couponSelect || !discountAmountInput) return;
-    
-    couponSelect.addEventListener('change', function() {
+
+    couponSelect.addEventListener('change', function () {
         const selected = this.selectedOptions[0];
         const discount = selected ? selected.getAttribute('data-discount') : 0;
         discountAmountInput.value = discount || 0;
@@ -78,7 +78,7 @@ function handleCouponChange() {
 // 表單驗證函數
 function validateForm() {
     const form = document.getElementById('bookingForm');
-    
+
     // 驗證必填欄位
     const requiredFields = form.querySelectorAll('[required]');
     let isValid = true;
@@ -137,7 +137,7 @@ function validateForm() {
 // 補齊表單資料
 function prepareFormData() {
     const form = document.getElementById('bookingForm');
-    
+
     // 補齊 couponCode (hidden input)
     const couponSelect = form.querySelector('select[name="couponCode"]');
     if (couponSelect) {
@@ -173,10 +173,17 @@ function prepareFormData() {
     roomAmountInput.value = totalRooms;
 
     // 補齊 totalAmount
-    const totalAmount = document.getElementById('totalAmountText').textContent.trim().replace(/[^0-9]/g, '');
+    const totalAmount = document.getElementById('totalPriceAmountText').textContent.trim().replace(/[^0-9]/g, '');
     const totalAmountInput = form.querySelector('input[name="totalAmount"]');
     if (totalAmountInput) {
         totalAmountInput.value = totalAmount;
+    }
+
+    // 補齊 actualAmount
+    const actualAmount = document.getElementById('totalAmountText').textContent.trim().replace(/[^0-9]/g, '');
+    const actualAmountInput = form.querySelector('input[name="actualAmount"]');
+    if (actualAmountInput) {
+        actualAmountInput.value = actualAmount;
     }
 }
 
@@ -184,7 +191,7 @@ function prepareFormData() {
 function handleLinePayment(formData) {
     const orderId = "ROOM" + Date.now() + window.memberId;
     const amount = formData.get('actualAmount');
-    
+
     // 準備 LINE Pay 請求資料
     const linePayData = {
         linepayBody: {
@@ -218,39 +225,39 @@ function handleLinePayment(formData) {
         method: 'POST',
         body: formData
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('訂單準備失敗');
-        }
-        return response.text();
-    })
-    .then(result => {
-        // 如果後端回傳成功，則呼叫 LINE Pay API
-        return fetch('/api/linepay/room', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(linePayData)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('訂單準備失敗');
+            }
+            return response.text();
+        })
+        .then(result => {
+            // 如果後端回傳成功，則呼叫 LINE Pay API
+            return fetch('/api/linepay/room', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(linePayData)
+            });
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // 跳轉到 LINE Pay 付款頁面
+                window.location.href = data.data;
+            } else {
+                alert(data.message || 'LINE Pay 付款連線失敗');
+            }
+        })
+        .catch(error => {
+            console.error('LINE Pay 處理失敗:', error);
+            alert('系統發生錯誤，請稍後再試');
         });
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            // 跳轉到 LINE Pay 付款頁面
-            window.location.href = data.data;
-        } else {
-            alert(data.message || 'LINE Pay 付款連線失敗');
-        }
-    })
-    .catch(error => {
-        console.error('LINE Pay 處理失敗:', error);
-        alert('系統發生錯誤，請稍後再試');
-    });
 }
 
 // 頁面載入完成後執行
-window.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('DOMContentLoaded', function () {
     const payMethodSelect = document.querySelector('select[name="payMethod"]');
     const bookBtn = document.getElementById('bookBtn');
 
@@ -258,7 +265,7 @@ window.addEventListener('DOMContentLoaded', function() {
     bookBtn.disabled = true;
 
     // 監聽付款方式選擇
-    payMethodSelect.addEventListener('change', function() {
+    payMethodSelect.addEventListener('change', function () {
         if (this.value === "0") {
             bookBtn.textContent = "確認預訂";
             bookBtn.disabled = false;
@@ -272,13 +279,13 @@ window.addEventListener('DOMContentLoaded', function() {
     });
 
     console.log('會員ID:', window.memberId);
-    
+
     // 查詢折價券
     queryCouponsForMember();
-    
+
     // 設定折價券選擇事件
     handleCouponChange();
-    
+
     // 初始化驗證碼
     refreshCaptcha();
 
@@ -336,7 +343,7 @@ function handleCouponChange() {
     const couponSelect = document.getElementById('couponSelect');
     const discountAmountInput = document.getElementById('discountAmount');
     if (!couponSelect || !discountAmountInput) return;
-    couponSelect.addEventListener('change', function() {
+    couponSelect.addEventListener('change', function () {
         const selected = this.selectedOptions[0];
         const discount = selected ? selected.getAttribute('data-discount') : 0;
         discountAmountInput.value = discount || 0;
@@ -347,12 +354,12 @@ function handleCouponChange() {
 }
 
 // 統一的表單提交處理
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const bookBtn = document.getElementById('bookBtn');
-    
-    bookBtn.addEventListener('click', function(e) {
+
+    bookBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        
+
         // 驗證表單
         if (!validateForm()) {
             return;
@@ -369,32 +376,27 @@ document.addEventListener('DOMContentLoaded', function() {
         if (payMethod === "0") {
             // 臨櫃付款 - 直接提交表單到後端處理
             console.log("處理臨櫃付款");
-            
+
             fetch('/orderInfo/confirm', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => {
-                if (response.redirected) {
-                    // 如果後端重定向，則跳轉到重定向的頁面
-                    window.location.href = response.url;
-                } else {
-                    return response.text();
-                }
-            })
-            .then(html => {
-                if (html) {
-                    // 如果返回 HTML 內容，則替換當前頁面
-                    document.open();
-                    document.write(html);
-                    document.close();
-                }
-            })
-            .catch(error => {
-                console.error('臨櫃付款處理失敗:', error);
-                alert('系統發生錯誤，請稍後再試');
-            });
-            
+                .then(response => response.text())
+                .then(html => {
+                    if (html.includes('redirect:/orderInfo/orderConfirm')) {
+                        // 如果返回重定向指令，直接跳轉
+                        window.location.href = '/orderInfo/orderConfirm';
+                    } else {
+                        // 如果返回其他 HTML 內容，則替換當前頁面
+                        document.open();
+                        document.write(html);
+                        document.close();
+                    }
+                })
+                .catch(error => {
+                    console.error('臨櫃付款處理失敗:', error);
+                    alert('系統發生錯誤，請稍後再試');
+                });
         } else if (payMethod === "1") {
             // LINE Pay 付款
             console.log("處理 LINE Pay 付款");

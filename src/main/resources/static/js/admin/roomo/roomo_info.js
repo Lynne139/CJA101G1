@@ -74,8 +74,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ===== 取消訂單 =====
     document.addEventListener("click", function (e) {
-        if (e.target.closest(".btn_delete")) {
-            const btn = e.target.closest(".btn_delete");
+        if (e.target.closest(".btn_cancel")) {
+            const btn = e.target.closest(".btn_cancel");
             const roomoId = btn.getAttribute("data-id");
 
             if (!roomoId) return;

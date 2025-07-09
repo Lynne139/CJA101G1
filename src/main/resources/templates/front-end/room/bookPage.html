@@ -86,8 +86,9 @@
 
 						<!-- 總金額 -->
 						<div class="total-section">
+								總金額 NT$ <span id="totalPriceAmountText" th:text="${roomOrder.totalAmount}"></span>
 							<div class="total-amount">
-								總金額 NT$ <span id="totalAmountText" th:text="${roomOrder.actualAmount}"></span>
+								實際支付額 NT$ <span id="totalAmountText" th:text="${roomOrder.actualAmount}"></span>
 							</div>
 							<small>含稅及服務費</small>
 						</div>

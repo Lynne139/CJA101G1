@@ -244,7 +244,8 @@ public class RoomOrderController {
 			// }
 			// 5. 更新會員累計金(扣除整筆actualAmount)
 			Integer memberId = order.getMember().getMemberId();
-			memberService.updateConsumptionAndLevelAndPoints(memberId, -order.getActualAmount());
+			Integer rollbackAmount = -order.getActualAmount();
+			memberService.updateConsumptionAndLevelAndPoints(memberId, rollbackAmount);
 			// 6.發送通知
 			notificationService.createNotification(memberId, "訂單取消", "由服務人員訂單取消成功，請至訂單查詢頁面查看。");
 
@@ -264,12 +265,22 @@ public class RoomOrderController {
 		for (RoomOList detail : details) {
 			totalRoomPrice += detail.getRoomPrice();
 		}
+		// 計算入住天數
+		java.time.LocalDate checkInDate = java.time.LocalDate.parse(order.getCheckInDate());
+		java.time.LocalDate checkOutDate = java.time.LocalDate.parse(order.getCheckOutDate());
+		long checkInDays = java.time.temporal.ChronoUnit.DAYS.between(checkInDate, checkOutDate);
+		if (checkInDays <= 0) {
+			checkInDays = 1; // 預設至少一天，避免異常
+		}
+		totalRoomPrice = totalRoomPrice * (int)checkInDays;
+		Integer totalAmount = order.getTotalAmount();
+		Integer discountAmount = order.getDiscountAmount();
 		// 計算加購專案價格
-		Integer addonPrice = order.getTotalAmount() - totalRoomPrice;
+		Integer addonPrice = totalAmount - totalRoomPrice;
 		// 計算新總價
-		Integer newTotal = totalRoomPrice - addonPrice;
+		Integer newTotal = totalAmount - addonPrice;
 		// 計算新實際支付金額
-		Integer newActualAmount = newTotal - order.getDiscountAmount();
+		Integer newActualAmount = newTotal - discountAmount;
 		// 更新訂單
 		order.setTotalAmount(newTotal);
 		order.setActualAmount(newActualAmount);
@@ -356,7 +367,10 @@ public class RoomOrderController {
 
 		// 更新會員累計金額
 		Integer memberId = roomOrder.getMember().getMemberId();
+		
 		RoomOrder oldOrder = orderService.getById(roomOrder.getRoomOrderId());
+		roomOrder.setCoupon(oldOrder.getCoupon());
+		
 		if (oldOrder.getActualAmount() != roomOrder.getActualAmount()) {
 			Integer price = roomOrder.getActualAmount() - oldOrder.getActualAmount();
 			memberService.updateConsumptionAndLevelAndPoints(memberId, price);
