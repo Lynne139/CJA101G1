@@ -161,11 +161,12 @@ public class RoomOrderFrontController {
         roomOrderService.save(order);
         // 更新會員累計金額
         Integer memberId = order.getMember().getMemberId();
-        memberService.updateConsumptionAndLevelAndPoints(memberId, -order.getActualAmount());
+        Integer rollbackAmount = -order.getActualAmount();
+        memberService.updateConsumptionAndLevelAndPoints(memberId, rollbackAmount);
         // 發送通知
         notificationService.createNotification(memberId, "訂單取消", "已成功取消訂單，請至訂單查詢頁面查看。");
 
-        return "redirect:/member/order/roomOrder";
+        return "redirect:/member/center";
     }
 
     // 會員訂單檢視（for 檢視 modal）
