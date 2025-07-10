@@ -27,7 +27,7 @@
         <form class="booking-form" 
               id="restoOrderFrontFormDetail" 
               th:object="${restoOrder}"
-              th:action="@{/restaurants/booking/confirm}"
+              th:action="@{/restaurants/booking/confirm/{id}(id=${resto.restoId})}"
               method="post">
 
           <fieldset class="form-fieldset">
@@ -192,9 +192,13 @@
             </div>
           </div>
         </div>
-        <button type="submit" 
-                form="restoOrderFrontFormDetail" 
-                class="confirm-button">確認訂位</button>
+        <div class="btn_wrapper">
+          <button id="confirmBtn"
+                  type="submit" 
+                  form="restoOrderFrontFormDetail" 
+                  class="confirm-button">確認訂位
+          </button>
+        </div>>
       </aside>
     </div>
   </main>

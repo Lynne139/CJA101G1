@@ -24,12 +24,17 @@ document.addEventListener('DOMContentLoaded', () => {
 	    target.textContent = input.value || "—";
 	  });
 	});
+	
+	
+	const form      = document.getElementById('booking');
+	const submitBtn = document.getElementById('confirmBtn');
+	
+	form.addEventListener('submit', () => {
+	    showBtnOverlay(submitBtn);
+	  });
+	
 
-	
-	
-	
-	
-	
+
 	
 	
 	
