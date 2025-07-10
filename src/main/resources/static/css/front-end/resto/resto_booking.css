@@ -221,7 +221,7 @@ input, textarea {
   }
   .summary-image {
     width: 150%;
-    height: 100px;
+    height: 150px;
     object-fit: cover;
     display: block;
   }
