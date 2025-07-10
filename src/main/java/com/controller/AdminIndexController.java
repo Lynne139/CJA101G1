@@ -251,13 +251,14 @@ public class AdminIndexController {
 	                      BindingResult result,
 	                      @RequestParam("uploadPic") MultipartFile uploadPic,
 	                      Model model, HttpServletRequest request) {
-		 if (memberSvc.findByEmail(memberVO.getMemberEmail()) != null) {
-	            result.rejectValue("memberEmail", null, "電子信箱已註冊，請使用其他信箱");
-	            model.addAttribute("memberVO", memberVO);
-	            model.addAttribute("currentURI", request.getRequestURI());
-	            model.addAttribute("mainFragment", "admin/fragments/member/update_member_input");
-	            return "admin/index_admin";
-	        }
+		 MemberVO existingMemberByEmail = memberSvc.findByEmail(memberVO.getMemberEmail());
+		 if (existingMemberByEmail != null && !existingMemberByEmail.getMemberId().equals(memberVO.getMemberId())) {
+		     result.rejectValue("memberEmail", null, "電子信箱已註冊，請使用其他信箱");
+		     model.addAttribute("memberVO", memberVO);
+		     model.addAttribute("currentURI", request.getRequestURI());
+		     model.addAttribute("mainFragment", "admin/fragments/member/update_member_input");
+		     return "admin/index_admin";
+		 }
 		 
 		 if (result.hasErrors()) {
 	         model.addAttribute("memberVO", memberVO);
