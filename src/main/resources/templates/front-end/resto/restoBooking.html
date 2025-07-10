@@ -27,7 +27,7 @@
         <form class="booking-form" 
               id="restoOrderFrontFormDetail" 
               th:object="${restoOrder}"
-              th:action="@{/restaurants/booking/confirm/{id}(id=${resto.restoId})}"
+              th:action="@{/restaurants/booking/confirm}"
               method="post">
 
           <fieldset class="form-fieldset">
@@ -42,7 +42,6 @@
             <!-- 返回頁面時Id給JS抓來渲染按鈕用 -->
             <input type="hidden" th:field="*{timeslotVO.timeslotId}" id="selectedTimeslotId"/> 
             <input type="hidden" name="orderSource" value="MEMBER" />
-<!--             <input type="hidden" th:field="*{memberVO.memberId}" /> -->
             
             
             

@@ -20,9 +20,9 @@ public class RestoEmailService {
 	@Autowired
     private JavaMailSender mailSender;
     // Example改成自己的e.g.RoomBooking，參數可自訂(e.g.加入RoomOrder roomOrder)
-    public void sendExampleEmail(String toEmail, RestoOrderVO restoOrderVO) throws MessagingException, IOException {
+    public void sendRestoRegiEmail(String toEmail, RestoOrderVO restoOrderVO) throws MessagingException, IOException {
 
-        toEmail = "cja101g1@gmail.com"; // 收件者電郵，這行僅供測試，實際應是傳入的參數
+        toEmail = "lolinouob@gmail.com"; // 收件者電郵，這行僅供測試，實際應是傳入的參數
         String subject = "【嶼蔻渡假村】餐廳訂位成功通知信"; // e.g.【嶼蔻渡假村】訂房成功通知信
         
         MimeMessage message = mailSender.createMimeMessage();
@@ -35,9 +35,13 @@ public class RestoEmailService {
 
         String customerName = restoOrderVO.getOrderGuestName(); // 改 e.g. = roomOrder.getCustomerName()
         String orderId = restoOrderVO.getRestoOrderId().toString(); // 改...
-        String regiInDate = restoOrderVO.getRegiDate().format(DateTimeFormatter.ofPattern("yyyy年M月d日"));; // 改...
+        String regiDate = restoOrderVO.getRegiDate().format(DateTimeFormatter.ofPattern("yyyy年M月d日")); // 改...
+        String regiPreiod = restoOrderVO.getSnapshotPeriodName(); // 改...
+        String regiTimeslot = restoOrderVO.getSnapshotTimeslotName(); // 改...
         String resto = restoOrderVO.getSnapshotRestoName(); // 改...
         String guestCount = restoOrderVO.getRegiSeats().toString();// 改...
+        String HighChairs = restoOrderVO.getHighChairs().toString();// 改...
+        String Req = restoOrderVO.getRegiReq();// 改...
 
         // htmlContent改成自己要的內容
         String htmlContent = """
@@ -55,9 +59,12 @@ public class RestoEmailService {
         	            <table style='width: 100%; border-collapse: collapse; border-spacing: 0; margin-top: 20px; font-size: 1.05em;'>
         	                """
         	                + "<tr><td style='padding: 0;'><strong>預約餐廳：</strong></td><td>" + resto + "</td></tr>"
-        	                + "<tr><td style='padding: 0;'><strong>用餐日期：</strong></td><td>" + regiInDate + "</td></tr>"
-        	                + "<tr><td style='padding: 0;><strong>用餐人數：</strong></td><td>" + guestCount + "位</td></tr>"
-        	                + "<tr><td style='padding: 0;'><strong>訂位編號：</strong></td><td>" + orderId + "</td></tr>"
+        	                + "<tr><td style='padding: 0;'><strong>用餐日期：</strong></td><td>" + regiDate + "</td></tr>"
+        	                + "<tr><td style='padding: 0;'><strong>用餐時段：</strong></td><td>" + regiPreiod + " " + regiTimeslot + "</td></tr>"
+        	                + "<tr><td style='padding: 0;'><strong>用餐人數：</strong></td><td>" + guestCount + "位</td></tr>"
+        	                + "<tr><td style='padding: 0;'><strong>兒童椅需求數：</strong></td><td>" + HighChairs + "位</td></tr>"
+        	                + "<tr><td style='padding: 0;'><strong>其他需求備註：</strong></td><td>" + guestCount + "位</td></tr>"
+        	                + "<tr><td style='padding: 0;'><strong>訂位編號：</strong></td><td>" + Req + "</td></tr>"
         	            + """
         	            </table>
 

@@ -371,7 +371,7 @@ public class FrontRestoController {
             /* 3. 寄出 Email － 目前只寄會員訂單 */
             String guestEmail = order.getOrderGuestEmail();  
             try {
-                restoEmailSvc.sendExampleEmail(guestEmail, order);
+                restoEmailSvc.sendRestoRegiEmail(guestEmail, order);
             } catch (Exception e) {
                 br.reject("error","送餐廳訂位確認信失敗");
             }
