@@ -1,12 +1,13 @@
 package com.resto.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -254,22 +255,13 @@ public class RestoOrderService {
         }
 
         sseController.sendStatusUpdate("refresh");
-        
-        
+   
     }
 
     
-    // 跟隨住宿訂單被取消
-    @Transactional
-    public void cancelByRoomOrderId(Integer roomOrderId) {
-        List<RestoOrderVO> orders = restoOrderRepository.findByRoomOrder_RoomOrderId(roomOrderId);
-        for (RestoOrderVO order : orders) {
-            order.setOrderStatus(RestoOrderStatus.CANCELED);
-        }
-    }
+
     
-   
-    // 今日訂單切換訂單狀態
+    //===== 後台-今日訂單切換訂單狀態 ===== //
     @Transactional
     public Map<String, Object> toggleStatus(Integer id, RestoOrderStatus newStatus) {
         RestoOrderVO order = restoOrderRepository.findById(id).orElseThrow();
@@ -298,29 +290,34 @@ public class RestoOrderService {
     }
 
     
-    
+    //===== 後台-今日訂單統計 ===== //
     // 找出今日訂單
     public List<RestoOrderVO> findTodayOrders(Integer restoId) {
         return restoOrderRepository.findTodayOrders(restoId);
     }
-    
-    
+       
     //  特定餐廳每日訂單的統計
     public RestoOrderSummaryDTO getTodaySummary(Integer restoId) {
         return restoOrderRepository.findTodaySummary(restoId);
     }
     
-    //餐廳加總每日訂單統計
+    // 餐廳加總每日訂單統計
     public List<RestoOrderSummaryDTO> getAllTodaySummaryPerResto() {
         return restoOrderRepository.findAllTodaySummaryPerResto();
     }
 
 
+    
+    //===== 住宿-跟隨住宿訂單被取消 ===== //
+    @Transactional
+    public void cancelByRoomOrderId(Integer roomOrderId) {
+        List<RestoOrderVO> orders = restoOrderRepository.findByRoomOrder_RoomOrderId(roomOrderId);
+        for (RestoOrderVO order : orders) {
+            order.setOrderStatus(RestoOrderStatus.CANCELED);
+        }
+    }
 
-
-    
-    
-    
+    //===== 住宿-餐廳發起取消時聯動回滾金額與關連訂單(WIP) ===== //
     private final RestTemplate restTemplate = new RestTemplate();
     private static final String ROOM_API_URL = "http://localhost:8080/room/cancel_project_add_on"; // 先用本機開發用的網址
 
@@ -357,7 +354,8 @@ public class RestoOrderService {
     }
 
     
-    // 前台嘗試定位(驗證名額)
+    //===== 前台-會員訂位 ===== //  
+    // 前台嘗試訂位(驗證名額)
     @Transactional
     public void tryCreateOrder(RestoOrderVO order) {
 
@@ -374,6 +372,41 @@ public class RestoOrderService {
     }
     
 
+    //===== 前台-會員訂單頁 ===== //
+    // 歷史訂單
+    @Transactional(readOnly = true)
+    public List<RestoOrderVO> getHistoryOrders(Integer memberId) {
+    	LocalDate today = LocalDate.now();
+        String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+        return restoOrderRepository.findHistoryOrders(memberId, today, currentTime);
+    }
+
+    // 進行中訂單
+    @Transactional(readOnly = true)
+    public List<RestoOrderVO> getActiveOrders(Integer memberId) {
+    	LocalDate today = LocalDate.now();
+        String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+        return restoOrderRepository.findActiveOrders(memberId, today, currentTime);
+    }
+
+    // 會員「取消訂單」
+    @Transactional
+    public void cancelOrder(Integer orderId) {
+        // toggleStatus更新並釋放座位
+        toggleStatus(orderId, RestoOrderStatus.CANCELED);
+    }
+
+    /**
+     * 會員所有訂單，依預約日由近到遠
+     */
+    @Transactional(readOnly = true)
+    public List<RestoOrderVO> getAllOrders(Integer memberId) {
+        return restoOrderRepository
+            .findAllByMemberVO_MemberIdOrderByRegiDateDesc(memberId);
+    }
+    
+    
+    
     
     
     

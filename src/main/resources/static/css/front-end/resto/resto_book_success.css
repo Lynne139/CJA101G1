@@ -32,7 +32,7 @@
 
     .success-container {
     
-      margin:30px auto;
+      margin:140px auto;
       background: var(--color-bg-panel);
       backdrop-filter: blur(10px);
       border-radius: 16px;

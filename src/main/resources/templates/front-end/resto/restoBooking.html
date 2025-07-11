@@ -133,8 +133,13 @@
         <div class="summary-card">
         
         <!-- 圖片 -->
-        <img th:src="@{/restaurants/img/{id}(id=${resto.restoId})}"  
-                   th:alt="${resto.restoName}" class="summary-image">          
+        <img th:if="${resto.restoImg == null}"
+             th:src="@{/images/admin/logo/yuko_logo_prim.svg}"  
+             th:alt="${resto.restoName}" class="summary-image opacity-25 object-fit-cover">          
+        <img th:if="${resto.restoImg != null}"
+             th:src="@{/restaurants/img/{id}(id=${resto.restoId})}"  
+                   th:alt="${resto.restoName}" class="summary-image opacity-25">          
+      
           
           <div class="summary-content">
             <div class="summary-section">
@@ -198,7 +203,7 @@
                   form="restoOrderFrontFormDetail" 
                   class="confirm-button">確認訂位
           </button>
-        </div>>
+        </div>
       </aside>
     </div>
   </main>

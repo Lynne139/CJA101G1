@@ -3,6 +3,7 @@ package com.resto.controller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriUtils;
 
 import com.member.model.MemberRepository;
 import com.member.model.MemberService;
@@ -412,10 +414,7 @@ public class FrontRestoController {
 	}
 	
 	
-	
-	
-	
-	
+
 	
 	// 將 dto + errors 放入 flash
 	private void keep(PreBookingDTO dto, BindingResult br, RedirectAttributes ra){
@@ -463,18 +462,65 @@ public class FrontRestoController {
 	}
 
 	
-	//  ====餐廳列表====	
-	@GetMapping("/member/order/restaurant")
-	public String showRestoOrderPage(HttpSession session, Model model) {
-        MemberVO member = (MemberVO) session.getAttribute("loggedInMember");
-        if (member == null) {
-            return "redirect:/front-end/member/login";
-        }
+	// ===== 會員中心餐廳訂單頁 =====
+	   // 列表：type=current or history
+	    @GetMapping("/member/order/restaurant")
+	    public String list(
+	    		@RequestParam(defaultValue = "all") String type,
+	            Model model,
+	            HttpSession session) {
 
-	    List<RestoOrderVO> restoOrderList = restoOrderRepository.findAllByMemberVO_MemberIdOrderByRegiDateDesc(member.getMemberId());
-	    model.addAttribute("restoOrderList", restoOrderList);
-	    return "front-end/resto/restoMemOrder";
-	}
+	        // 從 session 拿 memberId
+	    	 // 登入檢查
+	    	MemberVO loggedIn = (MemberVO) session.getAttribute("loggedInMember");
+	    	if (loggedIn == null) {
+	    	    String redirectUrl = "/member/order/restaurant?type=" + type;
+	    	    String encoded     = UriUtils.encode(redirectUrl, StandardCharsets.UTF_8);
+	    	    return "redirect:/member/login?redirectUrl=" + encoded;
+	    	}
+	        Integer memberId = loggedIn.getMemberId();
+	        // 根據 type 決定要抓哪一種清單
+	        List<RestoOrderVO> list;
+	        switch (type) {
+	            case "current":
+	                list = restoOrderSvc.getActiveOrders(memberId);
+	                break;
+	            case "history":
+	                list = restoOrderSvc.getHistoryOrders(memberId);
+	                break;
+	            default:  // "all"
+	                list = restoOrderSvc.getAllOrders(memberId);
+	        }
+
+	        // 放 model、回模板
+	        model.addAttribute("restoOrderList", list);
+	        model.addAttribute("type", type);
+	        return "front-end/resto/restoMemOrder";
+	    }
+
+	     
+
+	    // 取消訂單
+	    @PostMapping("/member/order/restaurant/cancel")
+	    public String cancel(
+	            @RequestParam Integer id,
+	            @RequestParam String type,
+	            RedirectAttributes ra,
+	            HttpSession session) {
+
+	    	// 先檢查登入、再取消
+	        MemberVO m = (MemberVO) session.getAttribute("loggedInMember");
+	        if (m == null) {
+	            // 帶上 redirectUrl，或直接重導去登入
+	            return "redirect:/member/login";
+	        }
+	        restoOrderSvc.cancelOrder(id);
+	       // 用 flash 標示一次性顯示「取消成功」
+	        ra.addFlashAttribute("cancelSuccess", true);
+	        ra.addAttribute("type", type);
+	        return "redirect:/member/order/restaurant";
+	    }
+		
 
 
 	

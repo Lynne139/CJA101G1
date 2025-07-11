@@ -22,7 +22,7 @@ public class RestoEmailService {
     // Example改成自己的e.g.RoomBooking，參數可自訂(e.g.加入RoomOrder roomOrder)
     public void sendRestoRegiEmail(String toEmail, RestoOrderVO restoOrderVO) throws MessagingException, IOException {
 
-        toEmail = "lolinouob@gmail.com"; // 收件者電郵，這行僅供測試，實際應是傳入的參數
+        toEmail = "cja101g1@gmail.com"; // 收件者電郵，這行僅供測試，實際應是傳入的參數
         String subject = "【嶼蔻渡假村】餐廳訂位成功通知信"; // e.g.【嶼蔻渡假村】訂房成功通知信
         
         MimeMessage message = mailSender.createMimeMessage();

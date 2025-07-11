@@ -102,7 +102,38 @@ public interface RestoOrderRepository extends JpaRepository<RestoOrderVO, Intege
     List<RestoOrderVO> findAllByMemberVO_MemberIdOrderByRegiDateDesc(Integer memberId);
 
 
+	// 歷史訂單
+    @Query("""
+    	    SELECT ro
+    	    FROM RestoOrderVO ro
+    	    WHERE ro.memberVO.memberId = :memberId
+    	      AND (
+    	           ro.regiDate < :today
+    	           OR
+    	           (ro.regiDate = :today AND ro.timeslotVO.timeslotName < :currentTime)
+    	      )
+    	    ORDER BY ro.regiDate DESC, ro.timeslotVO.timeslotName DESC
+    	  """)
+    	  List<RestoOrderVO> findHistoryOrders(
+    	      @Param("memberId") Integer memberId,
+    	      @Param("today") LocalDate today,
+    	      @Param("currentTime") String currentTime);
 
+	// 進行中訂單
+	@Query("""
+		    SELECT ro
+		    FROM RestoOrderVO ro
+		    WHERE ro.memberVO.memberId = :memberId
+		      AND (ro.regiDate > :today
+		           OR
+		           (ro.regiDate = :today AND ro.timeslotVO.timeslotName >= :currentTime)
+		      )
+		    ORDER BY ro.regiDate DESC, ro.timeslotVO.timeslotName DESC
+		  """)
+		  List<RestoOrderVO> findActiveOrders(
+		      @Param("memberId") Integer memberId,
+		      @Param("today") LocalDate today,
+		      @Param("currentTime") String currentTime);
 
 	
 }
