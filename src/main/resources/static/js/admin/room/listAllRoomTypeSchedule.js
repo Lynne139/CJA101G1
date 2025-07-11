@@ -74,9 +74,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-	const btn = document.querySelector("#btnInitAllSchedules");
 
-	btn.addEventListener("click", function() {
+	document.addEventListener("click", function(e) {
+		const btn = e.target.closest("#btnInitAllSchedules");
+		
+		if(!btn)return;
 	    if (!confirm("確定要為所有房型批次產生未來的排程嗎？")) return;
 
 	    btn.classList.add("loading");
