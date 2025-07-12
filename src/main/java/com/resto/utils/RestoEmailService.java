@@ -51,7 +51,7 @@ public class RestoEmailService {
 
         	        <!-- 正文內容 -->
         	        <div style='padding: 25px;'>
-        	            <h2 style='color: #c06014; font-size: 1.8em; margin-top: 5px;'>您的訂房已確認！</h2>"""
+        	            <h2 style='color: #c06014; font-size: 1.8em; margin-top: 5px;'>您的訂位已確認！</h2>"""
         	            + "<p style='font-size: 1.05em;'>親愛的 <strong>" + customerName + "</strong> 貴賓您好，</p>"
         	            + """
         	            <p style='font-size: 1.05em;'>感謝您選擇 <strong>嶼蔻渡假村 Maison d’Yuko</strong>，我們已收到您的餐廳訂位需求。以下為您的訂位資訊：</p>
@@ -62,9 +62,9 @@ public class RestoEmailService {
         	                + "<tr><td style='padding: 0;'><strong>用餐日期：</strong></td><td>" + regiDate + "</td></tr>"
         	                + "<tr><td style='padding: 0;'><strong>用餐時段：</strong></td><td>" + regiPreiod + " " + regiTimeslot + "</td></tr>"
         	                + "<tr><td style='padding: 0;'><strong>用餐人數：</strong></td><td>" + guestCount + "位</td></tr>"
-        	                + "<tr><td style='padding: 0;'><strong>兒童椅需求數：</strong></td><td>" + HighChairs + "位</td></tr>"
-        	                + "<tr><td style='padding: 0;'><strong>其他需求備註：</strong></td><td>" + guestCount + "位</td></tr>"
-        	                + "<tr><td style='padding: 0;'><strong>訂位編號：</strong></td><td>" + Req + "</td></tr>"
+        	                + "<tr><td style='padding: 0;'><strong>兒童椅需求數：</strong></td><td>" + HighChairs + "</td></tr>"
+        	                + "<tr><td style='padding: 0;'><strong>其他需求備註：</strong></td><td>" + Req + "</td></tr>"
+        	                + "<tr><td style='padding: 0;'><strong>訂位編號：</strong></td><td>" + orderId + "</td></tr>"
         	            + """
         	            </table>
 
