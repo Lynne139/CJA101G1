@@ -1325,11 +1325,11 @@ section {
     gap: 12px;
   }
 
-  #overlayMenu {
+  #overlayMenu-index {
     background-color: #F4EDE1;
   }
 
-  #overlayMenu * {
+  #overlayMenu-index * {
     color: #7E4E24;
   }
 

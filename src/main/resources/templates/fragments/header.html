@@ -266,13 +266,16 @@
         // menu收合
         $(document).ready(function() {
             $('#menuToggle').on('click', function () {
-                $('#overlayMenu').addClass('active');
+                $('#overlayMenu-index').addClass('active');
             });
             $('#menu-Toggle').on('click', function () {
                 $('#overlayMenu').addClass('active');
             });
             $('#menuClose').on('click', function () {
                 $('#overlayMenu').removeClass('active');
+            });
+            $('#menuClose-index').on('click', function () {
+                $('#overlayMenu-index').removeClass('active');
             });
         });
     </script>
