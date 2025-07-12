@@ -160,6 +160,11 @@ textarea.form-control.form-control:focus {
   color: var(--secondary-color);
 }
 
+.error_msg_block{
+  max-width:600px;
+  margin: 0 auto;
+}
+
 .meal-group {
   display: flex;
   flex-direction: column;
