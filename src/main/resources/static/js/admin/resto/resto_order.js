@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
       language: zhHANTLang,
       paging: true,
       pageLength: 10,
-      lengthMenu: [10, 20, 50],
+      lengthMenu: [5,10, 20, 50],
       order: [12, 'desc'],
       autoWidth: false,
       columnDefs: [

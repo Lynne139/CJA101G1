@@ -42,7 +42,6 @@
             <!-- 返回頁面時Id給JS抓來渲染按鈕用 -->
             <input type="hidden" th:field="*{timeslotVO.timeslotId}" id="selectedTimeslotId"/> 
             <input type="hidden" name="orderSource" value="MEMBER" />
-<!--             <input type="hidden" th:field="*{memberVO.memberId}" /> -->
             
             
             
@@ -134,8 +133,13 @@
         <div class="summary-card">
         
         <!-- 圖片 -->
-        <img th:src="@{/restaurants/img/{id}(id=${resto.restoId})}"  
+        <img th:if="${resto.restoImg == null}"
+             th:src="@{/images/admin/logo/yuko_logo_prim.svg}"  
+             th:alt="${resto.restoName}" class="summary-image opacity-25 object-fit-cover">          
+        <img th:if="${resto.restoImg != null}"
+             th:src="@{/restaurants/img/{id}(id=${resto.restoId})}"  
                    th:alt="${resto.restoName}" class="summary-image">          
+      
           
           <div class="summary-content">
             <div class="summary-section">
@@ -193,9 +197,13 @@
             </div>
           </div>
         </div>
-        <button type="submit" 
-                form="restoOrderFrontFormDetail" 
-                class="confirm-button">確認訂位</button>
+        <div class="btn_wrapper">
+          <button id="confirmBtn"
+                  type="submit" 
+                  form="restoOrderFrontFormDetail" 
+                  class="confirm-button">確認訂位
+          </button>
+        </div>
       </aside>
     </div>
   </main>

@@ -35,8 +35,15 @@
                    th:each="resto : ${restoList}">
             <div class="card-image-wrapper">
               <!-- 圖片 -->
-              <img th:src="@{/restaurants/img/{id}(id=${resto.restoId})}"  
-                   th:alt="${resto.restoName}" class="card-image">
+              <img th:if="${resto.restoImg == null}"
+                   th:src="@{images/admin/logo/yuko_logo_white copy.svg}"
+                   th:alt="${resto.restoName}"
+                   class="card-image opacity-25" />
+              <img th:if="${resto.restoImg != null}"
+                   th:src="@{/restaurants/img/{id}(id=${resto.restoId})}"
+                   th:alt="${resto.restoName}"
+                   class="card-image" />
+
             </div>
             <div class="card-content">
               <div class="card-text-group">

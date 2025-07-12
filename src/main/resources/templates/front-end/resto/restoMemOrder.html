@@ -36,69 +36,106 @@
           </nav>
         </aside>
         <section class="content-area">
-<!--           <div class="toolbar"> -->
-<!--             <div class="search-bar"> -->
-<!--               <i class="fa-solid fa-magnifying-glass"></i> -->
-<!--               <div class="col-md-4"> -->
-<!-- 					<label class="form-label">關鍵字搜索</label> -->
-<!-- 					<input type="text" class="form-control" name="keyword" th:value="${keyword}"> -->
-<!-- 			  </div> -->
-<!--             </div> -->
-<!--           </div> -->
+        
+        <!-- 若無訂單內容提示 -->
+        <div th:switch="${type}">
+          <div th:case="'all'"     th:if="${#lists.isEmpty(restoOrderList)}" class="text-center mb-4">
+            目前尚無任何訂單
+          </div>
+          <div th:case="'current'" th:if="${#lists.isEmpty(restoOrderList)}" class="text-center mb-4">
+            目前尚無進行中訂位
+          </div>
+          <div th:case="'history'" th:if="${#lists.isEmpty(restoOrderList)}" class="text-center mb-4">
+            目前尚無歷史訂位
+          </div>
+        </div>    
+<!--         <p style="position:fixed; top:0; left:0; background:#ffc; z-index:9999;" -->
+<!--            th:text="'DEBUG → type=' + ${type} + ', size=' + ${#lists.size(restoOrderList)}"> -->
+<!--         </p>  -->
     
           <!-- 有訂單資料 -->
           <div class="order-list" th:each="restoOrder : ${restoOrderList}">
             <article class="order-card-wrapper">
+              
               <div class="order-card">
                 <div class="order-details">
-                  <h2 class="restaurant-name" th:text="${restoOrder.snapshotRestoName}">餐廳名稱</h2>
+   
+                  <div class="title_n_status">
+                    <div class="restaurant-name mb-3" th:text="${restoOrder.snapshotRestoName}">餐廳名稱</div>
+                    <div class="status-reserved">
+                      <p th:text="${restoOrder.orderStatus.label}">訂單狀態</p>
+                    </div>                
+                  </div>
+                 
                   <div class="order-info">
-                    <p>
-                      <span th:text="${restoOrder.snapshotPeriodName}">區段</span>
-                      <span th:text="${restoOrder.snapshotTimeslotName}">時段</span>
-                    </p>
-                    <p><span th:text="${restoOrder.regiSeats}">人數</span> 位</p>
-                  </div>
-                  <p class="order-date" th:text="${restoOrder.regiDate}">2025-07-09</p>
+                    <!-- 訂位基本資訊 -->
+                    <div class="order_info mb-2">
+                      <span class="me-3">
+                        <i class="fa-solid fa-calendar-days me-1"></i>
+                        <span th:text="${#temporals.format(restoOrder.regiDate,'yyyy/MM/dd')}">YYYY/MM/DD</span>
+                      </span>
+                      <span class="me-2">
+                        <i class="fa-solid fa-clock me-1"></i>
+                        <span th:text="${restoOrder.snapshotPeriodName}">分類</span>
+                        <span th:text="${restoOrder.snapshotTimeslotName}">HH:MM</span>
+                      </span>
+                      <span class="me-2">
+                        <i class="fa-solid fa-user-group me-1"></i>
+                        <span th:text="${restoOrder.regiSeats}">N</span> 位
+                      </span>
+                    </div>
+                   </div>
+                   
+                   
+                   
+                   <hr>
+                
+                <div class="guest_detail">                          
+                    <div class="mb-4">
+                        <p ><strong>訂位姓名：</strong> <span th:text="${restoOrder.orderGuestName}"></span></p>
+                        <p ><strong>兒童座椅數：</strong> <span th:text="${restoOrder.highChairs}"></span></p>
+                        <p><strong>備註：</strong> <span th:text="${restoOrder.regiReq}"></span></p>                        
+                    </div>
                 </div>
+              
+              
                 <div class="order-actions">
-                  <div class="status-reserved">
-                    <p th:text="${restoOrder.orderStatus.label}">訂單狀態</p>
-                  </div>
+                  <p class=""><strong>訂單建立日期：</strong> <span th:text="${restoOrder.orderTime}"></span></p>
+                  
                   <div class="action-buttons">
-                    <button class="btn btn-cancel disabled">取消訂單</button>
-                    <button class="btn btn-contact">聯繫客服</button>
+                    
+                    <!-- 取消訂單表單 -->
+                    <form th:action="@{/member/order/restaurant/cancel}" method="post">
+                      <input type="hidden" name="id"   th:value="${restoOrder.restoOrderId}" />
+                      <input type="hidden" name="type" th:value="${type}" />
+                    
+                      <!-- 歷史訂單隱藏按鈕 -->
+                      <button type="submit"
+                              class="btn btn-cancel"
+                              th:if="${type != 'history'}"
+                              th:disabled="
+                                        ${ restoOrder.orderStatus.name() == 'CANCELED' }
+                                        or ${ restoOrder.regiDate.isAfter( T(java.time.LocalDate).now() ) }
+                                      ">
+                                取消訂單
+                              </button>
+                    </form>
+                    <a th:href="@{'/cs'}" class="btn btn-contact">
+                      聯繫客服
+                    </a>
                   </div>
                 </div>
+                 
+                </div>
               </div>
-              <div class="order-notes">
-                <p th:text="${restoOrder.regiReq}">需求備註</p>
-              </div>
+
             </article>
           </div>
         </section>
 
-            
-    
-    
-<!--           <nav class="pagination"> -->
-<!--             <span>第1頁</span> -->
-<!--             <div class="page-controls"> -->
-<!--               <a href="#" class="page-arrow prev"><img src="/page/cfd63966-2181-403d-a744-fb4058654db4/images/388_2576.svg" alt="Previous Page"></a> -->
-<!--               <a href="#" class="page-number active">1</a> -->
-<!--               <a href="#" class="page-arrow next"><img src="/page/cfd63966-2181-403d-a744-fb4058654db4/images/388_2580.svg" alt="Next Page"></a> -->
-<!--             </div> -->
-<!--             <span>第n頁</span> -->
-<!--           </nav> -->
       </div>
     </main>
   
-  
-  
-  
-  
-  
-
   <!-- Footer -->
   <div th:replace="~{fragments/footer :: footer}"></div>
 
@@ -109,7 +146,36 @@
   <script th:src="@{/js/admin/loading_overlay.js}"></script>
   <script th:src="@{/js/admin/toast.js}"></script>
         
-  <script th:src="@{/js/front-end/resto/resto_memorder.js}"></script>
+  <script th:src="@{/js/front-end/resto/resto_mem_order.js}"></script>
+  
+  
+  
+  
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="cancelToast" class="toast align-items-center text-white bg-success border-0"
+         role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">訂單已取消</div>
+        <button type="button"
+                class="btn-close btn-close-white me-2 m-auto"
+                data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+  
+  <script th:if="${cancelSuccess}">
+    // 只在 cancelSuccess=true 时执行
+    (function(){
+      var toastEl = document.getElementById('cancelToast');
+      // 先 ensure init
+      var toast = new bootstrap.Toast(toastEl);
+      toast.show();
+    })();
+  </script>
+    
+    
+    
+  
   
   
 </body>

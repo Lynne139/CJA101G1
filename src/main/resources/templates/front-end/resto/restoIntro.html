@@ -63,10 +63,10 @@
                 th:action="@{/restaurants/booking-pre}"
                 method="post">
                 
-        <div th:if="${globalError}" class="alert alert-danger">
-  <i class="fa-solid fa-triangle-exclamation me-2"></i>
-  <span th:text="${globalError}"></span>
-</div>
+        <div th:if="${globalError}" class="alert alert-danger error_msg_block mb-4">
+          <i class="fa-solid fa-triangle-exclamation me-2"></i>
+          <span th:text="${globalError}"></span>
+        </div>
                 
                 
           <input type="hidden" th:field="*{restoId}" />

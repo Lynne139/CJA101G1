@@ -1,7 +1,16 @@
 /* order today card status-bar */
+.summery_board{
+	position:sticky;
+	top:0;
+	background-color:#F8F3EB;
+	z-index:5000;
+	padding-bottom:24px;
+}
+
+
 .main_order_today .order-card { 
 	position: relative; 
-	}
+}
 .main_order_today .status-bar { 
 	
 	position: absolute; 
@@ -13,7 +22,7 @@
 	height:auto; 
 	border-top-left-radius:.5rem;
 	border-top-right-radius:.5rem;
-	}
+}
 
 .main_order_today p{
 	font-size:0.9rem;
@@ -29,7 +38,6 @@
 
 .main_order_today .today_summery_card{
 	height:100%;
-	
 }
 
 
