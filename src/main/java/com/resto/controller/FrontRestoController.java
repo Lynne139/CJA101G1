@@ -314,7 +314,7 @@ public class FrontRestoController {
 	        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 	    }
 	    
-	    /* ---- ③ 將受管實體塞回訂單 (避免 TransientObjectException) ---- */
+	    /* ---- 將受管實體塞回訂單 (避免 TransientObjectException) ---- */
 	    order.setRestoVO(resto);   // 受管實體
 	    order.setTimeslotVO(ts);   // 受管實體
 	    
@@ -353,11 +353,11 @@ public class FrontRestoController {
         }
                 
         
-        /* -------- 填表送出時再次名額驗證 ＋ 原子插單 -------- */
+        // 填表送出時再次名額驗證 ＋ 原子插單
         try {
             restoOrderSvc.tryCreateOrder(order);   // 寫入並回填 orderId
             
-            /* === 2. 若是會員 → 建立通知 === */
+            // 若是會員就建立通知
             if (order.getMemberVO() != null) {
                 Integer memberId = order.getMemberVO().getMemberId();
 
@@ -370,12 +370,13 @@ public class FrontRestoController {
             notificationSvc.createNotification(memberId, title, content);
             }
             
-            /* 3. 寄出 Email － 目前只寄會員訂單 */
+            //改非同步後會在另一個 thread 裡面執行，此處try-catch不會真的抓到錯(但作為保底保留沒壞處)
+            // 寄出 Email － 目前只寄會員訂單
             String guestEmail = order.getOrderGuestEmail();  
             try {
                 restoEmailSvc.sendRestoRegiEmail(guestEmail, order);
             } catch (Exception e) {
-                br.reject("error","送餐廳訂位確認信失敗");
+                br.reject("error","餐廳訂位自動確認信寄送失敗，請與餐廳聯繫補發");
             }
 
 
