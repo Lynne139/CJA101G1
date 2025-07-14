@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.resto.entity.RestoOrderVO;
@@ -19,9 +20,12 @@ public class RestoEmailService {
 	
 	@Autowired
     private JavaMailSender mailSender;
-    // Example改成自己的e.g.RoomBooking，參數可自訂(e.g.加入RoomOrder roomOrder)
-    public void sendRestoRegiEmail(String toEmail, RestoOrderVO restoOrderVO) throws MessagingException, IOException {
+    
+	// Example改成自己的e.g.RoomBooking，參數可自訂(e.g.加入RoomOrder roomOrder)
+	@Async
+	public void sendRestoRegiEmail(String toEmail, RestoOrderVO restoOrderVO){
 
+      try {
         toEmail = "cja101g1@gmail.com"; // 收件者電郵，這行僅供測試，實際應是傳入的參數
         String subject = "【嶼蔻渡假村】餐廳訂位成功通知信"; // e.g.【嶼蔻渡假村】訂房成功通知信
         
@@ -111,10 +115,12 @@ public class RestoEmailService {
         helper.addInline("footerImage", footerImage);
 
         mailSender.send(message);
+        System.out.println("寄出成功：" + toEmail);
+      } catch (Exception e) {
+	    System.err.println("寄信失敗：" + e.getMessage());
+        // 日後可 log 到檔案或補寄機制
+      }
+ 
     }
 	
-	
-	
-	
-
 }
