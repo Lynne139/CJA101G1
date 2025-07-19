@@ -155,7 +155,7 @@ public class TimeslotController {
 	    TimeslotVO ts = timeslotService.getById(timeslotId);
 	    PeriodVO newPeriod = periodService.getById(newPeriodId);
 
-	    // 檢查同餐廳才能搬
+	    // 防呆檢查同餐廳才能搬
 	    if (!Objects.equals(ts.getRestoVO().getRestoId(),
 	                        newPeriod.getRestoVO().getRestoId())) {
 	        return Map.of("msg", "error",

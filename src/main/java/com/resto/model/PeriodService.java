@@ -164,8 +164,8 @@ public class PeriodService {
 
         period.setPeriodCode(code);
 
-        // 如果 DB 有唯一索引，可省略 flush
-        periodRepository.flush();
+        // DB 有唯一索引，可省略 flush
+//        periodRepository.flush();
     }
 
     @Transactional

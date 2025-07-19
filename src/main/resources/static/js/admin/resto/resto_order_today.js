@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	    console.log("SSE 訊息：", e.data);
 	    if (e.data === "refresh") {
 	      await refreshSummary();      // 更新統計數字
-	      refreshCardStatuses();   // 更新卡片狀態
+	      await refreshCardStatuses();   // 更新卡片狀態
 		  await refreshOrderCards(); 
 	    }
 	  });

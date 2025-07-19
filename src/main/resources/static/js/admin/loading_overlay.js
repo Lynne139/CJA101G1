@@ -13,7 +13,8 @@ function showBtnOverlay(btnEl) {
   // 確保定位相對
   if (getComputedStyle(btnEl).position === "static") {
     btnEl.style.position = "relative";
-  }  btnEl.disabled = true;
+  }  
+  btnEl.disabled = true;
   btnEl.appendChild(overlay);
 }
 

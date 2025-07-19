@@ -680,7 +680,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-  // ===== 編輯時段 =====
+  // ===== 編輯時段(此功能已拔掉) =====
   //按下編輯icon按鈕打開modal
   document.addEventListener("click", async function (e) {
     if (e.target.closest(".btn_timeslot_edit")) {
@@ -822,14 +822,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.timeslot_group').forEach(groupEl => {
 
       new Sortable(groupEl, {
-        group:         'timeslot',          // 允許跨清單
-        animation:     150,
-        draggable:     '.timeslot_wrapper', // 只有 wrapper 可以拖
-		handle: '.timeslot_block',
+        group:         'timeslot',          // 指定群組名稱，所有 .timeslot_group 都設成同一個群組，就能跨 period 互相移動
+        animation:     150,					// 拖動前後，列表重新排版時的過場動畫速度
+        draggable:     '.timeslot_wrapper', // 只有符合此css選擇器的子元素可以被拖
+		handle: '.timeslot_block',  		// 即便整個 wrapper 可拖，只有從它裡面的 .timeslot_block 這塊「抓取」時，才開始拖動。可以避免誤拉到邊緣或按鈕上
         filter:        '.btn_add_timeslot', // 「＋」鈕不可拖
-		ghostClass: 'sortable-ghost', // 「＋」鈕永遠不會被插入/覆蓋
-		fallbackTolerance: 3,
-        onEnd(evt) {
+		ghostClass: 'sortable-ghost', 		// 拖動時，真正被拖動的那個 DOM 會套上css class (sortable-ghost)
+		fallbackTolerance: 3, 				// 觸控裝置上用，即使用指頭拖，移動超過3像素才算真的開始拖曳，避免手指輕微移動時就跟著亂跑
+        onEnd(evt) {  // 當一次拖放操作結束，會拿到一個 evt 物件(evt.item=被拖動的元素(.timeslot_wrapper)；evt.from / evt.to=「原本」跟「最終放到」的列表容器（.timeslot_group)
           const elWrapper = evt.item;                       // 被拖動的 wrapper
           const fromId    = evt.from.dataset.id;            // 原 periodId
           const toId      = evt.to.dataset.id;              // 目標 periodId
